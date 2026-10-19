@@ -18,6 +18,8 @@ from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
+from django.utils.log import log_message
+from django.utils.text import trim_value
 
 logger = logging.getLogger("django.db.models")
 
@@ -197,7 +199,15 @@ class Q(tree.Node):
             with context_manager:
                 return compiler.execute_sql(SINGLE) is not None
         except DatabaseError as e:
-            logger.warning("Got a database error calling check() on %r: %s", self, e)
+            # Trim large values, keeping the suffix out of the escaped args.
+            error, suffix = trim_value(str(e))
+            log_message(
+                logger,
+                "Got a database error calling check() on %r: %s" + suffix,
+                self,
+                error,
+                level="warning",
+            )
             return True
 
     def deconstruct(self):

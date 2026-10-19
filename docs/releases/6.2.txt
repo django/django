@@ -184,7 +184,8 @@ Internationalization
 Logging
 ~~~~~~~
 
-* ...
+* The warning logged when a database error occurs while validating model
+  constraints now escapes the error message and trims it to 4096 characters.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
