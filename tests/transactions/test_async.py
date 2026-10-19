@@ -258,6 +258,27 @@ class AsyncAtomicTests(TransactionTestCase):
             self.assertIs(parent_thread.is_alive(), False)
             release.set()
 
+    async def test_child_query_after_parent_exit_is_rejected(self):
+        """
+        A task created inside an async atomic block that queries the database
+        after the block exits is rejected, rather than silently running outside
+        the transaction on another connection.
+        """
+        release = asyncio.Event()
+
+        async def child():
+            await release.wait()
+            with self.assertRaisesMessage(
+                RuntimeError, "ThreadSensitiveContext has exited."
+            ):
+                await Reporter.objects.acreate(first_name="Haddock")
+
+        async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+            async with transaction.atomic():
+                tasks.create_task(child())
+            release.set()
+        self.assertEqual(await Reporter.objects.acount(), 0)
+
     async def test_rejected_children_preserve_parent_rollback(self):
         """Repeated child rejections leave the owner's rollback intact."""
         callbacks = []
