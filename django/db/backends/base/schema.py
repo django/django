@@ -1,5 +1,6 @@
 import logging
 import operator
+import sys
 from datetime import datetime
 from itertools import chain
 
@@ -171,11 +172,16 @@ class BaseDatabaseSchemaEditor:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if exc_type is None:
-            for sql in self.deferred_sql:
-                self.execute(sql, None)
-        if self.atomic_migration:
-            self.atomic.__exit__(exc_type, exc_value, traceback)
+        try:
+            if exc_type is None:
+                for sql in self.deferred_sql:
+                    self.execute(sql, None)
+        except BaseException:
+            exc_type, exc_value, traceback = sys.exc_info()
+            raise
+        finally:
+            if self.atomic_migration:
+                self.atomic.__exit__(exc_type, exc_value, traceback)
 
     # Core utility functions
 
