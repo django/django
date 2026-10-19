@@ -6078,3 +6078,18 @@ class SchemaTests(TransactionTestCase):
             if connection.vendor == "postgresql":
                 with connection.cursor() as cursor:
                     cursor.execute("DROP COLLATION IF EXISTS case_insensitive")
+
+
+class SchemaEditorTransactionTests(TransactionTestCase):
+    available_apps = []
+
+    @skipUnlessDBFeature("can_rollback_ddl")
+    def test_deferred_sql_failure_exits_atomic_block(self):
+        editor = connection.schema_editor()
+        with self.assertRaises(DatabaseError):
+            with editor:
+                editor.deferred_sql.append("SELECT * FROM django_nonexistent_table")
+
+        self.assertFalse(connection.in_atomic_block)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
