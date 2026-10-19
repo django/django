@@ -26,6 +26,7 @@ import os
 import shutil
 import stat
 import tarfile
+import warnings
 import zipfile
 
 from django.core.exceptions import SuspiciousOperation
@@ -175,6 +176,11 @@ class TarArchive(BaseArchive):
         members = self._archive.getmembers()
         leading = self.has_leading_dir(x.name for x in members)
         for member in members:
+            # Minimal tarfile filter='data' equivalent: only regular
+            # files and directories are extracted. Symlinks/hardlinks
+            # are not materialized, devices and fifos are skipped.
+            if not member.isreg() and not member.isdir():
+                continue
             name = member.name
             if leading:
                 name = self.split_leading_dir(name)[1]
@@ -183,16 +189,19 @@ class TarArchive(BaseArchive):
                 if filename:
                     os.makedirs(filename, exist_ok=True)
             else:
+                extracted = None
                 try:
                     extracted = self._archive.extractfile(member)
                 except (KeyError, AttributeError) as exc:
                     # Some corrupt tar files seem to produce this
                     # (specifically bad symlinks)
-                    print(
+                    warnings.warn(
                         "In the tar file %s the member %s is invalid: %s"
                         % (name, member.name, exc)
                     )
                 else:
+                    if extracted is None:
+                        continue
                     dirname = os.path.dirname(filename)
                     if dirname:
                         os.makedirs(dirname, exist_ok=True)
@@ -200,7 +209,7 @@ class TarArchive(BaseArchive):
                         shutil.copyfileobj(extracted, outfile)
                         self._copy_permissions(member.mode, filename)
                 finally:
-                    if extracted:
+                    if extracted is not None:
                         extracted.close()
 
     def close(self):
