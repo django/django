@@ -262,6 +262,23 @@ class Truncator(SimpleLazyObject):
         return " ".join(words)
 
 
+def trim_value(value, limit=4096):
+    """Trim string `value` to `limit` characters.
+
+    Return the trimmed value and suffix noting how many chars were trimmed
+    (empty when no trimming was done).
+
+    Non-string values are returned unchanged and suffix is the empty string.
+    """
+    suffix = ""
+    if isinstance(value, str) and (value_len := len(value)) > limit:
+        value, suffix = (
+            value[:limit],
+            f"… <trimmed {value_len - limit} chars out of {value_len}>",
+        )
+    return value, suffix
+
+
 @keep_lazy_text
 def get_valid_filename(name):
     """
