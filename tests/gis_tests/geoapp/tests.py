@@ -810,7 +810,7 @@ class GeoLookupTest(TestCase):
             State.objects.filter(poly__intersects=value)
 
         message = str(ctx.exception)
-        self.assertIn("… <trimmed 5003 bytes string>", message)
+        self.assertIn("… <trimmed 907 chars out of 5003>", message)
         self.assertNotIn("x" * 4097, message)
 
     def test_lookup_allows_geos_geometry_string(self):

@@ -30,6 +30,7 @@ from django.contrib.gis.geometry import json_regex
 from django.core.exceptions import SuspiciousOperation
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
+from django.utils.text import trim_value
 
 
 class DisallowedRasterLookup(SuspiciousOperation):
@@ -254,14 +255,9 @@ class GDALRaster(GDALRasterBase):
         """
         normalized = cls._preprocess_input(ds_input)
         if isinstance(normalized, (dict, str, bytes)):
-            value_repr = repr(normalized)
-            if len(value_repr) > 4096:
-                value_repr = "%s… <trimmed %d bytes string>" % (
-                    value_repr[:4096],
-                    len(value_repr),
-                )
+            value_repr, suffix = trim_value(repr(normalized))
             msg = (
-                f"Cannot use object {value_repr} for a spatial lookup "
+                f"Cannot use object {value_repr}{suffix} for a spatial lookup "
                 "parameter. If this is a raster, wrap it with GDALRaster() "
                 "before using it in a lookup to enable writing or fetching."
             )

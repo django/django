@@ -17,6 +17,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.text import trim_value
 from django.utils.version import get_docs_version
 from django.views.decorators.csp import csp_override, csp_report_only_override
 from django.views.decorators.debug import coroutine_functions_to_sensitive_variables
@@ -352,11 +353,9 @@ class ExceptionReporter:
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-                    v = pprint(v)
                     # Trim large blobs of data
-                    if len(v) > 4096:
-                        v = "%s… <trimmed %d bytes string>" % (v[0:4096], len(v))
-                    frame_vars.append((k, v))
+                    v, suffix = trim_value(pprint(v))
+                    frame_vars.append((k, v + suffix))
                 frame["vars"] = frame_vars
             frames[i] = frame
 
