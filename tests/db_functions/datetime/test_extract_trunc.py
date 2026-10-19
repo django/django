@@ -1767,6 +1767,34 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         self.assertEqual(ust_nera_model.hour, 9)
         self.assertEqual(ust_nera_model.hour_tz, 9)
 
+    def test_extract_trunc_func_with_fixed_offset_timezone(self):
+        start_datetime = datetime.datetime(2017, 7, 18, 3, 0)
+        end_datetime = datetime.datetime(2017, 7, 18, 4, 0)
+        start_datetime = timezone.make_aware(start_datetime)
+        end_datetime = timezone.make_aware(end_datetime)
+        self.create_model(start_datetime, end_datetime)
+        # The names of these time zones ("-0500" and "+0530") have no colon.
+        tz_minus = timezone.get_fixed_timezone(-300)
+        tz_plus = timezone.get_fixed_timezone(330)
+        qs = DTModel.objects.annotate(
+            hour_minus=ExtractHour("start_datetime", tzinfo=tz_minus),
+            date_minus=TruncDate("start_datetime", tzinfo=tz_minus),
+            hour_plus=ExtractHour("start_datetime", tzinfo=tz_plus),
+            minute_plus=ExtractMinute("start_datetime", tzinfo=tz_plus),
+        )
+        model = qs.get()
+        self.assertEqual(model.hour_minus, 22)
+        self.assertEqual(model.date_minus, datetime.date(2017, 7, 17))
+        self.assertEqual(model.hour_plus, 8)
+        self.assertEqual(model.minute_plus, 30)
+        with timezone.override(tz_minus):
+            self.assertIs(
+                DTModel.objects.filter(
+                    start_datetime__date=datetime.date(2017, 7, 17)
+                ).exists(),
+                True,
+            )
+
     def test_extract_func_explicit_timezone_priority(self):
         start_datetime = datetime.datetime(2015, 6, 15, 23, 30, 1, 321)
         end_datetime = datetime.datetime(2015, 6, 16, 13, 11, 27, 123)
