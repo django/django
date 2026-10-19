@@ -202,11 +202,35 @@ def urlsafe_base64_decode(s):
 def split_header_value(value, sep=","):
     """Yield stripped parts of an HTTP header value split by sep.
 
-    Use only with headers whose values are token lists (e.g. Vary,
-    Cache-Control). Do not use with headers that allow quoted strings in values
-    (e.g. Set-Cookie), as commas inside values will be used as separators.
+    A sep inside a quoted string (RFC 9110, Section 5.6.4) is not treated as a
+    separator, e.g. 'no-cache="Set-Cookie, Link", max-age=0' yields
+    'no-cache="Set-Cookie, Link"' and 'max-age=0'.
+
+    Use only with headers whose values are lists (e.g. Accept, Cache-Control,
+    Vary). Do not use with Set-Cookie, which is not a list, nor with ETags,
+    where a backslash is not an escape character.
     """
-    for part in value.split(sep):
+    if '"' not in value:
+        # Fast path for values without quoted strings.
+        parts = value.split(sep)
+    else:
+        # Split on separators outside of quoted strings. Inside a quoted
+        # string, a backslash escapes the next character.
+        parts = []
+        start = 0
+        in_quotes = escaped = False
+        for index, char in enumerate(value):
+            if escaped:
+                escaped = False
+            elif in_quotes and char == "\\":
+                escaped = True
+            elif char == '"':
+                in_quotes = not in_quotes
+            elif char == sep and not in_quotes:
+                parts.append(value[start:index])
+                start = index + 1
+        parts.append(value[start:])
+    for part in parts:
         if stripped := part.strip():
             yield stripped
 
@@ -237,8 +261,10 @@ def parse_etags(etag_str):
     if etag_str.strip() == "*":
         return ["*"]
     else:
-        # Parse each ETag individually, and return any that are valid.
-        etag_matches = (ETAG_MATCH.match(etag) for etag in split_header_value(etag_str))
+        # Parse each ETag individually, and return any that are valid. Don't
+        # use split_header_value() since a backslash in an ETag is not an
+        # escape character, e.g. '"a\", "b"' contains two ETags.
+        etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(","))
         return [match[1] for match in etag_matches if match]
 
 

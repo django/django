@@ -337,6 +337,23 @@ class SplitHeaderValueTests(unittest.TestCase):
             # Semicolons are not separators with the default sep.
             ("text/html; charset=utf-8", ["text/html; charset=utf-8"]),
             ("a; b, c; d", ["a; b", "c; d"]),
+            # Separators inside a quoted string are not separators.
+            (
+                'example="alpha, public, omega"',
+                ['example="alpha, public, omega"'],
+            ),
+            (
+                'text/plain; param="a,b", application/json',
+                ['text/plain; param="a,b"', "application/json"],
+            ),
+            # Escaped quotes inside a quoted string do not end the quoting.
+            (r'foo="a\"b,c", bar', [r'foo="a\"b,c"', "bar"]),
+            # An escaped backslash does not escape the closing quote.
+            (r'a="b\\", c', [r'a="b\\"', "c"]),
+            # A backslash outside of a quoted string is not an escape.
+            (r'a\, "b"', ["a\\", '"b"']),
+            # An unterminated quoted string extends to the end of the value.
+            ('a="b, c', ['a="b, c']),
         ]
         for value, expected in tests:
             with self.subTest(value=value):
@@ -352,10 +369,19 @@ class SplitHeaderValueTests(unittest.TestCase):
             (";text/html", ["text/html"]),
             # Whitespace around tokens.
             (" text/html ; charset=utf-8 ", ["text/html", "charset=utf-8"]),
+            # Quotes are honored for the custom separator too.
+            ('a; name="x;y"; b', ["a", 'name="x;y"', "b"]),
         ]
         for value, expected in tests:
             with self.subTest(value=value):
                 self.assertEqual(list(split_header_value(value, sep=";")), expected)
+
+    def test_many_separators_in_quoted_value(self):
+        # A quoted value containing many separators is a single part, and
+        # trailing unquoted parts are still split.
+        value = 'name="%s"' % ("," * 5000)
+        header = "%s, size=1" % value
+        self.assertEqual(list(split_header_value(header)), [value, "size=1"])
 
 
 class SplitDirectiveNamesTests(unittest.TestCase):
@@ -375,6 +401,12 @@ class SplitDirectiveNamesTests(unittest.TestCase):
             ("myprivate", ["myprivate"]),
             # A nameless directive yields an empty name.
             ('="Set-Cookie"', [""]),
+            # Commas inside a quoted value are not list separators.
+            ('example="alpha, public, omega"', ["example"]),
+            (
+                'no-cache="Set-Cookie, Authorization", max-age=0',
+                ["no-cache", "max-age"],
+            ),
         ]
         for value, expected in tests:
             with self.subTest(value=value):
@@ -391,6 +423,8 @@ class ETagProcessingTests(unittest.TestCase):
 
         # Ignore RFC 2616 ETags that are invalid according to RFC 9110.
         self.assertEqual(parse_etags(r'"etag", "e\"t\"ag"'), ['"etag"'])
+        # A backslash is a valid ETag character, not an escape character.
+        self.assertEqual(parse_etags(r'"etag\", "etag2"'), [r'"etag\"', '"etag2"'])
 
     def test_quoting(self):
         self.assertEqual(quote_etag("etag"), '"etag"')  # unquoted

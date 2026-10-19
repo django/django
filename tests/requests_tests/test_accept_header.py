@@ -192,6 +192,15 @@ class AcceptHeaderTests(TestCase):
             ],
         )
 
+    def test_quoted_parameter_with_comma(self):
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = 'text/plain; param="a,b", application/json'
+        # The comma in the quoted parameter value doesn't separate media types.
+        self.assertEqual(
+            [str(accepted_type) for accepted_type in request.accepted_types],
+            ["text/plain; param=a,b", "application/json"],
+        )
+
     def test_zero_quality(self):
         request = HttpRequest()
         request.META["HTTP_ACCEPT"] = "text/*;q=0,text/html"
