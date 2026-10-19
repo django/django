@@ -1819,6 +1819,7 @@ class QuerySet(AltersData):
         Return a new QuerySet instance that will select objects with a
         FOR UPDATE lock.
         """
+        self._not_support_combined_queries("select_for_update")
         if nowait and skip_locked:
             raise ValueError("The nowait option cannot be used with skip_locked.")
         obj = self._chain()

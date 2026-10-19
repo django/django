@@ -800,6 +800,7 @@ class QuerySetSetOperationTests(TestCase):
                 "filter",
                 "only",
                 "prefetch_related",
+                "select_for_update",
                 "select_related",
                 "update",
             ):
