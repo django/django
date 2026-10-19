@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 
+import github
 from pr_quality import check_pr
 from pr_quality.errors import LEVEL_ERROR, LEVEL_WARNING, MISSING_TRAC_TICKET, Message
 
@@ -178,6 +179,7 @@ class BaseTestCase(unittest.TestCase):
             mock.patch.object(
                 check_pr, "github_request", return_value=list(comments)
             ) as mock_gh,
+            mock.patch.object(github, "github_request", new=mock_gh),
             mock.patch.object(check_pr, "fetch_trac_ticket", return_value=trac_data),
         ):
             result = check_pr.main(
@@ -788,7 +790,7 @@ class TestIntegration(BaseTestCase):
                     "/issues/10/comments",
                     "test-token",
                     "test/repo",
-                    params={"per_page": check_pr.GITHUB_PER_PAGE, "page": 1},
+                    params={"per_page": github.GITHUB_PER_PAGE, "page": 1},
                 ),
             ],
         )
@@ -798,8 +800,16 @@ class TestIntegration(BaseTestCase):
             pr_body=VALID_PR_BODY,
             pr_title=VALID_PR_TITLE,
             comments=[
-                {"id": 123, "body": check_pr.CHECKS_HEADER},
-                {"id": 456, "body": "An unrelated review comment."},
+                {
+                    "id": 123,
+                    "body": check_pr.CHECKS_HEADER,
+                    "user": {"login": "github-actions[bot]"},
+                },
+                {
+                    "id": 456,
+                    "body": "An unrelated review comment.",
+                    "user": {"login": "octocat"},
+                },
             ],
         )
 
@@ -812,7 +822,7 @@ class TestIntegration(BaseTestCase):
                     "/issues/10/comments",
                     "test-token",
                     "test/repo",
-                    params={"per_page": check_pr.GITHUB_PER_PAGE, "page": 1},
+                    params={"per_page": github.GITHUB_PER_PAGE, "page": 1},
                 ),
                 mock.call("DELETE", "/issues/comments/123", "test-token", "test/repo"),
             ],
@@ -1050,14 +1060,21 @@ class TestWriteJobSummary(BaseTestCase):
 
 
 class TestGetRecentCommitCount(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        mock_datetime = self.enterContext(
+            mock.patch.object(github, "datetime", wraps=datetime)
+        )
+        mock_datetime.now.return_value = self.now
+
     def _make_github_request_mock(self, commits):
-        return mock.patch.object(check_pr, "github_request", return_value=commits)
+        return mock.patch.object(github, "github_request", return_value=commits)
 
     def test_returns_number_of_commits(self):
         commits = [{"sha": "abc"}, {"sha": "def"}, {"sha": "ghi"}]
         with self._make_github_request_mock(commits):
             self.assertEqual(
-                check_pr.get_recent_commit_count(
+                github.get_recent_commit_count(
                     "someuser", "django/django", "token", since_days=365, max_count=5
                 ),
                 3,
@@ -1066,15 +1083,15 @@ class TestGetRecentCommitCount(BaseTestCase):
     def test_no_commits_returns_zero(self):
         with self._make_github_request_mock([]):
             self.assertEqual(
-                check_pr.get_recent_commit_count(
+                github.get_recent_commit_count(
                     "newuser", "django/django", "token", since_days=365, max_count=5
                 ),
                 0,
             )
 
     def test_api_path_includes_author_since_and_max_count(self):
-        with mock.patch.object(check_pr, "github_request", return_value=[]) as mock_gh:
-            check_pr.get_recent_commit_count(
+        with mock.patch.object(github, "github_request", return_value=[]) as mock_gh:
+            github.get_recent_commit_count(
                 "someuser", "django/django", "token", since_days=365, max_count=5
             )
         params = mock_gh.call_args.kwargs["params"]
@@ -1087,6 +1104,7 @@ class TestRecheckOpenPRs(BaseTestCase):
     def setUp(self):
         super().setUp()
         self.github = self.enterContext(mock.patch.object(check_pr, "github_request"))
+        self.enterContext(mock.patch.object(github, "github_request", new=self.github))
         self.enterContext(
             mock.patch.object(check_pr, "get_recent_commit_count", return_value=0)
         )
@@ -1134,7 +1152,7 @@ class TestRecheckOpenPRs(BaseTestCase):
                         "base": "main",
                         "sort": "created",
                         "direction": "desc",
-                        "per_page": check_pr.GITHUB_PER_PAGE,
+                        "per_page": github.GITHUB_PER_PAGE,
                         "page": 1,
                     },
                 ),
@@ -1166,7 +1184,7 @@ class TestRecheckOpenPRs(BaseTestCase):
                         "base": "main",
                         "sort": "created",
                         "direction": "desc",
-                        "per_page": check_pr.GITHUB_PER_PAGE,
+                        "per_page": github.GITHUB_PER_PAGE,
                         "page": 1,
                     },
                 ),
@@ -1221,7 +1239,7 @@ class TestRecheckOpenPRs(BaseTestCase):
             {},  # Close PR #11.
         ]
 
-        with mock.patch.object(check_pr, "GITHUB_PER_PAGE", 1):
+        with mock.patch.object(github, "GITHUB_PER_PAGE", 1):
             result = check_pr.recheck_open_prs("test/repo", "test-token", True)
 
         self.assertEqual(result, 0)
@@ -1290,7 +1308,7 @@ class TestRecheckOpenPRs(BaseTestCase):
             {},  # Close PR #11.
         ]
 
-        with mock.patch.object(check_pr, "GITHUB_PER_PAGE", 2):
+        with mock.patch.object(github, "GITHUB_PER_PAGE", 2):
             result = check_pr.recheck_open_prs("test/repo", "test-token", True)
 
         self.assertEqual(result, 0)

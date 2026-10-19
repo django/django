@@ -28,11 +28,15 @@ import re
 import sys
 import time
 import urllib.error
-import urllib.parse
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
-from http import HTTPStatus
 
+from github import (
+    get_comment_ids_containing_marker,
+    get_recent_commit_count,
+    github_request,
+    github_results,
+)
 from pr_quality.errors import (
     CHECKS_FOOTER,
     CHECKS_HEADER,
@@ -49,7 +53,6 @@ from pr_quality.errors import (
     Message,
 )
 
-GITHUB_PER_PAGE = 100
 LARGE_PR_THRESHOLD = 80  # additions + deletions
 MIN_WORDS = 5
 SKIPPED = object()  # Sentinel: check was not applicable and was skipped.
@@ -88,84 +91,12 @@ def setup_logging(logger, gha_formatter=True):
         logger.addHandler(handler)
 
 
-def github_request(method, path, token, repo, data=None, params=None):
-    """Make an authenticated GitHub API request."""
-    url = f"https://api.github.com/repos/{repo}{path}"
-    if params:
-        encoded_params = urllib.parse.urlencode(params)
-        url = f"{url}?{encoded_params}"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
-    body = None
-    if data is not None:
-        body = json.dumps(data).encode()
-        headers["Content-Type"] = "application/json"
-    req = urllib.request.Request(url, data=body, headers=headers, method=method)
-    with urllib.request.urlopen(req, timeout=URLOPEN_TIMEOUT_SECONDS) as response:
-        if response.status != HTTPStatus.NO_CONTENT:
-            return json.loads(response.read())
-
-
-def get_recent_commit_count(pr_author, repo, token, since_days, max_count):
-    """Return the number of recent commits by the author, up to max_count."""
-    if not pr_author:
-        return 0
-
-    since = (datetime.now(timezone.utc) - timedelta(days=since_days)).strftime(
-        "%Y-%m-%dT%H:%M:%SZ"
-    )
-    results = github_request(
-        "GET",
-        "/commits",
-        token,
-        repo,
-        params={"author": pr_author, "since": since, "per_page": max_count},
-    )
-    return len(results)
-
-
 def get_pr_total_changes(pr_number, repo, token):
     """Return total lines changed in the PR (additions + deletions)."""
-    total_changes = 0
-    page = 1
-    while True:
-        results = github_request(
-            "GET",
-            f"/pulls/{pr_number}/files",
-            token,
-            repo,
-            params={"per_page": GITHUB_PER_PAGE, "page": page},
-        )
-        if not results:
-            break
-        total_changes += sum(f["changes"] for f in results)
-        if len(results) < GITHUB_PER_PAGE:
-            break
-        page += 1
-    return total_changes
-
-
-def get_comment_ids_to_delete(pr_number, repo, token):
-    ids = []
-    page = 1
-    while True:
-        comments = github_request(
-            "GET",
-            f"/issues/{pr_number}/comments",
-            token,
-            repo,
-            params={"per_page": GITHUB_PER_PAGE, "page": page},
-        )
-        for comment in comments:
-            if CHECKS_HEADER in comment["body"]:
-                ids.append(comment["id"])
-        if len(comments) < GITHUB_PER_PAGE:
-            break
-        page += 1
-    return ids
+    return sum(
+        file["changes"]
+        for file in github_results(f"/pulls/{pr_number}/files", repo, token)
+    )
 
 
 def strip_html_comments(text):
@@ -550,7 +481,9 @@ def main(
         if msg is not None and msg is not SKIPPED and level == LEVEL_WARNING
     ]
     # Remove outdated feedback, including when all checks now pass.
-    for comment_id in get_comment_ids_to_delete(pr_number, repo, token):
+    for comment_id in get_comment_ids_containing_marker(
+        pr_number, repo, token, marker=CHECKS_HEADER
+    ):
         github_request("DELETE", f"/issues/comments/{comment_id}", token, repo)
 
     if not failures and not warning_msgs:
@@ -599,38 +532,25 @@ def recheck_open_prs(repo, token, autoclose, summary_file=None, gha_formatter=Fa
 
     # Collect numbers before closing any PRs, which changes pagination.
     pr_numbers = []
-    page = 1
     now = datetime.now(timezone.utc)
     oldest = now - timedelta(days=5)
     cutoff = now - AUTOCLOSE_GRACE_PERIOD
-    while True:
-        prs = github_request(
-            "GET",
-            "/pulls",
-            token,
-            repo,
-            params={
-                "state": "open",
-                "base": "main",
-                "sort": "created",
-                "direction": "desc",
-                "per_page": GITHUB_PER_PAGE,
-                "page": page,
-            },
-        )
-        for pr in prs:
-            created_at = datetime.fromisoformat(pr["created_at"])
-            if created_at < oldest:
-                break
-            if created_at <= cutoff:
-                pr_numbers.append(pr["number"])
-
-        if (
-            len(prs) < GITHUB_PER_PAGE
-            or datetime.fromisoformat(prs[-1]["created_at"]) < oldest
-        ):
+    for pr in github_results(
+        "/pulls",
+        repo,
+        token,
+        params={
+            "state": "open",
+            "base": "main",
+            "sort": "created",
+            "direction": "desc",
+        },
+    ):
+        created_at = datetime.fromisoformat(pr["created_at"])
+        if created_at < oldest:
             break
-        page += 1
+        if created_at <= cutoff:
+            pr_numbers.append(pr["number"])
 
     failed = False
     for pr_number in pr_numbers:
