@@ -776,7 +776,6 @@ class BaseDatabaseSchemaEditor:
         db_params = field.db_parameters(connection=self.connection)
         if db_params["check"]:
             definition += " " + self.sql_check_constraint % db_params
-        add_fk_suffix = None
         if (
             field.remote_field
             and self.connection.features.supports_foreign_keys
@@ -784,13 +783,15 @@ class BaseDatabaseSchemaEditor:
         ):
             constraint_suffix = "_fk_%(to_table)s_%(to_column)s"
             # Add FK constraint inline, if supported.
-            if self.sql_create_column_inline_fk and self._inline_fk_on_add(field):
+            if sql_create_column_inline_fk := self._get_sql_create_column_inline_fk(
+                field
+            ):
                 to_table = field.remote_field.model._meta.db_table
                 to_column = field.remote_field.model._meta.get_field(
                     field.remote_field.field_name
                 ).column
                 namespace, _ = split_identifier(model._meta.db_table)
-                definition += " " + self.sql_create_column_inline_fk % {
+                definition += " " + sql_create_column_inline_fk % {
                     "name": self._fk_constraint_name(model, field, constraint_suffix),
                     "namespace": (
                         "%s." % self.quote_name(namespace) if namespace else ""
@@ -801,9 +802,16 @@ class BaseDatabaseSchemaEditor:
                     "deferrable": self.connection.ops.deferrable_sql(),
                     "on_delete_db": self._create_on_delete_sql(model, field),
                 }
-            # Otherwise, add the FK constraint after the column.
+            # Otherwise, add FK constraints later.
             else:
-                add_fk_suffix = constraint_suffix
+                self.deferred_sql.append(
+                    self._create_fk_sql(
+                        model,
+                        field,
+                        constraint_suffix,
+                        create_fk_sql=self._get_sql_create_added_column_fk(field),
+                    )
+                )
         # Build the SQL and run it
         sql = self.sql_create_column % {
             "table": self.quote_name(model._meta.db_table),
@@ -839,21 +847,17 @@ class BaseDatabaseSchemaEditor:
                     model, field, field_type, field.db_comment
                 )
             )
-        if add_fk_suffix:
-            self._add_field_fk(model, field, add_fk_suffix)
         # Add an index, if required
         self.deferred_sql.extend(self._field_indexes_sql(model, field))
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
 
-    def _add_field_fk(self, model, field, suffix):
-        """Add the FK constraint for a field whose column was just added."""
-        self.deferred_sql.append(self._create_fk_sql(model, field, suffix))
+    def _get_sql_create_column_inline_fk(self, field):
+        return self.sql_create_column_inline_fk
 
-    def _inline_fk_on_add(self, field):
-        """Return whether the FK can be added in the ADD COLUMN statement."""
-        return True
+    def _get_sql_create_added_column_fk(self, field):
+        return self.sql_create_fk
 
     def remove_field(self, model, field):
         """
@@ -1807,7 +1811,7 @@ class BaseDatabaseSchemaEditor:
             "type": new_type,
         }
 
-    def _create_fk_sql(self, model, field, suffix):
+    def _create_fk_sql(self, model, field, suffix, create_fk_sql=None):
         table = Table(model._meta.db_table, self.quote_name)
         name = self._fk_constraint_name(model, field, suffix)
         column = Columns(model._meta.db_table, [field.column], self.quote_name)
@@ -1819,7 +1823,7 @@ class BaseDatabaseSchemaEditor:
         )
         deferrable = self.connection.ops.deferrable_sql()
         return Statement(
-            self.sql_create_fk,
+            create_fk_sql or self.sql_create_fk,
             table=table,
             name=name,
             column=column,
