@@ -72,6 +72,18 @@ request.
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
 
+CVE-2026-113733: Password hash disclosure to "view only" admin users with custom user models
+============================================================================================
+
+Admin users with the view (but not change) permission to a user model were
+displayed the entire password hash when the model was not
+:setting:`AUTH_USER_MODEL`, or when :setting:`AUTH_USER_MODEL` inherited its
+``password`` field from a concrete parent model through multi-table
+inheritance.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
 Bugfixes
 ========
 
