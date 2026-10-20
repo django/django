@@ -533,6 +533,13 @@ class BaseCacheTests:
 
         self.assertIs(cache.touch("nonexistent"), False)
 
+    @retry()
+    def test_touch_expired(self):
+        cache.set("expire_key", "value", timeout=1)
+        time.sleep(2)
+        self.assertIs(cache.touch("expire_key", timeout=60), False)
+        self.assertIsNone(cache.get("expire_key"))
+
     def test_unicode(self):
         # Unicode values can be cached
         stuff = {
@@ -1449,6 +1456,56 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         # Column names are quoted.
         self.assertIn(connection.ops.quote_name("expires"), sql)
         self.assertIn(connection.ops.quote_name("cache_key"), sql)
+
+    def test_touch_expired_with_microsecond_precision(self):
+        """
+        Regression test for timestamp precision bug in touch().
+        touch() should not revive an entry that expired earlier in the current
+        second.
+        """
+        from datetime import UTC, timedelta
+
+        cache.set("precision_key", "value", timeout=60)
+
+        with connection.cursor() as cursor:
+            table_name = connection.ops.quote_name("test cache table")
+            cursor.execute(
+                "SELECT %s FROM %s WHERE %s = %%s"
+                % (
+                    connection.ops.quote_name("expires"),
+                    table_name,
+                    connection.ops.quote_name("cache_key"),
+                ),
+                [cache.make_and_validate_key("precision_key")],
+            )
+            stored_expires = cursor.fetchone()[0]
+
+        if settings.USE_TZ:
+            if stored_expires.tzinfo is None:
+                base_expires = stored_expires.replace(tzinfo=UTC)
+            else:
+                base_expires = stored_expires
+            mocked_now = base_expires + timedelta(seconds=0.7)
+        else:
+            mocked_now = stored_expires + timedelta(seconds=0.7)
+
+        with mock.patch(
+            "django.core.cache.backends.db.tz_now", return_value=mocked_now
+        ):
+            result = cache.touch("precision_key", timeout=60)
+            self.assertIs(result, False)
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT %s FROM %s WHERE %s = %%s"
+                % (
+                    connection.ops.quote_name("expires"),
+                    table_name,
+                    connection.ops.quote_name("cache_key"),
+                ),
+                [cache.make_and_validate_key("precision_key")],
+            )
+            self.assertEqual(cursor.fetchone()[0], stored_expires)
 
 
 @override_settings(USE_TZ=True)
