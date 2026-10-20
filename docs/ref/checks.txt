@@ -84,6 +84,7 @@ Django's system checks are organized using the following tags:
   or if you specify configured database aliases using the ``--database`` option
   when calling the :djadmin:`check` command.
 * ``files``: Checks files related configuration.
+* ``gis``: Checks :mod:`django.contrib.gis` configuration.
 * ``mail``: Checks email related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
@@ -95,6 +96,10 @@ Django's system checks are organized using the following tags:
 * ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
+
+.. versionchanged:: 5.2.19
+
+  The ``gis`` tag was added.
 
 Core system checks
 ==================
@@ -955,6 +960,15 @@ The following checks are performed when a model contains a
 * **contenttypes.E005**: Model names must be at most 100 characters.
 * **contenttypes.E006**: ``<field>`` cannot use the database-level
   ``on_delete`` variant.
+
+``gis``
+-------
+
+The following checks are performed when using :mod:`django.contrib.gis`:
+
+* **gis.W001**: The installed version of GDAL does not allow blocking file and
+  network access. Upgrade to GDAL 3.9 or higher to receive protection against
+  malicious spatial references.
 
 ``postgres``
 ------------
