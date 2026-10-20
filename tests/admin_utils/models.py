@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -105,3 +106,15 @@ class VehicleMixin(Vehicle):
 
 class Car(VehicleMixin):
     pass
+
+
+class ParentUser(AbstractBaseUser):
+    pass
+
+
+class ChildUser(ParentUser):
+    pass
+
+
+class MinimalPasswordUser(models.Model):
+    password = models.CharField(max_length=128)

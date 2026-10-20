@@ -432,9 +432,13 @@ def help_text_for_field(name, model):
 
 def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
+    from django.contrib.auth.base_user import AbstractBaseUser
     from django.db.models.expressions import DatabaseDefault
 
-    if field.name == "password" and field.model == get_user_model():
+    if field.name == "password" and (
+        issubclass(field.model, AbstractBaseUser)
+        or issubclass(get_user_model(), field.model)
+    ):
         return render_password_as_hash(value)
     elif getattr(field, "flatchoices", None):
         try:

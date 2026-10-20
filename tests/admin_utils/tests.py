@@ -17,6 +17,7 @@ from django.contrib.admin.utils import (
     lookup_field,
     quote,
 )
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import User
 from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.validators import EMPTY_VALUES
@@ -31,10 +32,13 @@ from .models import (
     Article,
     Car,
     Cascade,
+    ChildUser,
     DBCascade,
     Event,
     EventGuide,
     Location,
+    MinimalPasswordUser,
+    ParentUser,
     Site,
     Vehicle,
 )
@@ -307,6 +311,31 @@ class UtilsTests(SimpleTestCase):
                     password, password_field, self.empty_value
                 )
                 self.assertEqual(display_value, render_password_as_hash(password))
+
+    @override_settings(AUTH_USER_MODEL="admin_utils.ChildUser")
+    def test_password_display_for_field_inherited_user_model(self):
+        password_field = ChildUser._meta.get_field("password")
+        self.assertIs(password_field.model, ParentUser)
+        password = "md5$zjIiKM8EiyfXEGiexlQRw4$a59a82cf344546e7bc09cb5f2246370a"
+        display_value = display_for_field(password, password_field, self.empty_value)
+        self.assertEqual(display_value, render_password_as_hash(password))
+
+    @override_settings(AUTH_USER_MODEL="admin_utils.MinimalPasswordUser")
+    def test_password_display_for_field_user_model_not_abstract_base_user(self):
+        password_field = MinimalPasswordUser._meta.get_field("password")
+        password = "md5$zjIiKM8EiyfXEGiexlQRw4$a59a82cf344546e7bc09cb5f2246370a"
+        display_value = display_for_field(password, password_field, self.empty_value)
+        self.assertEqual(display_value, render_password_as_hash(password))
+
+    @isolate_apps("admin_utils")
+    def test_password_display_for_field_other_user_model(self):
+        class OtherUser(AbstractBaseUser):
+            pass
+
+        password_field = OtherUser._meta.get_field("password")
+        password = "md5$zjIiKM8EiyfXEGiexlQRw4$a59a82cf344546e7bc09cb5f2246370a"
+        display_value = display_for_field(password, password_field, self.empty_value)
+        self.assertEqual(display_value, render_password_as_hash(password))
 
     def test_list_display_for_value(self):
         display_value = display_for_value([1, 2, 3], self.empty_value)
