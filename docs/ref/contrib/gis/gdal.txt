@@ -1122,6 +1122,19 @@ Coordinate System Objects
         ...      AUTHORITY["EPSG","9122"]],
         ... AUTHORITY["EPSG","4326"]]""")  # OGC WKT
 
+    .. warning::
+
+        **URLs and file paths resolved below GDAL 3.9**
+
+        If a URL or file path is provided to ``SpatialReference``, versions of
+        GDAL below 3.9 will resolve it. Compare user-supplied strings to an
+        allow list first, or use an integer.
+
+    .. versionchanged:: 5.2.19
+
+        Blocking file and network access when forwarding inputs to GDAL 3.9+
+        was added.
+
     .. method:: __getitem__(target)
 
     Returns the value of the given string attribute node, ``None`` if the node
