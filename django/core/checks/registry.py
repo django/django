@@ -16,6 +16,7 @@ class Tags:
     compatibility = "compatibility"
     database = "database"
     files = "files"
+    gis = "gis"
     models = "models"
     security = "security"
     signals = "signals"

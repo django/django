@@ -53,7 +53,11 @@ jobs:
       - name: Install libmemcached-dev for pylibmc
         run: sudo apt install -y libmemcached-dev
       - name: Install geospatial dependencies
-        run: sudo apt install -y binutils libproj-dev gdal-bin
+        run: |
+          sudo apt-get install -y --no-install-recommends software-properties-common
+          sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends binutils libproj-dev gdal-bin
       - name: Print PostGIS versions
         env:
           POSTGRES_DB: geodjango

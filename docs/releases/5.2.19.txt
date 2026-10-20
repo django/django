@@ -70,3 +70,38 @@ request.
 
 This issue has severity "low" according to the :ref:`Django security policy
 <severity-levels>`.
+
+CVE-2026-114582: Server-side request forgery via ``SpatialReference`` string input
+==================================================================================
+
+:class:`~django.contrib.gis.gdal.SpatialReference` passed string input to GDAL,
+which by default resolves URLs and reads files. This behavior was not
+documented by Django. Other affected methods included
+:meth:`GEOSGeometry.transform()
+<django.contrib.gis.geos.GEOSGeometry.transform>`,
+:meth:`OGRGeometry.transform()
+<django.contrib.gis.gdal.OGRGeometry.transform>`,
+:meth:`GDALRaster.transform() <django.contrib.gis.gdal.GDALRaster.transform>`,
+the :attr:`~django.contrib.gis.gdal.OGRGeometry.srs` setter of
+:class:`~django.contrib.gis.gdal.OGRGeometry`, and the
+:attr:`~django.contrib.gis.gdal.GDALRaster.srs` and
+:attr:`~django.contrib.gis.gdal.GDALRaster.srid` setters of
+:class:`~django.contrib.gis.gdal.GDALRaster`. A URL or file path reaching any
+of these would issue an outbound request or read a file as the Django process
+user. The attack vectors could be combined to reveal local file contents by
+observing outbound requests.
+
+``SpatialReference`` now disables network and file access when parsing string
+input on GDAL 3.9 and later. As a consequence, file paths and URLs are no
+longer accepted as ``SpatialReference`` inputs. Dictionary references using the
+``DICT:`` prefix, including those prefixed with ``ESRI::``, are rejected on all
+GDAL versions.
+
+Full protection requires GDAL 3.9 or later. Integer SRIDs are looked up
+directly in the EPSG database, so prefer them when the input is untrusted. Or,
+if strings must be used on lower GDAL versions, compare to an allow list. The
+new ``gis.W001`` system check warns when the installed version of GDAL is not
+at least 3.9.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.

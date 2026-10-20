@@ -32,9 +32,19 @@ from enum import IntEnum
 from types import NoneType
 
 from django.contrib.gis.gdal.base import GDALBase
-from django.contrib.gis.gdal.error import SRSException
+from django.contrib.gis.gdal.error import GDALException, SRSException
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.prototypes import srs as capi
 from django.utils.encoding import force_bytes, force_str
+
+# Create null terminated gdal options array.
+papsz_options = [
+    b"ALLOW_FILE_ACCESS=NO",
+    b"ALLOW_NETWORK_ACCESS=NO",
+    None,
+]
+# Convert papszlist to ctypes array.
+PAPSZ_OPTIONS = (c_char_p * len(papsz_options))(*papsz_options)
 
 
 class AxisOrder(IntEnum):
@@ -312,7 +322,15 @@ class SpatialReference(GDALBase):
 
     def import_user_input(self, user_input):
         "Import the Spatial Reference from the given user input string."
-        capi.from_user_input(self.ptr, force_bytes(user_input))
+        user_input = force_bytes(user_input)
+        # GDAL's dictionary parser bypasses its file access restrictions.
+        if user_input.lstrip().lower().removeprefix(b"esri::").startswith(b"dict:"):
+            msg = "Spatial references from dictionaries are not supported."
+            raise GDALException(msg)
+        if GDAL_VERSION < (3, 9):
+            capi.from_user_input(self.ptr, user_input)
+        else:
+            capi.from_user_input_ex(self.ptr, user_input, byref(PAPSZ_OPTIONS))
 
     def import_wkt(self, wkt):
         "Import the Spatial Reference from OGC WKT (string)"
