@@ -53,7 +53,11 @@ jobs:
           sudo apt update
           xargs -a .github/workflows/data/apt-packages.txt sudo apt install -y --no-install-recommends
       - name: Install geospatial dependencies
-        run: sudo apt install -y --no-install-recommends binutils libproj-dev gdal-bin
+        run: |
+          sudo apt-get install -y --no-install-recommends software-properties-common
+          sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends binutils libproj-dev gdal-bin
       - name: Print PostGIS versions
         env:
           POSTGRES_DB: geodjango

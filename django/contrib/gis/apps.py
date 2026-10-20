@@ -1,6 +1,8 @@
 from django.apps import AppConfig
-from django.core import serializers
+from django.core import checks, serializers
 from django.utils.translation import gettext_lazy as _
+
+from .checks import check_gdal_39
 
 
 class GISConfig(AppConfig):
@@ -12,3 +14,4 @@ class GISConfig(AppConfig):
         serializers.BUILTIN_SERIALIZERS.setdefault(
             "geojson", "django.contrib.gis.serializers.geojson"
         )
+        checks.register(check_gdal_39, checks.Tags.gis, checks.Tags.security)
