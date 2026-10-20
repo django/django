@@ -121,6 +121,27 @@ class CSPBuildPolicyTest(SimpleTestCase):
             "default-src 'self' 'nonce-abc123'",
         )
 
+    def test_config_with_nonce_generated_as_sole_value(self):
+        policy = {"default-src": [CSP.NONCE]}
+        self.assertPolicyEqual(
+            build_policy(policy, nonce="abc123"),
+            "default-src 'nonce-abc123'",
+        )
+
+    def test_config_with_nonce_removed_as_sole_value(self):
+        """
+        When the sentinel is removed and it was the only value, the directive
+        falls back to 'none' instead of being dropped. Dropping it entirely
+        would leave the directive unrestricted, weakening the configured
+        policy.
+        """
+        self.assertPolicyEqual(
+            build_policy({"script-src": [CSP.NONCE]}), "script-src 'none'"
+        )
+        self.assertPolicyEqual(
+            build_policy({"script-src": CSP.NONCE}), "script-src 'none'"
+        )
+
     def test_config_with_multiple_nonces(self):
         policy = {
             "default-src": [CSP.SELF, CSP.NONCE],

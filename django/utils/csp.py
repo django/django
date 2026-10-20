@@ -112,11 +112,16 @@ def build_policy(config, nonce=None):
                 values = [values]
 
             # Replace the nonce sentinel with the actual nonce values, if the
-            # sentinel is found and a nonce is provided. Otherwise, remove it.
+            # sentinel is found and a nonce is provided. Otherwise, remove it
+            # and fall back to 'none' when the sentinel was the only value so
+            # the directive is never silently dropped (dropping it would leave
+            # the directive unrestricted, weakening the intended policy).
             if (has_sentinel := CSP.NONCE in values) and nonce:
                 values = [f"'nonce-{nonce}'" if v == CSP.NONCE else v for v in values]
             elif has_sentinel:
                 values = [v for v in values if v != CSP.NONCE]
+                if not values:
+                    values = [CSP.NONE]
 
             if not values:
                 continue
