@@ -1938,10 +1938,8 @@ class QuerySet(AltersData):
 
         for alias, annotation in annotations.items():
             if alias in names:
-                raise ValueError(
-                    "The annotation '%s' conflicts with a field on "
-                    "the model." % alias
-                )
+                # defer the concrete model's field so that the annotation lives
+                clone.query.add_deferred_loading((alias,))
             if isinstance(annotation, FilteredRelation):
                 clone.query.add_filtered_relation(annotation, alias)
             else:

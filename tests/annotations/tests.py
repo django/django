@@ -1284,6 +1284,27 @@ class NonAggregateAnnotationTestCase(TestCase):
 
         self.assertEqual(qs.count(), len(qs))
 
+    def test_self_field_annotation(self):
+        qs = Book.objects.annotate(
+            price=ExpressionWrapper(
+                F("price") * Value(0.2), output_field=DecimalField()
+            )
+        )
+
+        expected = {book.pk: book.price * Decimal("0.2") for book in Book.objects.all()}
+        for book in qs:
+            self.assertEqual(book.price, expected[book.pk])
+
+    def test_self_field_annotation_contain_single_select_column(self):
+        qs = Book.objects.defer("price").annotate(
+            price=F("price") * Value(Decimal("0.2"), output_field=DecimalField()),
+        )
+        sql = str(qs.query)
+        # Only the annotation is aliased "price"; the model column is deferred internally.
+        self.assertEqual(sql.count('AS "price"'), 1)
+        select_part = sql.split(" FROM ")[0]
+        self.assertNotIn('"annotations_book"."price",', select_part)
+
 
 class AliasTests(TestCase):
     @classmethod
