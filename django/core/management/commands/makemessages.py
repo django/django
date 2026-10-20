@@ -440,9 +440,20 @@ class Command(BaseCommand):
                     if match:
                         locale_parts = match.groupdict()
                         language = locale_parts["language"].lower()
+                        territory, x, private = locale_parts["territory"].partition(
+                            "-x-"
+                        )
+
+                        def format_subtag(m):
+                            subtag = m.group()
+                            if len(subtag) == 4:  # script, e.g. Hans
+                                return subtag.title()
+                            if len(subtag) == 2:  # region, e.g. CN
+                                return subtag.upper()
+                            return subtag
+
                         territory = (
-                            locale_parts["territory"][:2].upper()
-                            + locale_parts["territory"][2:]
+                            re.sub(r"[a-zA-Z]+", format_subtag, territory) + x + private
                         )
                         proposed_locale = f"{language}_{territory}"
                     else:

@@ -228,6 +228,15 @@ class BasicExtractorTests(ExtractorTests):
         self.assertNotIn("processing locale pl-PL", out.getvalue())
         self.assertIs(Path("locale/pl-PL/LC_MESSAGES/django.po").exists(), False)
 
+    def test_invalid_locale_mixed_case_script(self):
+        out = StringIO()
+        management.call_command(
+            "makemessages", locale=["zh-hans"], stdout=out, verbosity=1
+        )
+        self.assertIn("invalid locale zh-hans, did you mean zh_Hans?", out.getvalue())
+        self.assertNotIn("processing locale zh-hans", out.getvalue())
+        self.assertIs(Path("locale/zh-hans/LC_MESSAGES/django.po").exists(), False)
+
     def test_invalid_locale_lower_country(self):
         out = StringIO()
         management.call_command(
