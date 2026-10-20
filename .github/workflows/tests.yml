@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - '3.14'
+          - '3.15'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     timeout-minutes: 60
     steps:
@@ -75,5 +75,5 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
       - run: python -m unittest discover -v -s scripts/
