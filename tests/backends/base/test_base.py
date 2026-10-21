@@ -65,13 +65,15 @@ class DatabaseWrapperTests(SimpleTestCase):
     @requires_gil
     def test_release_memory_without_garbage_collection(self):
         # Schedule the restore of the garbage collection settings.
+        self.addCleanup(gc.garbage.clear)
         self.addCleanup(gc.set_debug, 0)
         self.addCleanup(gc.enable)
 
-        # Disable automatic garbage collection to control when it's triggered,
-        # then run a full collection cycle to ensure `gc.garbage` is empty.
+        # Disable automatic garbage collection to control when it's triggered.
         gc.disable()
         gc.collect()
+        # gc.collect() doesn't remove objects already retained in gc.garbage.
+        gc.garbage.clear()
 
         # The garbage list isn't automatically populated to avoid CPU overhead,
         # so debugging needs to be enabled to track all unreachable items and
