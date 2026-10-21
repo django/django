@@ -9,7 +9,7 @@ from django.db import models
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
 
-from .models import Score
+from .models import Category, Score
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 
@@ -85,6 +85,33 @@ class JsonlSerializerTestCase(SerializersTestBase, TestCase):
         with self.assertRaises(DeserializationError):
             for obj in serializers.deserialize("jsonl", """[{"pk":1}"""):
                 pass
+
+    def test_unicode_line_separators(self):
+        """
+        Unicode line separators (U+0085, U+2028, U+2029) are valid inside
+        JSON strings and should not be treated as record boundaries.
+        """
+        for separator in ("\u0085", "\u2028", "\u2029"):
+            name = f"Jane{separator}Doe"
+            data = serializers.serialize("jsonl", [Category(pk=1, name=name)])
+            for value in (data, data.encode()):
+                with self.subTest(separator=repr(separator), input_type=type(value)):
+                    objects = list(serializers.deserialize("jsonl", value))
+                    self.assertEqual(len(objects), 1)
+                    self.assertEqual(objects[0].object.name, name)
+
+    def test_crlf_line_endings(self):
+        """
+        CRLF line endings should be accepted as JSONL record separators.
+        """
+        data = (
+            '{"pk": 1, "model": "serializers.category", '
+            '"fields": {"name": "Reference"}}\r\n'
+            '{"pk": 2, "model": "serializers.category", '
+            '"fields": {"name": "Non-fiction"}}\r\n'
+        )
+        objects = list(serializers.deserialize("jsonl", data))
+        self.assertEqual(len(objects), 2)
 
     def test_helpful_error_message_invalid_pk(self):
         """
