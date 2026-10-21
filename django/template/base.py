@@ -406,14 +406,14 @@ class Token:
 
 class Lexer:
     _raw_start_re = re.compile(
-        r"%s\s+(?:comment|verbatim)\b" % re.escape(BLOCK_TAG_START)
+        r"%s\s*(?:comment|verbatim)\b" % re.escape(BLOCK_TAG_START)
     )
     _comment_end_re = re.compile(
-        r"%s[^\S\n]+endcomment[^\S\n]*%s"
+        r"%s[^\S\n]*endcomment[^\S\n]*%s"
         % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END))
     )
     _verbatim_end_re = re.compile(
-        r"%s[^\S\n]+endverbatim[^\S\n]*%s"
+        r"%s[^\S\n]*endverbatim[^\S\n]*%s"
         % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END))
     )
 
