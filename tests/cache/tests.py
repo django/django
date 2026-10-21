@@ -2396,7 +2396,7 @@ class CacheUtils(SimpleTestCase):
         self.assertEqual(
             get_cache_key(request),
             "views.decorators.cache.cache_page.settingsprefix.GET."
-            "18a03f9c9649f7d684af5db3524f5c99.3b59035bd3b34e30981dc990dd93acbb",
+            "18a03f9c9649f7d684af5db3524f5c99.4792b9bac48c3f0441b0d9b0d7af8f2c",
         )
 
     def test_learn_cache_key_strips_whitespace(self):
@@ -2423,10 +2423,29 @@ class CacheUtils(SimpleTestCase):
         self.assertIsNotNone(key_b)
         self.assertNotEqual(key_a, key_b)
 
+    def test_cache_key_blank_header(self):
+        """
+        An absent field must be distinguished from a present-but-empty field
+        (RFC 9111, Section 4.1).
+        """
+        request_no_headers = self.factory.head(self.path)
+        request_empty_headers = self.factory.head(self.path, headers={"Pony": ""})
+        response = HttpResponse()
+        response.headers["Vary"] = "Pony"
+        key_no_headers = learn_cache_key(request_no_headers, response)
+        key_empty_headers = learn_cache_key(request_empty_headers, response)
+        self.assertNotEqual(key_no_headers, key_empty_headers)
+        self.assertNotEqual(
+            get_cache_key(request_no_headers),
+            get_cache_key(request_empty_headers),
+        )
+
     def test_learn_cache_key_no_header_collision(self):
         tests = [
             ({"X-Region": "EU", "X-Tenant": ""}, {"X-Region": "", "X-Tenant": "EU"}),
             ({"X-Region": "EU"}, {"X-Tenant": "EU"}),
+            ({"X-Region": ""}, {}),
+            ({}, {"X-Region": ""}),
         ]
         for headers_a, headers_b in tests:
             with self.subTest(headers=(headers_a, headers_b)):

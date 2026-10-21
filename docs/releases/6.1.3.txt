@@ -52,6 +52,26 @@ data continue to accept these values.
 This issue has severity "moderate" according to the :ref:`Django security
 policy <severity-levels>`.
 
+CVE-2026-113593: Potential exposure of private data via empty and missing ``Vary`` headers
+==========================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` and
+:func:`~django.views.decorators.cache.cache_page` generated the same cache key
+for a request that omitted a header listed in the response's ``Vary`` header
+and a request that sent that header with an empty value. As a result, a
+response cached for one of these requests could be served to the other, which
+could lead to the exposure of private data.
+
+Cache keys now distinguish between absent and empty header values, as required
+by :rfc:`9111#section-4.1`.
+
+Responses previously cached for requests that omitted a header listed in
+``Vary`` will no longer be matched, and will be cached again on the next
+request.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
 Bugfixes
 ========
 
