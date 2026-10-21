@@ -8,7 +8,7 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import Col, ColPairs, F, OrderBy, RawSQL, Ref, Value
 from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
@@ -1708,6 +1708,37 @@ class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
     returning_params = ()
 
+    def format_source_expressions(self, expression):
+        if hasattr(expression, "get_source_expressions"):
+            parent = expression.copy()
+            parent.set_source_expressions(
+                self.format_source_expressions(expression.get_source_expressions())
+            )
+            return parent
+        else:
+            source_expressions = []
+            for each in expression:
+                if not isinstance(each, (Col, Value)) and hasattr(
+                    each, "get_source_expressions"
+                ):
+                    p = each.copy()
+                    p.set_source_expressions(
+                        self.format_source_expressions(p.get_source_expressions())
+                    )
+                    return [p]
+                else:
+                    if isinstance(each, Col):
+                        if not each.target.has_default():
+                            raise ValueError(
+                                'Failed to use "%s" in the insert query. '
+                                "F() expressions can only be used if the "
+                                "field in F() expression has default value set." % each
+                            )
+                        source_expressions.append(Value(each.target.default))
+                    elif isinstance(each, Value):
+                        source_expressions.append(each)
+            return source_expressions
+
     def field_as_sql(self, field, get_placeholder_sql, val):
         """
         Take a field and a value intended to be saved on that field, and
@@ -1754,9 +1785,8 @@ class SQLInsertCompiler(SQLCompiler):
             # existing columns on a row, but in the case of insert the row
             # doesn't exist yet.
             if value.contains_column_references:
-                raise ValueError(
-                    'Failed to insert expression "%s" on %s. F() expressions '
-                    "can only be used to update, not to insert." % (value, field)
+                value = (self.format_source_expressions(value)).resolve_expression(
+                    self.query, allow_joins=False, for_save=True
                 )
             if value.contains_aggregate:
                 raise FieldError(

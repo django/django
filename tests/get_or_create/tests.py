@@ -6,6 +6,8 @@ from unittest.mock import patch
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
+from django.db.models import F, Value
+from django.db.models.functions import Concat
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 from django.utils.functional import lazy
@@ -213,6 +215,19 @@ class GetOrCreateTests(TestCase):
             defaults=lazy(raise_exception, object)(),
         )
         self.assertFalse(created)
+
+    def test_defaults_support_f_objects(self):
+        obj, created = Person.objects.get_or_create(
+            first_name="Johnny",
+            defaults={
+                "last_name": Concat(F("last_name"), Value("Johannes")),
+                "birthday": date(1943, 2, 25),
+                "children_count": F("children_count") + 1,
+                "defaults": "jadaun",
+            },
+        )
+        self.assertTrue(created)
+        self.assertEqual(obj.defaults, "jadaun")
 
 
 class GetOrCreateTestsWithManualPKs(TestCase):

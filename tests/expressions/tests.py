@@ -501,10 +501,10 @@ class BasicExpressionsTests(TestCase):
         )
         acme.num_employees = F("num_employees") + 16
         msg = (
-            'Failed to insert expression "Col(expressions_company, '
-            'expressions.Company.num_employees) + Value(16)" on '
-            "expressions.Company.num_employees. F() expressions can only be "
-            "used to update, not to insert."
+            'Failed to use "Col(expressions_company, expressions.'
+            'Company.num_employees)" in the insert query. F() '
+            "expressions can only be used if the field in "
+            "F() expression has default value set."
         )
         with self.assertRaisesMessage(ValueError, msg):
             acme.save()
@@ -512,9 +512,10 @@ class BasicExpressionsTests(TestCase):
         acme.num_employees = 12
         acme.name = Lower(F("name"))
         msg = (
-            'Failed to insert expression "Lower(Col(expressions_company, '
-            'expressions.Company.name))" on expressions.Company.name. F() '
-            "expressions can only be used to update, not to insert."
+            'Failed to use "Col(expressions_company, expressions.'
+            'Company.name)" in the insert query. F() expressions '
+            "can only be used if the field in F() expression "
+            "has default value set."
         )
         with self.assertRaisesMessage(ValueError, msg):
             acme.save()
@@ -1677,10 +1678,10 @@ class ExpressionsNumericTests(TestCase):
         )
 
     def test_filter_decimal_expression(self):
-        obj = Number.objects.create(integer=0, float=1, decimal_value=Decimal("1"))
+        obj = Number.objects.create(integer=0, float=1, decimal_value=Decimal(1))
         qs = Number.objects.annotate(
             x=ExpressionWrapper(Value(1), output_field=DecimalField()),
-        ).filter(Q(x=1, integer=0) & Q(x=Decimal("1")))
+        ).filter(Q(x=1, integer=0) & Q(x=Decimal(1)))
         self.assertSequenceEqual(qs, [obj])
 
     def test_complex_expressions(self):
@@ -2199,7 +2200,7 @@ class FTimeDeltaTests(TestCase):
     def test_durationfield_multiply_divide(self):
         Experiment.objects.update(scalar=2)
         tests = [
-            (Decimal("2"), 2),
+            (Decimal(2), 2),
             (F("scalar"), 2),
             (2, 2),
             (3.2, 3.2),
