@@ -2160,7 +2160,24 @@ class CacheUtils(SimpleTestCase):
         self.assertEqual(
             get_cache_key(request),
             "views.decorators.cache.cache_page.settingsprefix.GET."
-            "18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e",
+            "18a03f9c9649f7d684af5db3524f5c99.4792b9bac48c3f0441b0d9b0d7af8f2c",
+        )
+
+    def test_cache_key_blank_header(self):
+        """
+        An absent field must be distinguished from a present-but-empty field
+        (RFC 9111, Section 4.1).
+        """
+        request_no_headers = self.factory.head(self.path)
+        request_empty_headers = self.factory.head(self.path, headers={"Pony": ""})
+        response = HttpResponse()
+        response.headers["Vary"] = "Pony"
+        key_no_headers = learn_cache_key(request_no_headers, response)
+        key_empty_headers = learn_cache_key(request_empty_headers, response)
+        self.assertNotEqual(key_no_headers, key_empty_headers)
+        self.assertNotEqual(
+            get_cache_key(request_no_headers),
+            get_cache_key(request_empty_headers),
         )
 
     def test_patch_cache_control(self):

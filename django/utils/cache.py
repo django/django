@@ -353,8 +353,14 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     ctx = md5(usedforsecurity=False)
     for header in headerlist:
         value = request.META.get(header)
-        if value is not None:
-            ctx.update(value.encode())
+        if value is None:
+            # An absent field must not share a cache key with a field that is
+            # present but empty (RFC 9111, Section 4.1). Emit a marker that
+            # cannot collide with any netstring.
+            ctx.update(b"-,")
+            continue
+        data = value.encode()
+        ctx.update(data)
     url = md5(request.build_absolute_uri().encode("ascii"), usedforsecurity=False)
     cache_key = "views.decorators.cache.cache_page.%s.%s.%s.%s" % (
         key_prefix,
