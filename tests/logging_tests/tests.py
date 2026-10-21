@@ -804,6 +804,14 @@ class LogFormattersTests(SimpleTestCase):
                 logger_output.getvalue(), r"^\[[/:,\w\s\d]+\] %s\n" % log_msg
             )
 
+    def test_server_formatter_percent_style_server_time(self):
+        formatter = ServerFormatter("[%(server_time)s] %(message)s")
+        record = logging.makeLogRecord({"msg": "test message"})
+        self.assertTrue(formatter.uses_server_time())
+        output = formatter.format(record)
+        self.assertIn("test message", output)
+        self.assertRegex(output, r"^\[.+\] test message$")
+
 
 class LogResponseRealLoggerTests(LoggingAssertionMixin, TestCase):
 
