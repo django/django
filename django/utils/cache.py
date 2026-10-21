@@ -357,7 +357,11 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     for header in headerlist:
         value = request.META.get(header)
         if value is None:
-            value = ""
+            # An absent field must not share a cache key with a field that is
+            # present but empty (RFC 9111, Section 4.1). Emit a marker that
+            # cannot collide with any netstring.
+            ctx.update(b"-,")
+            continue
         data = value.encode()
         # Use the netstring delimiter (with trailing comma).
         ctx.update(b"%d:%s," % (len(data), data))
