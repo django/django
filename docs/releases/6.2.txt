@@ -389,6 +389,12 @@ Miscellaneous
   database connections used during error handling are managed by
   ``close_old_connections()``.
 
+* The undocumented
+  ``django.contrib.sessions.backends.file.SessionStore._expiry_date()`` method
+  is removed. Use
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.get_expiry_date`
+  instead.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2
