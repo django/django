@@ -137,12 +137,17 @@ class UpdateCacheMiddleware(MiddlewareMixin):
             cache_key = learn_cache_key(
                 request, response, timeout, self.key_prefix, cache=self.cache
             )
+
+            def cache_response(r):
+                # Mark the response before caching so cached copies retain the marker.
+                r._cache_page_cached = True
+                self.cache.set(cache_key, r, timeout)
+
             if hasattr(response, "render") and callable(response.render):
-                response.add_post_render_callback(
-                    lambda r: self.cache.set(cache_key, r, timeout)
-                )
+                response.add_post_render_callback(cache_response)
             else:
-                self.cache.set(cache_key, response, timeout)
+                cache_response(response)
+
         return response
 
 

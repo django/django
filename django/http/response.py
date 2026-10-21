@@ -247,6 +247,14 @@ class HttpResponseBase:
         - int/float specifying seconds,
         - ``datetime.timedelta`` object.
         """
+        if getattr(self, "_cache_page_cached", False):
+            warnings.warn(
+                "HttpResponseBase.set_cookie() is setting a cookie on a response that "
+                "has already been cached. Ensure cookies are set before the response "
+                "is cached.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):

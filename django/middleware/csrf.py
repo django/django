@@ -7,6 +7,7 @@ against request forgeries from other sites.
 
 import logging
 import string
+import warnings
 from collections import defaultdict
 from urllib.parse import urlsplit
 
@@ -473,6 +474,14 @@ class CsrfViewMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         if request.META.get("CSRF_COOKIE_NEEDS_UPDATE"):
+            if getattr(response, "_cache_page_cached", False):
+                warnings.warn(
+                    "CsrfViewMiddleware is updating CSRF state on a response "
+                    "that has already been cached. Ensure CSRF processing "
+                    "occurs before the response is cached.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
             self._set_csrf_cookie(request, response)
             # Unset the flag to prevent _set_csrf_cookie() from being
             # unnecessarily called again in process_response() by other
