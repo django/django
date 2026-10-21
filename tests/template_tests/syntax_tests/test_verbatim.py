@@ -139,3 +139,15 @@ class VerbatimTagTests(SimpleTestCase):
     def test_literal_multiline_block_opener_in_raw_blocks(self):
         output = self.engine.render_to_string("verbatim")
         self.assertEqual(output, "\n{%\n")
+
+    @setup(
+        {
+            "no_spaces": "{%verbatim%}{{ x }}{%endverbatim%}",
+            "no_spaces_in_closing_tag": "{% verbatim %}{{ x }}{%endverbatim%}",
+        }
+    )
+    def test_tags_without_spaces(self):
+        for template_name in ("no_spaces", "no_spaces_in_closing_tag"):
+            with self.subTest(template_name=template_name):
+                output = self.engine.render_to_string(template_name)
+                self.assertEqual(output, "{{ x }}")
