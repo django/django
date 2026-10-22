@@ -981,11 +981,34 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
         other_session2["foo"] = "bar"
         other_session2.save()
 
-        # Three sessions are in the filesystem before clearsessions...
-        self.assertEqual(3, count_sessions())
+        # One session whose integer expiry has elapsed.
+        other_session3 = self.backend()
+        other_session3["foo"] = "bar"
+        other_session3.set_expiry(60)
+        other_session3.save()
+        expired_mtime = (timezone.now() - timedelta(seconds=120)).timestamp()
+        session_file = other_session3._key_to_file()
+        os.utime(session_file, (expired_mtime, expired_mtime))
+
+        # Four sessions are in the filesystem before clearsessions...
+        self.assertEqual(4, count_sessions())
         management.call_command("clearsessions")
-        # ... and two are deleted.
+        # ... and three are deleted.
         self.assertEqual(1, count_sessions())
+        self.assertFalse(os.path.exists(session_file))
+
+    def test_load_expired_integer_expiry(self):
+        self.session["foo"] = "bar"
+        self.session.set_expiry(60)
+        self.session.save()
+        session_key = self.session.session_key
+        session_file = self.session._key_to_file()
+        self.assertEqual(self.backend(session_key)["foo"], "bar")
+        expired_mtime = (timezone.now() - timedelta(seconds=120)).timestamp()
+        os.utime(session_file, (expired_mtime, expired_mtime))
+
+        self.assertEqual(self.backend(session_key).load(), {})
+        self.assertFalse(os.path.exists(session_file))
 
 
 class FileSessionPathLibTests(FileSessionTests):
