@@ -444,6 +444,9 @@ Miscellaneous
   Comparisons against one or two components, such as
   ``django.VERSION >= (6, 2)``, are unaffected.
 
+* :class:`django.utils.functional.cached_property` is deprecated in favor of
+  :func:`functools.cached_property`.
+
 * The :class:`~django.middleware.MiddlewareMixin` class moved from
   ``django.utils.deprecation`` to ``django.middleware``. The old import path
   is deprecated.

@@ -5,7 +5,9 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.query import ModelIterable
+from django.test import ignore_warnings
 from django.utils import functional
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 
 class Author(models.Model):
@@ -274,9 +276,12 @@ class Person(models.Model):
     def cached_all_houses(self):
         return self.all_houses
 
-    @functional.cached_property
-    def django_cached_all_houses(self):
-        return self.all_houses
+    # RemovedInDjango2029Warning: When the deprecation ends, remove.
+    with ignore_warnings(category=RemovedInDjango2029Warning):
+
+        @functional.cached_property
+        def django_cached_all_houses(self):
+            return self.all_houses
 
     class Meta:
         ordering = ["id"]

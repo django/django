@@ -78,10 +78,10 @@ class I:
         )
         self.assertEqual(line, 16)
 
-    def test_get_path_and_line_cached_property(self):
+    def test_get_path_and_line_classproperty(self):
         path, line = github_links.get_path_and_line(
             module="tests.sphinx_tests.testdata.package.module",
-            fullname="MyClass.my_cached_property",
+            fullname="MyClass.my_classproperty",
         )
 
         self.assertEqual(

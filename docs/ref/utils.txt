@@ -585,6 +585,11 @@ compatibility
         z = person.friends  # does not call
         x is z  # is True
 
+    .. deprecated:: 6.2
+
+        This decorator is deprecated in favor of
+        :func:`functools.cached_property`.
+
 .. class:: classproperty(method=None)
 
     Similar to :func:`@classmethod <classmethod>`, the ``@classproperty``
