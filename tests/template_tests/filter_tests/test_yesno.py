@@ -36,6 +36,6 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(yesno(None, "certainly,get out of town,perhaps"), "perhaps")
 
     def test_invalid_value(self):
-        self.assertIs(yesno(True, "yes"), True)
-        self.assertIs(yesno(False, "yes"), False)
-        self.assertIsNone(yesno(None, "yes"))
+        self.assertEqual(yesno(True, "yes"), "yes")
+        self.assertEqual(yesno(False, "yes"), "no")
+        self.assertEqual(yesno(None, "yes"), "maybe")
