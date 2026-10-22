@@ -127,7 +127,11 @@ Cache
 CSP
 ~~~
 
-* ...
+* :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` now sets
+  ``Cache-Control: private`` on responses that render a nonce, to stop shared
+  caches replaying it to other users. Set
+  :attr:`~django.middleware.csp.ContentSecurityPolicyMiddleware.nonce_cache_control`
+  to ``False`` on a subclass to opt out.
 
 CSRF
 ~~~~
