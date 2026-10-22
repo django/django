@@ -4,7 +4,6 @@ from pathlib import Path
 from django.conf import settings
 from django.template.backends.django import DjangoTemplates
 from django.template.loader import get_template
-from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 
@@ -33,7 +32,7 @@ class EngineMixin:
     def get_template(self, template_name):
         return self.engine.get_template(template_name)
 
-    @cached_property
+    @functools.cached_property
     def engine(self):
         return self.backend(
             {
@@ -60,7 +59,7 @@ class Jinja2(EngineMixin, BaseRenderer):
     django/forms/jinja2 and from apps' 'jinja2' directory.
     """
 
-    @cached_property
+    @functools.cached_property
     def backend(self):
         from django.template.backends.jinja2 import Jinja2
 

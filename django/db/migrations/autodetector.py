@@ -16,7 +16,6 @@ from django.db.migrations.utils import (
     RegexObject,
     resolve_relation,
 )
-from django.utils.functional import cached_property
 
 
 class OperationDependency(
@@ -30,11 +29,11 @@ class OperationDependency(
         ALTER_FOO_TOGETHER = 4
         REMOVE_INDEX_OR_CONSTRAINT = 5
 
-    @cached_property
+    @functools.cached_property
     def model_name_lower(self):
         return self.model_name.lower()
 
-    @cached_property
+    @functools.cached_property
     def field_name_lower(self):
         return self.field_name.lower()
 

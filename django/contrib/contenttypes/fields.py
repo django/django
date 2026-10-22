@@ -22,7 +22,6 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.sql import AND
 from django.db.models.sql.where import WhereNode
 from django.db.models.utils import AltersData
-from django.utils.functional import cached_property
 
 
 class GenericForeignKey(FieldCacheMixin, Field):
@@ -56,7 +55,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
         attname, column = super().get_attname_column()
         return attname, None
 
-    @cached_property
+    @functools.cached_property
     def ct_field_attname(self):
         return self.model._meta.get_field(self.ct_field).attname
 
@@ -153,7 +152,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
             else:
                 return []
 
-    @cached_property
+    @functools.cached_property
     def cache_name(self):
         return self.name
 
@@ -599,7 +598,7 @@ class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor):
     ``post.comments`` is a ReverseGenericManyToOneDescriptor instance.
     """
 
-    @cached_property
+    @functools.cached_property
     def related_manager_cls(self):
         return create_generic_related_manager(
             self.rel.model._default_manager.__class__,

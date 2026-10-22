@@ -7,7 +7,7 @@ import uuid
 import warnings
 from base64 import b64decode, b64encode
 from collections.abc import Iterable
-from functools import partialmethod, total_ordering
+from functools import cached_property, partialmethod, total_ordering
 
 from django import forms
 from django.apps import apps
@@ -34,7 +34,7 @@ from django.utils.dateparse import (
 )
 from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.duration import duration_string
-from django.utils.functional import Promise, cached_property
+from django.utils.functional import Promise
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _

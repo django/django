@@ -6,6 +6,7 @@ import re
 import warnings
 from collections import deque
 from collections.abc import Mapping
+from functools import cached_property
 from html.parser import HTMLParser
 from itertools import chain
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
@@ -14,7 +15,7 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.core.validators import DomainNameValidator, EmailValidator
 from django.utils.deprecation import RemovedInDjango2028Warning
-from django.utils.functional import Promise, cached_property, keep_lazy, keep_lazy_text
+from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import MAX_URL_LENGTH, RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe

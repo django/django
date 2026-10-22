@@ -6,7 +6,7 @@ import copy
 import operator
 import warnings
 from contextlib import aclosing, nullcontext
-from functools import partial, reduce
+from functools import cached_property, partial, reduce
 from itertools import chain, islice
 from weakref import ref as weak_ref
 
@@ -45,13 +45,12 @@ from django.db.models.utils import (
     create_namedtuple_class,
     resolve_callables,
 )
-from django.utils import timezone
+from django.utils import functional, timezone
 from django.utils.deprecation import (
     RemovedInDjango2028Warning,
     RemovedInDjango2029Warning,
     warn_about_external_use,
 )
-from django.utils.functional import cached_property
 from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
 from django.utils.warnings import django_file_prefixes
 
@@ -2862,8 +2861,11 @@ def get_prefetcher(instance, through_attr, to_attr):
 
     def is_to_attr_fetched(model, to_attr):
         # Special case cached_property instances because hasattr() triggers
-        # attribute computation and assignment.
-        if isinstance(getattr(model, to_attr, None), cached_property):
+        # attribute computation and assignment. Django's cached_property
+        # isn't a subclass of functools.cached_property.
+        if isinstance(
+            getattr(model, to_attr, None), (cached_property, functional.cached_property)
+        ):
 
             def has_cached_property(instance):
                 return to_attr in instance.__dict__
