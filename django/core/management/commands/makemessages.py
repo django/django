@@ -1,4 +1,5 @@
 import glob
+import locale
 import os
 import re
 import sys
@@ -663,8 +664,14 @@ class Command(BaseCommand):
             return
 
         input_files = [bf.work_path for bf in build_files]
-        with NamedTemporaryFile(mode="w+") as input_files_list:
-            input_files_list.write("\n".join(input_files))
+        # xgettext opens the listed paths as raw bytes, which Windows reads
+        # in the ANSI code page regardless of Python's UTF-8 mode.
+        if os.name == "nt":
+            files_list = "\n".join(input_files).encode(locale.getencoding())
+        else:
+            files_list = b"\n".join(os.fsencode(path) for path in input_files)
+        with NamedTemporaryFile(mode="w+b") as input_files_list:
+            input_files_list.write(files_list)
             input_files_list.flush()
             args.extend(["--files-from", input_files_list.name])
             args.extend(self.xgettext_options)
