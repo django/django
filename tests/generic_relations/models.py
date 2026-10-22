@@ -150,3 +150,25 @@ class AllowsNullGFK(models.Model):
     content_type = models.ForeignKey(ContentType, models.SET_NULL, null=True)
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey()
+
+
+class Note(models.Model):
+    title = models.CharField(max_length=30)
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, related_name="notes"
+    )
+    object_id = models.CharField(max_length=36)
+    owner = GenericForeignKey()
+
+
+class Story(models.Model):
+    name = models.CharField(max_length=30, primary_key=True)
+    notes = GenericRelation("Note", related_query_name="story")
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    inspiration = GenericForeignKey()
+
+
+class Idea(models.Model):
+    description = models.TextField()
+    stories = GenericRelation(Story)
