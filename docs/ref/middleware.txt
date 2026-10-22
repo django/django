@@ -616,17 +616,16 @@ Content Security Policy middleware
 
 .. class:: ContentSecurityPolicyMiddleware
 
-    .. attribute:: nonce_cache_control
+    .. attribute:: nonce_caching_allowed
 
         .. versionadded:: 6.2
 
-        Default: ``True``
+        Default: ``False``
 
-        When a nonce is used while rendering the response and is included in
-        a CSP header set by the middleware, the middleware adds
-        ``Cache-Control: private`` so that shared caches don't serve the same
-        nonce to other users. Set this to ``False`` on a subclass if you
-        handle nonce-safe caching yourself.
+        When ``False``, the middleware adds ``Cache-Control: private`` when it
+        includes a generated nonce in a CSP header. Set this to ``True`` on a
+        subclass if you handle nonce-safe caching yourself. See
+        :ref:`csp-nonce-caching` for details.
 
 Adds support for Content Security Policy (CSP), which helps mitigate risks such
 as Cross-Site Scripting (XSS) and data injection attacks by controlling the

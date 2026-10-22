@@ -10,8 +10,8 @@ def get_nonce(request):
 
 class ContentSecurityPolicyMiddleware(MiddlewareMixin):
     async_capable = False
-    # Subclass and set to False if you handle nonce-safe caching yourself.
-    nonce_cache_control = True
+    # Subclass and set to True if you handle nonce-safe caching yourself.
+    nonce_caching_allowed = False
 
     def process_request(self, request):
         request._csp_nonce = LazyNonce()
@@ -46,7 +46,7 @@ class ContentSecurityPolicyMiddleware(MiddlewareMixin):
                 policy_has_nonce |= contains_nonce
 
         # A nonce is single-use; don't let a shared cache replay it.
-        if nonce and policy_has_nonce and self.nonce_cache_control:
+        if nonce and policy_has_nonce and not self.nonce_caching_allowed:
             patch_cache_control(response, private=True)
 
         return response
