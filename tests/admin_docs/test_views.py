@@ -331,6 +331,9 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         """Model cached properties are displayed as fields."""
         self.assertContains(self.response, "<td>a_cached_property</td>")
 
+    def test_instance_of_django_cached_property_methods_are_displayed(self):
+        self.assertContains(self.response, "<td>a_django_cached_property</td>")
+
     def test_method_data_types(self):
         company = Company.objects.create(name="Django")
         person = Person.objects.create(

@@ -1,10 +1,10 @@
 import unittest
+from functools import cached_property
 
 from forms_tests.widget_tests.base import WidgetTest
 
 from django.db import connection
 from django.test import SimpleTestCase, TestCase, modify_settings
-from django.utils.functional import cached_property
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests")

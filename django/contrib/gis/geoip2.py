@@ -14,12 +14,12 @@ directory corresponding to settings.GEOIP_PATH.
 
 import ipaddress
 import socket
+from functools import cached_property
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
-from django.utils.functional import cached_property
 
 __all__ = ["HAS_GEOIP2"]
 

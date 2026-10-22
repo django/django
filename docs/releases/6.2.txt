@@ -408,6 +408,12 @@ Miscellaneous
   database connections used during error handling are managed by
   ``close_old_connections()``.
 
+* Django's built-in cached properties now use Python's
+  :func:`functools.cached_property`. Subclasses that override one with a
+  ``@property`` and call ``super()`` now get the cached value instead of
+  recomputing it, and accessing one on an instance without a ``__dict__``
+  raises ``TypeError`` instead of ``AttributeError``.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2

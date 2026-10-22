@@ -1,5 +1,6 @@
+from functools import cached_property
+
 from django.core import checks
-from django.utils.functional import cached_property
 
 NOT_PROVIDED = object()
 

@@ -1,4 +1,5 @@
 import logging
+from functools import cached_property
 
 from asgiref.sync import sync_to_async
 
@@ -6,7 +7,6 @@ from django.contrib.sessions.backends.base import CreateError, SessionBase, Upda
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, IntegrityError, router, transaction
 from django.utils import timezone
-from django.utils.functional import cached_property
 
 
 class SessionStore(SessionBase):

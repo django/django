@@ -1,7 +1,8 @@
+from functools import cached_property
+
 from django.core import checks
 from django.db import connections, router
 from django.db.models.sql import Query
-from django.utils.functional import cached_property
 
 from . import NOT_PROVIDED, Field
 

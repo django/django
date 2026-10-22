@@ -44,7 +44,6 @@ from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
 from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
 from django.utils.deprecation import RemovedInDjango2028Warning
-from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
 from django.utils.warnings import django_file_prefixes
@@ -338,7 +337,7 @@ class Query(BaseExpression):
         elif len(self.annotation_select) == 1:
             return next(iter(self.annotation_select.values())).output_field
 
-    @cached_property
+    @functools.cached_property
     def base_table(self):
         for alias in self.alias_map:
             return alias

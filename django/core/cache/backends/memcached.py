@@ -2,6 +2,7 @@
 
 import re
 import time
+from functools import cached_property
 
 from django.core.cache.backends.base import (
     DEFAULT_TIMEOUT,
@@ -9,7 +10,6 @@ from django.core.cache.backends.base import (
     InvalidCacheKey,
     memcache_key_warnings,
 )
-from django.utils.functional import cached_property
 
 
 class BaseMemcachedCache(BaseCache):
