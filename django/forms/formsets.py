@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.forms.fields import BooleanField, IntegerField
 from django.forms.forms import Form
 from django.forms.renderers import get_default_renderer
@@ -8,7 +8,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
 
-__all__ = ("BaseFormSet", "formset_factory", "all_valid")
+__all__ = ("BaseFormSet", "FormSet", "formset_factory", "all_valid")
 
 # special field names
 TOTAL_FORM_COUNT = "TOTAL_FORMS"
@@ -23,6 +23,8 @@ DEFAULT_MIN_NUM = 0
 
 # default maximum number of forms in a formset, to prevent memory exhaustion
 DEFAULT_MAX_NUM = 1000
+
+_ABSOLUTE_MAX_ERROR = "'absolute_max' must be greater or equal to 'max_num'."
 
 
 class ManagementForm(Form):
@@ -99,6 +101,12 @@ class BaseFormSet(RenderableFormMixin):
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
+        if getattr(self, "_declarative", False):
+            if self.min_num is None:
+                self.min_num = DEFAULT_MIN_NUM
+            self.max_num = _capped_max_num(self)
+            if self.absolute_max is None:
+                self.absolute_max = self.max_num + DEFAULT_MAX_NUM
         self.form_renderer = self.renderer
         self.renderer = self.renderer or get_default_renderer()
 
@@ -556,7 +564,7 @@ def formset_factory(
     if absolute_max is None:
         absolute_max = max_num + DEFAULT_MAX_NUM
     if max_num > absolute_max:
-        raise ValueError("'absolute_max' must be greater or equal to 'max_num'.")
+        raise ValueError(_ABSOLUTE_MAX_ERROR)
     attrs = {
         "form": form,
         "extra": extra,
@@ -575,6 +583,8 @@ def formset_factory(
         formset_name = form_name + "Set"
     else:
         formset_name = form_name + "FormSet"
+    if getattr(formset, "_declarative", False):
+        attrs["_factory_built"] = True
     return type(formset_name, (formset,), attrs)
 
 
@@ -582,3 +592,67 @@ def all_valid(formsets):
     """Validate every formset and return True if all are valid."""
     # List comprehension ensures is_valid() is called for all formsets.
     return all([formset.is_valid() for formset in formsets])
+
+
+def _capped_max_num(formset):
+    # A unique foreign key permits at most one related object.
+    fk = getattr(formset, "fk", None)
+    if fk is not None and fk.unique:
+        return 1
+    return DEFAULT_MAX_NUM if formset.max_num is None else formset.max_num
+
+
+def _prepare_declarative_formset(cls):
+    if (formset := getattr(cls, "formset", None)) is not None:
+        raise ImproperlyConfigured(
+            "Formset %s must inherit from %s instead of setting 'formset'."
+            % (cls.__name__, getattr(formset, "__name__", formset))
+        )
+    if cls.absolute_max is not None and _capped_max_num(cls) > cls.absolute_max:
+        raise ValueError(_ABSOLUTE_MAX_ERROR)
+
+
+class DeclarativeFormSetMixin:
+    """Mixin for creating formsets using declarative syntax."""
+
+    _declarative = True
+
+    def __init_subclass__(cls, abstract=False, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if cls.__dict__.get("_factory_built"):
+            # The factory already configured this class, so skip
+            # _prepare_declarative().
+            del cls._factory_built
+            return
+        if abstract:
+            return
+        cls._prepare_declarative()
+
+    @classmethod
+    def _prepare_declarative(cls):
+        raise NotImplementedError
+
+
+class FormSet(BaseFormSet, DeclarativeFormSetMixin, abstract=True):
+    """Base class for creating formsets using declarative syntax."""
+
+    form = None
+    extra = 1
+    can_order = False
+    can_delete = False
+    can_delete_extra = True
+    min_num = None
+    max_num = None
+    absolute_max = None
+    validate_min = False
+    validate_max = False
+    renderer = None
+
+    @classmethod
+    def _prepare_declarative(cls):
+        if cls.form is None:
+            raise ImproperlyConfigured(
+                "Creating a FormSet without the 'form' attribute is "
+                "prohibited; formset %s needs updating." % cls.__name__
+            )
+        _prepare_declarative_formset(cls)
