@@ -2,7 +2,7 @@
 Example docstring
 """
 
-from django.utils.functional import cached_property
+from django.utils.functional import classproperty
 from tests.sphinx_tests.testdata.package.wildcard_module import *  # noqa
 
 from . import other_module  # noqa
@@ -16,8 +16,8 @@ class MyClass(object):
     def my_method(self):
         pass
 
-    @cached_property
-    def my_cached_property(self):
+    @classproperty
+    def my_classproperty(cls):
         pass
 
 

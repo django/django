@@ -313,6 +313,8 @@ class ModelDetailView(BaseAdminDocsView):
         for func_name, func in model.__dict__.items():
             # Django's cached_property isn't a subclass of
             # functools.cached_property.
+            # RemovedInDjango2029Warning: When the deprecation ends, remove
+            # functional.cached_property.
             if inspect.isfunction(func) or isinstance(
                 func, (cached_property, functional.cached_property, property)
             ):
@@ -331,6 +333,8 @@ class ModelDetailView(BaseAdminDocsView):
                 # Show properties, cached_properties, and methods without
                 # arguments as fields. Otherwise, show as a 'method with
                 # arguments'.
+                # RemovedInDjango2029Warning: When the deprecation ends,
+                # remove functional.cached_property.
                 if isinstance(
                     func, (cached_property, functional.cached_property, property)
                 ):

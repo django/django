@@ -331,6 +331,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         """Model cached properties are displayed as fields."""
         self.assertContains(self.response, "<td>a_cached_property</td>")
 
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
     def test_instance_of_django_cached_property_methods_are_displayed(self):
         self.assertContains(self.response, "<td>a_django_cached_property</td>")
 

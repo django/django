@@ -5,7 +5,9 @@ Models for testing various aspects of the django.contrib.admindocs app.
 from functools import cached_property
 
 from django.db import models
+from django.test import ignore_warnings
 from django.utils import functional
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 
 class Company(models.Model):
@@ -80,9 +82,12 @@ class Person(models.Model):
     def a_cached_property(self):
         return "a_cached_property"
 
-    @functional.cached_property
-    def a_django_cached_property(self):
-        return "a_django_cached_property"
+    # RemovedInDjango2029Warning: When the deprecation ends, remove.
+    with ignore_warnings(category=RemovedInDjango2029Warning):
+
+        @functional.cached_property
+        def a_django_cached_property(self):
+            return "a_django_cached_property"
 
     def suffix_company_name(self, suffix="ltd"):
         return self.company.name + suffix

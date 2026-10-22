@@ -2863,6 +2863,8 @@ def get_prefetcher(instance, through_attr, to_attr):
         # Special case cached_property instances because hasattr() triggers
         # attribute computation and assignment. Django's cached_property
         # isn't a subclass of functools.cached_property.
+        # RemovedInDjango2029Warning: When the deprecation ends, remove
+        # functional.cached_property.
         if isinstance(
             getattr(model, to_attr, None), (cached_property, functional.cached_property)
         ):
