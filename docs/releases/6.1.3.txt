@@ -21,3 +21,7 @@ Bugfixes
   unintended, since SQL ``NULL`` cannot match any value.
 
 * Added compatibility for ``oracledb`` 26.0.0+ (:ticket:`37411`).
+
+* Fixed a crash in :djadmin:`makemessages` on Windows when processing files
+  with non-ASCII names on Python 3.15+, or with :ref:`UTF-8 mode
+  <python:utf8-mode>` enabled on older Python versions (:ticket:`37447`).
