@@ -301,6 +301,15 @@ but the header will lack the required source expression. In this case, the
 browser will block the inline script or style (or report it for report-only
 configurations).
 
+If a directive's only source is :attr:`~django.utils.csp.CSP.NONCE` and the
+nonce is never used, the directive is emitted as ``'none'`` instead (e.g.
+``script-src 'none'``), keeping the policy restrictive.
+
+.. versionchanged:: 6.2
+
+    Emitting ``'none'`` for nonce-only directives with an unused nonce was
+    added.
+
 .. _csp-nonce-generation:
 
 Nonce generation

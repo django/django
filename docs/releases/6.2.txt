@@ -316,6 +316,13 @@ backends.
 
 * Support for GEOS 3.10 is removed.
 
+CSP
+---
+
+* A CSP directive whose only source is :attr:`~django.utils.csp.CSP.NONCE` is
+  now emitted as ``'none'`` when the nonce is unused, instead of being dropped
+  from the response header.
+
 Models
 ------
 
