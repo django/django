@@ -1156,8 +1156,38 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
             "or any other trusted origins."
         )
         self.assertForbiddenReason(response, cm, msg)
-        self.assertContains(response, "X-Forwarded-Host", status_code=403)
-        self.assertNotContains(response, "X-Forwarded-Proto", status_code=403)
+        self.assertContains(
+            response,
+            "<li><strong><code>X-Forwarded-Host</code></strong>: "
+            "<code>www.example.com</code></li>",
+            status_code=403,
+            html=True,
+        )
+        self.assertContains(
+            response,
+            "<li><strong><code>X-Forwarded-Proto</code></strong>: not supplied</li>",
+            status_code=403,
+            html=True,
+        )
+
+    @override_settings(ALLOWED_HOSTS=["www.example.com", "localhost"], DEBUG=True)
+    def test_bad_origin_x_forwarded_host_empty_x_forwarded_proto(self):
+        """Empty X-Forwarded-Proto header is different from a missing one."""
+        req = self._get_POST_request_with_token()
+        req.META["HTTP_HOST"] = "localhost"
+        req.META["HTTP_ORIGIN"] = "http://www.example.com"
+        req.META["HTTP_X_FORWARDED_HOST"] = "www.example.com"
+        req.META["HTTP_X_FORWARDED_PROTO"] = ""
+        mw = CsrfViewMiddleware(post_form_view)
+        with self.assertLogs("django.security.csrf", "WARNING"):
+            response = mw.process_view(req, post_form_view, (), {})
+        self.assertContains(
+            response,
+            "<li><strong><code>X-Forwarded-Proto</code></strong>: "
+            "supplied, but empty</li>",
+            status_code=403,
+            html=True,
+        )
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"], DEBUG=True)
     def test_bad_origin_x_forwarded_proto(self):
@@ -1178,8 +1208,19 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
         )
         self.assertForbiddenReason(response, cm, msg)
         self.assertContains(response, "X-Forwarded-Proto", status_code=403)
-        self.assertContains(response, "<code>https</code>", status_code=403)
-        self.assertNotContains(response, "X-Forwarded-Host", status_code=403)
+        self.assertContains(
+            response,
+            "<li><strong><code>X-Forwarded-Proto</code></strong>: "
+            "<code>https</code></li>",
+            status_code=403,
+            html=True,
+        )
+        self.assertContains(
+            response,
+            "<li><strong><code>X-Forwarded-Host</code></strong>: not supplied</li>",
+            status_code=403,
+            html=True,
+        )
 
     @override_settings(ALLOWED_HOSTS=["www.example.com"], DEBUG=True)
     def test_no_likely_proxy_headers(self):
@@ -1220,6 +1261,21 @@ class CsrfViewMiddlewareTestMixin(CsrfFunctionTestMixin):
             response, "If the expected server origin looks correct", status_code=403
         )
         self.assertContains(response, "CSRF_TRUSTED_ORIGINS", status_code=403)
+
+    @override_settings(ALLOWED_HOSTS=["www.example.com"], DEBUG=True)
+    def test_no_likely_proxy_headers_empty_x_forwarded_host(self):
+        """An empty X-Forwarded-Host header can't be a likely proxy fix."""
+        req = self._get_POST_request_with_token()
+        req.META["HTTP_HOST"] = "www.example.com"
+        req.META["HTTP_ORIGIN"] = "https://"
+        req.META["HTTP_X_FORWARDED_HOST"] = ""
+        mw = CsrfViewMiddleware(post_form_view)
+        with self.assertLogs("django.security.csrf", "WARNING"):
+            response = mw.process_view(req, post_form_view, (), {})
+        self.assertContains(
+            response, "If the expected server origin looks correct", status_code=403
+        )
+        self.assertNotContains(response, "X-Forwarded-Host", status_code=403)
 
 
 class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):

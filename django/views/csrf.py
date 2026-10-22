@@ -27,7 +27,8 @@ def _forwarded_may_fix(request):
     if request.headers.get("X-Forwarded-Proto") == "https" and not request.is_secure():
         return True
     forwarded_host = request.headers.get("X-Forwarded-Host")
-    if forwarded_host is None:
+    if not forwarded_host:
+        # An absent or empty header can't supply the Origin's host.
         return False
     origin = request.headers.get("Origin", "")
     return origin.endswith(f"://{forwarded_host}")
