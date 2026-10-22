@@ -802,6 +802,11 @@ def _get_next_prev(generic_view, date, is_previous, period):
         # means there's no next/previous link available.
         try:
             result = getattr(qs[0], date_field)
+            # If result is None (e.g. from invalid dates like MySQL's
+            # 0000-00-00 being converted to None by the ORM), there's
+            # no valid date to return.
+            if result is None:
+                return None
         except IndexError:
             return None
 
