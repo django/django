@@ -5,6 +5,7 @@ from decimal import Decimal
 from unittest import mock, skipUnless
 
 from django import forms
+from django.apps import apps
 from django.core.exceptions import (
     NON_FIELD_ERRORS,
     FieldError,
@@ -3784,3 +3785,172 @@ class ConstraintValidationTests(TestCase):
         full_form = AttnameConstraintsModelForm(data, instance=instance)
         self.assertFalse(full_form.is_valid())
         self.assertEqual(full_form.errors, {"right": ["This field is required."]})
+
+
+class ReverseManyToManyTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.category = Category.objects.create(
+            name="Entertainment", slug="entertainment", url="entertainment"
+        )
+        cls.writer = Writer.objects.create(name="Bob Woodward")
+        cls.form_class = modelform_factory(
+            Category, fields=["name", "slug", "url", "article"]
+        )
+
+    def make_article(self, headline, categories=()):
+        article = Article.objects.create(
+            headline=headline,
+            slug="a",
+            pub_date=datetime.date(2008, 3, 18),
+            writer=self.writer,
+            article="Test",
+        )
+        article.categories.set(categories)
+        return article
+
+    def post_data(self, name, articles):
+        return {
+            "name": name,
+            "slug": name.lower(),
+            "url": name.lower(),
+            "article": articles,
+        }
+
+    def test_not_included_by_default(self):
+        self.assertNotIn(
+            "article", modelform_factory(Category, fields="__all__").base_fields
+        )
+
+    def test_included_when_named(self):
+        form_class = modelform_factory(Category, fields=["article", "name"])
+        self.assertEqual(list(form_class.base_fields), ["article", "name"])
+        field = form_class.base_fields["article"]
+        self.assertIsInstance(field, forms.ModelMultipleChoiceField)
+        self.assertEqual(field.queryset.model, Article)
+        self.assertFalse(field.required)
+
+    def test_unavailable_before_models_are_ready(self):
+        msg = "Unknown field(s) (article) specified for Category"
+        with mock.patch.object(apps, "models_ready", False):
+            with self.assertRaisesMessage(FieldError, msg):
+                modelform_factory(Category, fields=["article"])
+
+    def test_excluded(self):
+        form_class = modelform_factory(
+            Category, fields=["name", "article"], exclude=["article"]
+        )
+        self.assertEqual(list(form_class.base_fields), ["name"])
+
+    def test_initial_from_instance(self):
+        article = self.make_article("First", [self.category])
+        self.assertEqual(
+            self.form_class(instance=self.category).initial["article"], [article]
+        )
+        self.assertEqual(self.form_class(instance=Category()).initial["article"], [])
+
+    def test_model_to_dict(self):
+        article = self.make_article("First", [self.category])
+        self.assertNotIn("article", model_to_dict(self.category))
+        self.assertEqual(
+            model_to_dict(self.category, fields=["article"]), {"article": [article]}
+        )
+
+    def test_save_on_add(self):
+        article = self.make_article("First")
+        form = self.form_class(data=self.post_data("News", [article.pk]))
+        self.assertTrue(form.is_valid(), form.errors)
+        category = form.save()
+        self.assertSequenceEqual(category.article_set.all(), [article])
+        self.assertSequenceEqual(article.categories.all(), [category])
+
+    def test_save_on_change(self):
+        first = self.make_article("First", [self.category])
+        second = self.make_article("Second")
+        form = self.form_class(
+            data=self.post_data("Entertainment", [second.pk]), instance=self.category
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.changed_data, ["article"])
+        form.save()
+        self.assertSequenceEqual(self.category.article_set.all(), [second])
+        self.assertSequenceEqual(first.categories.all(), [])
+
+    def test_save_clears_relation(self):
+        self.make_article("First", [self.category])
+        form = self.form_class(
+            data=self.post_data("Entertainment", []), instance=self.category
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        self.assertSequenceEqual(self.category.article_set.all(), [])
+
+    def test_save_commit_false(self):
+        article = self.make_article("First")
+        form = self.form_class(data=self.post_data("News", [article.pk]))
+        self.assertTrue(form.is_valid(), form.errors)
+        category = form.save(commit=False)
+        category.save()
+        self.assertSequenceEqual(category.article_set.all(), [])
+        form.save_m2m()
+        self.assertSequenceEqual(category.article_set.all(), [article])
+
+    def test_meta_options_apply(self):
+        form_class = modelform_factory(
+            Category,
+            fields=["article"],
+            labels={"article": "Pieces"},
+            widgets={"article": forms.CheckboxSelectMultiple},
+        )
+        field = form_class.base_fields["article"]
+        self.assertEqual(field.label, "Pieces")
+        self.assertIsInstance(field.widget, forms.CheckboxSelectMultiple)
+
+    def test_declared_field_takes_precedence(self):
+        class CategoryForm(forms.ModelForm):
+            article = forms.ModelMultipleChoiceField(
+                queryset=Article.objects.none(), required=True
+            )
+
+            class Meta:
+                model = Category
+                fields = ["article"]
+
+        field = CategoryForm.base_fields["article"]
+        self.assertTrue(field.required)
+        self.assertSequenceEqual(field.queryset, [])
+
+    def test_forward_limit_choices_to_not_applied(self):
+        character = Character.objects.create(
+            username="user", last_action=datetime.datetime.today()
+        )
+        joke = StumpJoke.objects.create(most_recently_fooled=character)
+        form_class = modelform_factory(Character, fields=["username", "jokes_today"])
+        self.assertSequenceEqual(form_class.base_fields["jokes_today"].queryset, [joke])
+
+    @isolate_apps("model_forms")
+    def test_non_editable_relation_rejected(self):
+        class Ingredient(models.Model):
+            pass
+
+        class Recipe(models.Model):
+            ingredients = models.ManyToManyField(
+                Ingredient, related_name="recipes", editable=False
+            )
+
+        msg = (
+            "'recipes' cannot be specified for Ingredient model form as it is a "
+            "non-editable field"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            modelform_factory(Ingredient, fields=["recipes"])
+        self.assertEqual(model_to_dict(Ingredient(pk=1), fields=["recipes"]), {})
+
+    @isolate_apps("model_forms")
+    def test_symmetrical_self_relation_rejected(self):
+        class Node(models.Model):
+            friends = models.ManyToManyField("self")
+
+        msg = "Unknown field(s) (friends_rel_+) specified for Node"
+        with self.assertRaisesMessage(FieldError, msg):
+            modelform_factory(Node, fields=["friends_rel_+"])
