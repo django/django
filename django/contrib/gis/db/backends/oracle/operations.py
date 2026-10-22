@@ -18,6 +18,7 @@ from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.db.backends.oracle.operations import DatabaseOperations
+from django.db.backends.oracle.utils import BoundVar
 from django.utils.functional import cached_property
 
 DEFAULT_TOLERANCE = "0.05"
@@ -226,6 +227,31 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         from django.contrib.gis.db.backends.oracle.models import OracleSpatialRefSys
 
         return OracleSpatialRefSys
+
+    def returning_columns(self, fields):
+        """
+        Wrap spatial columns with TO_WKBGEOMETRY (via `self.select`) so
+        RETURNING hands back parseable WKB instead of SDO_GEOMETRY.
+        """
+        if not fields:
+            return "", ()
+        columns = []
+        params = []
+        for field in fields:
+            col = "%s.%s" % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            )
+            param = BoundVar(field)
+            if hasattr(field, "geom_type"):
+                col = self.select % col
+                param.db_type = self.connection.Database.BLOB
+            columns.append(col)
+            params.append(param)
+        return "RETURNING %s INTO %s" % (
+            ", ".join(columns),
+            ", ".join(["%s"] * len(params)),
+        ), tuple(params)
 
     def modify_insert_params(self, placeholder, params):
         """Drop out insert parameters for NULL placeholder. Needed for Oracle
