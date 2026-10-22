@@ -246,10 +246,7 @@ class ServerFormatter(logging.Formatter):
         return super().format(record)
 
     def uses_server_time(self):
-        return (
-            "{server_time}" in self._fmt
-            or "%(server_time)" in self._fmt
-        )
+        return "{server_time}" in self._fmt or "%(server_time)" in self._fmt
 
 
 def log_message(
