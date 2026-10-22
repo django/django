@@ -451,7 +451,7 @@ LANG_INFO = {
         "bidi": False,
         "code": "pa",
         "name": "Punjabi",
-        "name_local": "Punjabi",
+        "name_local": "ਪੰਜਾਬੀ",
     },
     "pl": {
         "bidi": False,
