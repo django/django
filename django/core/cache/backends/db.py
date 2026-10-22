@@ -31,8 +31,8 @@ class Options:
 
 
 class BaseDatabaseCache(BaseCache):
-    def __init__(self, table, params):
-        super().__init__(params)
+    def __init__(self, table, params, **kwargs):
+        super().__init__(params, **kwargs)
         self._table = table
         options = params.get("OPTIONS", {})
         try:
