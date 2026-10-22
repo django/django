@@ -1321,8 +1321,21 @@ class ModelAdmin(BaseModelAdmin):
                 return "%s__iexact" % field_name.removeprefix("="), None
             elif field_name.startswith("@"):
                 return "%s__search" % field_name.removeprefix("@"), None
-            # Use field_name if it includes a lookup.
+
             opts = queryset.model._meta
+
+            # Handle 'pk' expansion for MTI / inherited models
+            if field_name.startswith("pk__"):
+                if opts.pk.remote_field:
+                    target_pk_name = opts.pk.remote_field.model._meta.pk.name
+                    field_name = field_name.replace(
+                        "pk", f"{opts.pk.name}__{target_pk_name}", 1
+                    )
+                else:
+                    field_name = field_name.replace("pk", opts.pk.name, 1)
+            elif field_name == "pk":
+                field_name = opts.pk.name
+
             lookup_fields = field_name.split(LOOKUP_SEP)
             # Go through the fields, following all relations.
             prev_field = None
@@ -1332,20 +1345,18 @@ class ModelAdmin(BaseModelAdmin):
                 try:
                     field = opts.get_field(path_part)
                 except FieldDoesNotExist:
-                    # Use valid query lookups.
                     if prev_field and prev_field.get_lookup(path_part):
                         if path_part == "exact" and not isinstance(
                             prev_field, (models.CharField, models.TextField)
                         ):
-                            # Use prev_field to validate the search term.
                             return field_name, prev_field
                         return field_name, None
+                    raise
                 else:
                     prev_field = field
-                    if hasattr(field, "path_infos"):
-                        # Update opts to follow the relation.
+                    if hasattr(field, "path_infos") and field.path_infos:
                         opts = field.path_infos[-1].to_opts
-            # Otherwise, use the field with icontains.
+
             return "%s__icontains" % field_name, None
 
         may_have_duplicates = False
