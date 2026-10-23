@@ -2463,6 +2463,10 @@ class CacheUtils(SimpleTestCase):
                 {"no_cache": "Custom"},
                 {"no-cache=Set-Cookie", "no-cache=Link", "no-cache=Custom"},
             ),
+            # Commas in a quoted list of field names (RFC 9111, Sections
+            # 5.2.2.4 and 5.2.2.7) don't separate directives.
+            ('no-cache="Set-Cookie, Link"', {"no_cache": True}, {"no-cache"}),
+            ('private="Set-Cookie, Link"', {"public": True}, {"public"}),
             # Test whether private/public attributes are mutually exclusive
             ("private", {"private": True}, {"private"}),
             ("private", {"public": True}, {"public"}),
@@ -3178,6 +3182,18 @@ class CacheMiddlewareTest(SimpleTestCase):
         "public".
         """
         view_with_cache = cache_page(3)(cache_control(no_public=True)(hello_world_view))
+        request = self.factory.get("/view/", headers={"Authorization": "token"})
+        response = view_with_cache(request, "1")
+        self.assertIs(has_vary_header(response, "Authorization"), True)
+
+    def test_authorization_header_exception_quoted_public(self):
+        """
+        "public" within the quoted value of a hypothetical extension directive
+        is not confused for "public".
+        """
+        view_with_cache = cache_page(3)(
+            cache_control(example='"alpha, public, omega"')(hello_world_view)
+        )
         request = self.factory.get("/view/", headers={"Authorization": "token"})
         response = view_with_cache(request, "1")
         self.assertIs(has_vary_header(response, "Authorization"), True)
