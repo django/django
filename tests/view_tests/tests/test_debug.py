@@ -1114,12 +1114,13 @@ class ExceptionReporterTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn('<td class="code"><pre>Error in formatting', html)
+        # reprlib gracefully handles objects with failing __repr__ by falling
+        # back to a basic instance representation.
+        self.assertIn("OomOutput instance", html)
 
     def test_too_large_values_handling(self):
         "Large values should not create a large HTML."
         large = 256 * 1024
-        repr_len = large + len(repr(""))
         try:
 
             class LargeOutput:
@@ -1133,8 +1134,33 @@ class ExceptionReporterTests(SimpleTestCase):
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
+        self.assertIn("A" * 97 + "...", html)
+        self.assertNotIn("A" * 200, html)
+
+    def test_large_collection_values_handling(self):
+        "Large collections should not be fully rendered."
+        try:
+            large_list = list(range(1024 * 1024))  # NOQA
+            raise ValueError()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...]", html)
+
+    def test_repr_error_handling(self):
+        "Errors raised while formatting values should not make output choke."
+        try:
+            value = "value"  # NOQA
+            raise ValueError()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        with mock.patch("reprlib.Repr.repr", side_effect=MemoryError("OOM")):
+            html = reporter.get_traceback_html()
         self.assertIn(
-            "&lt;trimmed %d chars out of %d&gt;" % (repr_len - 4096, repr_len), html
+            '<td class="code"><pre>Error in formatting: MemoryError: OOM</pre></td>',
+            html,
         )
 
     def test_encoding_error(self):
