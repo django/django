@@ -2438,7 +2438,8 @@ class ModelAdmin(BaseModelAdmin):
             media = self.media + cl.formset.media
         else:
             media = self.media
-        for filter_spec in cl.filter_specs:
+
+        for filter_spec in getattr(cl, "filter_specs", ()):
             media += getattr(filter_spec, "media", forms.Media())
 
         # Build the action form and populate it with available actions.
