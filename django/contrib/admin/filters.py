@@ -11,7 +11,6 @@ import datetime
 from django import forms
 from django.contrib.admin.exceptions import NotRegistered
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.widgets import AutocompleteSelect
 from django.contrib.admin.utils import (
     build_q_object_from_lookup_parameters,
     get_last_value_from_parameters,
@@ -19,6 +18,7 @@ from django.contrib.admin.utils import (
     prepare_lookup_value,
     reverse_field_path,
 )
+from django.contrib.admin.widgets import AutocompleteSelect
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.utils import timezone
@@ -669,9 +669,7 @@ class AutocompleteFieldListFilter(RelatedFieldListFilter):
         return ()
 
     def __init__(self, field, request, params, model, model_admin, field_path):
-        if not (
-            field.many_to_one or field.one_to_one or field.many_to_many
-        ):
+        if not (field.many_to_one or field.one_to_one or field.many_to_many):
             raise ImproperlyConfigured(
                 "AutocompleteFieldListFilter must be used with a forward "
                 "relationship field."
