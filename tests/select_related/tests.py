@@ -2,9 +2,12 @@ import gc
 
 from django.core.exceptions import FieldError
 from django.db.models import FETCH_PEERS
-from django.test import SimpleTestCase, TestCase
-from django.test.utils import garbage_collect, ignore_warnings, requires_gil
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.test import SimpleTestCase, TestCase, ignore_warnings
+from django.test.utils import garbage_collect, requires_gil
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 
 from .models import (
     Bookmark,
@@ -153,6 +156,8 @@ class SelectRelatedTests(TestCase):
                 sorted(orders), ["Agaricales", "Diptera", "Fabales", "Primates"]
             )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_select_related_with_extra(self):
         s = (
             Species.objects.all()

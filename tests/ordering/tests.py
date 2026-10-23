@@ -18,7 +18,8 @@ from django.db.models import (
     When,
 )
 from django.db.models.functions import Length, Upper
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from .models import (
     Article,
@@ -340,6 +341,8 @@ class OrderingTests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             qs.last()
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_extra_ordering(self):
         """
         Ordering can be based on fields included from an 'extra' clause
@@ -357,6 +360,8 @@ class OrderingTests(TestCase):
             attrgetter("headline"),
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_extra_ordering_quoting(self):
         """
         If the extra clause uses an SQL keyword for a name, it will be
@@ -375,6 +380,8 @@ class OrderingTests(TestCase):
             attrgetter("headline"),
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_extra_ordering_with_table_name(self):
         self.assertQuerySetEqual(
             Article.objects.extra(order_by=["ordering_article.headline"]),

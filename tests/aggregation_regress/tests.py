@@ -25,9 +25,12 @@ from django.db.models import (
     When,
 )
 from django.db.models.functions import Cast, Concat
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate, ignore_warnings
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from django.test.utils import Approximate
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 
 from .models import (
     Alfa,
@@ -188,7 +191,9 @@ class AggregationTests(TestCase):
             publications=Count("id")
         )
         self.assertEqual(qs.order_by("id").count(), len(qs.order_by("id")))
-        self.assertEqual(qs.extra(order_by=["id"]).count(), len(qs.order_by("id")))
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango2029Warning):
+            self.assertEqual(qs.extra(order_by=["id"]).count(), len(qs.order_by("id")))
         self.assertEqual(qs.order_by("-id").count(), len(qs.order_by("-id")))
         self.assertEqual(
             qs.order_by("-publications").count(), len(qs.order_by("-publications"))
@@ -265,6 +270,8 @@ class AggregationTests(TestCase):
         qs2 = books.filter(id__in=list(qs))
         self.assertEqual(list(qs1), list(qs2))
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     @skipUnlessDBFeature("supports_subqueries_in_group_by")
     def test_annotate_with_extra(self):
         """
@@ -314,14 +321,18 @@ class AggregationTests(TestCase):
             {"pages__sum": 3703, "pages__avg": Approximate(617.166, places=2)},
         )
 
-        # Aggregate overrides extra selected column
-        self.assertEqual(
-            Book.objects.extra(select={"price_per_page": "price / pages"}).aggregate(
-                Sum("pages")
-            ),
-            {"pages__sum": 3703},
-        )
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango2029Warning):
+            # Aggregate overrides extra selected column
+            self.assertEqual(
+                Book.objects.extra(
+                    select={"price_per_page": "price / pages"}
+                ).aggregate(Sum("pages")),
+                {"pages__sum": 3703},
+            )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_annotation(self):
         # Annotations get combined with extra select clauses
         obj = (
@@ -917,6 +928,8 @@ class AggregationTests(TestCase):
             lambda b: (b.name, b.authors__age__avg, b.publisher.name, b.contact.name),
         )
 
+    # Entire block can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_values_extra_grouping(self):
         # Regression for #10132 - If the values() clause only mentioned extra
         # (select=) columns, those columns are used for grouping
@@ -1103,6 +1116,8 @@ class AggregationTests(TestCase):
             ],
         )
 
+    # Entire block can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_extra_select_grouping_with_params(self):
         # Regression for #10290 - extra selects with parameters can be used for
         # grouping.

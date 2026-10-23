@@ -8,7 +8,8 @@ from django.core.exceptions import (
 )
 from django.db import IntegrityError, models, transaction
 from django.db.models import FETCH_PEERS, FETCH_RAISE
-from django.test import TestCase
+from django.test import TestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -327,6 +328,8 @@ class ManyToOneTests(TestCase):
             queryset.query.get_compiler(queryset.db).as_sql()[0].count("INNER JOIN"), 1
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_joined_extra(self):
         new_article1 = self.r.article_set.create(
             headline="John's second story",
@@ -589,13 +592,17 @@ class ManyToOneTests(TestCase):
         reporter_fields = ", ".join(sorted(f.name for f in Reporter._meta.get_fields()))
         with self.assertRaisesMessage(FieldError, expected_message % reporter_fields):
             Article.objects.values_list("reporter__notafield")
-        article_fields = ", ".join(
-            ["EXTRA"] + sorted(f.name for f in Article._meta.get_fields())
-        )
-        with self.assertRaisesMessage(FieldError, expected_message % article_fields):
-            Article.objects.extra(select={"EXTRA": "EXTRA_SELECT"}).values_list(
-                "notafield"
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango2029Warning):
+            article_fields = ", ".join(
+                ["EXTRA"] + sorted(f.name for f in Article._meta.get_fields())
             )
+            with self.assertRaisesMessage(
+                FieldError, expected_message % article_fields
+            ):
+                Article.objects.extra(select={"EXTRA": "EXTRA_SELECT"}).values_list(
+                    "notafield"
+                )
 
     def test_fk_assignment_and_related_object_cache(self):
         # Tests of ForeignKey assignment and the related-object cache (see
