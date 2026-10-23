@@ -163,7 +163,7 @@ Other bugfixes and changes
   environment variable wasn't set
   (:ticket:`22256`).
 
-* Fixed :djadmin:`changepassword` on Windows
+* Fixed :cli:`changepassword` on Windows
   (:ticket:`22364`).
 
 * Avoided shadowing deadlock exceptions on MySQL

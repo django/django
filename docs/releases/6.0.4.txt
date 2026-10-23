@@ -17,7 +17,7 @@ proxies carefully strip security-sensitive headers named with hyphens, such a
 header could be spoofed by supplying a header named with underscores.
 
 Under WSGI, it is the responsibility of the server or proxy to avoid ambiguous
-mappings. (Django's :djadmin:`runserver` was patched in :cve:`2015-0219`.) But
+mappings. (Django's :cli:`runserver` was patched in :cve:`2015-0219`.) But
 under ASGI, there is not the same uniform expectation, even if many proxies
 protect against this under default configuration (including ``nginx`` via
 ``underscores_in_headers off;``).
