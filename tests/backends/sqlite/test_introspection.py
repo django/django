@@ -5,6 +5,8 @@ import sqlparse
 from django.db import connection
 from django.test import TestCase
 
+from ..models import Person
+
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
 class IntrospectionTests(TestCase):
@@ -53,6 +55,24 @@ class IntrospectionTests(TestCase):
                 self.assertEqual(field, "id")
             finally:
                 cursor.execute("DROP TABLE test_primary")
+
+    def test_get_table_list_for_names(self):
+        with connection.cursor() as cursor:
+            table_list = connection.introspection.get_table_list_for_names(
+                cursor, {Person._meta.db_table, "backends_nonexistent"}
+            )
+        self.assertEqual([table.name for table in table_list], [Person._meta.db_table])
+
+    def test_table_names_only_tables_exceeding_max_query_params(self):
+        only_tables = [
+            f"backends_nonexistent_{i}"
+            for i in range(connection.features.max_query_params)
+        ]
+        only_tables.append(Person._meta.db_table)
+        self.assertEqual(
+            connection.introspection.table_names(only_tables=only_tables),
+            [Person._meta.db_table],
+        )
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")

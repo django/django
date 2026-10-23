@@ -60,10 +60,12 @@ class MigrationRecorder:
         if self._has_table:
             return True
         # It hasn't been confirmed to exist, recheck.
+        db_table = self.Migration._meta.db_table
         with self.connection.cursor() as cursor:
-            tables = self.connection.introspection.table_names(cursor)
-
-        self._has_table = self.Migration._meta.db_table in tables
+            tables = self.connection.introspection.table_names(
+                cursor, only_tables=[db_table]
+            )
+        self._has_table = db_table in tables
         return self._has_table
 
     def ensure_schema(self):
