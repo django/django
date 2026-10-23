@@ -738,3 +738,136 @@ To define this dependency, we add one extra line::
 This definition ensures that all ``Person`` objects are serialized before
 any ``Book`` objects. In turn, any object referencing ``Book`` will be
 serialized after both ``Person`` and ``Book`` have been serialized.
+
+.. _model-field-serializers:
+
+Model field serializers
+=======================
+
+.. versionadded:: 6.2
+
+Some additional hooks for model field serialization and deserialization should
+be used only if :meth:`.Field.value_to_string` and :meth:`.Field.to_python`
+aren't sufficient. For example, :class:`.CompositePrimaryKey` has a field
+serializer to call ``serialize_field()`` for each of its fields.
+
+Built-in field serializers
+--------------------------
+
+The built-in field serializers which your custom field serializer may want to
+inherit are:
+
+.. class:: django.core.serializers.python.FieldSerializer
+
+    This field serializer is used by all serializers that inherit the Python
+    serializer (``json``, ``jsonl``, and ``yaml``).
+
+    .. classmethod:: serialize(field, obj, serializer)
+
+        The base implementation returns the value of
+        :meth:`field.value_from_object(obj) <.Field.value_from_object>` if the
+        value is a JSON-serializable type (``None``, ``int``, ``float``,
+        :class:`~decimal.Decimal`, :class:`~datetime.datetime`,
+        :class:`~datetime.date`, and :class:`~datetime.time`), otherwise it
+        returns the value of :meth:`field.value_to_string(obj)
+        <.Field.value_to_string>`.
+
+        Arguments:
+
+        * ``obj`` is the model instance
+        * ``field`` is the field instance
+        * ``serializer`` is the ``Serializer`` instance (e.g.
+          ``django.core.serializers.json.Serializer`` if serializing to JSON).
+
+    .. classmethod:: deserialize(field, value, deserializer)
+
+        The base implementation returns :meth:`field.to_python(value)
+        <.Field.to_python>`.
+
+        Arguments:
+
+        * ``field`` is the field instance
+        * ``value`` is the raw value to be deserialized
+        * ``deserializer`` is the ``Deserializer`` instance (e.g.
+          ``django.core.serializers.json.Deserializer`` if deserializing JSON).
+
+.. class:: django.core.serializers.xml_serializer.FieldSerializer
+
+    .. classmethod:: serialize(field, obj, serializer)
+
+        The base implementation returns :meth:`field.value_to_string(obj)
+        <.Field.value_to_string>`.
+
+    .. classmethod:: deserialize(field, field_node, deserializer)
+
+        The base implementation extracts the text from ``field_node`` (a
+        ``xml.dom.minidom.Element``), strips whitespace, and passes the
+        value to :meth:`.Field.to_python`.
+
+Custom field serializer examples
+--------------------------------
+
+Simple
+~~~~~~
+
+A simple field serializer might simply call ``super()`` and then do some
+additional processing::
+
+    from django.core.serializers import register_field_serializer
+    from django.core.serializers.python import FieldSerializer
+    from django.db import models
+
+
+    class MyField(models.Field): ...
+
+
+    @register_field_serializer("python", MyField)
+    class MyFieldPythonSerializer(FieldSerializer):
+        @classmethod
+        def serialize(cls, field, obj, serializer):
+            value = super().serialize(field, obj, serializer)
+            ...
+            return value
+
+        @classmethod
+        def deserialize(cls, field, value, deserializer):
+            value = super().deserialize(field, value, deserializer)
+            ...
+            return value
+
+Advanced
+~~~~~~~~
+
+A more complicated field serializer might make use of the ``serializer``
+and ``deserializer`` arguments to process an embedded model field that stores
+nested model data as a dictionary::
+
+    from django.core.serializers import register_field_serializer
+    from django.db import models
+
+
+    class EmbeddedModelField(models.Field):
+        # A custom field that has an `embedded_model` attribute specifying the
+        # model to be stored.
+        ...
+
+
+    @register_field_serializer("python", EmbeddedModelField)
+    class EmbeddedModelFieldPythonSerializer:
+        @classmethod
+        def serialize(cls, field, obj, serializer):
+            value = field.value_from_object(obj)
+            return {
+                subfield.name: serializer.serialize_field(subfield, value)
+                for subfield in value._meta.local_fields
+            }
+
+        @classmethod
+        def deserialize(cls, field, value, deserializer):
+            field_values = {}
+            for subfield_name, subvalue in value.items():
+                subfield = field.embedded_model._meta.get_field(subfield_name)
+                field_values[subfield.name] = deserializer.deserialize_field(
+                    subfield, subvalue, deserializer
+                )
+            return field.embedded_model(**field_values)
