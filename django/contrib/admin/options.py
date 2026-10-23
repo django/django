@@ -2439,6 +2439,9 @@ class ModelAdmin(BaseModelAdmin):
         else:
             media = self.media
 
+        for filter_spec in getattr(cl, "filter_specs", ()):
+            media += getattr(filter_spec, "media", forms.Media())
+
         # Build the action form and populate it with available actions.
         if actions:
             action_form = self.action_form(auto_id=None)
