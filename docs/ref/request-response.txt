@@ -1347,6 +1347,9 @@ with the following notable differences:
   or strings as content. When serving under WSGI, this should be a sync
   iterator. When serving under ASGI, then it should be an async iterator.
 
+  Under ASGI, it may also be given an asynchronous context manager that yields
+  such an async iterator. See :ref:`request-response-streaming-task-groups`.
+
 * You cannot access its content, except by iterating the response object
   itself. This should only occur when the response is returned to the client:
   you should not iterate the response yourself.
@@ -1359,6 +1362,11 @@ with the following notable differences:
   type during iteration, and a warning will be raised, but in order to do this
   the iterator must be fully-consumed, which defeats the purpose of using a
   :class:`StreamingHttpResponse` at all.
+
+  .. versionchanged:: 6.2
+
+      Support for asynchronous context managers as streaming content was
+      added.
 
 * It has no ``content`` attribute. Instead, it has a
   :attr:`~StreamingHttpResponse.streaming_content` attribute. This can be used
@@ -1404,10 +1412,24 @@ Attributes
 .. attribute:: StreamingHttpResponse.is_async
 
     Boolean indicating whether :attr:`StreamingHttpResponse.streaming_content`
-    is an asynchronous iterator or not.
+    is an asynchronous iterator or not. This is also ``True`` when
+    :attr:`is_acmgr` is ``True``.
 
     This is useful for middleware needing to wrap
     :attr:`StreamingHttpResponse.streaming_content`.
+
+.. attribute:: StreamingHttpResponse.is_acmgr
+
+    .. versionadded:: 6.2
+
+    Boolean indicating whether :attr:`StreamingHttpResponse.streaming_content`
+    is an asynchronous context manager, as described in
+    :ref:`request-response-streaming-task-groups`.
+
+    This is useful for middleware needing to wrap
+    :attr:`StreamingHttpResponse.streaming_content`, which must then be
+    wrapped in a further asynchronous context manager, rather than in an
+    iterator.
 
 .. _request-response-streaming-disconnect:
 
@@ -1436,6 +1458,100 @@ This example only shows how to handle client disconnection while the response
 is streaming. If you perform long-running operations in your view before
 returning the ``StreamingHttpResponse`` object, then you may also want to
 :ref:`handle disconnections in the view <async-handling-disconnect>` itself.
+
+.. _request-response-streaming-task-groups:
+
+Streaming with task groups
+--------------------------
+
+.. versionadded:: 6.2
+
+Under ASGI, you may want to stream content that is produced by concurrently
+running tasks, for example to merge several upstream feeds into a single
+response. :class:`asyncio.TaskGroup` is the natural way to manage such tasks,
+but an async generator can't ``yield`` from inside a task group: the
+generator's frame is suspended at each ``yield``, so cancellation and errors
+can't be delivered to the task group correctly (see :pep:`789`).
+
+Instead, pass an asynchronous context manager, such as one created with
+:func:`~contextlib.asynccontextmanager`, as the ``streaming_content``. The
+context manager sets up the task group and ``yield``\s an async iterator for
+Django to consume. Django enters the context manager when it starts streaming
+the response, iterates the yielded iterator, and then exits the context manager
+once streaming completes, fails, or is canceled because the client
+disconnected. The task group is thus entered and exited within the same frame,
+as required::
+
+    import asyncio
+    from contextlib import asynccontextmanager
+
+    from django.http import StreamingHttpResponse
+
+
+    @asynccontextmanager
+    async def news_and_weather():
+        queue = asyncio.Queue(maxsize=1)
+
+        async def consume_feed(url):
+            # connect_feed() stands in for an async client of your choice.
+            async with connect_feed(url) as feed:
+                async for message in feed:
+                    await queue.put(message)
+
+        async def items():
+            while True:
+                yield await queue.get()
+
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(consume_feed("wss://news.example.com/"))
+            tg.create_task(consume_feed("wss://weather.example.com/"))
+            yield items()
+
+
+    async def news_and_weather_view(request):
+        return StreamingHttpResponse(news_and_weather())
+
+The yielded iterator may be any async iterable, including an async generator as
+above. If it has an ``aclose()`` method, Django calls it before exiting the
+context manager.
+
+A response with asynchronous context manager content must be consumed with
+``async with``, which yields the response content as an async iterator of
+bytestrings::
+
+    async with response as content:
+        async for chunk in content:
+            ...
+
+Iterating such a response directly with ``async for`` raises ``TypeError``.
+Under WSGI, the content is consumed in full, with a warning, as for other
+asynchronous content.
+
+Middleware that wraps :attr:`~StreamingHttpResponse.streaming_content` must
+check :attr:`~StreamingHttpResponse.is_acmgr` and, when it's ``True``, wrap the
+content in a further asynchronous context manager::
+
+    from contextlib import asynccontextmanager
+
+
+    def uppercase_middleware(get_response):
+        async def middleware(request):
+            response = await get_response(request)
+            if response.streaming and response.is_acmgr:
+                original_content = response.streaming_content
+
+                @asynccontextmanager
+                async def uppercase_content():
+                    async with original_content as content:
+                        yield (chunk.upper() async for chunk in content)
+
+                response.streaming_content = uppercase_content()
+            return response
+
+        return middleware
+
+:class:`~django.middleware.gzip.GZipMiddleware` supports asynchronous context
+manager content.
 
 ``FileResponse`` objects
 ========================

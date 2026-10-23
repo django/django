@@ -194,6 +194,13 @@ class SignalsTests(SimpleTestCase):
         self.assertEqual(b"".join(list(response)), b"streaming content")
         self.assertEqual(self.signals, ["started", "finished"])
 
+    def test_request_signals_acmgr_streaming_response(self):
+        response = self.client.get("/async_streaming_acmgr/")
+        self.assertEqual(self.signals, ["started"])
+        with self.assertWarns(Warning):
+            self.assertEqual(b"".join(list(response)), b"streaming content")
+        self.assertEqual(self.signals, ["started", "finished"])
+
 
 def empty_middleware(get_response):
     pass
@@ -280,6 +287,17 @@ class HandlerRequestTests(SimpleTestCase):
         msg = (
             "StreamingHttpResponse must consume asynchronous iterators in order to "
             "serve them synchronously. Use a synchronous iterator instead."
+        )
+        with self.assertWarnsMessage(Warning, msg) as ctx:
+            self.assertEqual(b"".join(list(response)), b"streaming content")
+        self.assertEqual(ctx.filename, __file__)
+
+    def test_async_streaming_acmgr(self):
+        response = self.client.get("/async_streaming_acmgr/")
+        self.assertEqual(response.status_code, 200)
+        msg = (
+            "StreamingHttpResponse must consume asynchronous context managers in "
+            "order to serve them synchronously. Use a synchronous iterator instead."
         )
         with self.assertWarnsMessage(Warning, msg) as ctx:
             self.assertEqual(b"".join(list(response)), b"streaming content")
@@ -406,3 +424,11 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         self.assertEqual(
             b"".join([chunk async for chunk in response]), b"streaming content"
         )
+
+    async def test_async_streaming_acmgr(self):
+        response = await self.async_client.get("/async_streaming_acmgr/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIs(response.is_acmgr, True)
+        async with response as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(b"".join(chunks), b"streaming content")

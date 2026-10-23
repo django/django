@@ -3,6 +3,7 @@ import random
 import re
 import struct
 import zlib
+from contextlib import asynccontextmanager
 from io import BytesIO
 from unittest import mock
 from urllib.parse import quote
@@ -1001,6 +1002,33 @@ class GZipMiddlewareTest(SimpleTestCase):
             self.decompress(b"".join([chunk async for chunk in r])),
             b"".join(self.sequence),
         )
+        self.assertEqual(r.get("Content-Encoding"), "gzip")
+        self.assertFalse(r.has_header("Content-Length"))
+
+    async def test_compress_acmgr_streaming_response(self):
+        """
+        Compression is performed on responses with async context manager
+        streaming content.
+        """
+
+        async def get_stream_response(request):
+            @asynccontextmanager
+            async def acmgr():
+                async def iterator():
+                    for chunk in self.sequence:
+                        yield chunk
+
+                yield iterator()
+
+            resp = StreamingHttpResponse(acmgr())
+            resp["Content-Type"] = "text/html; charset=UTF-8"
+            return resp
+
+        r = await GZipMiddleware(get_stream_response)(self.req)
+        self.assertIs(r.is_acmgr, True)
+        async with r as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(self.decompress(b"".join(chunks)), b"".join(self.sequence))
         self.assertEqual(r.get("Content-Encoding"), "gzip")
         self.assertFalse(r.has_header("Content-Length"))
 

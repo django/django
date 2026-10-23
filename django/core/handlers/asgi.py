@@ -4,7 +4,7 @@ import sys
 import tempfile
 import traceback
 from collections import defaultdict
-from contextlib import aclosing, closing
+from contextlib import closing
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -318,11 +318,10 @@ class ASGIHandler(base.BaseHandler):
         )
         # Streaming responses need to be pinned to their iterator.
         if response.streaming:
-            # - Consume via `__aiter__` and not `streaming_content` directly,
-            #   to allow mapping of a sync iterator.
-            # - Use aclosing() when consuming aiter. See
-            #   https://github.com/python/cpython/commit/6e8dcdaaa49d4313bf9fab9f9923ca5828fbb10e
-            async with aclosing(aiter(response)) as content:
+            # Consume via `async with`, which closes the content iterator on
+            # exit and, for async context manager content, exits the context
+            # manager once streaming finishes, fails, or is cancelled.
+            async with response as content:
                 async for part in content:
                     for chunk, _ in self.chunk_bytes(part):
                         await send(

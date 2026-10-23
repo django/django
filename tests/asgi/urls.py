@@ -1,6 +1,7 @@
 import asyncio
 import threading
 import time
+from contextlib import asynccontextmanager
 
 from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, HttpResponse, StreamingHttpResponse
@@ -77,6 +78,30 @@ async def streaming_view(request):
     return StreamingHttpResponse(streaming_inner(sleep_time))
 
 
+@asynccontextmanager
+async def streaming_taskgroup_inner(sleep_time):
+    queue = asyncio.Queue()
+
+    async def producer():
+        await queue.put(b"first\n")
+        await asyncio.sleep(sleep_time)
+        await queue.put(b"last\n")
+        await queue.put(None)
+
+    async def items():
+        while (item := await queue.get()) is not None:
+            yield item
+
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(producer())
+        yield items()
+
+
+async def streaming_taskgroup_view(request):
+    sleep_time = float(request.GET["sleep"])
+    return StreamingHttpResponse(streaming_taskgroup_inner(sleep_time))
+
+
 test_filename = __file__
 
 
@@ -90,4 +115,5 @@ urlpatterns = [
     path("delayed_hello/", hello_with_delay),
     path("permission_denied/", permission_denied_view),
     path("streaming/", streaming_view),
+    path("streaming_taskgroup/", streaming_taskgroup_view),
 ]

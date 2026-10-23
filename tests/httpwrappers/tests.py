@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import itertools
 import json
@@ -5,7 +6,7 @@ import os
 import pickle
 import unittest
 import uuid
-from contextlib import aclosing
+from contextlib import aclosing, asynccontextmanager
 
 from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
@@ -873,6 +874,391 @@ class StreamingHttpResponseTests(SimpleTestCase):
             async for _ in content:
                 break
         self.assertTrue(finally_ran)
+
+    async def test_async_with_sync_content(self):
+        r = StreamingHttpResponse(iter(["hello", "world"]))
+        msg = (
+            "StreamingHttpResponse must consume synchronous iterators in order to "
+            "serve them asynchronously. Use an asynchronous iterator instead."
+        )
+        with self.assertWarnsMessage(Warning, msg):
+            async with r as content:
+                chunks = [chunk async for chunk in content]
+        self.assertEqual(chunks, [b"hello", b"world"])
+
+    async def test_async_with_async_content(self):
+        finally_ran = False
+
+        async def body():
+            nonlocal finally_ran
+            try:
+                yield b"hello"
+                yield b"world"
+            finally:
+                finally_ran = True
+
+        r = StreamingHttpResponse(body())
+        async with r as content:
+            self.assertEqual(await anext(content), b"hello")
+        # The content iterator is closed on exit.
+        self.assertTrue(finally_ran)
+
+
+class AsyncContextManagerStreamingHttpResponseTests(SimpleTestCase):
+    """
+    StreamingHttpResponse with an async context manager as streaming_content.
+    """
+
+    @staticmethod
+    @asynccontextmanager
+    async def acmgr(*chunks):
+        async def iterator():
+            for chunk in chunks:
+                yield chunk
+
+        yield iterator()
+
+    async def test_streaming_response(self):
+        r = StreamingHttpResponse(self.acmgr(b"hello", b"world"))
+        self.assertIs(r.is_acmgr, True)
+        self.assertIs(r.is_async, True)
+        async with r as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(chunks, [b"hello", b"world"])
+
+    async def test_make_bytes(self):
+        r = StreamingHttpResponse(self.acmgr("hello", "café", memoryview(b"!")))
+        async with r as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(chunks, [b"hello", b"caf\xc3\xa9", b"!"])
+
+    async def test_repr(self):
+        r = StreamingHttpResponse(self.acmgr(b"hello"))
+        self.assertEqual(
+            repr(r),
+            '<StreamingHttpResponse status_code=200, "text/html; charset=utf-8">',
+        )
+
+    async def test_streaming_content_is_acmgr(self):
+        """
+        streaming_content is itself an async context manager yielding bytes,
+        so that middleware can wrap and reassign it.
+        """
+        r = StreamingHttpResponse(self.acmgr("hello", "world"))
+        content_acmgr = r.streaming_content
+        self.assertTrue(hasattr(content_acmgr, "__aenter__"))
+        async with content_acmgr as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(chunks, [b"hello", b"world"])
+
+    async def test_reassign_streaming_content(self):
+        r = StreamingHttpResponse(self.acmgr(b"first"))
+        r.streaming_content = self.acmgr(b"second")
+        self.assertIs(r.is_acmgr, True)
+        async with r as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(chunks, [b"second"])
+
+    async def test_reassign_async_iterator(self):
+        async def iterator():
+            yield b"iterator"
+
+        r = StreamingHttpResponse(self.acmgr(b"first"))
+        r.streaming_content = iterator()
+        self.assertIs(r.is_acmgr, False)
+        self.assertIs(r.is_async, True)
+        async with r as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(chunks, [b"iterator"])
+
+    async def test_wrapping_streaming_content(self):
+        """
+        Middleware wrapping streaming_content in a further async context
+        manager, as GZipMiddleware does.
+        """
+        r = StreamingHttpResponse(self.acmgr(b"hello", b"world"))
+        original = r.streaming_content
+
+        @asynccontextmanager
+        async def upper():
+            async with original as content:
+
+                async def wrapper():
+                    async for chunk in content:
+                        yield chunk.upper()
+
+                yield wrapper()
+
+        r.streaming_content = upper()
+        async with r as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(chunks, [b"HELLO", b"WORLD"])
+
+    async def test_aenter_returns_self(self):
+        """
+        An object that is both an async context manager and an async
+        iterable, such as anyio's MemoryObjectReceiveStream, is handled.
+        """
+
+        class Stream:
+            closed = False
+
+            def __init__(self, *chunks):
+                self.chunks = list(chunks)
+
+            async def __aenter__(self):
+                return self
+
+            async def __aexit__(self, *exc_info):
+                self.closed = True
+
+            def __aiter__(self):
+                return self
+
+            async def __anext__(self):
+                if not self.chunks:
+                    raise StopAsyncIteration
+                return self.chunks.pop(0)
+
+        stream = Stream(b"hello", b"world")
+        r = StreamingHttpResponse(stream)
+        self.assertIs(r.is_acmgr, True)
+        async with r as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(chunks, [b"hello", b"world"])
+        self.assertIs(stream.closed, True)
+
+    async def test_cleanup_on_completion(self):
+        events = []
+
+        @asynccontextmanager
+        async def acmgr():
+            async def iterator():
+                try:
+                    yield b"hello"
+                    yield b"world"
+                finally:
+                    events.append("iterator closed")
+
+            try:
+                yield iterator()
+            finally:
+                events.append("exited")
+
+        r = StreamingHttpResponse(acmgr())
+        async with r as content:
+            chunks = [chunk async for chunk in content]
+            self.assertEqual(events, ["iterator closed"])
+        self.assertEqual(chunks, [b"hello", b"world"])
+        self.assertEqual(events, ["iterator closed", "exited"])
+
+    async def test_cleanup_on_break(self):
+        """
+        The content iterator is closed, then the context manager is exited,
+        when the consumer stops early.
+        """
+        events = []
+
+        @asynccontextmanager
+        async def acmgr():
+            async def iterator():
+                try:
+                    yield b"hello"
+                    yield b"world"
+                finally:
+                    events.append("iterator closed")
+
+            try:
+                yield iterator()
+            finally:
+                events.append("exited")
+
+        r = StreamingHttpResponse(acmgr())
+        async with r as content:
+            async for _ in content:
+                break
+        self.assertEqual(events, ["iterator closed", "exited"])
+
+    async def test_cleanup_on_error(self):
+        exc_infos = []
+
+        @asynccontextmanager
+        async def acmgr():
+            async def iterator():
+                yield b"hello"
+                raise ValueError("boom")
+
+            try:
+                yield iterator()
+            except ValueError as exc:
+                exc_infos.append(exc)
+                raise
+
+        r = StreamingHttpResponse(acmgr())
+        with self.assertRaisesMessage(ValueError, "boom"):
+            async with r as content:
+                async for _ in content:
+                    pass
+        self.assertEqual(len(exc_infos), 1)
+
+    async def test_cleanup_on_consumer_error(self):
+        events = []
+
+        @asynccontextmanager
+        async def acmgr():
+            async def iterator():
+                try:
+                    yield b"hello"
+                    yield b"world"
+                finally:
+                    events.append("iterator closed")
+
+            try:
+                yield iterator()
+            except RuntimeError:
+                events.append("exited with error")
+                raise
+
+        r = StreamingHttpResponse(acmgr())
+        with self.assertRaisesMessage(RuntimeError, "consumer"):
+            async with r as content:
+                async for _ in content:
+                    raise RuntimeError("consumer")
+        self.assertEqual(events, ["iterator closed", "exited with error"])
+
+    async def test_aiter_raises(self):
+        r = StreamingHttpResponse(self.acmgr(b"hello"))
+        msg = (
+            "StreamingHttpResponse with asynchronous context manager content must "
+            "be consumed with `async with`, not iterated directly."
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            async for _ in r:
+                pass
+
+    def test_iter_warning(self):
+        """
+        As for async iterators, async context manager content is consumed in
+        full to serve it synchronously.
+        """
+        r = StreamingHttpResponse(self.acmgr("hello", "world"))
+        msg = (
+            "StreamingHttpResponse must consume asynchronous context managers in "
+            "order to serve them synchronously. Use a synchronous iterator instead."
+        )
+        with self.assertWarnsMessage(Warning, msg):
+            self.assertEqual(list(r), [b"hello", b"world"])
+
+    async def test_taskgroup(self):
+        """
+        The content can be produced by tasks in an asyncio.TaskGroup, with the
+        context manager's yield standing in for the yield an async generator
+        couldn't make inside the task group (PEP 789).
+        """
+
+        @asynccontextmanager
+        async def taskgroup_stream():
+            queue = asyncio.Queue(maxsize=1)
+
+            async def producer(name, count):
+                for i in range(count):
+                    await queue.put(f"{name}-{i}".encode())
+
+            async def run_producers():
+                async with asyncio.TaskGroup() as tg:
+                    tg.create_task(producer("news", 2))
+                    tg.create_task(producer("weather", 1))
+                await queue.put(None)  # Sentinel: all producers finished.
+
+            async def items():
+                while (item := await queue.get()) is not None:
+                    yield item
+
+            async with asyncio.TaskGroup() as tg:
+                tg.create_task(run_producers())
+                yield items()
+
+        r = StreamingHttpResponse(taskgroup_stream())
+        async with r as content:
+            chunks = [chunk async for chunk in content]
+        self.assertEqual(sorted(chunks), [b"news-0", b"news-1", b"weather-0"])
+
+    async def test_taskgroup_cancellation(self):
+        """
+        Cancelling the consumer, as happens on client disconnect, cancels the
+        producer tasks via the task group.
+        """
+        producer_cancelled = False
+        first_chunk_received = asyncio.Event()
+
+        @asynccontextmanager
+        async def taskgroup_stream():
+            queue = asyncio.Queue()
+
+            async def producer():
+                nonlocal producer_cancelled
+                await queue.put(b"hello")
+                try:
+                    await asyncio.Event().wait()  # Block forever.
+                except asyncio.CancelledError:
+                    producer_cancelled = True
+                    raise
+
+            async def items():
+                while True:
+                    yield await queue.get()
+
+            async with asyncio.TaskGroup() as tg:
+                tg.create_task(producer())
+                yield items()
+
+        async def consume():
+            r = StreamingHttpResponse(taskgroup_stream())
+            async with r as content:
+                async for chunk in content:
+                    chunks.append(chunk)
+                    first_chunk_received.set()
+
+        chunks = []
+        consumer = asyncio.create_task(consume())
+        await first_chunk_received.wait()
+        consumer.cancel()
+        with self.assertRaises(asyncio.CancelledError):
+            await consumer
+        self.assertEqual(chunks, [b"hello"])
+        self.assertIs(producer_cancelled, True)
+
+    async def test_taskgroup_producer_error(self):
+        """
+        An error in a producer task cancels the consumer and is raised, in an
+        exception group, from the response context manager.
+        """
+
+        @asynccontextmanager
+        async def taskgroup_stream():
+            queue = asyncio.Queue()
+
+            async def producer():
+                await queue.put(b"hello")
+                raise ValueError("producer failed")
+
+            async def items():
+                while True:
+                    yield await queue.get()
+
+            async with asyncio.TaskGroup() as tg:
+                tg.create_task(producer())
+                yield items()
+
+        r = StreamingHttpResponse(taskgroup_stream())
+        chunks = []
+        with self.assertRaises(ExceptionGroup) as cm:
+            async with r as content:
+                async for chunk in content:
+                    chunks.append(chunk)
+        self.assertEqual(chunks, [b"hello"])
+        self.assertEqual(len(cm.exception.exceptions), 1)
+        self.assertEqual(str(cm.exception.exceptions[0]), "producer failed")
 
 
 class FileCloseTests(SimpleTestCase):

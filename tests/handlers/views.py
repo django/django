@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import asynccontextmanager
 from http import HTTPStatus
 
 from django.core.exceptions import BadRequest, SuspiciousOperation
@@ -77,6 +78,19 @@ async def async_streaming(request):
         yield b"content"
 
     return StreamingHttpResponse(async_streaming_generator())
+
+
+async def async_streaming_acmgr(request):
+    @asynccontextmanager
+    async def streaming_acmgr():
+        async def async_streaming_generator():
+            yield b"streaming"
+            yield b" "
+            yield b"content"
+
+        yield async_streaming_generator()
+
+    return StreamingHttpResponse(streaming_acmgr())
 
 
 class CoroutineClearingView:
