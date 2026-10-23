@@ -27,6 +27,7 @@ from django.forms.widgets import (
     EmailInput,
     FileInput,
     HiddenInput,
+    MultipleFileInput,
     MultipleHiddenInput,
     NullBooleanSelect,
     NumberInput,
@@ -60,6 +61,7 @@ __all__ = (
     "RegexField",
     "EmailField",
     "FileField",
+    "MultipleFileField",
     "ImageField",
     "URLField",
     "BooleanField",
@@ -667,14 +669,22 @@ class FileField(Field):
             raise ValidationError(self.error_messages["invalid"], code="invalid")
 
         if self.max_length is not None and len(file_name) > self.max_length:
-            params = {"max": self.max_length, "length": len(file_name)}
+            params = {
+                "file_name": file_name,
+                "max": self.max_length,
+                "length": len(file_name),
+            }
             raise ValidationError(
                 self.error_messages["max_length"], code="max_length", params=params
             )
         if not file_name:
             raise ValidationError(self.error_messages["invalid"], code="invalid")
         if not self.allow_empty_file and not file_size:
-            raise ValidationError(self.error_messages["empty"], code="empty")
+            raise ValidationError(
+                self.error_messages["empty"],
+                code="empty",
+                params={"file_name": file_name},
+            )
 
         return data
 
@@ -708,6 +718,36 @@ class FileField(Field):
     def _clean_bound_field(self, bf):
         value = bf.initial if self.disabled else bf.data
         return self.clean(value, bf.initial)
+
+
+class MultipleFileField(FileField):
+    widget = MultipleFileInput
+    default_error_messages = {
+        "empty": _("The submitted file %(file_name)s is empty."),
+        "max_length": ngettext_lazy(
+            "Ensure the filename %(file_name)s has at most %(max)d character "
+            "(it has %(length)d).",
+            "Ensure the filename %(file_name)s has at most %(max)d characters "
+            "(it has %(length)d).",
+            "max",
+        ),
+    }
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if data in self.empty_values:
+            value = single_file_clean(data, initial)
+            if value in self.empty_values:
+                return []
+            if isinstance(value, (list, tuple)):
+                return list(value)
+            return [value]
+        if not isinstance(data, (list, tuple)):
+            data = [data]
+        return [single_file_clean(file, None) for file in data]
+
+    def has_changed(self, initial, data):
+        return not self.disabled and bool(data)
 
 
 class ImageField(FileField):

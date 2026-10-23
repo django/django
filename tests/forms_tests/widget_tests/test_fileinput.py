@@ -1,5 +1,5 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import FileField, FileInput, Form
+from django.forms import FileField, FileInput, Form, MultipleFileInput
 from django.utils.datastructures import MultiValueDict
 
 from .base import WidgetTest
@@ -57,9 +57,6 @@ class FileInputTest(WidgetTest):
             FileInput(attrs={"multiple": True})
 
     def test_value_from_datadict_multiple(self):
-        class MultipleFileInput(FileInput):
-            allow_multiple_selected = True
-
         file_1 = SimpleUploadedFile("something1.txt", b"content 1")
         file_2 = SimpleUploadedFile("something2.txt", b"content 2")
         # Uploading multiple files is allowed.
@@ -80,9 +77,6 @@ class FileInputTest(WidgetTest):
         self.assertEqual(value, file_2)
 
     def test_multiple_default(self):
-        class MultipleFileInput(FileInput):
-            allow_multiple_selected = True
-
         tests = [
             (None, True),
             ({"class": "myclass"}, True),
