@@ -106,6 +106,22 @@ class FilteredRelationTests(TestCase):
             lambda x: (x, x.author_join, x.editor_join),
         )
 
+    def test_alias_collision_with_base_table(self):
+        authors = Author.objects.annotate(
+            filtered_relation_author=FilteredRelation("book")
+        ).filter(filtered_relation_author__title=self.book1.title)
+
+        self.assertSequenceEqual(authors, [self.author1])
+
+    def test_alias_collision_with_later_join(self):
+        authors = (
+            Author.objects.annotate(T3=FilteredRelation("book"))
+            .filter(T3__title=self.book1.title)
+            .filter(book__title=self.book4.title)
+        )
+
+        self.assertSequenceEqual(authors, [self.author1])
+
     def test_select_related_with_empty_relation(self):
         qs = (
             Author.objects.annotate(

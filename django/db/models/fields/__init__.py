@@ -173,6 +173,7 @@ class Field(RegisterLookupMixin):
 
     # Field flags
     hidden = False
+    is_composite = False
 
     many_to_many = None
     many_to_one = None
