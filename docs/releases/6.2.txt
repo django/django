@@ -31,6 +31,28 @@ and only officially support the latest release of each series.
 What's new in Django 6.2
 ========================
 
+Multiline template tags
+-----------------------
+
+The :class:`~django.template.backends.django.DjangoTemplates` backend now
+supports template tags spanning multiple lines. This can make tags with several
+arguments easier to read:
+
+.. code-block:: html+django
+
+    {% include
+        "blog/includes/article_card.html"
+        with
+            article=article
+            show_author=True
+            extra_classes="featured-article"
+        only
+    %}
+
+This change to template parsing may cause template errors or unexpected
+rendering in some existing templates. See
+:ref:`multiline-template-tags-compatibility` for details.
+
 Adopting calendar versioning
 ----------------------------
 
@@ -283,6 +305,44 @@ Validators
 
 Backwards incompatible changes in 6.2
 =====================================
+
+.. _multiline-template-tags-compatibility:
+
+Multiline template tag parsing
+------------------------------
+
+Previously, ``{%`` and ``%}`` sequences on separate lines were treated as text.
+These may now be interpreted as a template tag. This can change the rendered
+output or raise a :exc:`~django.template.TemplateSyntaxError`. Use the
+:ttag:`templatetag` tag with ``openblock`` and ``closeblock`` to output these
+sequences as text.
+
+For example, previously the following was rendered as text:
+
+.. code-block:: text
+
+    This is the opening delimiter {%.
+    This is the closing delimiter %}.
+
+To preserve this output, use:
+
+.. code-block:: html+django
+
+    This is the opening delimiter {% templatetag openblock %}.
+    This is the closing delimiter {% templatetag closeblock %}.
+
+Whitespace within the names of named :ttag:`verbatim` tags is now treated as
+equivalent when matching closing tags. Previously, ``{% verbatim a   b %}``
+required ``{% endverbatim a   b %}`` to close it. It now also matches
+``{% endverbatim a b %}``, which may cause a verbatim block to end earlier than
+intended.
+
+You can temporarily restore the previous parsing behavior by setting
+``"allow_multiline_tags": False`` in the
+:class:`~django.template.backends.django.DjangoTemplates` backend's
+:setting:`OPTIONS <TEMPLATES-OPTIONS>`. Remove the option once your templates
+are updated. This transitional option is deprecated and will be removed in
+Django 2029.
 
 Database backend API
 --------------------
