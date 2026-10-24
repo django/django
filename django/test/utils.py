@@ -1021,8 +1021,19 @@ def register_lookup(field, *lookups, lookup_name=None):
             field.register_lookup(lookup, lookup_name)
         yield
     finally:
+        # Each lookup was registered by this context manager on this exact
+        # class or instance, so deleting it from that object's own dict
+        # restores the exact pre-registration state. The public
+        # unregister_lookup() isn't used as it would leave a None tombstone
+        # that shadows lookups registered later under the same name on
+        # ancestor classes, breaking test isolation.
         for lookup in lookups:
-            field._unregister_lookup(lookup, lookup_name)
+            name = lookup_name or lookup.lookup_name
+            if isinstance(field, type):
+                del field.class_lookups[name]
+                field._clear_cached_class_lookups()
+            else:
+                del field.instance_lookups[name]
 
 
 def garbage_collect():
