@@ -652,6 +652,38 @@ class TestQuerying(TestCase):
             [self.objs[3], self.objs[4], self.objs[6]],
         )
 
+    def test_has_key_expression_not_supported(self):
+        if connection.vendor == "postgresql":
+            self.skipTest("PostgreSQL natively supports has_key with expressions.")
+
+        msg = (
+            "has_key lookup with expressions is not supported on %s."
+            % connection.display_name
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(NullableJSONModel.objects.filter(value__has_key=F("id")))
+
+        msg = (
+            "has_keys lookup with expressions is not supported on %s."
+            % connection.display_name
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(NullableJSONModel.objects.filter(value__has_keys=F("id")))
+
+        msg = (
+            "has_any_keys lookup with expressions is not supported on %s."
+            % connection.display_name
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(NullableJSONModel.objects.filter(value__has_any_keys=F("id")))
+
+    def test_range_with_expression(self):
+        obj = NullableJSONModel.objects.create(value={"target": 5, "bounds": [2, 6]})
+        self.assertSequenceEqual(
+            NullableJSONModel.objects.filter(value__target__range=F("value__bounds")),
+            [obj],
+        )
+
     def test_has_key_number(self):
         obj = NullableJSONModel.objects.create(
             value={
