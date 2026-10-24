@@ -1,0 +1,50 @@
+Excluding parts of files from templating
+----------------------------------------
+
+The templating engine will overwrite any context variables found in the project
+or app template. Sometimes, for the purposes of documentation, you want to
+leave the variables visible in the producted app or project structure. To have
+``{{ django_version }}`` or ``{{ project_name }}`` still visible in the
+resulting file, you can wrap that part of the file, or even the whole file with
+the template tags {% verbatim %} and {% endverbatim %}. The templating engine
+will end up removing them from the finished file.
+
+Using your templates
+====================
+Using your templates
+====================
+
+The basic command to start your project using your new template is:
+
+   .. code-block:: shell
+   $ django-admin startproject myproject .
+
+To add non-python files to the templating engine, add the names to the
+``extension`` flag like so:
+
+   .. code-block:: shell
+   $ django-admin startproject myproject . --extension js,toml
+
+So now all javascript and toml files will be run through the templating engine
+to replace any variables.
+
+If you are using any non-python files that you need run through the templating
+engine that do not have extensions, such as ``Dockerfile`` or ``.gitignore``,
+or for files with extensions in which not all should be templated, you can add
+them individually after the ``--name`` flag:
+
+   .. code-block:: shell
+   $ django-admin startproject myproject . --name Dockerfile,.gitignore
+
+# exclude directories (but not file) that should not be templated
+
+
+   .. code-block:: shell
+   $ django-admin startproject myproject . --exclude frontend,reference
+
+
+
+
+
+
+
