@@ -1,6 +1,7 @@
 import logging
 import multiprocessing
 import os
+import threading
 import unittest.loader
 from argparse import ArgumentParser
 from contextlib import contextmanager
@@ -856,3 +857,23 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
             ["test_runner_apps.databases.tests.DefaultDatabaseSerializedTests"]
         )
         self.assertEqual(databases, {"default": True})
+
+
+class UnhandledExceptionsTests(SimpleTestCase):
+    def test_unhandled_thread_exception_fails_test(self):
+        class DummyThreadExceptionTest(SimpleTestCase):
+            def test_thread_exception(self):
+                def crash():
+                    raise ValueError("Intentional thread crash")
+
+                with captured_stderr():
+                    t = threading.Thread(target=crash)
+                    t.start()
+                    t.join()
+
+        result = unittest.TestResult()
+        test = DummyThreadExceptionTest("test_thread_exception")
+        test(result)
+
+        self.assertEqual(len(result.errors), 1)
+        self.assertIn("Intentional thread crash", str(result.errors[0][1]))
