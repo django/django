@@ -519,16 +519,18 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
                 self.rhs.clear_select_clause()
                 self.rhs.add_fields(["pk"])
         else:
-            try:
-                # Remove None from the list as NULL is never equal to anything.
-                rhs = OrderedSet(self.rhs)
-                if None in rhs:
-                    self.rhs_contains_none = True
-                    rhs.discard(None)
-            except TypeError:  # Unhashable items in self.rhs
-                rhs = [r for r in self.rhs if r is not None]
+            if self.rhs_is_direct_value():
+                try:
+                    # Remove None from the list as NULL is never equal
+                    # to anything.
+                    rhs = OrderedSet(self.rhs)
+                    if None in rhs:
+                        self.rhs_contains_none = True
+                        rhs.discard(None)
+                except TypeError:  # Unhashable items in self.rhs
+                    rhs = [r for r in self.rhs if r is not None]
 
-            self.rhs = rhs
+                self.rhs = rhs
 
         return super().get_prep_lookup()
 
