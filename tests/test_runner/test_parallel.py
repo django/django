@@ -3,6 +3,7 @@ import multiprocessing
 import os
 import pickle
 import sys
+import traceback
 import unittest
 from unittest import mock
 from unittest.case import TestCase
@@ -29,6 +30,16 @@ def _test_error_exc_info():
     try:
         raise ValueError("woops")
     except ValueError:
+        return sys.exc_info()
+
+
+def _test_chained_error_exc_info():
+    try:
+        try:
+            raise ValueError("inner cause")
+        except ValueError as exc:
+            raise RuntimeError("outer error") from exc
+    except RuntimeError:
         return sys.exc_info()
 
 
@@ -172,6 +183,32 @@ class RemoteTestResultTest(SimpleTestCase):
         error_type, _, _ = event[3]
         self.assertEqual(error_type, ValueError)
         self.assertIs(result.wasSuccessful(), False)
+
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
+    def test_error_preserves_exception_chain(self):
+        """
+        Chained exceptions (via __cause__/__context__) survive the transfer of
+        errors from a worker process to the main process, so the full traceback
+        is shown when running tests in parallel (#29023).
+        """
+        result = RemoteTestResult()
+        test = None
+        result.startTest(test)
+        try:
+            result.addError(test, _test_chained_error_exc_info())
+        finally:
+            result.stopTest(test)
+
+        # Simulate transferring the events from a worker to the main process.
+        events = pickle.loads(pickle.dumps(result.events))
+        _, _, err = next(event for event in events if event[0] == "addError")
+        formatted = "".join(traceback.format_exception(*err))
+        self.assertIn("ValueError: inner cause", formatted)
+        self.assertIn("RuntimeError: outer error", formatted)
+        self.assertIn(
+            "The above exception was the direct cause of the following exception",
+            formatted,
+        )
 
     def test_picklable(self):
         result = RemoteTestResult()
