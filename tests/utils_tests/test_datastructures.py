@@ -248,6 +248,29 @@ class MultiValueDictTests(SimpleTestCase):
             with self.subTest(value), self.assertRaises(ValueError):
                 MultiValueDict().update(value)
 
+    def test_update_operator_dict(self):
+        d = MultiValueDict({"name": ["Adrian", "Simon"]})
+        d |= {"name": "Holovaty", "position": "Developer"}
+        self.assertEqual(
+            list(d.lists()),
+            [("name", ["Adrian", "Simon", "Holovaty"]), ("position", ["Developer"])],
+        )
+
+    def test_update_operator_multivaluedict(self):
+        d = MultiValueDict({"name": ["Adrian", "Simon"]})
+        d2 = MultiValueDict({"name": ["Holovaty"], "position": ["Developer"]})
+        d |= d2
+        self.assertEqual(
+            list(d.lists()),
+            [("name", ["Adrian", "Simon", "Holovaty"]), ("position", ["Developer"])],
+        )
+
+    def test_update_operator_nondict(self):
+        d = MultiValueDict({"name": ["Adrian", "Simon"]})
+        msg = "'int' object is not iterable"
+        with self.assertRaisesMessage(TypeError, msg):
+            d |= 42
+
 
 class ImmutableListTests(SimpleTestCase):
     def test_sort(self):
