@@ -1222,9 +1222,43 @@ class LookupTests(TestCase):
         sql = ctx.captured_queries[0]["sql"]
         self.assertIn("IN (%s)" % self.a1.pk, sql)
 
-    def test_in_ignore_solo_none(self):
-        with self.assertNumQueries(0):
-            self.assertSequenceEqual(Article.objects.filter(id__in=[None]), [])
+    def test_in_append_or_isnull(self):
+        a8 = Article.objects.create(
+            headline="Article 8", pub_date=datetime(2026, 9, 24), slug="a8"
+        )
+        # make sure we get "{lhs_sql} IS NULL" when testing against a list
+        # of values containing only None
+        with self.assertNumQueries(1):
+            self.assertSequenceEqual(
+                Article.objects.filter(author__in=[None]),
+                [a8],
+            )
+        # make sure "OR {lhs_sql} IS NULL" is appended to the SQL clause when
+        # the rhs contains None but also other values
+        self.assertQuerySetEqual(
+            Article.objects.filter(author__in=[None, self.au1]),
+            Article.objects.filter(Q(author=self.au1) | Q(author=None)),
+        )
+
+    def test_in_append_or_isnull_join(self):
+        a9 = Article.objects.create(
+            headline="Article 9", pub_date=datetime(2026, 9, 24), slug="a9"
+        )
+        # make sure we get "{lhs_sql} IS NULL" when testing against a list
+        # of values containing only None
+        with self.assertNumQueries(1):
+            self.assertSequenceEqual(
+                Article.objects.filter(author__name__in=[None]),
+                [a9],
+            )
+        # make sure "OR {lhs_sql} IS NULL" is appended to the SQL clause when
+        # the rhs contains None but also other values
+        self.assertQuerySetEqual(
+            Article.objects.filter(author__name__in=[None, self.au1.name]),
+            Article.objects.filter(
+                Q(author__name=self.au1.name) | Q(author__name=None)
+            ),
+        )
 
     def test_in_ignore_none_with_unhashable_items(self):
         class UnhashableInt(int):
