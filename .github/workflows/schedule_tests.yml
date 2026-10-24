@@ -132,8 +132,26 @@ jobs:
         run: python -m playwright install --with-deps ${{ matrix.browser }}
       - name: Run Playwright tests
         working-directory: ./tests/
+        run: python -Wall runtests.py --verbosity 2 --noinput --playwright=${{ matrix.browser }} --video=retain-on-failure --tracing=retain-on-failure --settings=test_sqlite --parallel 1
+
+      - name: Organize Playwright artifacts
+        if: failure()
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --playwright=${{ matrix.browser }} --settings=test_sqlite --parallel 1
+          mkdir --parents "/tmp/playwright-sqlite/${{ github.sha }}"
+          if [ -d "tests/videos/${{ matrix.browser }}" ]; then
+            mv "tests/videos/${{ matrix.browser }}" "/tmp/playwright-sqlite/${{ github.sha }}/videos"
+          fi
+          if [ -d "tests/traces/${{ matrix.browser }}" ]; then
+            mv "tests/traces/${{ matrix.browser }}" "/tmp/playwright-sqlite/${{ github.sha }}/traces"
+          fi
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-sqlite-${{ matrix.browser }}-${{ github.sha }}
+          path: /tmp/playwright-sqlite/
+          if-no-files-found: ignore
 
   playwright-postgresql:
     runs-on: ubuntu-latest
@@ -177,8 +195,26 @@ jobs:
         run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py
       - name: Run Playwright tests
         working-directory: ./tests/
+        run: python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --video=retain-on-failure --tracing=retain-on-failure --settings=test_postgres --parallel 1
+
+      - name: Organize Playwright artifacts
+        if: failure()
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --settings=test_postgres --parallel 1
+          mkdir --parents "/tmp/playwright-postgresql/${{ github.sha }}"
+          if [ -d tests/videos/chromium ]; then
+            mv tests/videos/chromium "/tmp/playwright-postgresql/${{ github.sha }}/videos"
+          fi
+          if [ -d tests/traces/chromium ]; then
+            mv tests/traces/chromium "/tmp/playwright-postgresql/${{ github.sha }}/traces"
+          fi
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-postgresql-${{ github.sha }}
+          path: /tmp/playwright-postgresql/
+          if-no-files-found: ignore
 
   postgresql:
     strategy:

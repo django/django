@@ -1,5 +1,6 @@
 import os
 import sys
+import tempfile
 import unittest
 from contextlib import contextmanager
 from functools import wraps
@@ -8,6 +9,16 @@ from pathlib import Path
 from django.conf import settings
 from django.test import LiveServerTestCase, override_settings, tag
 from django.utils.text import capfirst
+
+PLAYWRIGHT_RECORD_MODES = ("off", "on", "retain-on-failure")
+
+
+def should_keep_playwright_artifact(mode, failed):
+    if mode == "on":
+        return True
+    if mode == "retain-on-failure":
+        return failed
+    return False
 
 
 class PlaywrightTestCaseMeta(type(LiveServerTestCase)):
@@ -87,6 +98,8 @@ class ChangeViewportSize:
 class PlaywrightTestCase(LiveServerTestCase, metaclass=PlaywrightTestCaseMeta):
     default_timeout = 10000  # milliseconds
     screenshots = False
+    tracing = "off"
+    video = "off"
     browser_timezone = "America/Chicago"
 
     @classmethod
@@ -145,12 +158,104 @@ class PlaywrightTestCase(LiveServerTestCase, metaclass=PlaywrightTestCaseMeta):
         )
         # Use a fixed browser timezone so browser-based tests don't depend on
         # the local timezone of the machine running them.
-        cls._browser_context = cls._browser.new_context(
-            timezone_id=cls.browser_timezone
-        )
+        context_kwargs = {"timezone_id": cls.browser_timezone}
+        if cls.video != "off":
+            cls._video_tmpdir = tempfile.TemporaryDirectory(
+                prefix="playwright-",
+            )
+            cls.addClassCleanup(cls._video_tmpdir.cleanup)
+            context_kwargs["record_video_dir"] = cls._video_tmpdir.name
+        cls._browser_context = cls._browser.new_context(**context_kwargs)
+        cls._open_page()
+        cls.addClassCleanup(cls._close_browser)
+
+    def setUp(self):
+        super().setUp()
+        if self.video != "off" and self.page.is_closed():
+            # A new page starts a new recording; the previous test closed its
+            # page in _save_video.
+            type(self)._open_page()
+        if self.tracing != "off":
+            self._browser_context.tracing.start(
+                screenshots=True,
+                snapshots=True,
+            )
+            self.addCleanup(self._stop_tracing)
+        if self.video != "off":
+            # The main page already exists, so its "page" event has fired.
+            # Popups opened during the test, including from another popup,
+            # are remembered here.
+            self._videos = []
+            self._remember_page_video(self.page)
+            self._browser_context.on("page", self._remember_page_video)
+            self.addCleanup(self._save_video)
+
+    def _stop_tracing(self):
+        if should_keep_playwright_artifact(self.tracing, self._has_failed()):
+            path = Path.cwd() / "traces" / self.browser / f"{self._artifact_stem()}.zip"
+            path.parent.mkdir(exist_ok=True, parents=True)
+            self._browser_context.tracing.stop(path=path)
+        else:
+            self._browser_context.tracing.stop()
+
+    @classmethod
+    def _open_page(cls):
         cls.page = cls._browser_context.new_page()
         cls.page.set_default_timeout(cls.default_timeout)
-        cls.addClassCleanup(cls._close_browser)
+
+    def _artifact_stem(self):
+        safe_id = "".join("_" if c in '<>:"/\\|?*' else c for c in self.id())
+        return safe_id
+
+    def _has_failed(self):
+        outcome = getattr(self, "_outcome", None)
+        if outcome is None:
+            return False
+        for _test, exc_info in getattr(outcome, "errors", []):
+            if exc_info is not None:
+                return True
+        result = getattr(outcome, "result", None)
+        if result is None:
+            return False
+        try:
+            records = (*result.failures, *result.errors)
+        except TypeError:
+            return False
+        for record in records:
+            test = record[0]
+            if getattr(test, "test_case", test) is self:
+                return True
+        return False
+
+    def _remember_page_video(self, page):
+        video = page.video
+        if video is None:
+            return
+        for _, existing in self._videos:
+            if existing is video:
+                return
+        self._videos.append((page, video))
+
+    def _save_video(self):
+        self._browser_context.remove_listener("page", self._remember_page_video)
+        videos = self._videos
+        self._videos = []
+        keep = should_keep_playwright_artifact(self.video, self._has_failed())
+        directory = Path.cwd() / "videos" / self.browser
+        if keep and videos:
+            directory.mkdir(exist_ok=True, parents=True)
+        for index, (page, video) in enumerate(videos, start=1):
+            # save_as() raises until the page is closed.
+            if not page.is_closed():
+                page.close()
+            if not keep:
+                video.delete()
+                continue
+            suffix = "" if index == 1 else f"-{index}"
+            video.save_as(directory / f"{self._artifact_stem()}{suffix}.webm")
+        # A new page starts the next test's recording.
+        if not self.page.is_closed():
+            self.page.close()
 
     @contextmanager
     def desktop_size(self):
@@ -208,7 +313,8 @@ class PlaywrightTestCase(LiveServerTestCase, metaclass=PlaywrightTestCaseMeta):
         # single-threaded LiveServerThread to avoid a dead lock if the browser
         # kept a connection alive.
         if hasattr(cls, "page"):
-            cls.page.close()
+            if not cls.page.is_closed():
+                cls.page.close()
             del cls.page
         if hasattr(cls, "_browser_context"):
             cls._browser_context.close()
