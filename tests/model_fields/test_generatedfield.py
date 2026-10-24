@@ -119,6 +119,18 @@ class BaseGeneratedFieldTests(SimpleTestCase):
             kwargs["output_field"].deconstruct(), IntegerField().deconstruct()
         )
 
+    def test_deconstruct_ignore_null(self):
+        for null in (True, False):
+            with self.subTest(null=null):
+                field = GeneratedField(
+                    expression=F("a") + F("b"),
+                    output_field=IntegerField(),
+                    db_persist=True,
+                    null=null,
+                )
+                _, path, args, kwargs = field.deconstruct()
+                self.assertNotIn("null", kwargs)
+
     @isolate_apps("model_fields")
     def test_get_col(self):
         class Square(Model):
