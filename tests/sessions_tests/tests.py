@@ -987,6 +987,24 @@ class FileSessionTests(SessionTestsMixin, SimpleTestCase):
         # ... and two are deleted.
         self.assertEqual(1, count_sessions())
 
+    def test_save_raises_update_error_if_deleted_mid_save(self):
+        self.session["foo"] = "bar"
+        self.session.save()
+        self.assertTrue(self.session.exists(self.session.session_key))
+
+        original_encode = self.session.encode
+
+        def deleting_encode(session_data):
+            self.session.delete()
+            self.assertFalse(self.session.exists(self.session.session_key))
+            return original_encode(session_data)
+
+        with mock.patch.object(self.session, "encode", deleting_encode):
+            with self.assertRaises(UpdateError):
+                self.session.save()
+
+        self.assertFalse(self.session.exists(self.session.session_key))
+
 
 class FileSessionPathLibTests(FileSessionTests):
     def mkdtemp(self):
