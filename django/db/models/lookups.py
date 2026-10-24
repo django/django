@@ -409,6 +409,16 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
             return template % lhs_sql, params
         return super().as_sql(compiler, connection)
 
+    def as_oracle(self, compiler, connection):
+        if (
+            hasattr(self.lhs, "output_field")
+            and self.lhs.output_field.get_internal_type() == "TextField"
+        ):
+            lhs, lhs_params = self.process_lhs(compiler, connection)
+            rhs, rhs_params = self.process_rhs(compiler, connection)
+            return f"DBMS_LOB.COMPARE({lhs}, {rhs}) = 0", (*lhs_params, *rhs_params)
+        return super().as_oracle(compiler, connection)
+
 
 @Field.register_lookup
 class IExact(BuiltinLookup):
