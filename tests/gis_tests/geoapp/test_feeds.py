@@ -10,7 +10,7 @@ from .models import City
 @modify_settings(INSTALLED_APPS={"append": "django.contrib.sites"})
 @override_settings(ROOT_URLCONF="gis_tests.geoapp.urls")
 class GeoFeedTest(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["geoapp_initial"]
 
     @classmethod
     def setUpTestData(cls):

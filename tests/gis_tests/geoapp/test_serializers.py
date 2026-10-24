@@ -8,7 +8,7 @@ from .models import City, MultiFields, PennsylvaniaCity
 
 
 class GeoJSONSerializerTests(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["geoapp_initial"]
 
     def test_builtin_serializers(self):
         """
