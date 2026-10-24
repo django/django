@@ -1260,6 +1260,10 @@ class LookupTests(TestCase):
             ),
         )
 
+    def test_in_negated_none(self):
+        articles = Article.objects.exclude(author__name__in=[None])
+        self.assertIn("INNER JOIN", str(articles.query))
+
     def test_in_ignore_none_with_unhashable_items(self):
         class UnhashableInt(int):
             __hash__ = None
