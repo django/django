@@ -108,7 +108,7 @@ class FileBasedCache(BaseCache):
         """
         filelist = self._list_cache_files()
         num_entries = len(filelist)
-        if num_entries < self._max_entries:
+        if self._max_entries is None or num_entries < self._max_entries:
             return  # return early if no culling is required
         if self._cull_frequency == 0:
             return self.clear()  # Clear the cache when CULL_FREQUENCY = 0
