@@ -45,9 +45,9 @@ class AuthTemplateTests(TestCase):
             '<label for="id_email">Email address:</label>'
             '<ul class="errorlist" id="id_email_error">'
             "<li>This field is required.</li></ul>"
-            '<input type="email" name="email" autocomplete="email" maxlength="254" '
-            'required  aria-invalid="true" aria-describedby="id_email_error" '
-            'id="id_email"></div>',
+            '<input type="email" name="email" dir="ltr" autocomplete="email" '
+            'maxlength="254" required aria-invalid="true" '
+            'aria-describedby="id_email_error" id="id_email"></div>',
             html=True,
         )
 
