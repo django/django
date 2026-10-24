@@ -16,6 +16,7 @@ urlpatterns = [
     path("csp-report/", views.csp_report_view),
     path("csp-base/", views.empty_view),
     path("csp-nonce/", views.csp_nonce),
+    path("csp-nonce-public/", views.csp_nonce_public),
     path("csp-disabled-both/", views.csp_disabled_both),
     path("csp-disabled-enforced/", views.csp_disabled_enforced),
     path("csp-disabled-report-only/", views.csp_disabled_ro),

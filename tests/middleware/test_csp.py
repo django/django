@@ -4,6 +4,7 @@ from playwright_tests import PlaywrightTestCase
 from utils_tests.test_csp import basic_config, basic_policy
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.http import FileResponse, HttpResponse, StreamingHttpResponse
 from django.middleware.csp import ContentSecurityPolicyMiddleware
 from django.template import Context, Template
@@ -13,6 +14,17 @@ from django.test.utils import modify_settings, override_settings
 from django.utils.csp import CSP
 
 from .views import csp_reports
+
+nonce_config = {"default-src": [CSP.SELF, CSP.NONCE]}
+# Each setting the middleware reads, paired with the header it produces.
+csp_settings = [
+    ("SECURE_CSP", CSP.HEADER_ENFORCE),
+    ("SECURE_CSP_REPORT_ONLY", CSP.HEADER_REPORT_ONLY),
+]
+
+
+class CSPMiddlewareNonceCachingAllowed(ContentSecurityPolicyMiddleware):
+    nonce_caching_allowed = True
 
 
 @override_settings(
@@ -48,16 +60,83 @@ class CSPMiddlewareTest(SimpleTestCase):
             response[CSP.HEADER_ENFORCE], f"default-src 'self' 'nonce-{nonce}'"
         )
 
-    @override_settings(SECURE_CSP={"default-src": [CSP.SELF, CSP.NONCE]})
     def test_csp_basic_with_nonce_but_unused(self):
         """
         Test if `request.csp_nonce` is never accessed, it is not added to the
-        header.
+        header, and caching is left untouched.
         """
-        response = self.client.get("/csp-base/")
-        nonce = response.text
-        self.assertIsNotNone(nonce)
-        self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
+        for setting, header in csp_settings:
+            with (
+                self.subTest(setting=setting),
+                self.settings(**{setting: nonce_config}),
+            ):
+                response = self.client.get("/csp-base/")
+                nonce = response.text
+                self.assertIsNotNone(nonce)
+                self.assertEqual(response[header], basic_policy)
+                self.assertNotIn("Cache-Control", response)
+
+    def test_csp_nonce_overrides_explicit_public_cache_control(self):
+        """A rendered nonce overrides an explicit public Cache-Control."""
+        for setting, _ in csp_settings:
+            with (
+                self.subTest(setting=setting),
+                self.settings(**{setting: nonce_config}),
+            ):
+                response = self.client.get("/csp-nonce-public/")
+                self.assertTrue(response.text)
+                self.assertIn("private", response["Cache-Control"])
+                self.assertNotIn("public", response["Cache-Control"])
+
+    def test_csp_nonce_used_but_not_in_policy(self):
+        """
+        A nonce that isn't in any CSP header can't be replayed, so caching is
+        left untouched.
+        """
+        for setting, header in csp_settings:
+            with (
+                self.subTest(setting=setting),
+                self.settings(**{setting: basic_config}),
+            ):
+                response = self.client.get("/csp-nonce/")
+                self.assertTrue(response.text)
+                self.assertEqual(response[header], basic_policy)
+                self.assertNotIn("Cache-Control", response)
+
+    @override_settings(
+        MIDDLEWARE=["middleware.test_csp.CSPMiddlewareNonceCachingAllowed"],
+    )
+    def test_csp_nonce_caching_allowed(self):
+        """A project that opts out shouldn't get Cache-Control forced on it."""
+        for setting, _ in csp_settings:
+            with (
+                self.subTest(setting=setting),
+                self.settings(**{setting: nonce_config}),
+            ):
+                response = self.client.get("/csp-nonce/")
+                self.assertTrue(response.text)
+                self.assertNotIn("Cache-Control", response)
+
+    @override_settings(
+        MIDDLEWARE=[
+            "django.middleware.cache.UpdateCacheMiddleware",
+            "django.middleware.csp.ContentSecurityPolicyMiddleware",
+            "django.middleware.cache.FetchFromCacheMiddleware",
+        ],
+    )
+    def test_csp_nonce_not_reused_across_cached_responses(self):
+        """A cached response must not replay one visitor's nonce to another."""
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        self.addCleanup(cache.clear)
+        for setting, _ in csp_settings:
+            with (
+                self.subTest(setting=setting),
+                self.settings(**{setting: nonce_config}),
+            ):
+                cache.clear()
+                first_nonce = self.client.get("/csp-nonce/").text
+                second_nonce = self.client.get("/csp-nonce/").text
+                self.assertNotEqual(first_nonce, second_nonce)
 
     @override_settings(SECURE_CSP={"script-src": [CSP.NONCE]})
     def test_csp_nonce_only_directive_emits_none(self):
