@@ -260,6 +260,56 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertIsNone(cm.exception.__cause__)
         self.assertTrue(cm.exception.__suppress_context__)
 
+    def test_fetch_peers_preserves_local_modification(self):
+        qs = list(Primary.objects.fetch_mode(FETCH_PEERS).defer("value"))
+        p1, p2 = qs[0], qs[1]
+        # Modify the deferred field on one peer without saving.
+        p1.value = "local modification"
+        # Trigger the peer fetch by accessing the field on another peer.
+        with self.assertNumQueries(1):
+            _ = p2.value
+        # The local modification should be preserved.
+        self.assertEqual(p1.value, "local modification")
+        # The other peer should receive its database value.
+        self.assertEqual(p2.value, "yy")
+
+    def test_fetch_peers_deleted_peer_does_not_cause_keyerror(self):
+        qs = list(Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk"))
+        p1, p2 = qs[0], qs[1]
+        # Delete one peer's database row after queryset evaluation.
+        Primary.objects.filter(pk=p1.pk).delete()
+        # Accessing another peer's deferred field should not raise KeyError.
+        with self.assertNumQueries(1):
+            _ = p2.value
+        # The surviving peer should receive the correct value.
+        self.assertEqual(p2.value, "yy")
+
+    def test_fetch_peers_accessed_instance_deleted(self):
+        qs = list(Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk"))
+        p1 = qs[0]
+        # Delete the peer whose deferred field will be accessed.
+        Primary.objects.filter(pk=p1.pk).delete()
+        # Accessing the deleted instance's deferred field should raise
+        # DoesNotExist, consistent with FETCH_ONE behavior.
+        with self.assertNumQueries(1):
+            with self.assertRaises(Primary.DoesNotExist):
+                _ = p1.value
+
+    def test_fetch_peers_batching_preserved(self):
+        # Create a third Primary instance inside this test.
+        Primary.objects.create(name="p3", value="zz", related=self.s1)
+        qs = list(Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk"))
+        p1, p2, p3 = qs[0], qs[1], qs[2]
+        with self.assertNumQueries(1):
+            _ = p1.value
+        with self.assertNumQueries(0):
+            _ = p2.value
+        with self.assertNumQueries(0):
+            _ = p3.value
+        self.assertEqual(p1.value, "xx")
+        self.assertEqual(p2.value, "yy")
+        self.assertEqual(p3.value, "zz")
+
 
 class DeferOtherDatabaseTests(TestCase):
     databases = {"other"}
