@@ -72,6 +72,36 @@ class Storage:
         """
         return "%s_%s%s" % (file_root, get_random_string(7), file_ext)
 
+    def get_file_extension(self, file_name, max_length=None):
+        """
+        Return the extension for file_name.
+
+        When max_length is given, preserve as many suffixes as possible from
+        the right while ensuring that the extension is short enough to allow
+        the file root to be truncated to at least one character (accounting
+        for the 8-character '_XXXXXXX' suffix added by get_alternative_name()).
+        When max_length is not given, all suffixes are preserved (e.g.
+        '.tar.gz').
+        """
+        suffixes = pathlib.PurePath(file_name).suffixes
+        if not suffixes:
+            return ""
+        if max_length is None:
+            return "".join(suffixes)
+        # With a length limit, build the extension right-to-left, keeping
+        # suffixes while they fit. 9 = 1 (min root char) + 8 (_XXXXXXX).
+        ext_limit = max_length - 9
+        file_ext = ""
+        for suffix in reversed(suffixes):
+            candidate = suffix + file_ext
+            if len(candidate) <= ext_limit:
+                file_ext = candidate
+            else:
+                break
+        # Always return at least the last suffix; the SuspiciousFileOperation
+        # check in get_available_name() handles the truly impossible cases.
+        return file_ext or suffixes[-1]
+
     def get_available_name(self, name, max_length=None):
         """
         Return a filename that's free on the target storage system and
@@ -84,7 +114,7 @@ class Storage:
                 "Detected path traversal attempt in '%s'" % dir_name
             )
         validate_file_name(file_name)
-        file_ext = "".join(pathlib.PurePath(file_name).suffixes)
+        file_ext = self.get_file_extension(file_name, max_length=max_length)
         file_root = file_name.removesuffix(file_ext)
         # If the filename is not available, generate an alternative
         # filename until one is available.
