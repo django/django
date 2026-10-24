@@ -30,4 +30,7 @@
     document.addEventListener("formset:added", (event) => {
         $(event.target).find(".admin-autocomplete").djangoAdminSelect2();
     });
+    document.addEventListener("formset:id_modified", (event) => {
+        $(event.target).find(".admin-autocomplete").djangoAdminSelect2();
+    });
 }
