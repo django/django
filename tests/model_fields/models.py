@@ -603,6 +603,36 @@ class GeneratedModelVirtual(models.Model):
         required_db_features = {"supports_virtual_generated_columns"}
 
 
+class GeneratedModelDefaultPkBase(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    a = models.IntegerField()
+
+    class Meta:
+        abstract = True
+
+
+class GeneratedModelDefaultPk(GeneratedModelDefaultPkBase):
+    field = models.GeneratedField(
+        expression=F("a") + 1,
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelDefaultPkVirtual(GeneratedModelDefaultPkBase):
+    field = models.GeneratedField(
+        expression=F("a") + 1,
+        output_field=models.IntegerField(),
+        db_persist=False,
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
+
+
 class GeneratedModelParams(models.Model):
     field = models.GeneratedField(
         expression=Value("Constant", output_field=models.CharField(max_length=10)),

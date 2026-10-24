@@ -182,6 +182,9 @@ following is done:
    present in the database.
 #. Any cached relations are cleared from the reloaded instance.
 
+``refresh_from_db()`` doesn't change :attr:`_state.adding <Model._state>`. A
+newly constructed instance stays new after its values are reloaded.
+
 Only fields of the model are reloaded from the database. Other
 database-dependent values such as annotations aren't reloaded. Any
 :func:`@cached_property <functools.cached_property>` attributes aren't cleared
@@ -599,6 +602,53 @@ trigger which returns ``NULL``. In such cases it is possible to revert to the
 old algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
 option to ``True``.
 
+.. _saving-relations-to-new-instances:
+
+Saving relations to new instances
+---------------------------------
+
+.. deprecated:: 6.2
+
+    This deprecation is proposed, not approved. See
+    :ref:`deprecated-new-instance-relations-6.2`.
+
+    Saving a ``ForeignKey`` or ``OneToOneField`` whose cached related object
+    is a newly constructed instance with a primary key set (its
+    :attr:`_state.adding <Model._state>` is ``True``) is deprecated.
+    :meth:`~Model.save`, :meth:`.QuerySet.bulk_create`, and
+    :meth:`.QuerySet.bulk_update` (for the fields it updates) emit a
+    ``RemovedInDjango2029Warning`` even if the primary key matches an existing
+    row, or the row is saved later in the same transaction. The proposal is to
+    raise :exc:`ValueError` in Django 2029.
+
+    Assign the raw value instead::
+
+        entry = Entry(blog_id=5)  # Rather than Entry(blog=Blog(pk=5)).
+
+    Or assign an instance loaded from the intended database, such as
+    ``Blog.objects.using(db).get(pk=5)``.
+
+    Django doesn't check that a raw value matches a row. Only the database's
+    constraints, where they are enforced, reject a value with no matching row.
+    Saving the related row later in the same transaction works only where the
+    constraint is deferred. If the ``ForeignKey`` has a
+    :attr:`~django.db.models.ForeignKey.to_field`, the raw value is that
+    field's value, not the primary key.
+
+    Use the raw value from the start. Assigning the same value after assigning
+    the instance keeps the cached instance, so the warning remains::
+
+        entry = Entry(blog=Blog(pk=5))
+        entry.blog_id = 5  # Blog(pk=5) is still cached.
+        entry.save()  # Warns.
+
+    Calling :meth:`~Model.refresh_from_db` on the related instance doesn't
+    change ``adding``, so it still warns.
+
+    An instance without a primary key, or whose primary key was cleared, still
+    raises :exc:`ValueError`. The save check for ``GenericForeignKey`` is
+    unchanged.
+
 .. _ref-models-force-insert:
 
 Forcing an INSERT or UPDATE
@@ -1009,6 +1059,10 @@ Other attributes
     Instances fetched from a ``QuerySet`` will have ``adding=False``, ``db``
     set to the alias of the associated database, and ``fetch_mode`` copied
     from the queryset's fetch mode.
+
+    ``adding`` tracks the instance's save/load state, not whether a matching
+    row exists. A newly constructed instance with the primary key of an
+    existing row still has ``adding=True``.
 
     .. versionchanged:: 6.1
 

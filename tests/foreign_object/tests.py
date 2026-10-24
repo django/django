@@ -9,6 +9,7 @@ from django.db.models import FETCH_PEERS
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from .models import (
     Article,
@@ -639,6 +640,42 @@ class MultiColumnFKTests(TestCase):
             person._state.fetch_mode,
             FETCH_PEERS,
         )
+
+
+class MultiColumnNewInstanceTests(TestCase):
+    msg = (
+        "Passing a newly constructed model instance to related filters is "
+        "deprecated. Pass target field values instead."
+    )
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.usa = Country.objects.create(name="United States of America")
+        cls.bob = Person.objects.create(name="Bob", person_country=cls.usa)
+        cls.membership = Membership.objects.create(
+            membership_country=cls.usa, person=cls.bob
+        )
+
+    def new_bob(self):
+        return Person(pk=self.bob.pk, name="Bob", person_country_id=self.usa.pk)
+
+    def test_filter_new_instance(self):
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, self.msg):
+            qs = Membership.objects.filter(person=self.new_bob())
+        self.assertSequenceEqual(qs, [self.membership])
+
+    def test_reverse_manager_new_instance(self):
+        obj = self.new_bob()
+        with self.assertNumQueries(1):
+            memberships = list(obj.membership_set.all())
+        self.assertEqual(memberships, [self.membership])
+        with self.assertNumQueries(0):
+            self.assertIs(memberships[0].person, obj)
+
+    def test_delete_new_instance(self):
+        self.new_bob().delete()
+        self.assertIs(Person.objects.filter(pk=self.bob.pk).exists(), False)
+        self.assertIs(Membership.objects.exists(), False)
 
 
 class TestModelCheckTests(SimpleTestCase):

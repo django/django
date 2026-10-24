@@ -1322,6 +1322,27 @@ occupies no storage and is computed when it is read. Thus, a virtual generated
 column is similar to a view and a stored generated column is similar to a
 materialized view.
 
+With :attr:`~django.db.models.FETCH_ONE` (the default
+:doc:`fetch mode </topics/db/fetch-modes>`) or
+:attr:`~django.db.models.FETCH_PEERS` when fetching a single instance,
+accessing an unloaded generated field on a newly constructed instance raises
+``AttributeError`` if the instance has no primary key or its database lookup
+finds no matching row. A primary key assigned manually or by a default still
+permits loading a generated value from an existing row.
+
+For these single-instance lookups, a saved or loaded instance with a primary
+key continues to raise the model's
+:exc:`~django.db.models.Model.DoesNotExist` exception when no row matches.
+For an instance with a primary key, :attr:`~django.db.models.FETCH_RAISE`
+continues to block fetching with
+:exc:`~django.core.exceptions.FieldFetchBlocked`.
+
+.. versionchanged:: 6.2
+
+    For a newly constructed instance with a primary key, a generated-field
+    lookup that finds no matching row now raises ``AttributeError`` instead
+    of the model's :exc:`~django.db.models.Model.DoesNotExist` exception.
+
 .. attribute:: GeneratedField.expression
 
     An :class:`Expression` used by the database to automatically set the field
