@@ -26,7 +26,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
-from django.db import connection
 from django.db.models.utils import get_blank_choice_label
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
@@ -37,7 +36,7 @@ from django.test import (
     override_settings,
     skipUnlessDBFeature,
 )
-from django.test.utils import CaptureQueriesContext, override_script_prefix
+from django.test.utils import override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
@@ -328,18 +327,16 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_basic_add_QUERY(self):
         """
-        QUERY on the add_view renders the form like GET
+        QUERY on the add_view renders the form like GET, without opening a
+        transaction.
         """
         section_count = Section.objects.count()
-        with CaptureQueriesContext(connection) as ctx:
+        with mock.patch("django.contrib.admin.options.transaction.atomic") as atomic:
             response = self.client.query(reverse("admin:admin_views_section_add"))
+        atomic.assert_not_called()
         self.assertIsInstance(response, TemplateResponse)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Section.objects.count(), section_count)
-        self.assertNotIn(
-            "SAVEPOINT",
-            " ".join(query["sql"].upper() for query in ctx.captured_queries),
-        )
 
     def test_add_with_GET_args(self):
         response = self.client.get(

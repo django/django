@@ -46,7 +46,7 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
     Decorator to require that a view only accepts the GET, HEAD, and QUERY
     methods. These methods are commonly considered "safe" because they should
     not have the significance of taking an action other than retrieving the
-    requested resource.
+    requested result.
 
     .. versionchanged:: 6.2
 

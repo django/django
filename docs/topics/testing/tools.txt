@@ -277,7 +277,7 @@ Use the ``django.test.Client`` class to make requests.
         :class:`~django.core.serializers.json.DjangoJSONEncoder` by default,
         and can be overridden by providing a ``json_encoder`` argument to
         :class:`Client`. This serialization also happens for :meth:`put`,
-        :meth:`patch`, and :meth:`delete` requests.
+        :meth:`patch`, :meth:`delete`, and :meth:`query` requests.
 
         If you provide any other ``content_type`` (e.g. :mimetype:`text/xml`
         for an XML payload), the contents of ``data`` are sent as-is in the
@@ -414,13 +414,12 @@ Use the ``django.test.Client`` class to make requests.
         .. versionadded:: 6.2
 
         Makes a :rfc:`QUERY <10008#section-2>` request on the provided ``path``
-        and returns a ``Response`` object. Useful for testing endpoints that
-        accept a safe, idempotent query in the request body.
+        and returns a ``Response`` object.
 
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``. The
         ``content_type`` must match the data format, as :rfc:`RFC 10008
-        <10008#section-2>` requires servers to reject requests with a 
+        <10008#section-2>` requires servers to reject requests with a
         missing or inconsistent ``Content-Type``.
 
         The ``follow``, ``secure``, ``headers``, ``query_params``, and

@@ -24,6 +24,10 @@ restricted subset of the test client API:
   :meth:`~Client.delete`, :meth:`~Client.head`,
   :meth:`~Client.options`, :meth:`~Client.trace`, and :meth:`~Client.query`.
 
+  .. versionchanged:: 6.2
+
+      The ``query()`` method was added.
+
 * These methods accept all the same arguments *except* for
   ``follow``. Since this is just a factory for producing
   requests, it's up to you to handle the response.

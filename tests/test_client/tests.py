@@ -437,6 +437,16 @@ class ClientTest(TestCase):
                 )
                 self.assertContains(response, "a=b is the body")
 
+    def test_follow_307_and_308_preserves_query_body(self):
+        for code in (307, 308):
+            with self.subTest(code=code):
+                response = self.client.query(
+                    "/redirect_view_%s/?to=/query_view/" % code,
+                    data="a=b",
+                    follow=True,
+                )
+                self.assertContains(response, "a=b is the body")
+
     def test_follow_307_and_308_preserves_get_params(self):
         data = {"var": 30, "to": "/get_view/"}
         for code in (307, 308):

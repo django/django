@@ -46,9 +46,9 @@ Support for the HTTP ``QUERY`` method
 -------------------------------------
 
 Django now recognizes the :rfc:`QUERY <10008>` method, which performs a safe,
-idempotent request with the query content in the request body rather than in the
-URL's query string. Use ``QUERY`` for read-only operations whose input is more
-naturally expressed in a request body, such as searches with complex,
+idempotent request with the query content in the request body rather than in
+the URL's query string. Use ``QUERY`` for read-only operations whose input is
+more naturally expressed in a request body, such as searches with complex,
 structured filters.
 
 ``QUERY`` is treated as a safe method throughout Django: it is exempt from CSRF
@@ -63,6 +63,7 @@ method::
 
     import json
 
+    from django import forms
     from django.http import JsonResponse
     from django.views import View
     from books.models import Book
@@ -71,13 +72,15 @@ method::
     class BookSearchView(View):
         def query(self, request):
             criteria = json.loads(request.body)
-            authors = criteria["authors"]
-            books = Book.objects.filter(authors__name__in=authors).distinct()
+            formfield = forms.CharField()
+            names = criteria["authors"][:100]
+            authors = [formfield.to_python(name) for name in names]
+            books = Book.objects.filter(author__name__in=authors)
             return JsonResponse({"books": list(books.values("title"))})
 
 The query content is available as :attr:`HttpRequest.body
-<django.http.HttpRequest.body>`, you must parse it according to the 
-request's ``Content-Type``. Django does not automatically parse it into
+<django.http.HttpRequest.body>`; you must parse it according to the request's
+``Content-Type``. Django does not automatically parse it into
 :attr:`HttpRequest.POST <django.http.HttpRequest.POST>`.
 
 :class:`~django.middleware.cache.UpdateCacheMiddleware`,

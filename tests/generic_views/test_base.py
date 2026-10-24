@@ -146,10 +146,7 @@ class ViewTest(LoggingAssertionMixin, SimpleTestCase):
         A view supplying a query() method responds to QUERY with the query
         content available as request.body.
         """
-        request = self.rf.query(
-            "/", data=b"q=django", content_type="application/x-www-form-urlencoded"
-        )
-        response = QueryView.as_view()(request)
+        response = QueryView.as_view()(self.rf.query("/", data=b"q=django"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"q=django")
 
