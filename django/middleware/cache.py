@@ -23,7 +23,8 @@ Django's ``LocaleMiddleware``.
 
 More details about how the caching works:
 
-* Only GET or HEAD-requests with status code 200 are cached.
+* Only GET, HEAD, or QUERY requests with status code 200 are cached. QUERY
+  requests whose content exceeds DATA_UPLOAD_MAX_MEMORY_SIZE aren't cached.
 
 * The number of seconds each page is stored for is set by the "max-age" section
   of the response's "Cache-Control" header, falling back to the
@@ -49,6 +50,8 @@ import time
 
 from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
+from django.core.exceptions import RequestDataTooBig
+from django.http import RawPostDataException
 from django.middleware import MiddlewareMixin
 from django.utils.cache import (
     get_cache_key,
@@ -171,12 +174,27 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
         Check whether the page is already cached and return the cached
         version if available.
         """
-        if request.method not in ("GET", "HEAD"):
+        if request.method not in ("GET", "HEAD", "QUERY"):
             request._cache_update_cache = False
             return None  # Don't bother checking the cache.
 
-        # try and get the cached GET response
-        cache_key = get_cache_key(request, self.key_prefix, "GET", cache=self.cache)
+        if request.method == "QUERY":
+            # The request content is part of the cache key for QUERY requests.
+            # Read it now, before the view can consume the stream, and don't
+            # cache requests whose content is too large or was already read.
+            try:
+                request.body
+            except (RawPostDataException, RequestDataTooBig):
+                request._cache_update_cache = False
+                return None
+
+        # QUERY responses are keyed on their own (the request content is
+        # part of the key), so they don't share GET's cache entries.
+        lookup_method = "QUERY" if request.method == "QUERY" else "GET"
+        # try and get the cached GET (or QUERY) response
+        cache_key = get_cache_key(
+            request, self.key_prefix, lookup_method, cache=self.cache
+        )
         if cache_key is None:
             request._cache_update_cache = True
             return None  # No cache information available, need to rebuild.
