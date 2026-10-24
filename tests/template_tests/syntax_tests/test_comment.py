@@ -119,8 +119,8 @@ class CommentSyntaxTests(SimpleTestCase):
 
     @setup(
         {
-            "no_spaces": "{%comment%}hidden{%endcomment%}visible",
-            "no_spaces_in_closing_tag": "{% comment %}hidden{%endcomment%}visible",
+            "no_spaces": "{%comment%}{% hidden{%endcomment%}visible",
+            "no_spaces_in_closing_tag": "{% comment %}{% hidden{%endcomment%}visible",
         }
     )
     def test_tags_without_spaces(self):
