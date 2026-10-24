@@ -4,7 +4,7 @@ import shutil
 import string
 import tempfile
 import unittest
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from http import cookies
 from pathlib import Path
 from unittest import mock
@@ -35,6 +35,7 @@ from django.test import (
     ignore_warnings,
     override_settings,
 )
+from django.test.utils import freeze_time
 from django.utils import timezone
 
 from .models import SessionStore as CustomDatabaseSession
@@ -1286,6 +1287,53 @@ class SessionMiddlewareTests(TestCase):
 class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
     backend = CookieSession
 
+    def assert_session_expiry(self, expiry, *, valid_at, expired_at):
+        with freeze_time(123456789):
+            session = self.backend()
+            session["foo"] = "bar"
+            session.set_expiry(expiry)
+            session.save()
+            session_key = session.session_key
+
+        with freeze_time(valid_at):
+            self.assertEqual(self.backend(session_key).get("foo"), "bar")
+        with freeze_time(expired_at):
+            self.assertIsNone(self.backend(session_key).get("foo"))
+
+    @override_settings(SESSION_COOKIE_AGE=10)
+    def test_custom_expiry_larger_than_session_cookie_age(self):
+        self.assert_session_expiry(
+            20,
+            valid_at=123456800,
+            expired_at=123456810,
+        )
+
+    @override_settings(SESSION_COOKIE_AGE=20)
+    def test_custom_expiry_smaller_than_session_cookie_age(self):
+        self.assert_session_expiry(
+            10,
+            valid_at=123456798,
+            expired_at=123456800,
+        )
+
+    @override_settings(SESSION_COOKIE_AGE=10)
+    def test_browser_close_expiry_uses_session_cookie_age(self):
+        self.assert_session_expiry(
+            0,
+            valid_at=123456798,
+            expired_at=123456800,
+        )
+
+    def test_custom_datetime_expiry(self):
+        for tz in (None, UTC):
+            with self.subTest(tz=tz):
+                expiry = datetime.fromtimestamp(123456799, tz=tz)
+                self.assert_session_expiry(
+                    expiry,
+                    valid_at=123456798,
+                    expired_at=123456800,
+                )
+
     def test_save(self):
         """
         This test tested exists() in the other session backends, but that
@@ -1308,21 +1356,16 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
     async def test_cycle_async(self):
         pass
 
-    @unittest.expectedFailure
-    def test_actual_expiry(self):
-        # The cookie backend doesn't handle non-default expiry dates, see
-        # #19201
-        super().test_actual_expiry()
-
-    async def test_actual_expiry_async(self):
-        pass
-
     def test_unpickling_exception(self):
         # signed_cookies backend should handle unpickle exceptions gracefully
         # by creating a new session
         self.assertEqual(self.session.serializer, JSONSerializer)
         self.session.save()
-        with mock.patch("django.core.signing.loads", side_effect=ValueError):
+        with mock.patch(
+            "django.contrib.sessions.backends.signed_cookies."
+            "_SessionSigner.unsign_object_with_timestamp",
+            side_effect=ValueError,
+        ):
             self.session.load()
 
     @unittest.skip(
