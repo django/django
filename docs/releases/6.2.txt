@@ -335,6 +335,14 @@ Models
   ``ValidationError`` instead of being silently accepted, and surrounding
   whitespace is stripped.
 
+* With :attr:`~django.db.models.FETCH_ONE` (the default
+  :doc:`fetch mode </topics/db/fetch-modes>`) or
+  :attr:`~django.db.models.FETCH_PEERS` when fetching a single instance,
+  accessing an unloaded :class:`~django.db.models.GeneratedField` on a newly
+  constructed model instance with a primary key now raises ``AttributeError``
+  instead of the model's :exc:`~django.db.models.Model.DoesNotExist` when no
+  matching row exists. Successful lookups by primary key are unchanged.
+
 Requests and responses
 ----------------------
 
@@ -418,6 +426,50 @@ Miscellaneous
 
 Features deprecated in 6.2
 ==========================
+
+.. _deprecated-new-instance-relations-6.2:
+
+Models
+------
+
+.. note::
+
+    This deprecation is a proposal for :ticket:`36259`. Its scope and its
+    Django 2029 schedule haven't been approved.
+
+* Using a newly constructed model instance with a primary key set as a
+  related object is deprecated, even if the key matches an existing row. Such
+  an instance has :attr:`_state.adding <django.db.models.Model._state>` set to
+  ``True``. Django checks this state, not whether a row exists. A
+  ``RemovedInDjango2029Warning`` is emitted when such an instance is:
+
+  * passed to a related ``filter()`` or ``exclude()``, including in an
+    ``__in`` list, such as ``Entry.objects.filter(blog=Blog(pk=5))``. Pass the
+    target field value instead, such as ``Entry.objects.filter(blog=5)``. See
+    :ref:`queries over related objects
+    <topics-db-queries-related-new-instances>`.
+  * the cached related object of a ``ForeignKey`` or ``OneToOneField`` when
+    calling :meth:`.Model.save`, :meth:`.QuerySet.bulk_create`, or
+    :meth:`.QuerySet.bulk_update`, including when the related row is saved
+    later in the same transaction. Assign the raw value instead, such as
+    ``Entry(blog_id=5)``. See :ref:`saving-relations-to-new-instances`.
+  * passed to :meth:`.QuerySet.contains` or ``acontains()``.
+
+  An instance loaded from the intended database, such as
+  ``Blog.objects.using(db).get(pk=5)``, doesn't warn.
+
+  When warnings are turned into errors, the operation stops at the warning.
+  Work done before it, such as earlier queries, may already have happened.
+
+  Instances without a primary key, or whose primary key was cleared, raise
+  ``ValueError`` as before. The save check for ``GenericForeignKey`` is
+  unchanged.
+
+  Reading through reverse ``ForeignKey`` and ``ManyToManyField`` managers,
+  prefetching those relations, inline formsets, and :meth:`.Model.delete` now
+  use target field values internally, so they don't warn for such instances.
+  Manager methods that pass the instance to a filter or a save, such as the
+  reverse ``ForeignKey`` manager's ``create()`` and ``get_or_create()``, warn.
 
 Validators
 ----------

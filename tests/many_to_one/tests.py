@@ -9,6 +9,7 @@ from django.core.exceptions import (
 from django.db import IntegrityError, models, transaction
 from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -1015,3 +1016,35 @@ class ManyToOneTests(TestCase):
             self.assertEqual(a1.reporter, self.r)
         with self.assertNumQueries(0):
             self.assertEqual(a2.reporter, self.r)
+
+
+class NewInstanceRelatedFilterTests(TestCase):
+    msg = (
+        "Passing a newly constructed model instance to related filters is "
+        "deprecated. Pass target field values instead."
+    )
+
+    def test_filter_to_field_new_instance(self):
+        parent = Parent.objects.create(name="jeff")
+        child = ToFieldChild.objects.create(parent=parent)
+        obj = Parent(pk=parent.pk, name="jeff")
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, self.msg):
+            qs = ToFieldChild.objects.filter(parent=obj)
+        self.assertSequenceEqual(qs, [child])
+
+    def test_reverse_manager_to_field_new_instance(self):
+        parent = Parent.objects.create(name="jeff")
+        child = ToFieldChild.objects.create(parent=parent)
+        obj = Parent(pk=parent.pk, name="jeff")
+        with self.assertNumQueries(1):
+            children = list(obj.to_field_children.all())
+        self.assertEqual(children, [child])
+        with self.assertNumQueries(0):
+            self.assertIs(children[0].parent, obj)
+
+    def test_reverse_manager_string_pk_new_instance(self):
+        parent = ParentStringPrimaryKey.objects.create(name="jeff")
+        child = ChildStringPrimaryKeyParent.objects.create(parent=parent)
+        obj = ParentStringPrimaryKey(name="jeff")
+        self.assertTrue(obj._state.adding)
+        self.assertSequenceEqual(obj.childstringprimarykeyparent_set.all(), [child])

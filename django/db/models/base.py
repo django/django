@@ -59,10 +59,12 @@ from django.db.models.signals import (
     pre_save,
 )
 from django.db.models.utils import AltersData, make_model_tuple
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
+from django.utils.warnings import django_file_prefixes
 
 
 class Deferred:
@@ -1300,6 +1302,14 @@ class Model(AltersData, metaclass=ModelBase):
                     raise ValueError(
                         "%s() prohibited to prevent data loss due to unsaved "
                         "related object '%s'." % (operation_name, field.name)
+                    )
+                # RemovedInDjango2029Warning: Reject adding-state references.
+                if obj._state.adding:
+                    warnings.warn(
+                        "Saving a relation to a newly constructed model instance "
+                        "is deprecated. Assign the related field's raw value instead.",
+                        RemovedInDjango2029Warning,
+                        skip_file_prefixes=django_file_prefixes(),
                     )
                 if (
                     field_val := getattr(self, field.attname)

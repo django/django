@@ -1137,7 +1137,12 @@ class BaseInlineFormSet(BaseModelFormSet):
         if queryset is None:
             queryset = self.model._default_manager
         if self.instance._is_pk_set():
-            qs = queryset.filter(**{self.fk.name: self.instance})
+            # Avoid a circular import.
+            from django.db.models.fields.related_lookups import get_target_values
+
+            qs = queryset.filter(
+                **{self.fk.name: get_target_values(self.instance, self.fk)}
+            )
         else:
             qs = queryset.none()
         self.unique_fields = {self.fk.name}

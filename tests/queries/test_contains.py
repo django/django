@@ -1,9 +1,17 @@
-from django.test import TestCase
+from datetime import timedelta
 
-from .models import DumbCategory, NamedCategory, ProxyCategory
+from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango2029Warning
+
+from .models import DateTimePK, DumbCategory, NamedCategory, ProxyCategory
 
 
 class ContainsTests(TestCase):
+    deprecation_msg = (
+        "Passing a newly constructed model instance to QuerySet.contains() is "
+        "deprecated. Use filter(pk=obj.pk).exists() instead."
+    )
+
     @classmethod
     def setUpTestData(cls):
         cls.category = DumbCategory.objects.create()
@@ -18,6 +26,64 @@ class ContainsTests(TestCase):
         msg = "'obj' must be a model instance."
         with self.assertRaisesMessage(TypeError, msg):
             DumbCategory.objects.contains(object())
+
+    def test_default_pk_missing_row(self):
+        obj = DateTimePK()
+        self.assertTrue(obj._is_pk_set())
+        for nonempty in (False, True):
+            if nonempty:
+                # An unrelated row with a different key.
+                DateTimePK.objects.create(pk=obj.pk - timedelta(days=1))
+            for evaluated in (False, True):
+                with self.subTest(nonempty=nonempty, evaluated=evaluated):
+                    qs = DateTimePK.objects.all()
+                    if evaluated:
+                        self.assertEqual(len(list(qs)), int(nonempty))
+                    with (
+                        self.assertNumQueries(0 if evaluated else 1),
+                        self.assertWarnsMessage(
+                            RemovedInDjango2029Warning, self.deprecation_msg
+                        ),
+                    ):
+                        self.assertIs(qs.contains(obj), False)
+
+    def test_new_instance_identifies_existing_row(self):
+        saved = DateTimePK.objects.create()
+        obj = DateTimePK(pk=saved.pk)
+        self.assertTrue(obj._state.adding)
+        for evaluated in (False, True):
+            with self.subTest(evaluated=evaluated):
+                qs = DateTimePK.objects.all()
+                if evaluated:
+                    list(qs)
+                with (
+                    self.assertNumQueries(0 if evaluated else 1),
+                    self.assertWarnsMessage(
+                        RemovedInDjango2029Warning, self.deprecation_msg
+                    ),
+                ):
+                    self.assertIs(qs.contains(obj), True)
+
+    def test_raw_primary_key_lookup_without_warning(self):
+        obj = DateTimePK()
+        with self.assertNumQueries(1):
+            self.assertIs(DateTimePK.objects.filter(pk=obj.pk).exists(), False)
+
+    def test_cleared_pk(self):
+        obj = DateTimePK.objects.create()
+        obj.pk = None
+        self.assertFalse(obj._state.adding)
+        msg = "QuerySet.contains() cannot be used on unsaved objects."
+        for evaluated in (False, True):
+            with self.subTest(evaluated=evaluated):
+                qs = DateTimePK.objects.all()
+                if evaluated:
+                    list(qs)
+                with (
+                    self.assertNumQueries(0),
+                    self.assertRaisesMessage(ValueError, msg),
+                ):
+                    qs.contains(obj)
 
     def test_values(self):
         msg = "Cannot call QuerySet.contains() after .values() or .values_list()."

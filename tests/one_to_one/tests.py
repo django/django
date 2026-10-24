@@ -1,7 +1,8 @@
 from django.core.exceptions import FieldFetchBlocked
 from django.db import IntegrityError, connection, transaction
 from django.db.models import FETCH_PEERS, FETCH_RAISE
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from .models import (
     Bar,
@@ -20,6 +21,101 @@ from .models import (
     UndergroundBar,
     Waiter,
 )
+
+
+class AssignedPrimaryKeySaveTests(TransactionTestCase):
+    available_apps = ["one_to_one"]
+    deprecation_msg = (
+        "Saving a relation to a newly constructed model instance is deprecated. "
+        "Assign the related field's raw value instead."
+    )
+
+    @skipUnlessDBFeature("supports_foreign_keys")
+    def test_missing_related_row(self):
+        place = Place.objects.create(name="Ushaka", address="Ethekwini")
+        link = ManualPrimaryKey(primary_key="YTREWQ", name="moonwalk")
+        # Immediate constraints fail on INSERT; deferred ones fail on commit.
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, self.deprecation_msg):
+            with self.assertRaises(IntegrityError), transaction.atomic():
+                MultiModel.objects.create(link1=place, link2=link, name="Unsavable")
+        self.assertFalse(MultiModel.objects.exists())
+
+    @skipUnlessDBFeature("can_defer_constraint_checks", "supports_foreign_keys")
+    def test_related_row_saved_later_in_transaction(self):
+        place = Place.objects.create(name="Ushaka", address="Ethekwini")
+        link = ManualPrimaryKey(primary_key="YTREWQ", name="moonwalk")
+        with transaction.atomic():
+            with self.assertWarnsMessage(
+                RemovedInDjango2029Warning, self.deprecation_msg
+            ):
+                obj = MultiModel.objects.create(link1=place, link2=link, name="Savable")
+            self.assertTrue(link._state.adding)
+            link.save()
+        self.assertEqual(MultiModel.objects.get(pk=obj.pk).link2, link)
+
+    def test_new_instance_identifies_existing_related_row(self):
+        saved = ManualPrimaryKey.objects.create(primary_key="YTREWQ", name="moonwalk")
+        link = ManualPrimaryKey(pk=saved.pk)
+        self.assertTrue(link._state.adding)
+        with (
+            self.assertNumQueries(1),
+            self.assertWarnsMessage(RemovedInDjango2029Warning, self.deprecation_msg),
+        ):
+            obj = RelatedModel.objects.create(link=link, name="Savable")
+        self.assertEqual(RelatedModel.objects.get(pk=obj.pk).link, saved)
+        self.assertEqual(
+            ManualPrimaryKey.objects.get(pk=saved.pk).name,
+            "moonwalk",
+        )
+
+    def test_warning_does_not_query_for_related_row(self):
+        link = ManualPrimaryKey(pk="YTREWQ")
+        obj = RelatedModel(link=link, name="Savable")
+        with (
+            self.assertNumQueries(0),
+            self.assertWarnsMessage(
+                RemovedInDjango2029Warning, self.deprecation_msg
+            ) as warning,
+        ):
+            obj._prepare_related_fields_for_save(operation_name="save")
+        self.assertEqual(warning.filename, __file__)
+
+    @skipUnlessDBFeature("can_defer_constraint_checks", "supports_foreign_keys")
+    def test_scalar_reference_saved_later_without_warning(self):
+        place = Place.objects.create(name="Ushaka", address="Ethekwini")
+        link = ManualPrimaryKey(primary_key="YTREWQ", name="moonwalk")
+        with transaction.atomic():
+            obj = MultiModel.objects.create(
+                link1=place, link2_id=link.pk, name="Savable"
+            )
+            link.save()
+        self.assertEqual(MultiModel.objects.get(pk=obj.pk).link2, link)
+
+    def test_bulk_create_warns_for_new_related_instance(self):
+        saved = ManualPrimaryKey.objects.create(primary_key="YTREWQ", name="moonwalk")
+        obj = RelatedModel(link=ManualPrimaryKey(pk=saved.pk), name="Savable")
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, self.deprecation_msg):
+            RelatedModel.objects.bulk_create([obj])
+        self.assertEqual(RelatedModel.objects.get(name="Savable").link, saved)
+
+    def test_bulk_update_warns_for_new_related_instance(self):
+        saved = ManualPrimaryKey.objects.create(primary_key="YTREWQ", name="moonwalk")
+        obj = RelatedModel.objects.create(link=saved, name="Savable")
+        obj.link = ManualPrimaryKey(pk=saved.pk)
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, self.deprecation_msg):
+            self.assertEqual(RelatedModel.objects.bulk_update([obj], ["link"]), 1)
+        self.assertEqual(RelatedModel.objects.get(pk=obj.pk).link, saved)
+
+    def test_related_instance_with_cleared_pk(self):
+        link = ManualPrimaryKey.objects.create(primary_key="YTREWQ", name="moonwalk")
+        link.pk = None
+        self.assertFalse(link._state.adding)
+        msg = (
+            "save() prohibited to prevent data loss due to unsaved related object "
+            "'link'."
+        )
+        with self.assertNumQueries(0), self.assertRaisesMessage(ValueError, msg):
+            RelatedModel.objects.create(link=link, name="Unsavable")
 
 
 class OneToOneTests(TestCase):
