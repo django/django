@@ -7,7 +7,11 @@ from operator import or_
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.templatetags.auth import render_password_as_hash
-from django.core.exceptions import FieldDoesNotExist, ValidationError
+from django.core.exceptions import (
+    FieldDoesNotExist,
+    ImproperlyConfigured,
+    ValidationError,
+)
 from django.core.validators import EMPTY_VALUES, URLValidator
 from django.db import models, router
 from django.db.models.constants import LOOKUP_SEP
@@ -434,6 +438,11 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
     from django.db.models.expressions import DatabaseDefault
 
+    try:
+        from django.contrib.gis.db.models import GeometryField
+    except ImproperlyConfigured:
+        GeometryField = None
+
     if field.name == "password" and field.model == get_user_model():
         return render_password_as_hash(value)
     elif getattr(field, "flatchoices", None):
@@ -478,6 +487,8 @@ def display_for_field(value, field, empty_value_display, avoid_link=False):
             return json.dumps(value, ensure_ascii=False, cls=field.encoder)
         except TypeError:
             return display_for_value(value, empty_value_display)
+    elif GeometryField and isinstance(field, GeometryField):
+        return field.render_readonly(value, empty_value_display)
     else:
         return display_for_value(value, empty_value_display)
 
