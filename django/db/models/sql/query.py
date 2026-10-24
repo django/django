@@ -351,7 +351,10 @@ class Query(BaseExpression):
         done by the database interface at execution time.
         """
         sql, params = self.sql_with_params()
-        return sql % params
+        try:
+            return sql % params
+        except (TypeError, ValueError):
+            return sql
 
     def sql_with_params(self):
         """

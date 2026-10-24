@@ -77,6 +77,7 @@ from .models import (
     OrderItem,
     Page,
     Paragraph,
+    PercentColumn,
     Person,
     Plaything,
     PointerA,
@@ -4687,3 +4688,12 @@ class QuerySetCloningTests(TestCase):
         # QuerySet. qs3 is now all of the filters applied to qs + an additional
         # filter.
         self.assertIsNot(qs3, qs)
+
+
+class PercentInColumnNameTests(TestCase):
+    def test_str_with_percent_in_db_column(self):
+        qs = PercentColumn.objects.filter(value=1)
+        self.assertIn("per%cent", str(qs.query))
+
+    def test_str_without_params(self):
+        self.assertIn("per%cent", str(PercentColumn.objects.all().query))
