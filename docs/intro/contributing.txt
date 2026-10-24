@@ -598,6 +598,18 @@ __ https://code.djangoproject.com/query?status=new&status=reopened&has_patch=0&e
 __ https://code.djangoproject.com/query?status=new&status=reopened&needs_better_patch=1&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
 __ https://code.djangoproject.com/query?status=new&status=reopened&needs_tests=1&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
 
+Another effective way to find a ticket is the *vulture method*: taking over
+accepted tickets that haven't been touched in six months or longer. The ideal
+candidate has a linked pull request whose review requested changes that the
+original author hasn't responded to in at least six months. Before taking one
+over, leave a comment on both the ticket and the pull request to let the
+original author know you're continuing their work. For a short introduction,
+see this `video explaining the vulture method`_, then browse the list of
+`possibly vulture-able tickets`_.
+
+.. _video explaining the vulture method: https://youtube.com/shorts/D6QHet5U82U?si=j5M6sy0ufpeGy_iZ
+.. _possibly vulture-able tickets: https://code.djangoproject.com/query?stage=Accepted&changetime=5+years+ago..6+months+ago&needs_better_patch=1&status=assigned&status=new&time=5+years+ago..today&order=id&desc=1&col=id&col=summary&col=time&col=changetime&col=needs_better_patch&col=owner&col=type&col=component
+
 What's next after creating a pull request?
 ------------------------------------------
 
