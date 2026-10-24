@@ -1,0 +1,186 @@
+==================
+User profile model
+==================
+
+A profile model is a common way to store application-specific user data without
+modifying the authentication model.
+
+This approach keeps authentication-related fields separate from additional user
+information such as display names, biographies, or profile metadata.
+
+Applications that require changes to authentication-related fields or behavior
+should consider using a :ref:`custom user model <auth-custom-user>` instead.
+
+Define a profile model
+======================
+
+To define a profile model, create a model with a
+:class:`~django.db.models.OneToOneField` to
+:setting:`AUTH_USER_MODEL`:
+
+.. code-block:: python
+
+    from django.conf import settings
+    from django.db import models
+
+
+    class Profile(models.Model):
+        user = models.OneToOneField(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.CASCADE,
+            related_name="profile",
+        )
+        display_name = models.CharField(max_length=100, blank=True)
+        bio = models.TextField(blank=True)
+        birth_date = models.DateField(null=True, blank=True)
+
+        def __str__(self):
+            return self.display_name or self.user.get_username()
+
+The :attr:`~django.db.models.ForeignKey.on_delete` argument controls what
+happens to the profile when the related user is deleted. Using
+``models.CASCADE`` deletes the profile when the user is deleted.
+
+Store name-related data
+=======================
+
+The default :class:`~django.contrib.auth.models.User` model includes
+``first_name`` and ``last_name`` fields. Some applications may prefer storing
+display names or other name-related data in a related profile model instead.
+
+For example:
+
+.. code-block:: python
+
+    class Profile(models.Model):
+        user = models.OneToOneField(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.CASCADE,
+            related_name="profile",
+        )
+        display_name = models.CharField(max_length=100)
+
+This allows applications to define naming behavior independently from the
+authentication model.
+
+Create profile instances
+========================
+
+Create profile objects explicitly
+---------------------------------
+
+One approach is to create the profile when creating the user:
+
+.. code-block:: python
+
+    user = User.objects.create_user(
+        username="john",
+        password="example-password",
+    )
+
+    Profile.objects.create(
+        user=user,
+        display_name="John",
+    )
+
+Use ``get_or_create()``
+-----------------------
+
+If a profile may not exist yet, use ``get_or_create()``:
+
+.. code-block:: python
+
+    profile, created = Profile.objects.get_or_create(
+        user=request.user,
+    )
+
+Use a ``post_save`` signal
+--------------------------
+
+Some applications create profile objects automatically using a
+:data:`~django.db.models.signals.post_save` signal:
+
+.. code-block:: python
+
+    from django.conf import settings
+    from django.db.models.signals import post_save
+    from django.dispatch import receiver
+
+
+    @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance)
+
+Signal receivers are commonly defined in a ``signals`` module and imported in
+the :meth:`~django.apps.AppConfig.ready` method of an application
+configuration.
+
+Access profile data
+===================
+
+Access profile data through the reverse relation:
+
+.. code-block:: python
+
+    from django.contrib.auth import get_user_model
+
+    User = get_user_model()
+
+    user = User.objects.get(username="john")
+
+    display_name = user.profile.display_name
+
+In templates, access profile attributes directly:
+
+.. code-block:: html+django
+
+    <p>Welcome, {{ user.profile.display_name }}!</p>
+
+Edit profiles in the admin
+==========================
+
+Use admin inlines
+-----------------
+
+Profiles can be edited alongside users by defining an inline admin model:
+
+.. code-block:: python
+
+    from django.contrib import admin
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    from .models import Profile
+
+
+    class ProfileInline(admin.StackedInline):
+        model = Profile
+        can_delete = False
+
+
+    class CustomUserAdmin(UserAdmin):
+        inlines = [ProfileInline]
+
+
+    admin.site.unregister(User)
+    admin.site.register(User, CustomUserAdmin)
+
+Cache profile fragments
+=======================
+
+If profile information is displayed frequently, consider using template
+fragment caching to reduce database queries:
+
+.. code-block:: html+django
+
+    {% load cache %}
+
+    {% cache 600 user_profile user.id %}
+        <div class="profile">
+            <h2>{{ user.profile.display_name }}</h2>
+            <p>{{ user.profile.bio }}</p>
+        </div>
+    {% endcache %}
+
+The fragment is cached for 600 seconds and keyed using the user ID.
