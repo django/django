@@ -1,6 +1,7 @@
 import errno
 import gzip
 import os
+import shutil
 import struct
 import tempfile
 import unittest
@@ -519,6 +520,61 @@ class FileMoveSafeTests(unittest.TestCase):
             content = f.read()
 
         self.assertEqual(content, b"content")
+
+    @mock.patch("django.core.files.move.os.access")
+    def test_file_move_created_after_exists_check(self, mocked_exists_check):
+        with tempfile.NamedTemporaryFile(delete=False) as src:
+            src.write(b"file to move")
+            src_name = src.name
+        self.addCleanup(os.remove, src_name)
+
+        dest_dir = tempfile.mkdtemp()
+        dest_name = os.path.join(dest_dir, "destination.txt")
+        self.addCleanup(shutil.rmtree, dest_dir)
+
+        def create_destination(*args, **kwargs):
+            with open(dest_name, "wb") as dest:
+                dest.write(b"existing destination")
+            return False
+
+        mocked_exists_check.side_effect = create_destination
+
+        msg = r"Destination file .* exists and allow_overwrite is False\."
+        with self.assertRaisesRegex(FileExistsError, msg):
+            file_move_safe(src_name, dest_name, allow_overwrite=False)
+
+        with open(dest_name, "rb") as dest:
+            self.assertEqual(dest.read(), b"existing destination")
+        self.assertTrue(os.path.exists(src_name))
+
+    @mock.patch("django.core.files.move.os.link", side_effect=OSError())
+    @mock.patch("django.core.files.move.os.access")
+    def test_file_move_created_after_exists_check_fallback(
+        self, mocked_exists_check, mocked_link
+    ):
+        with tempfile.NamedTemporaryFile(delete=False) as src:
+            src.write(b"file to move")
+            src_name = src.name
+        self.addCleanup(os.remove, src_name)
+
+        dest_dir = tempfile.mkdtemp()
+        dest_name = os.path.join(dest_dir, "destination.txt")
+        self.addCleanup(shutil.rmtree, dest_dir)
+
+        def create_destination(*args, **kwargs):
+            with open(dest_name, "wb") as dest:
+                dest.write(b"existing destination")
+            return False
+
+        mocked_exists_check.side_effect = create_destination
+
+        msg = r"Destination file .* exists and allow_overwrite is False\."
+        with self.assertRaisesRegex(FileExistsError, msg):
+            file_move_safe(src_name, dest_name, allow_overwrite=False)
+
+        with open(dest_name, "rb") as dest:
+            self.assertEqual(dest.read(), b"existing destination")
+        self.assertTrue(os.path.exists(src_name))
 
 
 class SpooledTempTests(unittest.TestCase):
