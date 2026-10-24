@@ -16,6 +16,7 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
+from django.utils.text import capfirst
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
@@ -219,6 +220,7 @@ class UserAdmin(admin.ModelAdmin):
             "has_change_permission": True,
             "has_absolute_url": False,
             "opts": self.opts,
+            "module_name": str(capfirst(self.opts.verbose_name_plural)),
             "original": user,
             "save_as": False,
             "show_save": True,
