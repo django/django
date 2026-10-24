@@ -3,6 +3,7 @@ Implementations of SQL functions for SQLite.
 """
 
 import functools
+import json
 import operator
 import random
 import statistics
@@ -65,6 +66,9 @@ def register(connection):
     create_deterministic_function("django_time_diff", 2, _sqlite_time_diff)
     create_deterministic_function("django_timestamp_diff", 2, _sqlite_timestamp_diff)
     create_deterministic_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
+    create_deterministic_function(
+        "django_json_array_remove_nulls", 1, _sqlite_json_array_remove_nulls
+    )
     create_deterministic_function("regexp", 2, _sqlite_regexp)
     create_deterministic_function("BITXOR", 2, _sqlite_bitxor)
     create_deterministic_function("COT", 1, _sqlite_cot)
@@ -285,6 +289,10 @@ def _sqlite_format_dtdelta(connector, lhs, rhs):
     else:
         out = real_lhs / real_rhs
     return out
+
+
+def _sqlite_json_array_remove_nulls(value):
+    return json.dumps([item for item in json.loads(value) if item is not None])
 
 
 def _sqlite_time_diff(lhs, rhs):
