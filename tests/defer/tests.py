@@ -1,5 +1,11 @@
-from django.core.exceptions import FieldDoesNotExist, FieldError, FieldFetchBlocked
+from django.core.exceptions import (
+    FieldDoesNotExist,
+    FieldError,
+    FieldFetchBlocked,
+    SynchronousOnlyOperation,
+)
 from django.db.models import FETCH_PEERS, FETCH_RAISE
+from django.db.models.fetch_modes import ASYNC_UNSAFE_FETCH_MSG
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import ignore_warnings
 from django.utils.deprecation import RemovedInDjango2028Warning
@@ -251,6 +257,18 @@ class DeferTests(AssertionMixin, TestCase):
             p1.value
         self.assertIsNone(cm.exception.__cause__)
         self.assertTrue(cm.exception.__suppress_context__)
+
+    async def test_only_fetch_mode_async(self):
+        p1 = await Primary.objects.only("name").aget(name="p1")
+        msg = ASYNC_UNSAFE_FETCH_MSG.format(model="Primary", field="value")
+        with self.assertRaisesMessage(SynchronousOnlyOperation, msg):
+            p1.value
+
+    async def test_defer_fetch_mode_async(self):
+        p1 = await Primary.objects.defer("value").aget(name="p1")
+        msg = ASYNC_UNSAFE_FETCH_MSG.format(model="Primary", field="value")
+        with self.assertRaisesMessage(SynchronousOnlyOperation, msg):
+            p1.value
 
     def test_defer_fetch_mode_raise(self):
         p1 = Primary.objects.fetch_mode(FETCH_RAISE).defer("value").get(name="p1")
