@@ -210,7 +210,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* :meth:`~django.db.models.query.QuerySet.update` now supports aggregate
+  functions and joined fields in the updated fields.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
