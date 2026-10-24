@@ -89,9 +89,19 @@ In such cases, you should set :setting:`CONN_MAX_AGE` to a low value or even
 to be reused. This will help keep the number of simultaneous connections to
 this database small.
 
-The development server creates a new thread for each request it handles,
-negating the effect of persistent connections. Don't enable them during
-development.
+The development server uses a thread-per-request model. While persistent
+connections (controlled by CONN_MAX_AGE) may appear to work during
+sequential requests due to HTTP keep-alive and thread reuse, this behavior
+is not guaranteed.
+
+In particular:
+
+- Database connections are thread-local.
+- The development server may create new threads even for sequential requests.
+- Connections are reset when the auto-reloader restarts the server.
+
+As a result, persistent connections in development may not behave the same
+as in production environments, and their use is generally discouraged.
 
 When Django establishes a connection to the database, it sets up appropriate
 parameters, depending on the backend being used. If you enable persistent
