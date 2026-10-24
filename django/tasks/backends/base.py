@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from inspect import iscoroutinefunction
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.tasks import DEFAULT_TASK_QUEUE_NAME
@@ -14,6 +14,7 @@ from django.tasks.base import (
 from django.tasks.exceptions import InvalidTask
 from django.utils import timezone
 from django.utils.inspect import get_func_args, is_module_level_function
+from django.utils.json import normalize_json
 
 
 class BaseTaskBackend(metaclass=ABCMeta):
@@ -33,6 +34,9 @@ class BaseTaskBackend(metaclass=ABCMeta):
     # Does the backend support executing Tasks in a given
     # priority order?
     supports_priority = False
+
+    # Does the backend support storing and saving metadata?
+    supports_metadata = False
 
     def __init__(self, alias, params):
         self.alias = alias
@@ -82,6 +86,18 @@ class BaseTaskBackend(metaclass=ABCMeta):
         if self.queues and task.queue_name not in self.queues:
             raise InvalidTask(f"Queue '{task.queue_name}' is not valid for backend.")
 
+        if not isinstance(task.metadata, dict):
+            raise InvalidTask("metadata must be a dict.")
+        if task.metadata:
+            if not self.supports_metadata:
+                raise InvalidTask("Backend does not support metadata.")
+            if not all(isinstance(key, str) for key in task.metadata):
+                raise InvalidTask("metadata keys must be strings.")
+            try:
+                normalize_json(task.metadata)
+            except (TypeError, ValueError) as e:
+                raise InvalidTask(f"metadata must be JSON-serializable: {e}") from e
+
     @abstractmethod
     def enqueue(self, task, args, kwargs):
         """Queue up a task to be executed."""
@@ -107,6 +123,27 @@ class BaseTaskBackend(metaclass=ABCMeta):
         return await sync_to_async(self.get_result, thread_sensitive=True)(
             result_id=result_id
         )
+
+    def save_metadata(self, task_result, metadata):
+        """
+        Persist the metadata (including reserved keys) for a task result.
+
+        Backends supporting metadata must implement this method and/or
+        asave_metadata().
+        """
+        if type(self).asave_metadata is not BaseTaskBackend.asave_metadata:
+            return async_to_sync(self.asave_metadata)(
+                task_result=task_result, metadata=metadata
+            )
+        raise NotImplementedError("This backend does not support saving metadata.")
+
+    async def asave_metadata(self, task_result, metadata):
+        """See save_metadata()."""
+        if type(self).save_metadata is not BaseTaskBackend.save_metadata:
+            return await sync_to_async(self.save_metadata, thread_sensitive=True)(
+                task_result=task_result, metadata=metadata
+            )
+        raise NotImplementedError("This backend does not support saving metadata.")
 
     def check(self, **kwargs):
         return []
