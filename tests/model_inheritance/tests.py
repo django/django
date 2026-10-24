@@ -5,6 +5,7 @@ from django.db import connection, models
 from django.db.models.query_utils import DeferredAttribute
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext, isolate_apps
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from .models import (
     Base,
@@ -683,3 +684,51 @@ class InheritanceUniqueTests(TestCase):
         msg = "Grand parent with this First name and Last name already exists."
         with self.assertRaisesMessage(ValidationError, msg):
             grand_child.validate_unique()
+
+
+class NewParentInstanceRelatedFilterTests(TestCase):
+    deprecation_msg = (
+        "Passing a newly constructed model instance to related filters is "
+        "deprecated. Pass target field values instead."
+    )
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.restaurant = Restaurant.objects.create(
+            name="Demon Dogs", address="944 W. Fullerton", serves_hot_dogs=True
+        )
+        cls.lot = ParkingLot.objects.create(
+            name="Lot", address="Back", main_site=cls.restaurant
+        )
+        cls.supplier = Supplier.objects.create(name="Supplier", address="Front")
+        cls.supplier.customers.add(cls.restaurant)
+
+    def test_filter_fk_to_parent_new_instance(self):
+        obj = Place(pk=self.restaurant.pk)
+        with (
+            self.assertNumQueries(0),
+            self.assertWarnsMessage(
+                RemovedInDjango2029Warning, self.deprecation_msg
+            ) as warning,
+        ):
+            qs = ParkingLot.objects.filter(main_site=obj)
+        self.assertEqual(warning.filename, __file__)
+        self.assertSequenceEqual(qs, [self.lot])
+
+    def test_filter_m2m_to_child_new_instance(self):
+        obj = Restaurant(pk=self.restaurant.pk)
+        with (
+            self.assertNumQueries(0),
+            self.assertWarnsMessage(
+                RemovedInDjango2029Warning, self.deprecation_msg
+            ) as warning,
+        ):
+            qs = Supplier.objects.filter(customers=obj)
+        self.assertEqual(warning.filename, __file__)
+        self.assertSequenceEqual(qs, [self.supplier])
+
+    def test_reverse_managers_new_instance(self):
+        self.assertSequenceEqual(Place(pk=self.restaurant.pk).lot.all(), [self.lot])
+        self.assertSequenceEqual(
+            Restaurant(pk=self.restaurant.pk).provider.all(), [self.supplier]
+        )

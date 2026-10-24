@@ -33,6 +33,14 @@ details on these changes.
 
 * ``django.utils.functional.cached_property`` will be removed.
 
+* Proposed, not approved (see :ref:`deprecated-new-instance-relations-6.2`):
+  passing a newly constructed model instance with a primary key set
+  (``_state.adding`` is ``True``) to a related filter,
+  :meth:`.QuerySet.contains`, or ``acontains()``, or saving a cached
+  ``ForeignKey`` or ``OneToOneField`` that holds one with :meth:`.Model.save`,
+  :meth:`.QuerySet.bulk_create`, or :meth:`.QuerySet.bulk_update`, would raise
+  :exc:`ValueError`.
+
 .. _deprecation-removed-in-2028:
 
 2028

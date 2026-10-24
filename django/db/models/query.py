@@ -1531,6 +1531,14 @@ class QuerySet(AltersData):
             raise TypeError("'obj' must be a model instance.")
         if not obj._is_pk_set():
             raise ValueError("QuerySet.contains() cannot be used on unsaved objects.")
+        # RemovedInDjango2029Warning: Reject adding-state model arguments.
+        if obj._state.adding:
+            warnings.warn(
+                "Passing a newly constructed model instance to QuerySet.contains() "
+                "is deprecated. Use filter(pk=obj.pk).exists() instead.",
+                RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
         if self._result_cache is not None:
             return obj in self._result_cache
         return self.filter(pk=obj.pk).exists()

@@ -7,14 +7,26 @@ from operator import attrgetter
 
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models import CharField, Count, Exists, F, Max, OuterRef, Q
+from django.db.models import (
+    CharField,
+    Count,
+    Exists,
+    F,
+    Max,
+    OuterRef,
+    Q,
+    prefetch_related_objects,
+)
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import ExtractYear, Length, LTrim
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.utils.deprecation import (
+    RemovedInDjango2028Warning,
+    RemovedInDjango2029Warning,
+)
 
 from .models import (
     FK1,
@@ -2006,6 +2018,175 @@ class Queries5Tests(TestCase):
             Employment.objects.filter(employer__in=[company, Company(name="unsaved")])
         with self.assertRaisesMessage(ValueError, msg):
             StaffUser.objects.filter(staff=Staff(name="unsaved"))
+
+
+class RelatedFilterPrimaryKeyTests(TestCase):
+    new_instance_msg = (
+        "Passing a newly constructed model instance to related filters is "
+        "deprecated. Pass target field values instead."
+    )
+
+    def test_new_instance_identifies_existing_row(self):
+        saved = DateTimePK.objects.create()
+        info = ExtraInfo.objects.create(info="matching", date=saved)
+        other = ExtraInfo.objects.create(info="unrelated")
+        obj = DateTimePK(pk=saved.pk)
+        self.assertTrue(obj._state.adding)
+        for lookup in ("date", "date__in"):
+            with self.subTest(lookup=lookup):
+                kwargs = {lookup: [obj] if lookup.endswith("__in") else obj}
+                with self.assertWarnsMessage(
+                    RemovedInDjango2029Warning, self.new_instance_msg
+                ):
+                    qs = ExtraInfo.objects.filter(**kwargs)
+                self.assertSequenceEqual(qs, [info])
+                with self.assertWarnsMessage(
+                    RemovedInDjango2029Warning, self.new_instance_msg
+                ):
+                    qs = ExtraInfo.objects.exclude(**kwargs)
+                self.assertSequenceEqual(qs, [other])
+
+    def test_default_pk_missing_row(self):
+        info = ExtraInfo.objects.create(info="unrelated")
+        obj = DateTimePK()
+        self.assertTrue(obj._is_pk_set())
+        for lookup in ("date", "date__in"):
+            with self.subTest(lookup=lookup):
+                kwargs = {lookup: [obj] if lookup.endswith("__in") else obj}
+                with self.assertWarnsMessage(
+                    RemovedInDjango2029Warning, self.new_instance_msg
+                ):
+                    qs = ExtraInfo.objects.filter(**kwargs)
+                self.assertSequenceEqual(qs, [])
+                with self.assertWarnsMessage(
+                    RemovedInDjango2029Warning, self.new_instance_msg
+                ):
+                    qs = ExtraInfo.objects.exclude(**kwargs)
+                self.assertSequenceEqual(qs, [info])
+
+    def test_new_instance_in_q_object_and_mixed_list(self):
+        saved = DateTimePK.objects.create()
+        info = ExtraInfo.objects.create(info="matching", date=saved)
+        obj = DateTimePK(pk=saved.pk)
+        for q in (Q(date=obj), Q(date__in=[saved, obj])):
+            with self.subTest(q=q):
+                with self.assertWarnsMessage(
+                    RemovedInDjango2029Warning, self.new_instance_msg
+                ):
+                    qs = ExtraInfo.objects.filter(q)
+                with self.assertNumQueries(1):
+                    self.assertSequenceEqual(qs, [info])
+
+    def test_saved_instance_and_target_values(self):
+        # No warning: RemovedInDjango2029Warning is an error in the test suite.
+        saved = DateTimePK.objects.create()
+        info = ExtraInfo.objects.create(info="matching", date=saved)
+        for kwargs in (
+            {"date": saved},
+            {"date__in": [saved]},
+            {"date": saved.pk},
+            {"date_id": saved.pk},
+            {"date__in": [saved.pk]},
+        ):
+            with self.subTest(kwargs=kwargs):
+                self.assertSequenceEqual(ExtraInfo.objects.filter(**kwargs), [info])
+
+    def test_reverse_manager_new_instance_existing_row(self):
+        saved = DateTimePK.objects.create()
+        info = ExtraInfo.objects.create(info="matching", date=saved)
+        obj = DateTimePK(pk=saved.pk)
+        with self.assertNumQueries(1):
+            infos = list(obj.extrainfo_set.all())
+        self.assertEqual(infos, [info])
+        with self.assertNumQueries(0):
+            self.assertIs(infos[0].date, obj)
+
+    def test_reverse_manager_write_on_new_instance_warns(self):
+        # Reverse-manager writes keep passing the instance, so they follow the
+        # new filter contract during the experiment.
+        saved = DateTimePK.objects.create()
+        info = ExtraInfo.objects.create(info="matching", date=saved)
+        obj = DateTimePK(pk=saved.pk)
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, self.new_instance_msg):
+            found, created = obj.extrainfo_set.get_or_create(info="matching")
+        self.assertEqual(found, info)
+        self.assertIs(created, False)
+
+    def test_prefetch_new_instance(self):
+        saved = DateTimePK.objects.create()
+        info = ExtraInfo.objects.create(info="matching", date=saved)
+        obj = DateTimePK(pk=saved.pk)
+        prefetch_related_objects([obj], "extrainfo_set")
+        with self.assertNumQueries(0):
+            self.assertSequenceEqual(obj.extrainfo_set.all(), [info])
+
+    def test_prefetch_cleared_pk_rejected(self):
+        obj = DateTimePK.objects.create()
+        obj.pk = None
+        msg = "Model instances passed to related filters must be saved."
+        with self.assertNumQueries(0), self.assertRaisesMessage(ValueError, msg):
+            prefetch_related_objects([obj], "extrainfo_set")
+
+    def test_prefetch_mixed_cleared_pk_rejected(self):
+        saved = DateTimePK.objects.create()
+        cleared = DateTimePK.objects.create()
+        cleared.pk = None
+        msg = "Model instances passed to related filters must be saved."
+        with self.assertNumQueries(0), self.assertRaisesMessage(ValueError, msg):
+            prefetch_related_objects([saved, cleared], "extrainfo_set")
+
+    def test_prefetch_many_to_many_new_instance(self):
+        tag = Tag.objects.create(name="t1")
+        author = Author.objects.create(
+            name="a1", num=1, extra=ExtraInfo.objects.create(info="e1")
+        )
+        saved = Item.objects.create(
+            name="i1",
+            created=datetime.datetime.now(),
+            creator=author,
+            note=Note.objects.create(note="n1", misc="m1"),
+        )
+        saved.tags.add(tag)
+        obj = Item(pk=saved.pk)
+        prefetch_related_objects([obj], "tags")
+        with self.assertNumQueries(0):
+            self.assertSequenceEqual(obj.tags.all(), [tag])
+
+    def test_prefetch_many_to_many_mixed_cleared_pk_rejected(self):
+        tag = Tag.objects.create(name="t1")
+        author = Author.objects.create(
+            name="a1", num=1, extra=ExtraInfo.objects.create(info="e1")
+        )
+        saved = Item.objects.create(
+            name="i1",
+            created=datetime.datetime.now(),
+            creator=author,
+            note=Note.objects.create(note="n1", misc="m1"),
+        )
+        saved.tags.add(tag)
+        cleared = Item.objects.get(pk=saved.pk)
+        cleared.pk = None
+        msg = "Model instances passed to related filters must be saved."
+        with self.assertNumQueries(0), self.assertRaisesMessage(ValueError, msg):
+            prefetch_related_objects([saved, cleared], "tags")
+
+    def test_reverse_manager_before_save(self):
+        obj = DateTimePK()
+        self.assertTrue(obj._is_pk_set())
+        self.assertSequenceEqual(obj.extrainfo_set.all(), [])
+
+    def test_cleared_pk(self):
+        obj = DateTimePK.objects.create()
+        obj.pk = None
+        self.assertFalse(obj._state.adding)
+        msg = "Model instances passed to related filters must be saved."
+        for method in ("filter", "exclude"):
+            for lookup in ("date", "date__in"):
+                with self.subTest(method=method, lookup=lookup):
+                    kwargs = {lookup: [obj] if lookup.endswith("__in") else obj}
+                    with self.assertNumQueries(0):
+                        with self.assertRaisesMessage(ValueError, msg):
+                            getattr(ExtraInfo.objects, method)(**kwargs)
 
 
 class SelectRelatedTests(TestCase):

@@ -1,10 +1,13 @@
 import uuid
 from decimal import Decimal
+from unittest import mock
 
 from django.apps import apps
-from django.core.exceptions import ValidationError
+from django.core.exceptions import FieldFetchBlocked, ValidationError
 from django.db import IntegrityError, connection
 from django.db.models import (
+    FETCH_PEERS,
+    FETCH_RAISE,
     CharField,
     F,
     FloatField,
@@ -21,6 +24,8 @@ from .models import (
     GeneratedModel,
     GeneratedModelCheckConstraint,
     GeneratedModelCheckConstraintVirtual,
+    GeneratedModelDefaultPk,
+    GeneratedModelDefaultPkVirtual,
     GeneratedModelFieldWithConverters,
     GeneratedModelNonAutoPk,
     GeneratedModelNull,
@@ -177,6 +182,108 @@ class GeneratedFieldTestMixin:
         m = self.base_model(a=1, b=2)
         msg = "Cannot retrieve deferred field 'field' from an unsaved model."
         with self.assertRaisesMessage(AttributeError, msg):
+            m.field
+
+    def test_unsaved_with_supplied_pk_missing_row(self):
+        m = self.base_model(pk=1, a=1, b=2)
+        msg = "Cannot retrieve deferred field 'field' from an unsaved model."
+        with self.assertNumQueries(1), self.assertRaisesMessage(AttributeError, msg):
+            m.field
+
+    def test_unsaved_with_default_pk_missing_row(self):
+        m = self.default_pk_model(a=1)
+        msg = "Cannot retrieve deferred field 'field' from an unsaved model."
+        with self.assertNumQueries(1), self.assertRaisesMessage(AttributeError, msg):
+            m.field
+
+    def test_unsaved_with_supplied_pk_existing_row(self):
+        saved = self.base_model.objects.create(a=1, b=2)
+        m = self.base_model(pk=saved.pk, a=10, b=20)
+        with self.assertNumQueries(1):
+            self.assertEqual(m.field, 3)
+        with self.assertNumQueries(0):
+            self.assertEqual(m.field, 3)
+
+    def test_unsaved_with_default_pk_existing_row(self):
+        saved = self.default_pk_model.objects.create(a=1)
+        m = self.default_pk_model(pk=saved.pk, a=10)
+        with self.assertNumQueries(1):
+            self.assertEqual(m.field, 2)
+
+    def test_saved_deferred_generated_field_missing_row(self):
+        saved = self.base_model.objects.create(a=1, b=2)
+        m = self.base_model.objects.defer("field").get(pk=saved.pk)
+        self.base_model.objects.filter(pk=saved.pk).delete()
+        msg = f"{self.base_model._meta.object_name} matching query does not exist."
+        with (
+            self.assertNumQueries(1),
+            self.assertRaisesMessage(self.base_model.DoesNotExist, msg),
+        ):
+            m.field
+
+    def test_unsaved_deferred_regular_field_missing_row(self):
+        m = self.base_model(pk=1, a=1, b=2)
+        del m.a
+        msg = f"{self.base_model._meta.object_name} matching query does not exist."
+        with (
+            self.assertNumQueries(1),
+            self.assertRaisesMessage(self.base_model.DoesNotExist, msg),
+        ):
+            m.a
+
+    def test_deferred_generated_field_with_cleared_pk(self):
+        saved = self.base_model.objects.create(a=1, b=2)
+        m = self.base_model.objects.defer("field").get(pk=saved.pk)
+        m.pk = None
+        msg = "Cannot retrieve deferred field 'field' from an unsaved model."
+        with self.assertNumQueries(0), self.assertRaisesMessage(AttributeError, msg):
+            m.field
+
+    def test_unsaved_generated_field_fetch_raise(self):
+        m = self.base_model(pk=1, a=1, b=2)
+        m._state.fetch_mode = FETCH_RAISE
+        msg = f"Fetching of {self.base_model.__qualname__}.field blocked."
+        with (
+            self.assertNumQueries(0),
+            self.assertRaisesMessage(FieldFetchBlocked, msg),
+        ):
+            m.field
+
+    def test_unsaved_generated_field_fetch_peers_missing_row(self):
+        m = self.base_model(pk=1, a=1, b=2)
+        m._state.fetch_mode = FETCH_PEERS
+        msg = "Cannot retrieve deferred field 'field' from an unsaved model."
+        with self.assertNumQueries(1), self.assertRaisesMessage(AttributeError, msg):
+            m.field
+
+    def test_unsaved_generated_field_fetch_peers_existing_row(self):
+        saved = self.base_model.objects.create(a=1, b=2)
+        m = self.base_model(pk=saved.pk, a=10, b=20)
+        m._state.fetch_mode = FETCH_PEERS
+        with self.assertNumQueries(1):
+            self.assertEqual(m.field, 3)
+        with self.assertNumQueries(0):
+            self.assertEqual(m.field, 3)
+
+    def test_generated_field_refresh_other_model_error(self):
+        m = self.base_model(pk=1, a=1, b=2)
+        msg = "Related row not found."
+        with (
+            mock.patch.object(m, "refresh_from_db", side_effect=Foo.DoesNotExist(msg)),
+            self.assertNumQueries(0),
+            self.assertRaisesMessage(Foo.DoesNotExist, msg),
+        ):
+            m.field
+
+    @isolate_apps("model_fields")
+    def test_unsaved_inherited_generated_field(self):
+        class GeneratedProxy(self.base_model):
+            class Meta:
+                proxy = True
+
+        m = GeneratedProxy(pk=1, a=1, b=2)
+        msg = "Cannot retrieve deferred field 'field' from an unsaved model."
+        with self.assertNumQueries(1), self.assertRaisesMessage(AttributeError, msg):
             m.field
 
     def test_full_clean(self):
@@ -394,6 +501,7 @@ class GeneratedFieldTestMixin:
 @skipUnlessDBFeature("supports_stored_generated_columns")
 class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     base_model = GeneratedModel
+    default_pk_model = GeneratedModelDefaultPk
     nullable_model = GeneratedModelNull
     check_constraint_model = GeneratedModelCheckConstraint
     unique_constraint_model = GeneratedModelUniqueConstraint
@@ -424,10 +532,17 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
         self.assertEqual(obj.a, 2)
         self.assertEqual(obj.b, 3)
 
+    def test_unsaved_with_non_auto_pk_missing_row(self):
+        obj = GeneratedModelNonAutoPk(id=1, a=2)
+        msg = "Cannot retrieve deferred field 'b' from an unsaved model."
+        with self.assertNumQueries(1), self.assertRaisesMessage(AttributeError, msg):
+            obj.b
+
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")
 class VirtualGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     base_model = GeneratedModelVirtual
+    default_pk_model = GeneratedModelDefaultPkVirtual
     nullable_model = GeneratedModelNullVirtual
     check_constraint_model = GeneratedModelCheckConstraintVirtual
     unique_constraint_model = GeneratedModelUniqueConstraintVirtual
