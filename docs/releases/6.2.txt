@@ -132,6 +132,11 @@ CSP
 CSRF
 ~~~~
 
+* The CSRF failure reason for a rejected ``Origin`` header now includes the
+  expected origin. When :setting:`DEBUG` is ``True``, the CSRF failure page
+  also suggests settings to check, including when ``X-Forwarded-Proto`` or
+  ``X-Forwarded-Host`` proxy headers are detected.
+
 * ...
 
 Database backends
