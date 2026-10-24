@@ -351,6 +351,19 @@ class ChangeList:
         (on the admin or model) or a callable with the 'admin_order_field'
         attribute. Return None if no proper model field name can be matched.
         """
+        if callable(field_name):
+            attr = field_name
+        elif hasattr(self.model_admin, field_name) and field_name != "__str__":
+            attr = getattr(self.model_admin, field_name)
+        else:
+            attr = getattr(self.model, field_name, None)
+
+        if isinstance(attr, property) and hasattr(attr, "fget"):
+            attr = attr.fget
+
+        if attr is not None and hasattr(attr, "admin_order_field"):
+            return getattr(attr, "admin_order_field")
+
         try:
             field = self.lookup_opts.get_field(field_name)
             return field.name

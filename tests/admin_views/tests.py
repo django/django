@@ -820,6 +820,25 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             cl.get_queryset(request), Article.objects.order_by("title", "-pk")
         )
 
+    def test_admin_order_field_shadowing_model_field(self):
+        """
+        An admin_order_field on a ModelAdmin method takes precedence over a
+        model field of the same name.
+        """
+
+        class ParentAdminWithChildCount(admin.ModelAdmin):
+            list_display = ["name", "child_set"]
+
+            @admin.display(ordering="child_count")
+            def child_set(self, obj):
+                return obj.child_count
+
+        model_admin = ParentAdminWithChildCount(Parent, site)
+        request = RequestFactory().get("/")
+        request.user = self.superuser
+        cl = model_admin.get_changelist_instance(request)
+        self.assertEqual(cl.get_ordering_field("child_set"), "child_count")
+
     def test_change_list_sorting_model_admin(self):
         """
         Ensure we can sort on a list_display field that is a ModelAdmin method
