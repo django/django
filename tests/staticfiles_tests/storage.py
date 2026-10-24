@@ -98,7 +98,3 @@ class ExtraPatternsStorage(ManifestStaticFilesStorage):
 class NoneHashStorage(ManifestStaticFilesStorage):
     def file_hash(self, name, content=None):
         return None
-
-
-class NoPostProcessReplacedPathStorage(ManifestStaticFilesStorage):
-    max_post_process_passes = 0
