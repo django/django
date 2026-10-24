@@ -502,7 +502,7 @@ class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
 @Field.register_lookup
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = "in"
-    contains_none = False
+    rhs_contains_none = False
 
     def get_prep_lookup(self):
         from django.db.models.sql.query import Query  # avoid circular import
@@ -523,7 +523,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
                 # Remove None from the list as NULL is never equal to anything.
                 rhs = OrderedSet(self.rhs)
                 if None in rhs:
-                    self.contains_none = True
+                    self.rhs_contains_none = True
                     rhs.discard(None)
             except TypeError:  # Unhashable items in self.rhs
                 rhs = [r for r in self.rhs if r is not None]
@@ -567,12 +567,12 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             else:
                 sql, params = super().as_sql(compiler, connection)
         except EmptyResultSet:
-            if self.contains_none:
+            if self.rhs_contains_none:
                 sql = f"{lhs_sql} IS NULL"
                 params = lhs_params
                 return sql, params
             raise
-        if self.contains_none:
+        if self.rhs_contains_none:
             sql = f"({sql} OR {lhs_sql} IS NULL)"
             params += lhs_params
         return sql, params
