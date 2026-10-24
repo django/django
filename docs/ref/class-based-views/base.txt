@@ -57,7 +57,21 @@ ancestor classes are  documented under the section title of **Ancestors
 
         Default::
 
-            ["get", "post", "put", "patch", "delete", "head", "options", "trace"]
+            [
+                "get",
+                "post",
+                "put",
+                "patch",
+                "delete",
+                "head",
+                "options",
+                "trace",
+                "query",
+            ]
+
+        .. versionchanged:: 6.2
+
+            ``"query"`` was added to the default list.
 
     **Methods**
 
