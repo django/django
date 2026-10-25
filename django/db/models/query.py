@@ -741,7 +741,7 @@ class QuerySet(AltersData):
             not clone.query.select_for_update
             or connections[clone.db].features.supports_select_for_update_with_limit
         ):
-            limit = MAX_GET_RESULTS
+            limit = MAX_GET_RESULTS if settings.DEBUG else 2
             clone.query.set_limits(high=limit)
         num = len(clone)
         if num == 1:

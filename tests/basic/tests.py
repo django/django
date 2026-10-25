@@ -20,6 +20,7 @@ from django.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
+    override_settings,
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
@@ -535,6 +536,7 @@ class ModelTest(TestCase):
         # Fields that weren't deleted aren't reloaded.
         self.assertEqual(article.pub_date, new_pub_date)
 
+    @override_settings(DEBUG=True)
     def test_multiple_objects_max_num_fetched(self):
         max_results = MAX_GET_RESULTS - 1
         Article.objects.bulk_create(
@@ -557,6 +559,19 @@ class ModelTest(TestCase):
             Article.objects.get,
             headline__startswith="Area",
         )
+
+    @override_settings(DEBUG=False)
+    def test_multiple_objects_max_num_fetched_with_debug_false(self):
+        Article.objects.bulk_create(
+            Article(headline="Area %s" % i, pub_date=datetime(2005, 7, 28))
+            for i in range(5)
+        )
+        with self.assertNumQueries(1):
+            with self.assertRaisesMessage(
+                MultipleObjectsReturned,
+                "get() returned more than one Article -- it returned more than 1!",
+            ):
+                Article.objects.get(headline__startswith="Area")
 
     def test_is_pk_unset(self):
         cases = [
@@ -704,6 +719,7 @@ class ModelLookupTest(TestCase):
         b = Article.objects.get(pk=self.a.id)
         self.assertEqual(a, b)
 
+    @override_settings(DEBUG=True)
     def test_too_many(self):
         # Create a very similar object
         a = Article(
