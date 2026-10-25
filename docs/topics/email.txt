@@ -1020,8 +1020,8 @@ Email backends
 
 The actual sending of an email is handled by the email backend.
 
-Django comes with several email backends. With the exception of the SMTP
-backend, these are mainly useful during testing and development. If the
+Django comes with several email backends. With the exception of the SMTP and
+tasks backends, these are mainly useful during testing and development. If the
 built-in backends don't meet your needs there are :ref:`third-party packages
 <topic-third-party-email-backends>` available. You can also subclass one of the
 built-in backends to change its behavior, or even :ref:`write your own email
@@ -1252,6 +1252,70 @@ it, set :setting:`BACKEND <MAILERS-BACKEND>` to
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
+
+.. _topic-email-tasks-backend:
+
+Tasks backend
+-------------
+
+.. versionadded:: 6.2
+
+The tasks backend sends messages in the background using Django's :doc:`Tasks
+framework </topics/tasks>`. Instead of sending messages itself, it enqueues a
+task that sends them later using another mailer. To use it, set
+:setting:`BACKEND <MAILERS-BACKEND>` to
+``"django.core.mail.backends.tasks.EmailBackend"``.
+
+The tasks backend supports these :setting:`OPTIONS <MAILERS-OPTIONS>`:
+
+* ``"mailer"`` (required): the :setting:`MAILERS` alias of the mailer that the
+  task uses to send the messages. It must refer to another mailer defined in
+  :setting:`MAILERS`, not the tasks mailer itself.
+
+* ``"task_backend"``: the :setting:`TASKS` alias of the task backend used to
+  enqueue the task. Defaults to the ``"default"`` task backend.
+
+* ``"queue_name"``: the name of the queue the task is enqueued on. Defaults to
+  the :attr:`~django.tasks.Task.queue_name` of the task.
+
+* ``"priority"``: the :attr:`~django.tasks.Task.priority` of the task.
+
+For example, to send messages through an SMTP server in the background by
+default, while keeping the ability to send them immediately::
+
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.tasks.EmailBackend",
+            "OPTIONS": {
+                "mailer": "smtp",
+                "queue_name": "email",
+            },
+        },
+        "smtp": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": "smtp.example.net",
+                "use_tls": True,
+            },
+        },
+    }
+
+All messages passed to a single ``send_messages()`` call are enqueued in one
+task. Messages without any recipients are not queued.
+
+``send_messages()`` returns the number of messages sent. If the task backend
+executes the task immediately, such as the :ref:`immediate-task-backend`, this
+is the number of messages sent by the ``"mailer"``. Otherwise, it returns ``0``
+because the messages are sent later, when a worker runs the task.
+
+Task arguments must be JSON serializable, so the tasks backend converts each
+message to JSON before it is enqueued, and the task rebuilds the message before
+sending it. Every part of the message must therefore be serializable: the
+standard :class:`EmailMessage` and :class:`EmailMultiAlternatives` fields,
+including attachments and alternatives, are supported. An
+:class:`EmailMessage` subclass is preserved, but the subclass's
+``__init__()`` method is not called when the message is rebuilt, so any custom
+attributes that aren't stored in the standard fields are lost.
 
 .. _topic-third-party-email-backends:
 

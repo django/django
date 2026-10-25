@@ -151,6 +151,10 @@ Email
   and :setting:`SERVER_EMAIL` settings now support
   :class:`~email.headerregistry.Address` objects.
 
+* The new :ref:`tasks email backend <topic-email-tasks-backend>` sends email
+  in the background using the :doc:`Tasks framework </topics/tasks>` and
+  another mailer.
+
 Error Reporting
 ~~~~~~~~~~~~~~~
 
