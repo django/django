@@ -27,10 +27,10 @@ jobs:
         include:
           - conda-environment-file: ".github/workflows/data/conda/geolibs-pg17-gil.yml"
             pg_major: "17"
-            python: "3.15"
+            python: "3.14"
           - conda-environment-file: ".github/workflows/data/conda/geolibs-pg17-freethreading.yml"
             pg_major: "17"
-            python: "3.15t"
+            python: "3.14t"
           - conda-environment-file: ".github/workflows/data/conda/geolibs-pg18-gil.yml"
             pg_major: "18"
             python: "3.15"
