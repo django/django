@@ -1633,8 +1633,22 @@ class Query(BaseExpression):
             require_outer = (
                 condition.rhs is False if current_negated else condition.rhs is True
             )
-        elif lookup_type == "in" and condition.contains_none:
-            require_outer = True
+        elif lookup_type == "in":
+            require_outer = (
+                not condition.rhs_contains_none
+                if current_negated
+                else condition.rhs_contains_none
+            )
+            lookup_class = targets[0].get_lookup("isnull")
+            col = self._get_col(targets[0], join_info.targets[0], alias)
+            if condition.rhs_contains_none:
+                if condition.rhs == []:
+                    clause = WhereNode([lookup_class(col, True)], connector=AND)
+                else:
+                    clause.add(lookup_class(col, True), OR)
+            elif current_negated and require_outer:
+                clause.add(lookup_class(col, False), AND)
+
         elif current_negated and condition.rhs is not None:
             require_outer = True
             # The condition added below will be SQL like this:
