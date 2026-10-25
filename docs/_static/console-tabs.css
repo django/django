@@ -107,6 +107,10 @@
     }
 
     > section {
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow-x: auto;
+        /* Place the panel on its own row and hide it until active. */
         flex-basis: 100%;
         display: none;
     }
