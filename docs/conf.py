@@ -238,6 +238,8 @@ html_theme_path = ["_theme"]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
+# All files in html_static_path are bundled into epub as well. Use
+# epub_exclude_files for any that are not epub compatible.
 html_static_path = ["_static"]
 
 html_css_files = [
@@ -435,7 +437,12 @@ epub_cover = ("", "epub-cover.html")
 # epub_post_files = []
 
 # A list of files that should not be packed into the epub file.
-# epub_exclude_files = []
+epub_exclude_files = ["_static/console-tabs.css"]
+
+# Empty, rather than defaulting to html_css_files, because its only entry is
+# the console-tabs.css excluded above. Any epub compatible addition to
+# html_css_files needs repeating here.
+epub_css_files = []
 
 # The depth of the table of contents in toc.ncx.
 # epub_tocdepth = 3
