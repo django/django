@@ -447,6 +447,8 @@ class Command(BaseCommand):
 
         def model_installed(model):
             opts = model._meta
+            if not opts.managed:
+                return False
             converter = connection.introspection.identifier_converter
             max_name_length = connection.ops.max_name_length()
             return not (
