@@ -403,14 +403,19 @@ class PasswordResetForm(forms.Form):
         """
         Send a django.core.mail.EmailMultiAlternatives to `to_email`.
         """
-        subject = loader.render_to_string(subject_template_name, context)
+        request = context.get("request")
+        subject = loader.render_to_string(
+            subject_template_name, context, request=request
+        )
         # Email subject *must not* contain newlines
         subject = "".join(subject.splitlines())
-        body = loader.render_to_string(email_template_name, context)
+        body = loader.render_to_string(email_template_name, context, request=request)
 
         email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
         if html_email_template_name is not None:
-            html_email = loader.render_to_string(html_email_template_name, context)
+            html_email = loader.render_to_string(
+                html_email_template_name, context, request=request
+            )
             email_message.attach_alternative(html_email, "text/html")
 
         try:
@@ -478,6 +483,8 @@ class PasswordResetForm(forms.Form):
                 "protocol": "https" if use_https else "http",
                 **(extra_email_context or {}),
             }
+            if request is not None:
+                context["request"] = request
             self.send_mail(
                 subject_template_name,
                 email_template_name,

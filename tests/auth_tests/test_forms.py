@@ -30,8 +30,9 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
+from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
-from django.urls import reverse
+from django.urls import include, path, reverse
 from django.utils import translation
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
@@ -47,6 +48,27 @@ from .models.with_custom_email_field import CustomEmailField
 from .models.with_integer_username import IntegerUsernameUser
 from .models.with_many_to_many import CustomUserWithM2M, Organization
 from .settings import AUTH_TEMPLATES
+
+
+def password_reset_test_view(request):
+    return HttpResponse()
+
+
+password_reset_test_urlpatterns = (
+    [
+        path(
+            "email-template-url/",
+            password_reset_test_view,
+            name="email-template-url",
+        ),
+    ],
+    "password_reset_test",
+)
+
+urlpatterns = [
+    path("first/", include(password_reset_test_urlpatterns, namespace="first")),
+    path("second/", include(password_reset_test_urlpatterns, namespace="second")),
+]
 
 
 class TestDataMixin:
@@ -1256,6 +1278,51 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         # potential case where contrib.sites is not installed. Refs #16412.
         form.save(domain_override="example.com")
         self.assertEmailMessageSent(subject="Custom password reset on example.com")
+
+    @override_settings(
+        ROOT_URLCONF="auth_tests.test_forms",
+        TEMPLATES=[
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "OPTIONS": {
+                    "loaders": [
+                        (
+                            "django.template.loaders.locmem.Loader",
+                            {
+                                "registration/password_reset_subject.txt": (
+                                    "Password reset"
+                                ),
+                                "registration/password_reset_email.html": (
+                                    "{% url "
+                                    '"password_reset_test:email-template-url"'
+                                    " %}"
+                                ),
+                                "registration/password_reset_html.html": (
+                                    "<p>{% url "
+                                    '"password_reset_test:email-template-url"'
+                                    " %}</p>"
+                                ),
+                            },
+                        ),
+                    ],
+                },
+            },
+        ],
+    )
+    def test_save_renders_email_templates_with_request(self):
+        request = RequestFactory().get("/first/password_reset/")
+        request.current_app = "first"
+        form = PasswordResetForm({"email": "testclient@example.com"})
+        self.assertTrue(form.is_valid())
+        form.save(
+            request=request,
+            html_email_template_name="registration/password_reset_html.html",
+        )
+        msg = self.assertEmailMessageSent()
+        self.assertEqual(msg.body, "/first/email-template-url/")
+        self.assertEqual(
+            msg.alternatives, [("<p>/first/email-template-url/</p>", "text/html")]
+        )
 
     def test_custom_email_constructor(self):
         data = {"email": "testclient@example.com"}
