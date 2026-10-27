@@ -651,7 +651,7 @@ for HEAD request.
 
 Since ``QUERY`` requests carry their parameters in the request body rather
 than the URL, the cache key for a ``QUERY`` request also incorporates the
-request body and its ``Content-Type``, as required by
+request body and its ``Content-Type`` and ``Content-Encoding``, as required by
 :rfc:`10008#section-2.7`. ``QUERY`` responses are cached independently of any
 ``GET`` or ``HEAD`` response for the same URL. ``QUERY`` requests whose body
 exceeds :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` aren't cached.

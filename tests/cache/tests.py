@@ -2407,6 +2407,19 @@ class CacheUtils(SimpleTestCase):
             get_cache_key(other_content_type, method="QUERY"),
         )
 
+    def test_query_cache_key_varies_by_content_encoding(self):
+        request = self.factory.query(
+            self.path, "a", headers={"Content-Encoding": "gzip"}
+        )
+        learn_cache_key(request, HttpResponse())
+        other_encoding = self.factory.query(
+            self.path, "a", headers={"Content-Encoding": "br"}
+        )
+        self.assertNotEqual(
+            get_cache_key(request, method="QUERY"),
+            get_cache_key(other_encoding, method="QUERY"),
+        )
+
     def test_query_cache_key_differs_from_get(self):
         get_request = self.factory.get(self.path)
         learn_cache_key(get_request, HttpResponse())
@@ -2711,6 +2724,29 @@ class CacheQUERYTest(SimpleTestCase):
             request
         )
         self.assertIsNone(get_cache_data)
+
+    def test_query_doesnt_overwrite_get_vary_headers(self):
+        """
+        Learning the Vary headers of a QUERY response doesn't affect the
+        headers used for the cache key of a GET response for the same URL.
+        """
+
+        def get_view(request):
+            response = HttpResponse("get content")
+            response.headers["Vary"] = "X-Tenant"
+            return response
+
+        request = self.factory.get(self.path, headers={"X-Tenant": "a"})
+        request._cache_update_cache = True
+        UpdateCacheMiddleware(get_view)(request)
+        self._set_cache(self.factory.query(self.path, "field = 'test'"), "query")
+
+        request = self.factory.get(self.path, headers={"X-Tenant": "a"})
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(
+            request
+        )
+        self.assertIsNotNone(get_cache_data)
+        self.assertEqual(get_cache_data.content, b"get content")
 
     def test_query_view_reads_stream(self):
         """
