@@ -49,6 +49,38 @@ class ContextTests(SimpleTestCase):
             self.assertEqual(c["a"], 3)
         self.assertEqual(c["a"], 1)
 
+    def test_context_manager_cleans_up_extra_layers(self):
+        for method in ("push", "update"):
+            with self.subTest(method=method):
+                c = Context({"a": 1})
+                original_dicts = c.dicts[:]
+                with getattr(c, method)({"a": 2}):
+                    c.push(a=3)
+                    c.update({"b": 4})
+                    self.assertEqual(c["a"], 3)
+                    self.assertEqual(c["b"], 4)
+                self.assertEqual(c.dicts, original_dicts)
+
+    def test_context_manager_cleans_up_equal_layers(self):
+        c = Context({"a": 1})
+        original_dicts = c.dicts[:]
+        with c.push(a=1):
+            c.push(a=1)
+        self.assertEqual(c.dicts, original_dicts)
+
+    def test_nested_context_managers_clean_up_extra_layers(self):
+        c = Context({"a": 1})
+        original_dicts = c.dicts[:]
+        with c.push(a=2):
+            c.push(b=3)
+            outer_dicts = c.dicts[:]
+            with self.assertRaisesMessage(ValueError, "render failed"):
+                with c.update({"a": 4}):
+                    c.update({"b": 5})
+                    raise ValueError("render failed")
+            self.assertEqual(c.dicts, outer_dicts)
+        self.assertEqual(c.dicts, original_dicts)
+
     def test_push_context_manager_with_context_object(self):
         c = Context({"a": 1})
         with c.push(Context({"a": 3})):

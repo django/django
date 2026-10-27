@@ -521,8 +521,9 @@ If you ``pop()`` too much, it'll raise
     ...
     ContextPopException
 
-You can also use ``push()`` as a context manager to ensure a matching ``pop()``
-is called.
+You can also use ``push()`` as a context manager. On exit, it removes the
+layer it added and any layers pushed above it within the block, including
+when an exception is raised.
 
 .. code-block:: pycon
 
@@ -570,8 +571,8 @@ the stack instead of an empty one.
     >>> c["foo"]
     'first level'
 
-Like ``push()``, you can use ``update()`` as a context manager to ensure a
-matching ``pop()`` is called.
+Like ``push()``, you can use ``update()`` as a context manager to remove its
+layer and any layers pushed above it when the block exits.
 
 .. code-block:: pycon
 

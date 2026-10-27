@@ -1,6 +1,7 @@
 from django.template import (
     Context,
     Engine,
+    Library,
     TemplateDoesNotExist,
     TemplateSyntaxError,
     loader,
@@ -19,6 +20,25 @@ include_fail_templates = {
 
 class IncludeTagTests(SimpleTestCase):
     libraries = {"bad_tag": "template_tests.templatetags.bad_tag"}
+
+    def test_include_context_with_extra_layer(self):
+        library = Library()
+
+        @library.simple_tag(takes_context=True)
+        def push_context(context):
+            context.update({"extra": "inner"})
+            return ""
+
+        engine = Engine()
+        engine.template_builtins.append(library)
+        included = engine.from_string("{% push_context %}{{ foo }}{{ extra }}")
+        template = engine.from_string(
+            '{{ foo }}|{% include included with foo="bar" %}|{{ foo }}'
+        )
+        context = Context({"foo": "foo", "included": included})
+        original_dicts = context.dicts[:]
+        self.assertEqual(template.render(context), "foo|barinner|foo")
+        self.assertEqual(context.dicts, original_dicts)
 
     @setup({"include01": '{% include "basic-syntax01" %}'}, basic_templates)
     def test_include01(self):
