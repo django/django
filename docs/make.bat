@@ -37,6 +37,7 @@ if "%1" == "help" (
 	echo.  spelling   to check for typos in documentation
 	echo.  black      to apply the black formatting to code blocks in documentation
 	echo.  lint       to check for linting errors in documentation
+	echo.  epubcheck  to validate the epub build with EPUBCheck
 	goto end
 )
 
@@ -116,10 +117,8 @@ if "%1" == "devhelp" (
 )
 
 if "%1" == "epub" (
-	%SPHINXBUILD% -b epub %ALLSPHINXOPTS% %BUILDDIR%/epub
+	call :run_epub
 	if errorlevel 1 exit /b 1
-	echo.
-	echo.Build finished. The epub file is in %BUILDDIR%/epub.
 	goto end
 )
 
@@ -189,6 +188,16 @@ results in %BUILDDIR%/doctest/output.txt.
 	goto end
 )
 
+if "%1" == "epubcheck" (
+	call :run_epub
+	if errorlevel 1 exit /b 1
+	python -m epubcheck %BUILDDIR%/epub/Django.epub
+	if errorlevel 1 exit /b 1
+	echo.
+	echo.EPUBCheck complete.
+	goto end
+)
+
 if "%1" == "spelling" (
 	call :run_spelling
 	goto end
@@ -212,6 +221,13 @@ if "%1" == "check" (
 	echo.All checks completed.
 	goto end
 )
+
+:run_epub
+	%SPHINXBUILD% -b epub %ALLSPHINXOPTS% %BUILDDIR%/epub
+	if errorlevel 1 exit /b 1
+	echo.
+	echo.Build finished. The epub file is in %BUILDDIR%/epub.
+	exit /b
 
 :run_spelling
 	%SPHINXBUILD% -b spelling %ALLSPHINXOPTS% %BUILDDIR%/spelling

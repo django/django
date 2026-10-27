@@ -26,7 +26,7 @@ ALLSPHINXOPTS   = -n -d $(BUILDDIR)/doctrees -D language=$(LANGUAGEOPT) --jobs $
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html htmlview dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext
+.PHONY: help clean html htmlview dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext epubcheck
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -52,6 +52,7 @@ help:
 	@echo "  spelling   to check for typos in documentation"
 	@echo "  black      to apply the black formatting to code blocks in documentation"
 	@echo "  lint       to check for linting errors in documentation"
+	@echo "  epubcheck  to validate the epub build with EPUBCheck"
 
 
 clean:
@@ -186,6 +187,9 @@ lint:
 	$(PYTHON) lint.py
 	@echo
 	@echo "Documentation lint complete."
+
+epubcheck: epub
+	$(PYTHON) -m epubcheck $(BUILDDIR)/epub/Django.epub
 
 check:
 	@echo "=== Spelling check ==="; \

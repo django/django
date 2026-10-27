@@ -3,3 +3,4 @@ Sphinx>=7.3.0
 sphinxcontrib-spelling
 blacken-docs
 sphinx-lint
+epubcheck

@@ -48,6 +48,8 @@ jobs:
         run: make black
       - name: Spelling
         run: SPHINXOPTS="-q -W" make spelling
+      - name: EPUBCheck
+        run: SPHINXOPTS="-q" make epubcheck
 
   sphinx-extension-tests:
     runs-on: ubuntu-24.04

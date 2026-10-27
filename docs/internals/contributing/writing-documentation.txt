@@ -142,6 +142,8 @@ will be themed differently than the documentation at
 `docs.djangoproject.com <https://docs.djangoproject.com/>`_. This is OK! If
 your changes look good on your local machine, they'll look good on the website.
 
+.. _documentation-autobuild:
+
 Automating documentation rebuilds
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -217,7 +219,8 @@ changes can be merged. They can also be run locally with a single command:
      $ make check
 
 This command runs all current checks and will include any new checks added in
-the future.
+the future, with the exception of :ref:`EPUBCheck <documentation-epub-check>`,
+which requires a Java runtime.
 
 .. _documentation-spelling-check:
 
@@ -288,6 +291,40 @@ The command prints any violations to the terminal in the form
 * For long lines consider wrapping text onto new lines or breaking long inline
   links into named references. The custom line length check should already skip
   common false positives such as headings, tables and long links.
+
+.. _documentation-epub-check:
+
+EPUBCheck
+---------
+
+Django's documentation is also available in EPUB format. EPUB is based on the
+HTML build but has several limitations that don't apply to content meant for
+web browsers. Verifying EPUB compatibility is particularly important when
+changing CSS files, images, or other assets that are included in the HTML
+documentation, or when altering any Sphinx ``toctree``.
+
+To ensure that the EPUB is valid, build it and check it with the `EPUBCheck`_
+tool from the ``docs`` directory:
+
+.. console::
+
+     $ make epubcheck
+
+Some ``NAV-011`` warnings are expected: they come from index pages with their
+own sections following a ``toctree``, which makes the table of contents link
+back to a document earlier in the EPUB reading order. Any errors, however,
+indicate a problem that should be fixed.
+
+The ``EPUBCheck`` tool requires Java, so it is not included in the standard
+set of :ref:`quality checks <documentation-checks>` run by ``make check``.
+
+Running ``sphinx-autobuild`` to :ref:`automatically rebuild
+<documentation-autobuild>` changes in HTML can interfere with EPUB builds.
+Sphinx warnings about ``.buildinfo.bak`` indicate overlapping builds that will
+lead to ``EPUBCheck`` errors. Stop ``sphinx-autobuild`` and run ``make clean``
+if this occurs.
+
+.. _EPUBCheck: https://www.w3.org/publishing/epubcheck/
 
 .. _documentation-link-check:
 
