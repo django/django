@@ -1,0 +1,8 @@
+===========================
+Django 6.0.10 release notes
+===========================
+
+*November 3, 2026*
+
+Django 6.0.10 fixes five security issues with severity "low" and one security
+issue with severity "moderate" in 6.0.9.
