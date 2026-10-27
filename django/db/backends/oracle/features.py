@@ -149,6 +149,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if (21,) <= self.connection.oracle_version < (23,):
+            skips.update(
+                {
+                    "Raises ORA-24826 on Oracle 21c: value LOB no longer available": {
+                        "db_functions.json.test_json_object.JSONObjectTests."
+                        "test_order_by_key.",
+                        "db_functions.json.test_json_object.JSONObjectTests."
+                        "test_order_by_nested_key",
+                    },
+                },
+            )
         if self.connection.is_pool:
             skips.update(
                 {
