@@ -434,8 +434,17 @@ class Collector:
         """
         Get a QuerySet of the related model to objs via related fields.
         """
+        # Avoid a circular import.
+        from django.db.models.fields.related_lookups import get_target_values
+
         predicate = query_utils.Q.create(
-            [(f"{related_field.name}__in", objs) for related_field in related_fields],
+            [
+                (
+                    f"{related_field.name}__in",
+                    [get_target_values(obj, related_field) for obj in objs],
+                )
+                for related_field in related_fields
+            ],
             connector=query_utils.Q.OR,
         )
         return related_model._base_manager.using(self.using).filter(predicate)

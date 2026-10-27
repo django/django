@@ -873,3 +873,16 @@ class FastDeleteTests(TestCase):
         with self.assertNumQueries(1):
             User.objects.filter(~Q(pk__in=[]) | Q(avatar__desc="foo")).delete()
         self.assertFalse(User.objects.exists())
+
+
+class DeleteNewInstanceTests(TestCase):
+    def test_delete_new_instance_cascades(self):
+        r = R.objects.create()
+        S.objects.create(r=r)
+        obj = R(pk=r.pk)
+        self.assertTrue(obj._state.adding)
+        deleted, rows_count = obj.delete()
+        self.assertEqual(deleted, 2)
+        self.assertEqual(rows_count["delete.R"], 1)
+        self.assertEqual(rows_count["delete.S"], 1)
+        self.assertIs(R.objects.filter(pk=r.pk).exists(), False)

@@ -12,6 +12,7 @@ from django.test import (
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from .models import (
     NullableUUIDModel,
@@ -347,5 +348,12 @@ class TestAsPrimaryKeyTransactionTests(TransactionTestCase):
     @skipUnlessDBFeature("supports_foreign_keys")
     def test_unsaved_fk(self):
         u1 = PrimaryKeyUUIDModel()
-        with self.assertRaises(IntegrityError):
+        msg = (
+            "Saving a relation to a newly constructed model instance is deprecated. "
+            "Assign the related field's raw value instead."
+        )
+        with (
+            self.assertWarnsMessage(RemovedInDjango2029Warning, msg),
+            self.assertRaises(IntegrityError),
+        ):
             RelatedToUUIDModel.objects.create(uuid_fk=u1)

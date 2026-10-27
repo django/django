@@ -1,5 +1,6 @@
 import time
 import traceback
+import warnings
 from datetime import date, datetime, timedelta
 from threading import Event, Thread, Timer
 from unittest.mock import patch
@@ -8,6 +9,7 @@ from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.functional import lazy
 
 from .models import (
@@ -259,12 +261,31 @@ class GetOrCreateTransactionTests(TransactionTestCase):
         databases that delay integrity checks until the end of transactions,
         otherwise the exception is never raised.
         """
-        try:
-            Profile.objects.get_or_create(person=Person(id=1))
-        except IntegrityError:
-            pass
-        else:
-            self.skipTest("This backend does not support integrity checks.")
+        filter_msg = (
+            "Passing a newly constructed model instance to related filters is "
+            "deprecated. Pass target field values instead."
+        )
+        save_msg = (
+            "Saving a relation to a newly constructed model instance is deprecated. "
+            "Assign the related field's raw value instead."
+        )
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always", RemovedInDjango2029Warning)
+            try:
+                Profile.objects.get_or_create(person=Person(id=1))
+            except IntegrityError:
+                pass
+            else:
+                self.skipTest("This backend does not support integrity checks.")
+        # The initial lookup, failed insert, and retry lookup each warn.
+        self.assertEqual(
+            [warning.category for warning in caught],
+            [RemovedInDjango2029Warning] * 3,
+        )
+        self.assertEqual(
+            [str(warning.message) for warning in caught],
+            [filter_msg, save_msg, filter_msg],
+        )
 
 
 class GetOrCreateThroughManyToMany(TestCase):

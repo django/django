@@ -115,3 +115,22 @@ class InlineFormsetTests(TestCase):
         self.assertIs(formset.is_valid(), True)
         self.assertIsNotNone(formset.instance.uuid)
         self.assertEqual(formset.forms[0].instance.parent_id, formset.instance.uuid)
+
+    def test_inlineformset_factory_new_parent_instance_existing_row(self):
+        parent = UUIDPKParent.objects.create(name="Foo")
+        child = UUIDPKChild.objects.create(name="Bar", parent=parent)
+        obj = UUIDPKParent(pk=parent.pk, name="Foo")
+        self.assertTrue(obj._state.adding)
+        FormSet = inlineformset_factory(UUIDPKParent, UUIDPKChild, fields="__all__")
+        formset = FormSet(instance=obj)
+        self.assertSequenceEqual(formset.get_queryset(), [child])
+
+    def test_inlineformset_factory_new_parent_instance_alternate_key(self):
+        parent = ParentWithUUIDAlternateKey.objects.create(name="Foo")
+        child = ChildRelatedViaAK.objects.create(name="Bar", parent=parent)
+        obj = ParentWithUUIDAlternateKey(pk=parent.pk, uuid=parent.uuid, name="Foo")
+        FormSet = inlineformset_factory(
+            ParentWithUUIDAlternateKey, ChildRelatedViaAK, fields="__all__"
+        )
+        formset = FormSet(instance=obj)
+        self.assertSequenceEqual(formset.get_queryset(), [child])

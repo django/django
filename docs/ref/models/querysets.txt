@@ -2944,6 +2944,22 @@ know that it will be at some point, then using ``some_queryset.contains(obj)``
 will make an additional database query, generally resulting in slower overall
 performance.
 
+.. deprecated:: 6.2
+
+    This deprecation is proposed, not approved. See
+    :ref:`deprecated-new-instance-relations-6.2`.
+
+    Passing ``contains()`` or ``acontains()`` a newly constructed instance
+    with a primary key set (its
+    :attr:`_state.adding <django.db.models.Model._state>` is ``True``) is
+    deprecated, even if a matching row exists. The proposal is to raise
+    :exc:`ValueError` in Django 2029.
+
+    Use ``some_queryset.filter(pk=obj.pk).exists()`` instead. It doesn't use
+    the cache of an evaluated queryset, so it may run an extra query. If
+    ``some_queryset`` is already evaluated, ``obj in some_queryset`` gives the
+    same answer from its cache.
+
 ``update()``
 ~~~~~~~~~~~~
 

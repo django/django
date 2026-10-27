@@ -2124,6 +2124,33 @@ three queries would be identical::
     Entry.objects.filter(blog=b.id)  # Query using id from instance
     Entry.objects.filter(blog=5)  # Query using id directly
 
+.. _topics-db-queries-related-new-instances:
+
+.. deprecated:: 6.2
+
+    This deprecation is proposed, not approved. See
+    :ref:`deprecated-new-instance-relations-6.2`.
+
+    Passing a newly constructed instance with a primary key set (its
+    :attr:`_state.adding <django.db.models.Model._state>` is ``True``) is
+    deprecated, even if the key matches an existing row. For example,
+    ``filter(blog=Blog(pk=5))``, ``exclude(blog=Blog(pk=5))``, and
+    ``filter(blog__in=[Blog(pk=5)])`` emit a ``RemovedInDjango2029Warning``.
+    The proposal is to raise :exc:`ValueError` in Django 2029.
+
+    Pass the target field value instead, or an instance loaded from the
+    intended database. If the :class:`~django.db.models.ForeignKey` has a
+    :attr:`~django.db.models.ForeignKey.to_field`, the target value is that
+    field's value, not the primary key. For a relation over several columns,
+    pass a tuple of the target values, in the order of the relation's target
+    fields.
+
+    Reading through a reverse ``ForeignKey`` manager or a ``ManyToManyField``
+    manager, such as ``Blog(pk=5).entry_set.all()``, and prefetching those
+    relations use target values and don't warn. Manager methods that pass the
+    instance to a filter or a save, such as the reverse ``ForeignKey``
+    manager's ``create()`` and ``get_or_create()``, warn.
+
 Falling back to raw SQL
 =======================
 

@@ -285,7 +285,15 @@ class DeferredAttribute:
                         "from an unsaved model."
                     )
 
-                instance._state.fetch_mode.fetch(self, instance)
+                try:
+                    instance._state.fetch_mode.fetch(self, instance)
+                except instance.__class__.DoesNotExist as exc:
+                    if not self.field.generated or not instance._state.adding:
+                        raise
+                    raise AttributeError(
+                        f"Cannot retrieve deferred field {field_name!r} "
+                        "from an unsaved model."
+                    ) from exc
             else:
                 data[field_name] = val
         return data[field_name]

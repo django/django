@@ -77,6 +77,7 @@ from django.db import (
 )
 from django.db.models import Manager, Q, Window, signals
 from django.db.models.expressions import ColPairs
+from django.db.models.fields.related_lookups import get_target_values
 from django.db.models.fields.tuple_lookups import TupleIn
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
@@ -94,8 +95,8 @@ class ForeignKeyDeferredAttribute(DeferredAttribute):
         instance.__dict__[self.field.attname] = value
 
 
-def _filter_prefetch_queryset(queryset, field_name, instances):
-    predicate = Q(**{f"{field_name}__in": instances})
+def _filter_prefetch_queryset(queryset, field_name, values):
+    predicate = Q(**{f"{field_name}__in": values})
     db = queryset._db or DEFAULT_DB_ALIAS
     if queryset.query.is_sliced:
         if not connections[db].features.supports_over_clause:
@@ -759,7 +760,19 @@ def create_reverse_many_to_one_manager(superclass, rel):
                     queryset = queryset.using(self._db)
                 queryset._fetch_mode = self.instance._state.fetch_mode
                 queryset._defer_next_filter = True
-                queryset = queryset.filter(**self.core_filters)
+                if self.field.many_to_one:
+                    # Filter on target field values, read when filtering,
+                    # rather than on the instance, which may not be saved yet.
+                    queryset = queryset.filter(
+                        **{
+                            self.field.name: get_target_values(
+                                self.instance, self.field
+                            )
+                        }
+                    )
+                else:
+                    # Field-like objects such as GenericRelation.
+                    queryset = queryset.filter(**self.core_filters)
             empty_strings_as_null = None
             for field in self.field.foreign_related_fields:
                 val = getattr(self.instance, field.attname)
@@ -837,7 +850,16 @@ def create_reverse_many_to_one_manager(superclass, rel):
             rel_obj_attr = self.field.get_local_related_value
             instance_attr = self.field.get_foreign_related_value
             instances_dict = {instance_attr(inst): inst for inst in instances}
-            queryset = _filter_prefetch_queryset(queryset, self.field.name, instances)
+            queryset = _filter_prefetch_queryset(
+                queryset,
+                self.field.name,
+                (
+                    [get_target_values(inst, self.field) for inst in instances]
+                    if self.field.many_to_one
+                    # Field-like objects such as GenericRelation.
+                    else instances
+                ),
+            )
             # Restore subsequent cloning operations.
             if _cloning_disabled:
                 queryset._enable_cloning()
@@ -1224,7 +1246,9 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
             queryset = _filter_prefetch_queryset(
-                queryset, self.query_field_name, instances
+                queryset,
+                self.query_field_name,
+                [get_target_values(inst, self.source_field) for inst in instances],
             )
 
             # M2M: need to annotate the query in order to get the primary model
