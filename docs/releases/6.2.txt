@@ -77,11 +77,11 @@ The query content is available as :attr:`HttpRequest.body
 :class:`~django.middleware.cache.FetchFromCacheMiddleware`, and
 :func:`~django.views.decorators.cache.cache_page`. As required by
 :rfc:`10008#section-2.7`, the cache key for a ``QUERY`` request incorporates
-the request content and its ``Content-Type``, so queries with different
-content are cached separately, independently of any ``GET`` or ``HEAD``
-response for the same URL. ``QUERY`` requests whose content exceeds
-:setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` aren't cached. Conditional request
-processing with ``ETag`` or ``Last-Modified`` validators is supported.
+the request content and its ``Content-Type`` and ``Content-Encoding``, so
+queries with different content are cached separately, independently of any
+``GET`` or ``HEAD`` response for the same URL. ``QUERY`` requests whose content
+exceeds :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` aren't cached. Conditional
+request processing with ``ETag`` or ``Last-Modified`` validators is supported.
 
 Adopting calendar versioning
 ----------------------------
