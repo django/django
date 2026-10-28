@@ -19,6 +19,14 @@ class Editor(models.Model):
     name = models.CharField(max_length=255)
 
 
+class Location(models.Model):
+    small = models.BooleanField(default=False)
+
+
+class Library(Location):
+    editors = models.ManyToManyField(Editor, related_name="libraries")
+
+
 class Book(models.Model):
     AVAILABLE = "available"
     RESERVED = "reserved"
