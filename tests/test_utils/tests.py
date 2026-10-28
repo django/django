@@ -1356,6 +1356,95 @@ class AssertWarnsMessageTests(SimpleTestCase):
             func1()
 
 
+class IgnoreWarningsTests(SimpleTestCase):
+    @contextmanager
+    def captured_warnings(self):
+        with warnings.catch_warnings(record=True) as captured:
+            warnings.simplefilter("always")
+            yield captured
+
+    def test_no_arguments(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings():
+                warnings.warn("Expected message", UserWarning)
+                warnings.warn("Another message", DeprecationWarning)
+        self.assertEqual(captured, [])
+
+    def test_message_not_matched(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message="is deprecated"):
+                warnings.warn("Expected message", UserWarning)
+        self.assertEqual(len(captured), 1)
+
+    def test_module_matched_by_prefix(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module="test_utils"):
+                warnings.warn_explicit(
+                    "Expected message",
+                    UserWarning,
+                    "example.py",
+                    1,
+                    module="test_utils.example",
+                )
+        self.assertEqual(captured, [])
+
+    def test_module_not_matched_in_the_middle(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module="utils.example"):
+                warnings.warn_explicit(
+                    "Expected message",
+                    UserWarning,
+                    "example.py",
+                    1,
+                    module="test_utils.example",
+                )
+        self.assertEqual(len(captured), 1)
+
+    def test_module_regex(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(module=r"test_utils\.\w+"):
+                warnings.warn_explicit(
+                    "Expected message",
+                    UserWarning,
+                    "example.py",
+                    1,
+                    module="test_utils.example",
+                )
+        self.assertEqual(captured, [])
+
+    def test_category(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(category=UserWarning):
+                warnings.warn("Expected message", UserWarning)
+                warnings.warn("Another message", UserWarning)
+                warnings.warn("Expected message", DeprecationWarning)
+        self.assertEqual(len(captured), 1)
+        self.assertIs(captured[0].category, DeprecationWarning)
+
+    def test_lineno(self):
+        with self.captured_warnings() as captured:
+            with ignore_warnings(lineno=10):
+                warnings.warn_explicit("Ignored message", UserWarning, "example.py", 10)
+                warnings.warn_explicit(
+                    "Expected message", UserWarning, "example.py", 11
+                )
+        self.assertEqual(
+            [str(warning.message) for warning in captured],
+            ["Expected message"],
+        )
+
+    def test_warning_filters_restored(self):
+        message = "Expected message"
+        with self.captured_warnings() as captured:
+            with ignore_warnings(message=message):
+                warnings.warn(message, UserWarning)
+            warnings.warn(message, UserWarning)
+        self.assertEqual(
+            [str(warning.message) for warning in captured],
+            [message],
+        )
+
+
 class AssertFieldOutputTests(SimpleTestCase):
     def test_assert_field_output(self):
         error_invalid = ["Enter a valid email address."]
