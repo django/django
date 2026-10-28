@@ -418,6 +418,13 @@ Dropped support for PostgreSQL 15
 Upstream support for PostgreSQL 15 ends in November 2027. Django 6.2 supports
 PostgreSQL 16 and higher.
 
+Improved warning matching in ``assertWarnsMessage()``
+-----------------------------------------------------
+
+:meth:`~django.test.SimpleTestCase.assertWarnsMessage` now checks all warnings
+for a matching ``expected_warning`` and ``expected_message``. Previously, only
+the first warning in the expected category was checked for the message.
+
 Miscellaneous
 -------------
 

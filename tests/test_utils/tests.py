@@ -1336,11 +1336,31 @@ class AssertWarnsMessageTests(SimpleTestCase):
         with self.assertWarnsMessage(UserWarning, "Expected message"):
             warnings.warn("Expected message", UserWarning)
 
+    def test_context_manager_warning_attributes(self):
+        expected_warning = UserWarning("Expected message")
+        with self.assertWarnsMessage(UserWarning, "Expected message") as cm:
+            warnings.warn(expected_warning)
+        self.assertIs(cm.warning, expected_warning)
+        self.assertEqual(cm.filename, cm.warnings[0].filename)
+        self.assertEqual(cm.lineno, cm.warnings[0].lineno)
+
+    def test_context_manager_message_kwarg(self):
+        msg = "Custom assertWarnsMessage() failure message"
+
+        expected_message = "No 'UserWarning' warning was triggered"
+
+        with (
+            self.assertRaisesMessage(AssertionError, expected_message),
+            self.assertWarnsMessage(UserWarning, "Expected Message", msg=msg),
+        ):
+            pass
+
     def test_context_manager_failure(self):
-        msg = "Expected message' not found in 'Unexpected message'"
-        with self.assertRaisesMessage(AssertionError, msg):
-            with self.assertWarnsMessage(UserWarning, "Expected message"):
-                warnings.warn("Unexpected message", UserWarning)
+        with (
+            self.assertRaises(AssertionError),
+            self.assertWarnsMessage(UserWarning, "Expected message"),
+        ):
+            pass
 
     def test_callable(self):
         def func():
@@ -1354,6 +1374,20 @@ class AssertWarnsMessageTests(SimpleTestCase):
 
         with self.assertWarnsMessage(UserWarning, "[.*x+]y?"):
             func1()
+
+    def test_warning_subclass(self):
+        class CustomWarning(UserWarning):
+            pass
+
+        with self.assertWarnsMessage(UserWarning, "Expected message") as cm:
+            warnings.warn("Expected message", CustomWarning)
+
+        self.assertIsInstance(cm.warning, CustomWarning)
+
+    def test_warnings_match_regardless_the_order(self):
+        with self.assertWarnsMessage(UserWarning, "Expected message"):
+            warnings.warn("Unexpected message", UserWarning)
+            warnings.warn("Expected message", UserWarning)
 
 
 class AssertFieldOutputTests(SimpleTestCase):
