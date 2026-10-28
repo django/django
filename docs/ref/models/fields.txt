@@ -1402,14 +1402,11 @@ values are stored as null.
 
 .. class:: ImageField(upload_to=None, height_field=None, width_field=None, max_length=100, **options)
 
-Inherits all attributes and methods from :class:`FileField`, but also
-validates that the uploaded object is a valid image.
+Inherits all attributes and methods from :class:`FileField`, and also provides
+``height`` and ``width`` attributes. No additional image-specific validation is
+performed at the model field level.
 
-In addition to the special attributes that are available for
-:class:`FileField`, an :class:`ImageField` also has ``height`` and ``width``
-attributes.
-
-To facilitate querying on those attributes, :class:`ImageField` has the
+To facilitate querying on ``height`` and ``width``, :class:`ImageField` has the
 following optional arguments:
 
 .. attribute:: ImageField.height_field
