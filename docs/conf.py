@@ -436,7 +436,7 @@ epub_cover = ("", "epub-cover.html")
 # epub_post_files = []
 
 # A list of files that should not be packed into the epub file.
-epub_exclude_files = ["_static/console-tabs.css"]
+epub_exclude_files = [join("_static", "console-tabs.css")]
 
 # Empty, rather than defaulting to html_css_files, because its only entry is
 # the console-tabs.css excluded above. Any epub compatible addition to
