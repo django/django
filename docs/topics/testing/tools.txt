@@ -1660,9 +1660,23 @@ your test suite.
 .. method:: SimpleTestCase.assertWarnsMessage(expected_warning, expected_message, callable, *args, **kwargs)
             SimpleTestCase.assertWarnsMessage(expected_warning, expected_message)
 
-    Analogous to :meth:`SimpleTestCase.assertRaisesMessage` but for
-    :meth:`~unittest.TestCase.assertWarnsRegex` instead of
-    :meth:`~unittest.TestCase.assertRaisesRegex`.
+    Asserts that execution of ``callable`` emits at least one warning of
+    category ``expected_warning`` (or a subclass) whose message contains
+    ``expected_message``. It's a simpler version of
+    :meth:`unittest.TestCase.assertWarnsRegex` where ``expected_message``
+    isn't treated as a regular expression.
+
+    If only ``expected_warning`` and ``expected_message`` are given, returns a
+    context manager::
+
+        with self.assertWarnsMessage(DeprecationWarning, "Deprecated feature"):
+            deprecated_function()
+
+    .. versionchanged:: 6.2
+
+        All warnings are now checked for a matching category and message.
+        Previously, only the first warning in the expected category was checked
+        for the message.
 
 .. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')
 
