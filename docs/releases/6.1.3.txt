@@ -21,6 +21,11 @@ Bugfixes
   (:ticket:`37403`). Using such an expression in an ``IN`` lookup is likely
   unintended, since SQL ``NULL`` cannot match any value.
 
+* Fixed a regression in Django 6.1 where
+  :meth:`~django.forms.BoundField.legend_tag` with a custom ``attrs`` could add
+  the :attr:`~django.forms.Form.required_css_class` more than once
+  (:ticket:`37463`).
+
 * Added compatibility for ``oracledb`` 26.0.0+ (:ticket:`37411`).
 
 * Fixed a crash in :djadmin:`makemessages` on Windows when processing files

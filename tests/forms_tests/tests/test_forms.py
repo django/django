@@ -3974,6 +3974,22 @@ aria-describedby="id_age_error"></td></tr>""",
             "<legend>Field2:</legend>",
         )
 
+    def test_legend_has_required_css_class_multiple_render(self):
+        class SomeForm(Form):
+            required_css_class = "required"
+            field = CharField(max_length=10)
+
+        f = SomeForm({"field": "test"})
+        attrs = {"class": "foo"}
+        self.assertHTMLEqual(
+            f["field"].legend_tag(attrs=attrs),
+            '<legend class="foo required">Field:</legend>',
+        )
+        self.assertHTMLEqual(
+            f["field"].legend_tag(attrs=attrs),
+            '<legend class="foo required">Field:</legend>',
+        )
+
     def test_label_split_datetime_not_displayed(self):
         class EventForm(Form):
             happened_at = SplitDateTimeField(widget=SplitHiddenDateTimeWidget)

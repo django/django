@@ -190,13 +190,12 @@ class BoundField(RenderableFieldMixin):
         widget = self.field.widget
         id_ = widget.attrs.get("id") or self.auto_id
         if id_:
+            attrs = {**(attrs or {})}
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
-                attrs = attrs or {}
                 if tag != "legend":
                     attrs = {**attrs, "for": id_for_label}
             if self.field.required and hasattr(self.form, "required_css_class"):
-                attrs = attrs or {}
                 if "class" in attrs:
                     attrs["class"] += " " + self.form.required_css_class
                 else:
