@@ -365,6 +365,7 @@ th {
 }
 
 thead th,
+thead td,
 tfoot td {
     color: var(--body-quiet-color);
     padding: 5px 10px;
@@ -402,6 +403,7 @@ tr:nth-child(odd) + .row-form-errors .errorlist {
 
 /* SORTABLE TABLES */
 
+thead td,
 thead th {
     padding: 5px 10px;
     line-height: normal;

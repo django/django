@@ -936,6 +936,118 @@ class TestInline(TestDataMixin, TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_inlines.urls")
+class TestTabularInlineDeleteRendering(TestCase):
+    """
+    The "Delete?" table heading & delete checkbox are rendered only if
+    user can delete related objects and at least one inline
+    object has been saved.
+    They should not be rendered if the user cannot delete. The checkboxes
+    are also not rendered for extra (unsaved) forms.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testing",
+            password="password",
+            is_staff=True,
+        )
+
+        pc_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(ProfileCollection)
+        )
+        p_permission = Permission.objects.filter(
+            codename__in=["view_profile", "delete_profile"],
+            content_type=ContentType.objects.get_for_model(Profile),
+        )
+        pc = ProfileCollection.objects.create()
+        Profile.objects.create(collection=pc, first_name="John", last_name="Doe")
+
+        sp_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(SomeParentModel)
+        )
+        sc_permission = Permission.objects.filter(
+            codename__in=["view_somechildmodel"],
+            content_type=ContentType.objects.get_for_model(SomeChildModel),
+        )
+        sp = SomeParentModel.objects.create(name="p")
+        SomeChildModel.objects.create(name="c", position="0", parent=sp)
+
+        cls.user.user_permissions.add(
+            *pc_permission, *p_permission, *sp_permission, *sc_permission
+        )
+
+        cls.pc_url = reverse(
+            "admin:admin_inlines_profilecollection_change", args=(pc.pk,)
+        )
+        cls.sp_url = reverse(
+            "admin:admin_inlines_someparentmodel_change", args=(sp.pk,)
+        )
+
+        empty_pc = ProfileCollection.objects.create()
+        cls.empty_pc_url = reverse(
+            "admin:admin_inlines_profilecollection_change",
+            args=(empty_pc.pk,),
+        )
+
+        cls.add_delete_user = User.objects.create_user(
+            username="add_delete",
+            password="password",
+            is_staff=True,
+        )
+        cls.add_delete_user.user_permissions.add(
+            *pc_permission,
+            *Permission.objects.filter(
+                codename__in=["view_profile", "add_profile", "delete_profile"],
+                content_type=ContentType.objects.get_for_model(Profile),
+            ),
+        )
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_inline_delete_heading_rendered_only_when_delete_allowed(self):
+        response = self.client.get(self.pc_url)
+        self.assertContains(response, "<th>Delete?</th>", html=True)
+        # User can't delete, so no delete heading
+        response = self.client.get(self.sp_url)
+        self.assertNotContains(response, "<th>Delete?</th>", html=True)
+        # No saved inline objects, so no delete heading
+        self.client.force_login(self.add_delete_user)
+        response = self.client.get(self.empty_pc_url)
+        self.assertContains(response, 'name="profile_set-0-first_name"')
+        self.assertNotContains(response, "<th>Delete?</th>", html=True)
+
+    def test_inline_delete_checkbox_rendered_only_when_delete_allowed(self):
+        # 1 saved inline object exists and user can delete, checkbox rendered
+        response = self.client.get(self.pc_url)
+        self.assertContains(
+            response,
+            '<input type="checkbox" name="profile_set-0-DELETE" '
+            'id="id_profile_set-0-DELETE">',
+            html=True,
+        )
+        # User can't delete, so no delete checkbox
+        response = self.client.get(self.sp_url)
+        self.assertNotContains(response, 'name="somechildmodel_set-0-DELETE"')
+
+    def test_inline_delete_checkbox_not_rendered_for_extra_forms(self):
+        self.client.force_login(self.add_delete_user)
+        response = self.client.get(self.pc_url)
+        # Saved inline object has a delete checkbox
+        self.assertContains(
+            response,
+            '<input type="checkbox" name="profile_set-0-DELETE" '
+            'id="id_profile_set-0-DELETE">',
+            html=True,
+        )
+        # 1 saved inline object exists, extra unsaved form rendered
+        self.assertContains(response, 'name="profile_set-1-first_name"')
+        # ... but the extra unsaved form has no delete checkbox
+        self.assertNotContains(response, 'name="profile_set-1-DELETE"')
+
+
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
 class TestInlineMedia(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -2509,7 +2621,7 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         )
         tabular_inline = self.page.locator("[data-inline-type='tabular']")
         headers = tabular_inline.locator("th")
-        self.expect(headers).to_have_count(8)
+        self.expect(headers).to_have_count(7)
         self.expect(headers).to_have_text(
             [
                 "",
@@ -2519,7 +2631,6 @@ class PlaywrightTests(AdminPlaywrightTestCase):
                 "CREATION DATE",
                 "UPDATE DATE",
                 "UPDATED BY",
-                "DELETE?",
             ],
             use_inner_text=True,
         )
@@ -2555,8 +2666,10 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         cf = ExtraTerrestrial.objects.create(name="test")
         url = reverse("admin:admin_inlines_extraterrestrial_change", args=(cf.pk,))
         self.page.goto(self.live_server_url + url)
-        headers = self.page.locator("fieldset.module thead tr th")
-        self.expect(headers.last).to_have_text("")
+        delete_placeholder_cell = self.page.locator(
+            "fieldset.module thead tr > td:last-child"
+        ).last
+        self.expect(delete_placeholder_cell).to_have_text("")
         delete = self.page.locator(
             "fieldset.module tbody" " tr.dynamic-sighting_set:not(.original) td.delete",
         ).first
