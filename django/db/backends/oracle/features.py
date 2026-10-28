@@ -154,7 +154,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 {
                     "Raises ORA-24826 on Oracle 21c: value LOB no longer available": {
                         "db_functions.json.test_json_object.JSONObjectTests."
-                        "test_order_by_key.",
+                        "test_order_by_key",
                         "db_functions.json.test_json_object.JSONObjectTests."
                         "test_order_by_nested_key",
                     },
