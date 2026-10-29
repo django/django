@@ -298,7 +298,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
     def test_that_stdin_pipe_validates_only_once(self, _):
         """
         A CommandError should be raised if the password value read with --stdin
-        fail validation, with only one error message.
+        fails validation, with only one error message.
         """
         joe = User.objects.get(username="joe")
         self.assertTrue(joe.check_password("qwerty"))

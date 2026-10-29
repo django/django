@@ -73,9 +73,9 @@ class Command(BaseCommand):
         else:
             username = getpass.getuser()
 
-        if not options["interactive"] ^ options["stdin"]:
+        if (not options["interactive"]) ^ options["stdin"]:
             raise CommandError(
-                "The '--no-input' option must be used " "with the '--stdin' option."
+                "The '--no-input' option must be used with the '--stdin' option."
             )
 
         if options["stdin"]:
