@@ -1759,7 +1759,8 @@ Suppresses all user prompts.
 
 .. django-admin-option:: --stdin
 
-Read new password from standard input rather than prompting. Default is ``False``.
+Read new password from standard input rather than prompting.
+Default is ``False``.
 
 ``createsuperuser``
 ~~~~~~~~~~~~~~~~~~~
