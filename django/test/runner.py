@@ -14,6 +14,7 @@ import sys
 import textwrap
 import time
 import unittest
+import unittest.case
 import unittest.suite
 from collections import defaultdict
 from contextlib import contextmanager
@@ -162,6 +163,36 @@ class DummyList:
         pass
 
 
+class SubTestResult(unittest.case._SubTest):
+    """
+    An always-picklable stand-in for unittest.case._SubTest that stores only
+    eagerly computed string descriptions and failure exception type, avoiding
+    pickling the entire test case across worker processes.
+    """
+
+    def __init__(self, subtest):
+        # Skip _SubTest.__init__(): it stores subtest.test_case, the reference
+        # that causes the whole test case to be pickled.
+        unittest.TestCase.__init__(self)
+        self._str = str(subtest)
+        self._id = subtest.id()
+        self._shortDescription = subtest.shortDescription()
+        self._sub_description = subtest._subDescription()
+        self.failureException = subtest.failureException
+
+    def __str__(self):
+        return self._str
+
+    def id(self):
+        return self._id
+
+    def shortDescription(self):
+        return self._shortDescription
+
+    def _subDescription(self):
+        return self._sub_description
+
+
 class RemoteTestResult(unittest.TestResult):
     """
     Extend unittest.TestResult to record events in the child processes so they
@@ -206,22 +237,6 @@ class RemoteTestResult(unittest.TestResult):
         the parent process. Let the exception rise, if not.
         """
         pickle.loads(pickle.dumps(obj))
-
-    def _print_unpicklable_subtest(self, test, subtest, pickle_exc):
-        print("""
-Subtest failed:
-
-    test: {}
- subtest: {}
-
-Unfortunately, the subtest that failed cannot be pickled, so the parallel
-test runner cannot handle it cleanly. Here is the pickling error:
-
-> {}
-
-You should re-run this test with --parallel=1 to reproduce the failure
-with a cleaner failure message.
-""".format(test, subtest, pickle_exc))
 
     def check_picklable(self, test, err):
         # Ensure that sys.exc_info() tuples are picklable. This displays a
@@ -274,13 +289,6 @@ failure and get a correct traceback.
 """.format(test, original_exc_txt, pickle_exc_txt))
             raise
 
-    def check_subtest_picklable(self, test, subtest):
-        try:
-            self._confirm_picklable(subtest)
-        except Exception as exc:
-            self._print_unpicklable_subtest(test, subtest, exc)
-            raise
-
     def startTestRun(self):
         super().startTestRun()
         self.events.append(("startTestRun",))
@@ -323,11 +331,10 @@ failure and get a correct traceback.
         # Follow Python's implementation of unittest.TestResult.addSubTest() by
         # not doing anything when a subtest is successful.
         if err is not None:
-            # Call check_picklable() before check_subtest_picklable() since
-            # check_picklable() performs the tblib check.
             self.check_picklable(test, err)
-            self.check_subtest_picklable(test, subtest)
-            self.events.append(("addSubTest", self.test_index, subtest, err))
+            self.events.append(
+                ("addSubTest", self.test_index, SubTestResult(subtest), err)
+            )
         super().addSubTest(test, subtest, err)
 
     def addSuccess(self, test):
