@@ -56,7 +56,8 @@ editing content:
     After :meth:`~django.views.generic.base.View.setup`,
     :meth:`~django.views.generic.base.View.dispatch` selects a handler based on
     the request method. For GET and POST requests, the default implementations
-    follow these paths. Indentation shows nested calls and conditional branches.
+    follow these paths. Indentation shows nested calls and conditional
+    branches.
 
     * GET:
 
@@ -77,12 +78,16 @@ editing content:
         * :meth:`~django.views.generic.edit.FormMixin.get_form`
         * ``form.is_valid()`` determines which branch is followed:
 
-          * If valid: :meth:`~django.views.generic.edit.FormMixin.form_valid`
+          * If valid:
+
+            :meth:`~django.views.generic.edit.FormMixin.form_valid`
 
             * :meth:`~django.views.generic.edit.FormMixin.get_success_url`,
               followed by a redirect.
 
-          * If invalid: :meth:`~django.views.generic.edit.FormMixin.form_invalid`
+          * If invalid:
+
+            :meth:`~django.views.generic.edit.FormMixin.form_invalid`
 
             * :meth:`~django.views.generic.edit.FormMixin.get_context_data`,
               using the bound form with its validation errors.
@@ -200,23 +205,28 @@ editing content:
           * :meth:`~django.views.generic.edit.FormMixin.get_form`
           * ``form.is_valid()`` determines which branch is followed:
 
-            * If valid: :meth:`~django.views.generic.edit.ModelFormMixin.form_valid`
+            * If valid:
+
+              :meth:`~django.views.generic.edit.ModelFormMixin.form_valid`
               saves the new object and assigns it to ``self.object``.
 
               * :meth:`~django.views.generic.edit.FormMixin.form_valid`
 
-                * :meth:`~django.views.generic.edit.ModelFormMixin.get_success_url`,
+                * :meth:`~django.views.generic.edit.ModelFormMixin.get_success_url`
                   followed by a redirect.
 
-            * If invalid: :meth:`~django.views.generic.edit.FormMixin.form_invalid`
+            * If invalid:
+
+              :meth:`~django.views.generic.edit.FormMixin.form_invalid`
 
               * :meth:`~django.views.generic.edit.FormMixin.get_context_data`,
                 using the bound form with its validation errors.
               * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
     Form construction and template rendering follow the
-    :ref:`FormView flowchart <formview-method-flowchart>`, with the model-specific
-    implementations of :meth:`~django.views.generic.edit.ModelFormMixin.get_form_class`
+    :ref:`FormView flowchart <formview-method-flowchart>`, with the
+    model-specific implementations of
+    :meth:`~django.views.generic.edit.ModelFormMixin.get_form_class`
     and :meth:`~django.views.generic.edit.ModelFormMixin.get_form_kwargs`, and
     :meth:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.get_template_names`.
 
@@ -333,26 +343,32 @@ editing content:
           * :meth:`~django.views.generic.edit.FormMixin.get_form`
           * ``form.is_valid()`` determines which branch is followed:
 
-            * If valid: :meth:`~django.views.generic.edit.ModelFormMixin.form_valid`
+            * If valid:
+
+              :meth:`~django.views.generic.edit.ModelFormMixin.form_valid`
               saves the changes to the object.
 
               * :meth:`~django.views.generic.edit.FormMixin.form_valid`
 
-                * :meth:`~django.views.generic.edit.ModelFormMixin.get_success_url`,
+                * :meth:`~django.views.generic.edit.ModelFormMixin.get_success_url`
                   followed by a redirect.
 
-            * If invalid: :meth:`~django.views.generic.edit.FormMixin.form_invalid`
+            * If invalid:
+
+              :meth:`~django.views.generic.edit.FormMixin.form_invalid`
 
               * :meth:`~django.views.generic.edit.FormMixin.get_context_data`,
                 using the bound form with its validation errors.
               * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
     :meth:`~django.views.generic.detail.SingleObjectMixin.get_object` calls
-    :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset` and, when
-    looking up by slug, :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`.
+    :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset` and,
+    when looking up by slug,
+    :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`.
     Form construction and template rendering follow the
-    :ref:`FormView flowchart <formview-method-flowchart>`, with the model-specific
-    implementations of :meth:`~django.views.generic.edit.ModelFormMixin.get_form_class`
+    :ref:`FormView flowchart <formview-method-flowchart>`, with the
+    model-specific implementations of
+    :meth:`~django.views.generic.edit.ModelFormMixin.get_form_class`
     and :meth:`~django.views.generic.edit.ModelFormMixin.get_form_kwargs`, and
     :meth:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.get_template_names`.
     The form is bound to the existing object through its ``instance`` argument.
@@ -472,19 +488,22 @@ editing content:
             * :meth:`~django.views.generic.edit.DeletionMixin.get_success_url`
             * ``self.object.delete()``, followed by a redirect.
 
-          * If invalid: :meth:`~django.views.generic.edit.FormMixin.form_invalid`
+          * If invalid:
+
+            :meth:`~django.views.generic.edit.FormMixin.form_invalid`
 
             * :meth:`~django.views.generic.edit.FormMixin.get_context_data`,
               using the bound form with its validation errors.
             * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
     GET only displays the confirmation form. A valid POST deletes the object;
-    an invalid POST leaves it unchanged. The default empty form is always valid,
-    but a custom confirmation form can produce the invalid branch.
+    an invalid POST leaves it unchanged. The default empty form is always
+    valid, but a custom confirmation form can produce the invalid branch.
 
     :meth:`~django.views.generic.detail.SingleObjectMixin.get_object` calls
-    :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset` and, when
-    looking up by slug, :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`.
+    :meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset` and,
+    when looking up by slug,
+    :meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`.
     Form construction and template rendering follow the
     :ref:`FormView flowchart <formview-method-flowchart>`, using
     :meth:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.get_template_names`
