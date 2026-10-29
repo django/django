@@ -353,24 +353,32 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         joe.refresh_from_db()
         self.assertFalse(joe.check_password("not qwerty"))
 
-    def test_that_stdin_and_noinput_options_must_be_used_together(self):
-        with self.assertRaisesMessage(CommandError, ""):
-            call_command(
-                "changepassword",
-                username="joe",
-                stdout=self.stdout,
-                stderr=self.stderr,
-                stdin=True,
-                interactive=True,
-            )
+    def test_that_stdin_can_be_used_with_interactive(self):
+        """
+        Executing the changepassword command with --stdin option
+        but without --no-input option (interactive=True)
+        should read value from stdin.
+        """
+        call_command(
+            "changepassword",
+            username="joe",
+            stdout=self.stdout,
+            stderr=self.stderr,
+            stdin=True,
+            interactive=True,
+        )
 
+    def test_that_noinput_cannot_be_used_without_stdin(self):
+        """
+        Executing the changepassword command with --no-input option
+        but without --stdin option should crash and leave password unchanged.
+        """
         with self.assertRaisesMessage(CommandError, ""):
             call_command(
                 "changepassword",
                 username="joe",
                 stdout=self.stdout,
                 stderr=self.stderr,
-                stdin=False,
                 interactive=False,
             )
 
