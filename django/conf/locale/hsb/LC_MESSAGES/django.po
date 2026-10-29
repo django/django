@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2025
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>, 2016-2026\n"
 "Language-Team: Upper Sorbian (http://app.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
@@ -140,6 +140,9 @@ msgstr "Chorwatšćina"
 
 msgid "Upper Sorbian"
 msgstr "Hornjoserbšćina"
+
+msgid "Haitian Creole"
+msgstr "Haitiska kreolšćina"
 
 msgid "Hungarian"
 msgstr "Madźaršćina"
@@ -555,8 +558,8 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"Hódnota „%(value)s“ ma njepłaćiwy datumowy format. Dyrbi we formaće DD.MM."
-"YYYY być."
+"Hódnota „%(value)s“ ma njepłaćiwy datumowy format. Dyrbi we formaće "
+"DD.MM.YYYY być."
 
 #, python-format
 msgid ""
@@ -570,11 +573,11 @@ msgstr "Datum (bjez časa)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
-"Hódnota „%(value)s“ ma njepłaćiwy format. Dyrbi we formaće DD.MM.YYYY HH:MM[:"
-"ss[.uuuuuu]][TZ] być."
+"Hódnota „%(value)s“ ma njepłaćiwy format. Dyrbi we formaće DD.MM.YYYY "
+"HH:MM[:ss[.uuuuuu]][TZ] być."
 
 #, python-format
 msgid ""
@@ -596,11 +599,11 @@ msgstr "Decimalna ličba"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
-"Hódnota „%(value)s“ ma njepłaćiwy format. Dyrbi w formaće [DD] [HH:[MM:]]ss[."
-"uuuuuu] być."
+"Hódnota „%(value)s“ ma njepłaćiwy format. Dyrbi w formaće [DD] [HH:"
+"[MM:]]ss[.uuuuuu] być."
 
 msgid "Duration"
 msgstr "Traće"
@@ -665,8 +668,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Hódnota „%(value)s“ ma njepłaćiwy format. Dyrbi we formaće HH:MM[:ss[."
-"uuuuuu]] być."
+"Hódnota „%(value)s“ ma njepłaćiwy format. Dyrbi we formaće "
+"HH:MM[:ss[.uuuuuu]] być."
 
 #, python-format
 msgid ""
@@ -726,8 +729,8 @@ msgid "Many-to-many relationship"
 msgstr "Poćah wjele wjele"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -902,6 +905,22 @@ msgstr "Haj"
 
 msgid "No"
 msgstr "Ně"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Hotowy"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Běži"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Njeje so poradźiło"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Wuspěšny"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1304,8 +1323,8 @@ msgstr "Žadyn %(verbose_name_plural)s k dispoziciji njeje"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "Přichodowe %(verbose_name_plural)s k dispoziciji njejsu, dokelž hódnota "
 "%(class_name)s.allow_future je False."

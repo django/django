@@ -4,10 +4,12 @@ from django.contrib.redirects.models import Redirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseGone, HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 
 
 class RedirectFallbackMiddleware(MiddlewareMixin):
+    async_capable = False
+
     # Defined as class-level attributes to be subclassing-friendly.
     response_gone_class = HttpResponseGone
     response_redirect_class = HttpResponsePermanentRedirect

@@ -1,6 +1,6 @@
 import unittest
 
-from migrations.test_base import OperationTestBase, OptimizerTestBase
+from migrations.base import OperationTestBase, OptimizerTestBase
 
 from django.db import IntegrityError, NotSupportedError, connection, transaction
 from django.db.migrations.operations import RemoveIndex, RenameIndex

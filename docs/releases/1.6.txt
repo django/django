@@ -890,7 +890,7 @@ Miscellaneous
 * Due to a change in the form validation workflow,
   :class:`~django.forms.TypedChoiceField` ``coerce`` method should always
   return a value present in the ``choices`` field attribute. That limitation
-  should be lift again in Django 1.7.
+  should be lifted again in Django 1.7.
 
 * There have been changes in the way timeouts are handled in cache backends.
   Explicitly passing in ``timeout=None`` no longer results in using the

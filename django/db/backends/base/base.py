@@ -8,6 +8,7 @@ import warnings
 import zoneinfo
 from collections import deque
 from contextlib import contextmanager
+from functools import cached_property
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -19,7 +20,6 @@ from django.db.backends.utils import debug_transaction
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper, ProgrammingError
 from django.utils.asyncio import async_unsafe
-from django.utils.functional import cached_property
 
 NO_DB_ALIAS = "__no_db__"
 RAN_DB_VERSION_CHECK = set()
@@ -741,11 +741,8 @@ class BaseDatabaseWrapper:
                 try:
                     func()
                 except Exception as e:
-                    logger.error(
-                        f"Error calling {func.__qualname__} in on_commit() (%s).",
-                        e,
-                        exc_info=True,
-                    )
+                    name = getattr(func, "__qualname__", func)
+                    logger.exception("Error calling %s in on_commit() (%s).", name, e)
             else:
                 func()
 
@@ -759,11 +756,11 @@ class BaseDatabaseWrapper:
                 try:
                     func()
                 except Exception as e:
-                    logger.error(
-                        f"Error calling {func.__qualname__} in on_commit() during "
-                        f"transaction (%s).",
+                    name = getattr(func, "__qualname__", func)
+                    logger.exception(
+                        "Error calling %s in on_commit() during transaction (%s).",
+                        name,
                         e,
-                        exc_info=True,
                     )
             else:
                 func()

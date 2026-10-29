@@ -29,8 +29,8 @@ GDAL_PIXEL_TYPES = {
     9: "GDT_CInt32",  # Complex Int32
     10: "GDT_CFloat32",  # Complex Float32
     11: "GDT_CFloat64",  # Complex Float64
-    12: "GDT_UInt64",  # 64 bit unsigned integer (GDAL 3.5+).
-    13: "GDT_Int64",  # 64 bit signed integer (GDAL 3.5+).
+    12: "GDT_UInt64",  # 64 bit unsigned integer
+    13: "GDT_Int64",  # 64 bit signed integer
     14: "GDT_Int8",  # 8 bit signed integer (GDAL 3.7+).
 }
 

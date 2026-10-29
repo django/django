@@ -744,9 +744,9 @@ class TestRunnerInitializerTests(SimpleTestCase):
         self.assertIsInstance(initializer, functools.partial)
         self.assertIs(initializer.args[0], _init_worker)
         initargs = mocked_pool.call_args.kwargs["initargs"]
-        self.assertEqual(len(initargs), 7)
-        self.assertEqual(initargs[5], True)  # debug_mode
-        self.assertEqual(initargs[6], {db.DEFAULT_DB_ALIAS})  # Used database aliases.
+        self.assertEqual(len(initargs), 8)
+        self.assertEqual(initargs[6], True)  # debug_mode
+        self.assertEqual(initargs[7], {db.DEFAULT_DB_ALIAS})  # Used database aliases.
 
 
 class Ticket17477RegressionTests(AdminScriptTestCase):
@@ -799,7 +799,12 @@ class SQLiteInMemoryTestDbs(TransactionTestCase):
                     },
                 }
             )
-            with mock.patch("django.test.utils.connections", new=tested_connections):
+            with (
+                mock.patch("django.test.utils.connections", new=tested_connections),
+                mock.patch.dict(
+                    settings.DATABASES, tested_connections.settings, clear=True
+                ),
+            ):
                 other = tested_connections["other"]
                 try:
                     new_test_connections = DiscoverRunner(verbosity=0).setup_databases()

@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Abdulrahman Alfawal, 2025
 # Ahmad Khayyat <akhayyat@gmail.com>, 2013,2021
 # Bashar Al-Abdulhadi, 2015-2016,2021
 # Bashar Al-Abdulhadi, 2014
@@ -11,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-10-15 21:38+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
-"Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
+"POT-Creation-Date: 2025-03-19 11:30-0500\n"
+"PO-Revision-Date: 2025-12-03 08:09+0000\n"
+"Last-Translator: Abdulrahman Alfawal, 2025\n"
+"Language-Team: Arabic (http://app.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,12 +36,22 @@ msgstr "تواريخ مهمة"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "العنصر من نوع %(name)s ذو الحقل الأساسي %(key)r غير موجود."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "تم إرسال بيانات نموذج متضاربة. يرجى المحاولة لاحقاً."
+
 msgid "Password changed successfully."
 msgstr "تم تغيير كلمة المرور بنجاح."
+
+msgid "Password-based authentication was disabled."
+msgstr "تم تعطيل المصادقة باستخدام كلمة المرور."
 
 #, python-format
 msgid "Change password: %s"
 msgstr "غيّر كلمة المرور: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "تعيين كلمة المرور: %s"
 
 msgid "Authentication and Authorization"
 msgstr "المصادقة والتفويض"
@@ -51,12 +62,18 @@ msgstr "كلمة المرور"
 msgid "last login"
 msgstr "آخر دخول"
 
-msgid "No password set."
-msgstr "لم يتم تعيين كلمة المرور."
-
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 "صيغة كلمة المرور غير صحيحة أو أن خوارزمية البعثرة (hashing) غير معروفة."
+
+msgid "No password set."
+msgstr "لم يتم تعيين كلمة المرور."
+
+msgid "Reset password"
+msgstr "إعادة ضبط كلمة المرور"
+
+msgid "Set password"
+msgstr "تعيين كلمة المرور"
 
 msgid "The two password fields didn’t match."
 msgstr "حقلا كلمة المرور غير متطابقين."
@@ -71,11 +88,33 @@ msgid "Enter the same password as before, for verification."
 msgstr "أدخل كلمة المرور أعلاه مرة أخرى لتأكيدها."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user’s "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"لا يتم حفظ كلمات المرور بصورتها الأصلية، لذلك لا يمكنك عرض كلمة مرور هذا "
-"المستخدم، لكن يمكنك تغييرها باستخدام <a href=\"{}\">هذا النموذج</a>"
+"ما إذا كان المستخدم سيتمكن من تسجيل الدخول باستخدام كلمة مرور أم لا. إذا تم "
+"تعطيلها، فقد يظل قادراً على المصادقة باستخدام طرق أخرى، مثل تسجيل الدخول "
+"الموحد (Single Sign-On) أو LDAP."
+
+msgid "Password-based authentication"
+msgstr "المصادقة باستخدام كلمة المرور"
+
+msgid "Enabled"
+msgstr "مفعل"
+
+msgid "Disabled"
+msgstr "معطل"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+"لا يتم تخزين كلمات المرور بصيغتها الأصلية، لذلك لا يمكن الاطلاع على كلمة "
+"مرور المستخدم."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
+"قم بتفعيل المصادقة باستخدام كلمة المرور لهذا المستخدم بواسطة تعيين كلمة مرور."
 
 #, python-format
 msgid ""
@@ -100,9 +139,6 @@ msgstr "كلمة مرورك القديمة غير صحيحة. رجاءً أدخ�
 
 msgid "Old password"
 msgstr "كلمة المرور القديمة"
-
-msgid "Password (again)"
-msgstr "كلمة المرور (مجدداً)"
 
 msgid "algorithm"
 msgstr "خوارزمية"
@@ -227,24 +263,15 @@ msgid "users"
 msgstr "المستخدمون"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] ""
-"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرف على الأقل."
-msgstr[1] ""
-"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرف واحد على الأقل."
-msgstr[2] ""
-"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرفين على الأقل."
-msgstr[3] ""
-"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حروف على الأقل."
-msgstr[4] ""
-"كلمة المرور هذه قصيرة جدا. يجب أن تتكون من %(min_length)d حرف على الأقل."
-msgstr[5] ""
-"كلمة المرور هذه قصيرة جداً. يجب أن تتكون من %(min_length)d رمزاً على الأقل."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "كلمة المرور قصيرة جداً. يجب أن تحتوي على %d أحرف على الأقل."
+msgstr[1] "كلمة المرور قصيرة جداً. يجب أن تحتوي على %d أحرف على الأقل."
+msgstr[2] "كلمة المرور قصيرة جداً. يجب أن تحتوي على %d أحرف على الأقل."
+msgstr[3] "كلمة المرور قصيرة جداً. يجب أن تحتوي على %d أحرف على الأقل."
+msgstr[4] "كلمة المرور قصيرة جداً. يجب أن تحتوي على %d حرفاً على الأقل."
+msgstr[5] "كلمة المرور قصيرة جداً. يجب أن تحتوي على %d حرفاً على الأقل."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -281,11 +308,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "إعادة تعيين كلمة المرور على %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"أدخل اسم مستخدم صحيحاً. يمكن أن يتكون اسم المستخدم من أحرف إنجليزية وأرقام و "
-"الرموز @/./+/-/_ فقط."
+"أدخل اسم مستخدم صالح. يمكن أن يحتوي هذا الحقل على أحرف صغيرة a-z وأحرف كبيرة "
+"A-Z غير مشكَّلة، أرقام، وعلامات @/./+/-/_ فقط."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

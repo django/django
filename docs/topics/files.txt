@@ -243,7 +243,7 @@ parameter for :class:`~django.db.models.FileField` or
 storage at runtime, selecting different storages for different environments,
 for example.
 
-Your callable will be evaluated when your models classes are loaded, and must
+Your callable will be evaluated when your model classes are loaded, and must
 return an instance of :class:`~django.core.files.storage.Storage`.
 
 For example::
@@ -273,7 +273,7 @@ use :data:`~django.core.files.storage.storages`::
     class MyModel(models.Model):
         upload = models.FileField(storage=select_storage)
 
-Because the callable is evaluated when your models classes are loaded, if you
+Because the callable is evaluated when your model classes are loaded, if you
 need to override the :setting:`STORAGES` setting in tests, you should use a
 ``LazyObject`` subclass instead::
 

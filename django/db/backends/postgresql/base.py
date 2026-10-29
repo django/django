@@ -8,6 +8,7 @@ import asyncio
 import threading
 import warnings
 from contextlib import contextmanager
+from functools import cached_property, lru_cache
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -16,7 +17,6 @@ from django.db import connections
 from django.db.backends.base.base import NO_DB_ALIAS, BaseDatabaseWrapper
 from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
 from django.utils.asyncio import async_unsafe
-from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils.version import get_version_tuple
 
@@ -29,6 +29,7 @@ except ImportError:
     raise ImproperlyConfigured("Error loading psycopg2 or psycopg module")
 
 
+@lru_cache
 def psycopg_version():
     version = Database.__version__.split(" ", 1)[0]
     return get_version_tuple(version)
@@ -87,6 +88,12 @@ def _get_varchar_column(data):
     return "varchar(%(max_length)s)" % data
 
 
+def _get_decimal_column(data):
+    if data["max_digits"] is None and data["decimal_places"] is None:
+        return "numeric"
+    return "numeric(%(max_digits)s, %(decimal_places)s)" % data
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "postgresql"
     display_name = "PostgreSQL"
@@ -103,7 +110,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "CharField": _get_varchar_column,
         "DateField": "date",
         "DateTimeField": "timestamp with time zone",
-        "DecimalField": "numeric(%(max_digits)s, %(decimal_places)s)",
+        "DecimalField": _get_decimal_column,
         "DurationField": "interval",
         "FileField": "varchar(%(max_length)s)",
         "FilePathField": "varchar(%(max_length)s)",
@@ -208,15 +215,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # Ensure we run in autocommit, Django properly sets it later on.
             connect_kwargs["autocommit"] = True
             enable_checks = self.settings_dict["CONN_HEALTH_CHECKS"]
+            # Copy to avoid mutating the user's settings dict.
+            pool_options = {**pool_options}
+            pool_options.setdefault(
+                "check", ConnectionPool.check_connection if enable_checks else None
+            )
             pool = ConnectionPool(
                 kwargs=connect_kwargs,
                 open=False,  # Do not open the pool during startup.
                 configure=self._configure_connection,
-                check=ConnectionPool.check_connection if enable_checks else None,
                 **pool_options,
             )
             # setdefault() ensures that multiple threads don't set this in
-            # parallel. Since we do not open the pool during it's init above,
+            # parallel. Since we do not open the pool during its init above,
             # this means that at worst during startup multiple threads generate
             # pool objects and the first to set it wins.
             self._connection_pools.setdefault(self.alias, pool)

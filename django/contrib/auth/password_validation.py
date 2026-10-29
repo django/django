@@ -10,7 +10,7 @@ from django.core.exceptions import (
     ImproperlyConfigured,
     ValidationError,
 )
-from django.utils.functional import cached_property, lazy
+from django.utils.functional import lazy
 from django.utils.html import format_html, format_html_join
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext as _
@@ -33,6 +33,13 @@ def get_password_validators(validator_config):
                 "AUTH_PASSWORD_VALIDATORS setting."
             )
             raise ImproperlyConfigured(msg % validator["NAME"])
+        else:
+            if not callable(klass):
+                msg = (
+                    "The configured validator in NAME is not callable: %s. "
+                    "Check your AUTH_PASSWORD_VALIDATORS setting."
+                )
+                raise ImproperlyConfigured(msg % validator["NAME"])
         validators.append(klass(**validator.get("OPTIONS", {})))
 
     return validators
@@ -233,7 +240,7 @@ class CommonPasswordValidator:
     The password list must be lowercased to match the comparison in validate().
     """
 
-    @cached_property
+    @functools.cached_property
     def DEFAULT_PASSWORD_LIST_PATH(self):
         return Path(__file__).resolve().parent / "common-passwords.txt.gz"
 

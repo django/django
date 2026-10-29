@@ -70,6 +70,10 @@ class PickleabilityTestCase(TestCase):
         klass = Event.MultipleObjectsReturned
         self.assertIs(pickle.loads(pickle.dumps(klass)), klass)
 
+    def test_not_updated_class(self):
+        klass = Event.NotUpdated
+        self.assertIs(pickle.loads(pickle.dumps(klass)), klass)
+
     def test_forward_relatedobjectdoesnotexist_class(self):
         # ForwardManyToOneDescriptor
         klass = Event.group.RelatedObjectDoesNotExist
@@ -368,11 +372,11 @@ class PickleabilityTestCase(TestCase):
         self.assertEqual(restored[0]._state.peers, ())
 
     def test_fetch_mode_raise(self):
-        objs = list(Happening.objects.fetch_mode(models.RAISE))
-        self.assertEqual(objs[0]._state.fetch_mode, models.RAISE)
+        objs = list(Happening.objects.fetch_mode(models.FETCH_RAISE))
+        self.assertEqual(objs[0]._state.fetch_mode, models.FETCH_RAISE)
 
         restored = pickle.loads(pickle.dumps(objs))
-        self.assertIs(restored[0]._state.fetch_mode, models.RAISE)
+        self.assertIs(restored[0]._state.fetch_mode, models.FETCH_RAISE)
 
 
 class InLookupTests(TestCase):

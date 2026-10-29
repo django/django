@@ -43,7 +43,7 @@ class CreateExtension(Operation):
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        if not router.allow_migrate(
+        if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
             schema_editor.connection.alias, app_label, **self.hints
         ):
             return

@@ -2,6 +2,10 @@ import secrets
 from enum import StrEnum
 
 from django.utils.functional import SimpleLazyObject, empty
+from django.utils.html import format_html
+
+# Template context key for the CSP nonce.
+CONTEXT_KEY = "csp_nonce"
 
 
 class CSP(StrEnum):
@@ -63,21 +67,31 @@ class LazyNonce(SimpleLazyObject):
 
     Example Django template usage with context processors enabled:
 
-        <script{% if csp_nonce %} nonce="{{ csp_nonce }}"...{% endif %}>
+        <script {% csp_nonce_attr %}></script>
 
-    The `{% if %}` block will only render if the nonce has been evaluated
-    elsewhere.
+    ``{% csp_nonce_attr %}`` will only render the nonce attribute if the nonce
+    has been evaluated (i.e. accessed) elsewhere in the request/response cycle.
 
     """
 
     def __init__(self):
-        super().__init__(self._generate)
-
-    def _generate(self):
-        return secrets.token_urlsafe(16)
+        super().__init__(generate_nonce)
 
     def __bool__(self):
         return self._wrapped is not empty
+
+
+def nonce_attr(context, media=None):
+    nonce = context.get(CONTEXT_KEY)
+    if media:
+        return media.render(attrs={"nonce": nonce} if nonce is not None else None)
+    if nonce is None:
+        return ""
+    return format_html('nonce="{}"', nonce)
+
+
+def generate_nonce():
+    return secrets.token_urlsafe(16)
 
 
 def build_policy(config, nonce=None):
@@ -103,6 +117,10 @@ def build_policy(config, nonce=None):
                 values = [f"'nonce-{nonce}'" if v == CSP.NONCE else v for v in values]
             elif has_sentinel:
                 values = [v for v in values if v != CSP.NONCE]
+                if not values:
+                    # Removing the nonce sentinel left the directive empty.
+                    # Omitting it would fail open, so emit 'none' instead.
+                    values = [CSP.NONE]
 
             if not values:
                 continue
@@ -112,3 +130,17 @@ def build_policy(config, nonce=None):
         policy.append(f"{directive} {rendered_value}".rstrip())
 
     return "; ".join(policy)
+
+
+def _csp_policy_contains_nonce(policy):
+    try:
+        policy_values = policy.values()
+    except AttributeError:
+        return False
+    for values in policy_values:
+        try:
+            if values == CSP.NONCE or CSP.NONCE in values:
+                return True
+        except TypeError:
+            pass
+    return False

@@ -3,6 +3,8 @@ SQL functions reference lists:
 https://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html
 """
 
+from functools import cached_property
+
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
@@ -12,7 +14,6 @@ from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.operations import DatabaseOperations
-from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 
@@ -76,6 +77,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "IsEmpty": "ST_IsEmpty",
         "Length": "ST_Length",
         "LineLocatePoint": "ST_Line_Locate_Point",
+        "NumDimensions": "ST_NDims",
         "NumPoints": "ST_NPoints",
         "Reverse": "ST_Reverse",
         "Scale": "ScaleCoords",
@@ -181,7 +183,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geom_lib_version(self):
         """
-        Return the version of the version-dependant geom library used by
+        Return the version of the version-dependent geom library used by
         SpatiaLite.
         """
         if self.spatial_version >= (5,):
@@ -229,6 +231,9 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         read = wkb_r().read
 
         def converter(value, expression, connection):
-            return None if value is None else GEOSGeometryBase(read(value), geom_class)
+            if value is not None:
+                return GEOSGeometryBase(
+                    read(value, max_geom_collections=None), geom_class
+                )
 
         return converter

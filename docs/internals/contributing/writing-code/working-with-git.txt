@@ -111,7 +111,7 @@ necessary:
 
 .. code-block:: shell
 
-    git commit -m 'Added two more tests for edge cases'
+    git commit -m 'Added two more tests for edge cases.'
 
 Publishing work
 ---------------
@@ -163,11 +163,46 @@ will deal with your pull request has only two options: merge it or close it.
 For this reason, it isn't useful to make a pull request until the code is ready
 for merging -- or sufficiently close that a merger will finish it themselves.
 
+.. _editing-commit-messages:
+
+Editing commit messages
+-----------------------
+
+To change the message of the most recent commit, run:
+
+.. code-block:: shell
+
+    git commit --amend
+
+This opens an editor with the current commit message. Edit it, save, and close
+to update the commit.
+
+To change the message of an earlier commit, use the "reword" option in
+interactive rebase. For example, to reword one of the last three commits:
+
+.. code-block:: shell
+
+    git rebase -i HEAD~3
+
+This opens an editor listing the three commits, each prefixed with the word
+"pick". Change "pick" to "reword" (or "r") on the line of the commit you want
+to change, then save and close. A new editor will open for each commit marked
+as "reword", allowing you to update the message.
+
+See :ref:`committing-guidelines` for the required commit message format.
+
+After rewriting a commit that has already been pushed to GitHub, you will need
+to force-push your branch:
+
+.. code-block:: shell
+
+    git push --force-with-lease origin ticket_xxxxx
+
 Rebasing branches
 -----------------
 
-In the example above, you created two commits, the "Fixed ticket_xxxxx" commit
-and "Added two more tests" commit.
+In the example above, you created two commits, the "Fixed #xxxxx  -- ..."
+commit and the "Added two more tests ..." commit.
 
 We do not want to have the entire history of your working process in your
 repository. Your commit "Added two more tests" would be unhelpful noise.
@@ -208,7 +243,7 @@ the changes:
 
 .. code-block:: shell
 
-    git push -f origin ticket_xxxxx
+    git push --force-with-lease origin ticket_xxxxx
 
 Note that this will rewrite history of ticket_xxxxx - if you check the commit
 hashes before and after the operation at GitHub you will notice that the commit
@@ -264,10 +299,10 @@ of:
 
 .. code-block:: text
 
-    Made changes asked in review by <reviewer>
+    Made changes asked in review by <reviewer>.
 
-    - Fixed whitespace errors in foobar
-    - Reworded the docstring of bar()
+    - Fixed whitespace errors in foobar.
+    - Reworded the docstring of bar().
 
 Finally, push your work back to your GitHub repository. Since you didn't touch
 the public commits during the rebase, you should not need to force-push:

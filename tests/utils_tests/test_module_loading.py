@@ -4,12 +4,14 @@ import unittest
 from importlib import import_module
 from zipimport import zipimporter
 
+import django.utils.module_loading
 from django.test import SimpleTestCase, modify_settings
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import (
     autodiscover_modules,
     import_string,
     module_has_submodule,
+    qualname,
 )
 
 
@@ -135,10 +137,39 @@ class ModuleImportTests(SimpleTestCase):
 
         # Test exceptions raised
         with self.assertRaises(ImportError):
-            import_string("no_dots_in_path")
+            import_string("does_not_exist")
         msg = 'Module "utils_tests" does not define a "unexistent" attribute'
         with self.assertRaisesMessage(ImportError, msg):
             import_string("utils_tests.unexistent")
+        msg = (
+            'Module "utils_tests.test_module" does not define a "unexistent" attribute'
+        )
+        with self.assertRaisesMessage(ImportError, msg):
+            import_string("utils_tests.test_module.unexistent")
+
+    def test_import_string_objects_collision_handling(self):
+        collision_dotpath = "utils_tests.test_module.collision.collider"
+        self.addCleanup(sys.modules.pop, collision_dotpath, None)
+
+        # When there is a name collision between __init__-defined variables and
+        # submodules, we get back the submodule.
+        cls = import_string(collision_dotpath)
+        mod = import_module(collision_dotpath)
+        self.assertEqual(mod, cls)
+
+    def test_import_string_unloaded_module(self):
+        module_dotpath = "utils_tests"
+        self.addCleanup(sys.modules.pop, module_dotpath, None)
+        import_string(module_dotpath)
+
+    def test_import_string_unloaded_submodule(self):
+        submodule_dotpath = "utils_tests.test_module.good_module"
+        self.addCleanup(sys.modules.pop, submodule_dotpath, None)
+        import_string(submodule_dotpath)
+
+    def test_import_string_empty(self):
+        with self.assertRaisesMessage(ValueError, "Empty module name"):
+            import_string("")
 
 
 @modify_settings(INSTALLED_APPS={"append": "utils_tests.test_module"})
@@ -226,3 +257,66 @@ class CustomLoader(EggLoader):
     def tearDown(self):
         super().tearDown()
         sys.path_hooks.pop(0)
+
+
+class TopLevelClass:
+    class NestedClass:
+        @classmethod
+        def clsmethod(cls):
+            pass
+
+        def method(self):
+            pass
+
+
+class CustomException(Exception):
+    pass
+
+
+def top_level_func():
+    pass
+
+
+class QualnameTests(SimpleTestCase):
+    def test_classes_and_functions(self):
+        tests = [
+            (int, "builtins.int"),
+            (str, "builtins.str"),
+            (len, "builtins.len"),
+            (ValueError, "builtins.ValueError"),
+            (CustomException, "utils_tests.test_module_loading.CustomException"),
+            (sys, "sys"),
+            (
+                django.utils.module_loading,
+                "django.utils.module_loading",
+            ),
+            (TopLevelClass, "utils_tests.test_module_loading.TopLevelClass"),
+            (
+                TopLevelClass.NestedClass,
+                "utils_tests.test_module_loading.TopLevelClass.NestedClass",
+            ),
+            (
+                TopLevelClass.NestedClass.clsmethod,
+                "utils_tests.test_module_loading.TopLevelClass.NestedClass.clsmethod",
+            ),
+            (top_level_func, "utils_tests.test_module_loading.top_level_func"),
+        ]
+        for val, expected in tests:
+            with self.subTest(val=val):
+                self.assertEqual(qualname(val), expected)
+
+    def test_invalid_values(self):
+        def local_func():
+            pass
+
+        tests = [
+            (lambda: None, "local or anonymous object."),
+            (local_func, "local or anonymous object."),
+            (TopLevelClass(), "no __qualname__ attribute."),
+            (None, "no __module__ attribute."),
+            (123, "no __module__ attribute."),
+            ("str", "no __module__ attribute."),
+        ]
+        for val, msg in tests:
+            with self.subTest(val=val), self.assertRaisesMessage(ValueError, msg):
+                qualname(val)

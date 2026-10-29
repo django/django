@@ -78,6 +78,7 @@ from .text import (
     Trim,
     Upper,
 )
+from .uuid import UUID4, UUID7
 from .window import (
     CumeDist,
     DenseRank,
@@ -178,6 +179,9 @@ __all__ = [
     "Substr",
     "Trim",
     "Upper",
+    # uuid
+    "UUID4",
+    "UUID7",
     # window
     "CumeDist",
     "DenseRank",

@@ -247,9 +247,7 @@ class Chapter(models.Model):
 
 
 class FootNote(models.Model):
-    """
-    Model added for ticket 19838
-    """
+    """Model for models.PROTECT."""
 
     chapter = models.ForeignKey(Chapter, models.PROTECT)
     note = models.CharField(max_length=40)

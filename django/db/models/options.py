@@ -1,6 +1,7 @@
 import bisect
 import copy
 from collections import defaultdict
+from functools import cached_property
 
 from django.apps import apps
 from django.conf import settings
@@ -17,7 +18,6 @@ from django.db.models import (
 from django.db.models.fields import composite
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
-from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.text import camel_case_to_spaces, format_lazy
 from django.utils.translation import override
@@ -226,7 +226,7 @@ class Options:
             if self.verbose_name_plural is None:
                 self.verbose_name_plural = format_lazy("{}s", self.verbose_name)
 
-            # order_with_respect_and ordering are mutually exclusive.
+            # order_with_respect_to and ordering are mutually exclusive.
             self._ordering_clash = bool(self.ordering and self.order_with_respect_to)
 
             # Any leftover attributes must be invalid.

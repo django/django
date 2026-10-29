@@ -40,6 +40,7 @@ standard_duration_re = _lazy_re_compile(
 iso8601_duration_re = _lazy_re_compile(
     r"^(?P<sign>[-+]?)"
     r"P"
+    r"(?:(?P<weeks>\d+([.,]\d+)?)W)?"
     r"(?:(?P<days>\d+([.,]\d+)?)D)?"
     r"(?:T"
     r"(?:(?P<hours>\d+([.,]\d+)?)H)?"
@@ -134,8 +135,8 @@ def parse_duration(value):
 
     The preferred format for durations in Django is '%d %H:%M:%S.%f'.
 
-    Also supports ISO 8601 representation and PostgreSQL's day-time interval
-    format.
+    Also supports ISO 8601 representation (excluding years and months) and
+    PostgreSQL's day-time interval format.
     """
     match = (
         standard_duration_re.match(value)

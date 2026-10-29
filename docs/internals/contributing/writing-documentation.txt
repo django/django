@@ -124,6 +124,8 @@ Create and activate a virtual environment, then install the dependencies:
      $ source .venv/bin/activate
      $ python -m pip install -r docs/requirements.txt
 
+.. _build-documentation-locally:
+
 Build the documentation locally
 -------------------------------
 
@@ -139,6 +141,53 @@ Your locally-built documentation will be accessible at
 will be themed differently than the documentation at
 `docs.djangoproject.com <https://docs.djangoproject.com/>`_. This is OK! If
 your changes look good on your local machine, they'll look good on the website.
+
+.. _documentation-autobuild:
+
+Automating documentation rebuilds
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:pypi:`sphinx-autobuild` can be used to automatically rebuild the documentation
+and reload the documentation page in the browser whenever a file changes. To
+enable auto-reloading:
+
+1. Install the package:
+
+   .. console::
+
+        $ python -m pip install sphinx-autobuild
+
+2. From the ``docs`` directory, run one of the following commands:
+
+   * On Linux and macOS:
+
+     .. code-block:: shell
+
+          $ SPHINXBUILD=sphinx-autobuild SPHINXOPTS="--open-browser --delay 0" make html
+
+   * On Windows (Command Prompt):
+
+     .. code-block:: doscon
+
+          ...\> set SPHINXBUILD=sphinx-autobuild
+          ...\> set SPHINXOPTS=--open-browser --delay 0
+          ...\> make html
+
+   * On Windows (PowerShell):
+
+     .. code-block:: powershell
+
+          PS> $env:SPHINXBUILD="sphinx-autobuild"
+          PS> $env:SPHINXOPTS="--open-browser --delay 0"
+          PS> make html
+
+   Alternatively, ``sphinx-autobuild`` can be invoked directly:
+
+   .. console::
+
+        $ sphinx-autobuild . _build/html --open-browser --delay 0
+
+The auto-reloader can be stopped with ``Ctrl+C``.
 
 Making edits to the documentation
 ---------------------------------
@@ -170,7 +219,8 @@ changes can be merged. They can also be run locally with a single command:
      $ make check
 
 This command runs all current checks and will include any new checks added in
-the future.
+the future, with the exception of :ref:`EPUBCheck <documentation-epub-check>`,
+which requires a Java runtime.
 
 .. _documentation-spelling-check:
 
@@ -178,8 +228,9 @@ Spelling check
 ~~~~~~~~~~~~~~
 
 Before you commit your docs, it's a good idea to run the spelling checker.
-You'll need to install :pypi:`sphinxcontrib-spelling` first. Then from the
-``docs`` directory, run:
+You'll need to install :pypi:`sphinxcontrib-spelling` first. The spell checker
+also requires a system-level spell checking backend such as `Aspell
+<http://aspell.net/>`__. Then from the ``docs`` directory, run:
 
 .. console::
 
@@ -241,6 +292,40 @@ The command prints any violations to the terminal in the form
   links into named references. The custom line length check should already skip
   common false positives such as headings, tables and long links.
 
+.. _documentation-epub-check:
+
+EPUBCheck
+---------
+
+Django's documentation is also available in EPUB format. EPUB is based on the
+HTML build but has several limitations that don't apply to content meant for
+web browsers. Verifying EPUB compatibility is particularly important when
+changing CSS files, images, or other assets that are included in the HTML
+documentation, or when altering any Sphinx ``toctree``.
+
+To ensure that the EPUB is valid, build it and check it with the `EPUBCheck`_
+tool from the ``docs`` directory:
+
+.. console::
+
+     $ make epubcheck
+
+Some ``NAV-011`` warnings are expected: they come from index pages with their
+own sections following a ``toctree``, which makes the table of contents link
+back to a document earlier in the EPUB reading order. Any errors, however,
+indicate a problem that should be fixed.
+
+The ``EPUBCheck`` tool requires Java, so it is not included in the standard
+set of :ref:`quality checks <documentation-checks>` run by ``make check``.
+
+Running ``sphinx-autobuild`` to :ref:`automatically rebuild
+<documentation-autobuild>` changes in HTML can interfere with EPUB builds.
+Sphinx warnings about ``.buildinfo.bak`` indicate overlapping builds that will
+lead to ``EPUBCheck`` errors. Stop ``sphinx-autobuild`` and run ``make clean``
+if this occurs.
+
+.. _EPUBCheck: https://www.w3.org/publishing/epubcheck/
+
 .. _documentation-link-check:
 
 Link check
@@ -273,6 +358,76 @@ location, e.g. the scheme has changed ``http://`` → ``https://``. In certain
 cases, we do not want to update a "redirected" link, e.g. a rewrite to always
 point to the latest or stable version of the documentation, e.g.
 ``/en/stable/`` → ``/en/3.2/``.
+
+.. _documentation-voice:
+
+Voice
+=====
+
+We value the human voice in Django's documentation, in which the reader can
+have the experience of one person addressing another.
+
+The Django documentation is successful because it contains human rhythms and
+patterns. It speaks in the way an expert would speak to help a fellow
+developer. It expresses things in lively and imaginative ways. It's systematic
+but not mechanical.
+
+The documentation doesn't erase the personality of its authors or smooth
+everything into a slippery, dull surface. Some friction is necessary for a
+reader to grasp a concept.
+
+The documentation should not reach for grandiose but empty descriptions: for
+example, by overusing superlatives such as *clear*, *robust*, or *structured*.
+
+To make this more concrete, we present the same information in two versions:
+human and frictionless. The "human" example is excerpted from this
+documentation. The "frictionless" version was produced by prompting an AI tool
+for a version "suitable for a pull request (smooth and professional)":
+
+.. admonition:: Human version (excerpted from Django's documentation)
+
+  How Django knows to UPDATE vs. INSERT
+
+  You may have noticed Django database objects use the same ``save()`` method
+  for creating and changing objects. Django abstracts the need to use
+  ``INSERT`` or ``UPDATE`` SQL statements. Specifically, when you call
+  ``save()`` and the object's primary key attribute does **not** define a
+  :attr:`~django.db.models.Field.default` or
+  :attr:`~django.db.models.Field.db_default`, Django follows this algorithm:
+  ...
+
+  The one gotcha here is that you should be careful not to specify a
+  primary-key value explicitly when saving new objects, if you cannot guarantee
+  the primary-key value is unused.
+
+.. admonition:: Frictionless version
+
+  How Django determines UPDATE vs. INSERT
+
+  Django model instances use a single method, ``save()``, for both creating and
+  updating records. Internally, Django determines whether to issue an
+  ``INSERT`` or ``UPDATE`` SQL statement based on the state of the model
+  instance and its primary key.
+
+  When calling ``save()``, Django follows this general logic: ...
+
+  One important caveat is to avoid explicitly assigning a primary key value
+  when creating new objects unless you can guarantee that the value is unique.
+  Providing a conflicting primary key may lead to unexpected behavior or
+  database errors.
+
+Notice how the revision does not address the reader (originally: "you may have
+noticed"). Notice the deleted figurative language (originally: "Django knows")
+and a deleted technical term appropriate for the context (originally:
+"algorithm"). Notice how a self-evident point is belabored (revised: "may lead
+to unexpected behavior or database errors"). Finally, notice how the original
+version poses a problem (an abstraction is provided: how?), whereas the revised
+version merely summarizes ("Django determines ... based on the state of ..."),
+impairing the sense that the design was intentional.
+
+Without a doubt, a different prompt would produce a different, perhaps improved
+result. Still, we include this example to illustrate how easily the
+documentation can be undermined when attention is not given to voice.
 
 Writing style
 =============
@@ -420,6 +575,43 @@ documentation:
 * Use :rst:role:`:cve:<cve>` to reference a Common Vulnerabilities and
   Exposures (CVE) identifier. For example, use ``:cve:`2019-14232```.
 
+* When documenting Python objects (classes, methods, attributes, etc.) using
+  `Sphinx directives`__ such as ``.. class::``, ``.. method::``, and
+  ``.. attribute::``, all content must be properly indented to ensure correct
+  rendering and to support features like automatic table of contents
+  generation.
+
+  Follow these rules:
+
+  * The directive itself remains flush with the left margin (no indentation).
+  * All descriptive text under the directive must be indented by 4 spaces.
+  * Multi-line descriptions must keep the same indentation level.
+  * Nested directives (for example, methods inside a class) require an
+    additional 4 spaces of indentation to maintain hierarchy.
+  * Field lists (such as ``:param:``, ``:returns:``, etc.) must align with the
+    directive's content level.
+
+  Example:
+
+  .. code-block:: rst
+
+      .. class:: MyClass
+
+          A brief description of the class.
+
+          .. method:: my_method(arg1, arg2)
+
+              Method description.
+
+              :param arg1: Description of the first parameter
+              :param arg2: Description of the second parameter
+
+          .. attribute:: my_attribute
+
+              Attribute description.
+
+__ https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
+
 Django-specific markup
 ======================
 
@@ -483,7 +675,7 @@ define some extra description units:
 
 Django's documentation uses a custom ``console`` directive for documenting
 command-line examples involving ``django-admin``, ``manage.py``, ``python``,
-etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
+etc. In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 
 For example, you can replace this fragment:
@@ -541,57 +733,84 @@ Our policy for new features is:
     development version. Assume documentation readers are using the latest
     release, not the development version.
 
-Our preferred way for marking new features is by prefacing the features'
-documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
-blank line and an optional description (indented).
+New features and significant changes should be identified using Sphinx's
+``versionadded`` and ``versionchanged`` directives in their documentation, and
+should also be mentioned in the appropriate section of the release notes
+(``docs/releases/A.B.txt``).
 
-General improvements or other changes to the APIs that should be emphasized
-should use the "``.. versionchanged:: X.Y``" directive (with the same format
-as the ``versionadded`` mentioned above.
-
-These ``versionadded`` and ``versionchanged`` blocks should be
-"self-contained." In other words, since we only keep these annotations around
-for two releases, it's nice to be able to remove the annotation and its
-contents without having to reflow, reindent, or edit the surrounding text. For
-example, instead of putting the entire description of a new or changed feature
-in a block, do something like this:
+Our preferred way to mark a new feature is to preface its documentation with
+"``.. versionadded:: A.B``". This should usually be placed at the top of a
+section, just below the heading or Sphinx directive that introduces the new
+feature:
 
 .. code-block:: rst
 
-    .. class:: Author(first_name, last_name, middle_name=None)
-
-        A person who writes books.
-
-        ``first_name`` is ...
-
-        ...
-
-        ``middle_name`` is ...
-
-        .. versionchanged:: A.B
-
-            The ``middle_name`` argument was added.
-
-Put the changed annotation notes at the bottom of a section, not the top.
-
-Also, avoid referring to a specific version of Django outside a
-``versionadded`` or ``versionchanged`` block. Even inside a block, it's often
-redundant to do so as these annotations render as "New in Django A.B:" and
-"Changed in Django A.B", respectively.
-
-If a function, attribute, etc. is added, it's also okay to use a
-``versionadded`` annotation like this:
-
-.. code-block:: rst
-
-    .. attribute:: Author.middle_name
+    .. class:: Author(last_name, first_name)
 
         .. versionadded:: A.B
 
-        An author's middle name.
+        A person who writes books...
 
-We can remove the ``.. versionadded:: A.B`` annotation without any indentation
-changes when the time comes.
+If the new feature doesn't have its own section, the ``versionadded``
+annotation can be placed near where it is mentioned and should be followed by a
+blank line and an indented description of what was added:
+
+.. code-block:: rst
+
+    Books
+    -----
+
+    Books are...
+
+    Each book can have one or more :class:`Author`\s...
+
+    .. versionadded:: A.B
+
+        Support for multiple authors.
+
+Sphinx renders this as "Added in version A.B: Support for multiple authors."
+Avoid using "added" or similar words in the description when it would be
+redundant.
+
+General improvements and significant changes to APIs should be marked with
+"``.. versionchanged:: A.B``" followed by a blank line and an indented
+description of the changes. Sphinx renders this as "Changed in version A.B:"
+followed by the description.
+
+Put ``versionchanged`` notes at the bottom of a section. Related changes in the
+same release can be collected in a single note, split into multiple paragraphs
+if helpful for readability. Adjacent ``versionchanged`` directives covering
+different releases should be sorted from oldest to newest version.
+
+These ``versionadded`` and ``versionchanged`` blocks should be
+"self-contained." Since we only keep these annotations around for two releases,
+it's nice to be able to remove the annotation and its contents without having
+to reflow, reindent, or edit the surrounding text. For example, instead of
+mentioning what's new or changed in the same paragraphs that describe the
+feature, do something like this:
+
+.. code-block:: rst
+
+    .. class:: Author(last_name, first_name=None)
+
+        A person who writes books...
+
+        ``last_name`` and ``first_name`` are...
+
+        .. versionchanged:: A.B
+
+            The ``first_name`` argument was made optional.
+
+    .. class:: Book(author)
+
+When the time comes, we can delete the lines containing ``.. versionchanged::
+A.B`` and its indented description without editing any other lines.
+
+For similar reasons, avoid referring to a specific version of Django outside a
+``versionadded`` or ``versionchanged`` block. Such references become outdated
+and are difficult to maintain. (Even inside one of those blocks, it's often
+redundant to mention the version number in the description. Sphinx already
+includes it in the "Added in version A.B" or "Changed in version A.B" prefix.)
 
 Minimizing images
 =================

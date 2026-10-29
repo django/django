@@ -45,6 +45,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 from ..models import Author, DTModel, Fan
 
@@ -1948,3 +1949,65 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             DTModel.objects.annotate(
                 hour_melb=Trunc("start_time", "hour", tzinfo=melb),
             ).get()
+
+    @override_settings(TIME_ZONE="Australia/Melbourne")
+    def test_trunc_filter_non_utc_active(self):
+        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+        start_datetime = datetime.datetime(2015, 6, 15, 1, 30, 1, 321, tzinfo=melb)
+        end_datetime = datetime.datetime(2015, 6, 16, 2, 30, 1, 123, tzinfo=melb)
+        self.create_model(start_datetime, end_datetime)
+
+        # Trunc() yields a naive datetime (June 15), but the RHS is aware.
+        self.assertEqual(
+            DTModel.objects.annotate(
+                day_melb=Trunc("start_datetime", "day"),
+            )
+            .filter(day_melb__lt=start_datetime)
+            .count(),
+            0,
+        )
+        # When TIME_ZONE != "UTC", supply tzinfo explicitly.
+        self.assertEqual(
+            DTModel.objects.annotate(
+                day_melb=Trunc("start_datetime", "day", tzinfo=datetime.UTC),
+            )
+            .filter(day_melb__lt=start_datetime)
+            .count(),
+            1,
+        )
+
+    def test_extract_deconstruct_tzinfo_none(self):
+        msg = "Extract() database function's tzinfo argument is not provided"
+        # RemovedInDjango2029Warning: When the deprecation ends, replace with:
+        # _, _, kwargs = Extract("start_datetime", "hour").deconstruct()
+        # self.assertEqual(kwargs["tzinfo"].key, settings.TIME_ZONE)
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+            Extract("start_datetime", "hour").deconstruct()
+
+    def test_trunc_deconstruct_tzinfo_none(self):
+        msg = "Trunc() database function's tzinfo argument is not provided"
+        # RemovedInDjango2029Warning: When the deprecation ends, replace with:
+        # _, _, kwargs = Trunc("start_datetime", "day").deconstruct()
+        # self.assertEqual(kwargs["tzinfo"].key, settings.TIME_ZONE)
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg):
+            Trunc("start_datetime", "day").deconstruct()
+
+    @override_settings(USE_TZ=False)
+    def test_extract_deconstruct_use_tz_false(self):
+        _, _, kwargs = Extract("start_datetime", "hour").deconstruct()
+        self.assertNotIn("tzinfo", kwargs)
+
+    @override_settings(USE_TZ=False)
+    def test_trunc_deconstruct_use_tz_false(self):
+        _, _, kwargs = Trunc("start_datetime", "day").deconstruct()
+        self.assertNotIn("tzinfo", kwargs)
+
+    def test_extract_deconstruct_with_tzinfo(self):
+        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+        _, _, kwargs = Extract("start_datetime", "hour", tzinfo=melb).deconstruct()
+        self.assertEqual(kwargs["tzinfo"], melb)
+
+    def test_trunc_deconstruct_with_tzinfo(self):
+        melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+        _, _, kwargs = Trunc("start_datetime", "day", tzinfo=melb).deconstruct()
+        self.assertEqual(kwargs["tzinfo"], melb)

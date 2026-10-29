@@ -1,14 +1,16 @@
 import collections.abc
 import inspect
 import warnings
+from functools import cached_property
 from math import ceil
 
-from asgiref.sync import iscoroutinefunction, sync_to_async
+from asgiref.sync import sync_to_async
 
-from django.utils.deprecation import RemovedInDjango70Warning
-from django.utils.functional import cached_property
+from django.utils.asyncio import maybe_aclosing
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.inspect import method_has_no_args
 from django.utils.translation import gettext_lazy as _
+from django.utils.warnings import django_file_prefixes
 
 
 class UnorderedObjectListWarning(RuntimeWarning):
@@ -56,7 +58,7 @@ class BasePaginator:
             else self.default_error_messages | error_messages
         )
         if self.per_page <= self.orphans:
-            # RemovedInDjango70Warning: When the deprecation ends, replace
+            # RemovedInDjango2028Warning: When the deprecation ends, replace
             # with:
             # raise ValueError(
             #     "The orphans argument cannot be larger than or equal to the "
@@ -65,9 +67,9 @@ class BasePaginator:
             msg = (
                 "Support for the orphans argument being larger than or equal to the "
                 "per_page argument is deprecated. This will raise a ValueError in "
-                "Django 7.0."
+                "Django 2028."
             )
-            warnings.warn(msg, category=RemovedInDjango70Warning, stacklevel=2)
+            warnings.warn(msg, category=RemovedInDjango2028Warning, stacklevel=2)
 
     def _check_object_list_is_ordered(self):
         """
@@ -86,7 +88,7 @@ class BasePaginator:
                 "Pagination may yield inconsistent results with an unordered "
                 "object_list: {}.".format(obj_list_repr),
                 UnorderedObjectListWarning,
-                stacklevel=3,
+                skip_file_prefixes=django_file_prefixes(),
             )
 
     def _get_elided_page_range(
@@ -103,29 +105,22 @@ class BasePaginator:
             1, 2, …, 40, 41, 42, 43, 44, 45, 46, …, 49, 50.
         """
         if num_pages <= (on_each_side + on_ends) * 2:
-            for page in page_range:
-                yield page
+            yield from page_range
             return
 
         if number > (1 + on_each_side + on_ends) + 1:
-            for page in range(1, on_ends + 1):
-                yield page
+            yield from range(1, on_ends + 1)
             yield self.ELLIPSIS
-            for page in range(number - on_each_side, number + 1):
-                yield page
+            yield from range(number - on_each_side, number + 1)
         else:
-            for page in range(1, number + 1):
-                yield page
+            yield from range(1, number + 1)
 
         if number < (num_pages - on_each_side - on_ends) - 1:
-            for page in range(number + 1, number + on_each_side + 1):
-                yield page
+            yield from range(number + 1, number + on_each_side + 1)
             yield self.ELLIPSIS
-            for page in range(num_pages - on_ends + 1, num_pages + 1):
-                yield page
+            yield from range(num_pages - on_ends + 1, num_pages + 1)
         else:
-            for page in range(number + 1, num_pages + 1):
-                yield page
+            yield from range(number + 1, num_pages + 1)
 
     def _get_page(self, *args, **kwargs):
         """
@@ -266,7 +261,7 @@ class AsyncPaginator(BasePaginator):
             return self._cache_acount
         c = getattr(self.object_list, "acount", None)
         if (
-            iscoroutinefunction(c)
+            inspect.iscoroutinefunction(c)
             and not inspect.isbuiltin(c)
             and method_has_no_args(c)
         ):
@@ -377,8 +372,9 @@ class AsyncPage:
 
     async def __aiter__(self):
         if hasattr(self.object_list, "__aiter__"):
-            async for obj in self.object_list:
-                yield obj
+            async with maybe_aclosing(aiter(self.object_list)) as it:
+                async for obj in it:
+                    yield obj
         else:
             for obj in self.object_list:
                 yield obj
@@ -421,7 +417,8 @@ class AsyncPage:
         """
         if not isinstance(self.object_list, list):
             if hasattr(self.object_list, "__aiter__"):
-                self.object_list = [obj async for obj in self.object_list]
+                async with maybe_aclosing(aiter(self.object_list)) as it:
+                    self.object_list = [obj async for obj in it]
             else:
                 self.object_list = await sync_to_async(list)(self.object_list)
         return self.object_list

@@ -26,6 +26,17 @@ class BaseFinder:
             "configured correctly."
         )
 
+    def find(self, path, find_all=False):
+        """
+        Given a relative file path, find an absolute file path.
+
+        If the ``find_all`` parameter is False (default) return only the first
+        found file path; if True, return a list of all found files paths.
+        """
+        raise NotImplementedError(
+            "subclasses of BaseFinder must provide a find() method"
+        )
+
     def list(self, ignore_patterns):
         """
         Given an optional list of paths to ignore, return a two item iterable

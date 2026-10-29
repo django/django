@@ -1,4 +1,5 @@
 from decimal import Decimal
+from functools import cached_property
 
 from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField
@@ -18,7 +19,6 @@ from django.db.models import (
     Value,
 )
 from django.db.models.functions import Cast
-from django.utils.functional import cached_property
 
 NUMERIC_TYPES = (int, float, Decimal)
 
@@ -517,6 +517,13 @@ class MakeValid(GeomOutputGeoFunc):
 
 
 class MemSize(GeoFunc):
+    output_field = IntegerField()
+    arity = 1
+
+
+@BaseSpatialField.register_lookup
+class NumDimensions(GeoFuncMixin, Transform):
+    lookup_name = "num_dimensions"
     output_field = IntegerField()
     arity = 1
 

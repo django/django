@@ -1,17 +1,18 @@
 """
-Creates permissions for all installed apps that need permissions.
+Creates permissions for all installed apps that need permissions, and renames
+them on model renames.
 """
 
 import getpass
+import sys
 import unicodedata
 
 from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
+from django.core.management.color import color_style
 from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
-from django.db.utils import IntegrityError
-from django.utils.text import camel_case_to_spaces
 
 
 def _get_all_permissions(opts):
@@ -110,82 +111,135 @@ def create_permissions(
             print("Adding permission '%s'" % perm)
 
 
-class RenamePermission(migrations.RunPython):
-    def __init__(self, app_label, old_model, new_model):
-        self.app_label = app_label
-        self.old_model = old_model
-        self.new_model = new_model
-        super(RenamePermission, self).__init__(
-            self.rename_forward, self.rename_backward
-        )
-
-    def _rename(self, apps, schema_editor, old_model, new_model):
-        ContentType = apps.get_model("contenttypes", "ContentType")
-        # Use the live Permission model instead of the frozen one, since frozen
-        # models do not retain foreign key constraints.
-        from django.contrib.auth.models import Permission
-
-        db = schema_editor.connection.alias
-        ctypes = ContentType.objects.using(db).filter(
-            app_label=self.app_label, model__icontains=old_model.lower()
-        )
-        for permission in Permission.objects.using(db).filter(
-            content_type_id__in=ctypes.values("id")
-        ):
-            prefix = permission.codename.split("_")[0]
-            default_verbose_name = camel_case_to_spaces(new_model)
-
-            new_codename = f"{prefix}_{new_model.lower()}"
-            new_name = f"Can {prefix} {default_verbose_name}"
-
-            if permission.codename != new_codename or permission.name != new_name:
-                permission.codename = new_codename
-                permission.name = new_name
-                try:
-                    with transaction.atomic(using=db):
-                        permission.save(update_fields={"name", "codename"})
-                except IntegrityError:
-                    pass
-
-    def rename_forward(self, apps, schema_editor):
-        self._rename(apps, schema_editor, self.old_model, self.new_model)
-
-    def rename_backward(self, apps, schema_editor):
-        self._rename(apps, schema_editor, self.new_model, self.old_model)
+def _get_permission_metadata(apps, app_label, model_name):
+    try:
+        model = apps.get_model(app_label, model_name)
+    except LookupError:
+        # Model does not exist in this migration state, e.g. zero.
+        Permission = apps.get_model("auth", "Permission")
+        return Permission._meta.default_permissions, model_name
+    return (
+        model._meta.default_permissions,
+        model._meta.verbose_name_raw,
+    )
 
 
-def rename_permissions(
-    plan,
+def rename_permissions_after_model_rename(
+    app_config,
     verbosity=2,
-    interactive=True,
+    plan=None,
     using=DEFAULT_DB_ALIAS,
     apps=global_apps,
+    stdout=sys.stdout,
     **kwargs,
 ):
-    """
-    Insert a `RenamePermissionType` operation after every planned `RenameModel`
-    operation.
-    """
+    if not app_config.models_module:
+        return
+
+    # This handler is connected to the global post_migrate signal, which is
+    # emitted for *all* apps — including test configurations where
+    # django.contrib.auth is NOT installed.
     try:
         Permission = apps.get_model("auth", "Permission")
+        ContentType = apps.get_model("contenttypes", "ContentType")
     except LookupError:
         return
-    else:
-        if not router.allow_migrate_model(using, Permission):
-            return
+    db = using or router.db_for_write(Permission)
+    if not router.allow_migrate_model(db, Permission):
+        return
 
-    for migration, backward in plan:
-        inserts = []
-        for index, operation in enumerate(migration.operations):
-            if isinstance(operation, migrations.RenameModel):
-                operation = RenamePermission(
-                    migration.app_label,
-                    operation.old_name,
-                    operation.new_name,
+    app_label = app_config.label
+
+    # Collect (from_model, to_model) pairs
+    renames = []
+    for migration, backward in plan or []:
+        if migration.app_label != app_label:
+            continue
+        operations = migration.operations
+        if backward:
+            operations = reversed(operations)
+        for op in operations:
+            if not isinstance(op, migrations.RenameModel):
+                continue
+            if backward:
+                renames.append((op.new_name, op.old_name))
+            else:
+                renames.append((op.old_name, op.new_name))
+
+    if not renames:
+        return
+
+    # Collapse chains of renames (e.g. A -> B -> C) into one rename per model
+    # (A -> C). post_migrate runs after every RenameContentType operation, so
+    # each content type is already stored under the model's final name.
+    original_names = {}
+    for old_name, new_name in renames:
+        old_name, new_name = old_name.lower(), new_name.lower()
+        original_names[new_name] = original_names.pop(old_name, old_name)
+    # Final model names as written in the migrations, for the permission names.
+    final_names = {new_name.lower(): new_name for _, new_name in renames}
+
+    content_types = (
+        ContentType.objects.using(db)
+        .filter(app_label=app_label, model__in=original_names.keys())
+        .prefetch_related("permission_set")
+    )
+    perms_by_model = {
+        ct.model: {perm.codename: perm for perm in ct.permission_set.all()}
+        for ct in content_types
+    }
+
+    planned = []
+    conflicts = []
+
+    for new_name, old_name in original_names.items():
+        codenames = perms_by_model.get(new_name)
+        if codenames is None:
+            # Perhaps RenameContentType aborted due to a conflict?
+            continue
+
+        actions, verbose_name_raw = _get_permission_metadata(
+            apps, app_label, final_names[new_name]
+        )
+        for action in actions:
+            old_codename = f"{action}_{old_name}"
+            new_codename = f"{action}_{new_name}"
+            new_name_str = f"Can {action} {verbose_name_raw}"
+
+            perm = codenames.get(old_codename)
+            if perm is None:
+                continue
+            if codenames.get(new_codename, perm) is not perm:
+                conflicts.append((perm.pk, old_codename, new_codename))
+                continue
+
+            planned.append((perm, old_codename, new_codename, new_name_str))
+
+    # Raise error if conflicts found
+    if conflicts:
+        if verbosity:
+            style = color_style()
+            for pk, old, new in conflicts:
+                msg = (
+                    f"Failed to rename permission {pk} from '{old}' to '{new}'. "
+                    f"Please resolve the conflict manually.\n"
                 )
-                inserts.append((index + 1, operation))
-        for inserted, (index, operation) in enumerate(inserts):
-            migration.operations.insert(inserted + index, operation)
+                stdout.write(style.WARNING(msg))
+        error_message = f"{len(conflicts)} permission rename conflict(s) detected."
+        raise RuntimeError(error_message)
+
+    with transaction.atomic(using=db):
+        for perm, _, new_codename, new_name_str in planned:
+            perm.codename = new_codename
+            perm.name = new_name_str
+            perm.save(update_fields={"codename", "name"}, using=db)
+
+    for _, from_codename, to_codename, _ in planned:
+        if verbosity >= 2:
+            stdout.write(
+                f"Renamed permission(s): "
+                f"{app_label}.{from_codename} → {to_codename}\n"
+            )
 
 
 def get_system_username():

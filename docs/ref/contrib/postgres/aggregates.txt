@@ -62,6 +62,11 @@ General-purpose aggregation functions
     Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
     ``default`` if all values are null.
 
+    .. deprecated:: 6.1
+
+        This class is deprecated in favor of the generally available
+        :class:`~django.db.models.BitAnd` class.
+
 ``BitOr``
 ---------
 
@@ -70,6 +75,11 @@ General-purpose aggregation functions
     Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
     ``default`` if all values are null.
 
+    .. deprecated:: 6.1
+
+        This class is deprecated in favor of the generally available
+        :class:`~django.db.models.BitOr` class.
+
 ``BitXor``
 ----------
 
@@ -77,6 +87,11 @@ General-purpose aggregation functions
 
     Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
     ``default`` if all values are null.
+
+    .. deprecated:: 6.1
+
+        This class is deprecated in favor of the generally available
+        :class:`~django.db.models.BitXor` class.
 
 ``BoolAnd``
 -----------
@@ -182,12 +197,21 @@ General-purpose aggregation functions
 
     .. deprecated:: 6.0
 
+        The PostgreSQL ``StringAgg`` class is deprecated in favor of the
+        generally available :class:`~django.db.models.StringAgg` class.
+
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string, or ``default`` if there are no values.
 
     .. attribute:: delimiter
 
-        Required argument. Needs to be a string.
+        Required argument. A string, :class:`~django.db.models.Value`, or
+        expression representing the string for separating values. For example,
+        ``Value(",")``.
+
+        .. deprecated:: 6.0
+
+            Support for providing a string is deprecated.
 
     .. attribute:: distinct
 

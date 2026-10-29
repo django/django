@@ -1,4 +1,5 @@
 import os.path
+import tempfile
 
 from django.core.exceptions import ValidationError
 from django.forms import FilePathField
@@ -97,6 +98,16 @@ class FilePathFieldTest(SimpleTestCase):
             path=self.path, recursive=True, allow_folders=False, allow_files=False
         )
         self.assertChoices(f, [])
+
+    def test_set_choices_picks_up_new_files(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            f = FilePathField(path=tmp_dir)
+            self.assertEqual(f.choices, [])
+            tmp_file = os.path.join(tmp_dir, "new_file.txt")
+            open(tmp_file, "w").close()
+            f.set_choices()
+            self.assertIn((tmp_file, "new_file.txt"), f.choices)
+            self.assertIn((tmp_file, "new_file.txt"), f.widget.choices)
 
     def test_recursive_folders_without_files(self):
         f = FilePathField(

@@ -8,16 +8,16 @@ against request forgeries from other sites.
 import logging
 import string
 from collections import defaultdict
+from functools import cached_property
 from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.http import HttpHeaders, UnreadablePostError
+from django.middleware import MiddlewareMixin
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
-from django.utils.deprecation import MiddlewareMixin
-from django.utils.functional import cached_property
 from django.utils.http import is_same_domain
 from django.utils.log import log_response
 from django.utils.regex_helper import _lazy_re_compile
@@ -170,6 +170,8 @@ class CsrfViewMiddleware(MiddlewareMixin):
     This middleware should be used in conjunction with the {% csrf_token %}
     template tag.
     """
+
+    async_capable = False
 
     @cached_property
     def csrf_trusted_origins_hosts(self):
@@ -420,9 +422,9 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if getattr(callback, "csrf_exempt", False):
             return None
 
-        # Assume that anything not defined as 'safe' by RFC 9110 needs
-        # protection
-        if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
+        # Skip CSRF checks for methods defined as 'safe' by RFC 9110 and
+        # RFC 10008.
+        if request.method in ("GET", "HEAD", "OPTIONS", "QUERY", "TRACE"):
             return self._accept(request)
 
         if getattr(request, "_dont_enforce_csrf_checks", False):

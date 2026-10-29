@@ -571,7 +571,7 @@ Email
   parameter for sending a multipart :mimetype:`text/plain` and
   :mimetype:`text/html` email.
 
-* The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now accepts a
+* The :ref:`SMTP EmailBackend <topic-email-smtp-backend>` now accepts a
   ``timeout`` parameter.
 
 File Storage

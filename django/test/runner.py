@@ -12,6 +12,7 @@ import pickle
 import random
 import sys
 import textwrap
+import time
 import unittest
 import unittest.suite
 from collections import defaultdict
@@ -207,8 +208,7 @@ class RemoteTestResult(unittest.TestResult):
         pickle.loads(pickle.dumps(obj))
 
     def _print_unpicklable_subtest(self, test, subtest, pickle_exc):
-        print(
-            """
+        print("""
 Subtest failed:
 
     test: {}
@@ -221,10 +221,7 @@ test runner cannot handle it cleanly. Here is the pickling error:
 
 You should re-run this test with --parallel=1 to reproduce the failure
 with a cleaner failure message.
-""".format(
-                test, subtest, pickle_exc
-            )
-        )
+""".format(test, subtest, pickle_exc))
 
     def check_picklable(self, test, err):
         # Ensure that sys.exc_info() tuples are picklable. This displays a
@@ -245,8 +242,7 @@ with a cleaner failure message.
                 pickle_exc_txt, 75, initial_indent="    ", subsequent_indent="    "
             )
             if tblib is None:
-                print(
-                    """
+                print("""
 
 {} failed:
 
@@ -258,13 +254,9 @@ parallel test runner to handle this exception cleanly.
 In order to see the traceback, you should install tblib:
 
     python -m pip install tblib
-""".format(
-                        test, original_exc_txt
-                    )
-                )
+""".format(test, original_exc_txt))
             else:
-                print(
-                    """
+                print("""
 
 {} failed:
 
@@ -279,10 +271,7 @@ Here's the error encountered while trying to pickle the exception:
 
 You should re-run this test with the --parallel=1 option to reproduce the
 failure and get a correct traceback.
-""".format(
-                        test, original_exc_txt, pickle_exc_txt
-                    )
-                )
+""".format(test, original_exc_txt, pickle_exc_txt))
             raise
 
     def check_subtest_picklable(self, test, subtest):
@@ -430,8 +419,59 @@ def parallel_type(value):
 _worker_id = 0
 
 
+def _claim_database_clone_slot(worker_slots, timeout=5):
+    """
+    Claim a database clone slot (1-based index) for this worker process.
+
+    Each slot of the shared worker_slots array stores the pid of the worker
+    process that owns it, or 0 if the slot is free. When multiprocessing.Pool
+    spawns a replacement for an exited worker, the replacement waits for the
+    parent process to release the dead worker's slot instead of being assigned
+    an index that has no matching database clone.
+    """
+    pid = os.getpid()
+    deadline = time.monotonic() + timeout
+    while True:
+        with worker_slots.get_lock():
+            free_index = None
+            for index, owner in enumerate(worker_slots):
+                # Prefer a slot this pid already owns over a free one, so that
+                # a pid reused by the OS for a replacement worker can never
+                # hold two slots at once (which would leave the exited
+                # worker's slot stuck until the replacement finishes).
+                if owner == pid:
+                    return index + 1
+                if owner == 0 and free_index is None:
+                    free_index = index
+            if free_index is not None:
+                worker_slots[free_index] = pid
+                return free_index + 1
+        if time.monotonic() > deadline:
+            raise RuntimeError(
+                f"Test worker (pid {pid}) could not acquire a test database "
+                f"clone within {timeout} seconds because all "
+                f"{len(worker_slots)} clones are assigned to running workers."
+            )
+        time.sleep(0.05)
+
+
+def _release_dead_worker_slots(worker_slots):
+    """
+    Release database clone slots owned by worker processes that exited, so
+    that replacement workers spawned by multiprocessing.Pool can reuse them.
+
+    This runs in the parent process, where pool workers are visible as active
+    children.
+    """
+    with worker_slots.get_lock():
+        alive_pids = {child.pid for child in multiprocessing.active_children()}
+        for index, owner in enumerate(worker_slots):
+            if owner and owner not in alive_pids:
+                worker_slots[index] = 0
+
+
 def _init_worker(
-    counter,
+    worker_slots,
     initial_settings=None,
     serialized_contents=None,
     process_setup=None,
@@ -448,9 +488,7 @@ def _init_worker(
 
     global _worker_id
 
-    with counter.get_lock():
-        counter.value += 1
-        _worker_id = counter.value
+    _worker_id = _claim_database_clone_slot(worker_slots)
 
     is_spawn_or_forkserver = multiprocessing.get_start_method() in {
         "forkserver",
@@ -486,13 +524,11 @@ def _init_worker(
         )
 
 
-def _safe_init_worker(init_worker, counter, *args, **kwargs):
+def _safe_init_worker(init_worker, init_failed, *args, **kwargs):
     try:
-        init_worker(counter, *args, **kwargs)
+        init_worker(*args, **kwargs)
     except Exception:
-        with counter.get_lock():
-            # Set a value that will not increment above zero any time soon.
-            counter.value = -1000
+        init_failed.value = True
         raise
 
 
@@ -566,20 +602,9 @@ class ParallelTestSuite(unittest.TestSuite):
         exception classes which cannot be unpickled.
         """
         self.initialize_suite()
-        counter = multiprocessing.Value(ctypes.c_int, 0)
-        pool = multiprocessing.Pool(
-            processes=self.processes,
-            initializer=functools.partial(_safe_init_worker, self.init_worker.__func__),
-            initargs=[
-                counter,
-                self.initial_settings,
-                self.serialized_contents,
-                self.process_setup.__func__,
-                self.process_setup_args,
-                self.debug_mode,
-                self.used_aliases,
-            ],
-        )
+        # One slot per db clone, holding the pid of the worker process (or 0).
+        worker_slots = multiprocessing.Array(ctypes.c_longlong, self.processes)
+        init_failed = multiprocessing.Value(ctypes.c_bool, False)
         args = [
             (self.runner_class, index, subsuite, self.failfast, self.buffer)
             for index, subsuite in enumerate(self.subsuites)
@@ -587,30 +612,47 @@ class ParallelTestSuite(unittest.TestSuite):
         # Don't buffer in the main process to avoid error propagation issues.
         result.buffer = False
 
-        test_results = pool.imap_unordered(self.run_subsuite.__func__, args)
+        with multiprocessing.Pool(
+            processes=self.processes,
+            initializer=functools.partial(_safe_init_worker, self.init_worker.__func__),
+            initargs=[
+                init_failed,
+                worker_slots,
+                self.initial_settings,
+                self.serialized_contents,
+                self.process_setup.__func__,
+                self.process_setup_args,
+                self.debug_mode,
+                self.used_aliases,
+            ],
+        ) as pool:
+            test_results = pool.imap_unordered(self.run_subsuite.__func__, args)
 
-        while True:
-            if result.shouldStop:
-                pool.terminate()
-                break
+            while True:
+                if result.shouldStop:
+                    pool.terminate()
+                    break
 
-            try:
-                subsuite_index, events = test_results.next(timeout=0.1)
-            except multiprocessing.TimeoutError as err:
-                if counter.value < 0:
-                    err.add_note("ERROR: _init_worker failed, see prior traceback")
+                # Return the database clones of exited workers to the pool of
+                # available slots so that replacement workers can reuse them.
+                _release_dead_worker_slots(worker_slots)
+
+                try:
+                    subsuite_index, events = test_results.next(timeout=0.1)
+                except multiprocessing.TimeoutError as err:
+                    if init_failed.value:
+                        err.add_note("ERROR: _init_worker failed, see prior traceback")
+                        raise
+                    continue
+                except StopIteration:
                     pool.close()
-                    raise
-                continue
-            except StopIteration:
-                pool.close()
-                break
+                    break
 
-            tests = list(self.subsuites[subsuite_index])
-            for event in events:
-                self.handle_event(result, tests, event)
+                tests = list(self.subsuites[subsuite_index])
+                for event in events:
+                    self.handle_event(result, tests, event)
 
-        pool.join()
+            pool.join()
 
         return result
 

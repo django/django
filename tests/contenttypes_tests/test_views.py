@@ -1,6 +1,7 @@
 import datetime
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.models import Site
@@ -26,9 +27,10 @@ from .models import (  # isort:skip
 class ContentTypesViewsTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Don't use the manager to ensure the site exists with pk=1, regardless
-        # of whether or not it already exists.
-        cls.site1 = Site(pk=1, domain="testserver", name="testserver")
+        # Update the default site to use the testserver domain to avoid
+        # assertRedirects() failure: "The test client is unable to fetch
+        # remote URLs (got http://example.com/authors/1/)."
+        cls.site1 = Site(pk=settings.SITE_ID, domain="testserver", name="testserver")
         cls.site1.save()
         cls.author1 = Author.objects.create(name="Boris")
         cls.article1 = Article.objects.create(
@@ -182,7 +184,7 @@ class ContentTypesViewsSiteRelTests(TestCase):
         # domains in the MockSite model.
         MockSite.objects.bulk_create(
             [
-                MockSite(pk=1, domain="example.com"),
+                MockSite(pk=settings.SITE_ID, domain="example.com"),
                 MockSite(pk=self.site_2.pk, domain=self.site_2.domain),
                 MockSite(pk=self.site_3.pk, domain=self.site_3.domain),
             ]

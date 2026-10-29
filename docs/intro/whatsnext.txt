@@ -212,10 +212,6 @@ We follow this policy:
 * As we add features to Django's development version, we update the
   documentation in the same Git commit transaction.
 
-* To distinguish feature changes/additions in the docs, we use the phrase:
-  "New in Django Development version" for the version of Django that hasn't
-  been released yet, or "New in version X.Y" for released versions.
-
 * Documentation fixes and improvements may be backported to the last release
   branch, at the discretion of the merger, however, once a version of Django is
   :ref:`no longer supported<supported-versions-policy>`, that version of the

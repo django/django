@@ -1,0 +1,58 @@
+==========================
+Django 6.0.7 release notes
+==========================
+
+*July 7, 2026*
+
+Django 6.0.7 fixes three security issues with severity "low" and one bug in
+6.0.6.
+
+CVE-2026-48588: Potential exposure of private data via cached ``Set-Cookie`` response
+=====================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` and
+:func:`~django.views.decorators.cache.cache_page` avoided caching responses
+that set a cookie while varying on ``Cookie`` only when the incoming request
+contained no cookies at all. When the request already carried an unrelated
+cookie (such as a language or theme preference cookie), the protection did not
+apply, allowing a response that sets a session or other sensitive cookie to be
+stored in Django's shared cache.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-53877: Heap buffer over-read in ``GDALRaster``
+=======================================================
+
+When :class:`~django.contrib.gis.gdal.GDALRaster` was instantiated with a bytes
+object representing a raster file, the
+:attr:`~django.contrib.gis.gdal.GDALRaster.vsi_buffer` property could over-read
+the allocated buffer by approximately 32 bytes. This could result in
+information disclosure of adjacent heap memory or, in rare cases, a
+segmentation fault. Only rasters stored in GDAL's virtual filesystem were
+affected.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-53878: Header injection possibility since ``DomainNameValidator`` accepted newlines in input
+=====================================================================================================
+
+:class:`~django.core.validators.DomainNameValidator` accepted newlines in
+domain names. If such values were included in HTTP responses, header injection
+attacks were possible. Django itself wasn't vulnerable because
+:class:`~django.http.HttpResponse` prohibits newlines in HTTP headers.
+
+The vulnerability only affected uses of ``DomainNameValidator`` outside Django
+form fields, as ``CharField`` strips newlines by default.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 6.0 where the PBKDF2 and MD5 password hashers
+  raised :exc:`UnicodeDecodeError` for :class:`bytes` passwords that were not
+  valid UTF-8. Passwords supplied as :class:`str` or as UTF-8 :class:`bytes`
+  are unaffected (:ticket:`37184`).

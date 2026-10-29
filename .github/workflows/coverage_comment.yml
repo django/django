@@ -1,0 +1,86 @@
+name: Coverage Comment
+
+on:
+  # The so-called dangerous workflow_run trigger is necessary for letting forks
+  # gain workflow-scoped pull-requests: write permission. The only
+  # user-controlled content is the content of diff-cover-report.md.
+  workflow_run:  # zizmor: ignore[dangerous-triggers]
+    workflows: ["Coverage Tests"]
+    types:
+      - completed
+
+permissions:
+  actions: read
+  pull-requests: write
+
+jobs:
+  comment:
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.repository == 'django/django'
+    name: Post Coverage Comment
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: coverage-artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Post/update PR comment
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const reportPath = 'diff-cover-report.md';
+            let body = 'No coverage data available.';
+            if (fs.existsSync(reportPath)) {
+              body = fs.readFileSync(reportPath, 'utf8');
+              const divider = '-------------';
+              // Start after the second divder, where changed files are listed.
+              const start = body.indexOf(divider, 1);
+              body = body.substring(start);
+            }
+            const commentBody = (
+              '#### Uncovered lines in changed files\n\n```\n' + body + '```\n' +
+              '**Note:** Missing lines are warnings only. Some database-specific lines may not be measured. [More information](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#code-coverage-on-pull-requests)'
+            );
+
+            const run = context.payload.workflow_run;
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              head: `${run.head_repository.owner.login}:${run.head_branch}`,
+            });
+            const pr = prs[0];
+            if (!pr) {
+              core.setFailed(`No PR found for commit ${run.head_sha}.`);
+              return;
+            }
+            
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+            });
+            
+            for (const c of comments) {
+              if ((c.body || '').includes('Uncovered lines in changed files')) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id,
+                });
+              }
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: commentBody,
+            });

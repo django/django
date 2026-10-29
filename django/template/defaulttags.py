@@ -11,7 +11,7 @@ from itertools import groupby
 
 from django.conf import settings
 from django.http import QueryDict
-from django.utils import timezone
+from django.utils import csp, timezone
 from django.utils.datastructures import DeferredSubDict
 from django.utils.html import conditional_escape, escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
@@ -395,19 +395,21 @@ class LoadNode(Node):
 
 
 class NowNode(Node):
-    def __init__(self, format_string, asvar=None):
-        self.format_string = format_string
+    def __init__(self, format_expr, asvar=None):
+        self.format_expr = format_expr
         self.asvar = asvar
 
     def render(self, context):
         tzinfo = timezone.get_current_timezone() if settings.USE_TZ else None
-        formatted = date(datetime.now(tz=tzinfo), self.format_string)
+        format_string = self.format_expr.resolve(context)
+        formatted = date(datetime.now(tz=tzinfo), format_string)
 
         if self.asvar:
             context[self.asvar] = formatted
             return ""
-        else:
-            return formatted
+        if context.autoescape and (self.format_expr.is_var or self.format_expr.filters):
+            return conditional_escape(formatted)
+        return formatted
 
 
 class PartialDefNode(Node):
@@ -1181,7 +1183,7 @@ def lorem(parser, token):
 @register.tag
 def now(parser, token):
     """
-    Display the date, formatted according to the given string.
+    Display the date, formatted according to the given string or variable.
 
     Use the same format as PHP's ``date()`` function; see https://php.net/date
     for all the possible values.
@@ -1189,6 +1191,10 @@ def now(parser, token):
     Sample usage::
 
         It is {% now "jS F Y H:i" %}
+
+    You can also pass a template variable as the format string:
+
+        It is {% now my_date_format %}
     """
     bits = token.split_contents()
     asvar = None
@@ -1197,8 +1203,8 @@ def now(parser, token):
         bits = bits[:-2]
     if len(bits) != 2:
         raise TemplateSyntaxError("'now' statement takes one argument")
-    format_string = bits[1][1:-1]
-    return NowNode(format_string, asvar)
+    format_expr = parser.compile_filter(bits[1])
+    return NowNode(format_expr, asvar)
 
 
 @register.tag(name="partialdef")
@@ -1241,7 +1247,7 @@ def partialdef_func(parser, token):
 
     nodelist = parser.parse(valid_endpartials)
     endpartial = parser.next_token()
-    if endpartial.contents not in valid_endpartials:
+    if " ".join(endpartial.split_contents()) not in valid_endpartials:
         parser.invalid_block_tag(endpartial, "endpartialdef", valid_endpartials)
 
     pos_close = getattr(endpartial, "position", None)
@@ -1296,6 +1302,10 @@ def querystring(context, *args, **kwargs):
     Keyword arguments are treated as an extra, final mapping. These mappings
     are processed sequentially, with later arguments taking precedence.
 
+    Passing `None` as a value removes the corresponding key from the result.
+    For iterable values, `None` entries are ignored, but if all values are
+    `None`, the key is removed.
+
     A query string prefixed with `?` is returned.
 
     Raise TemplateSyntaxError if a positional argument is not a mapping or if
@@ -1327,7 +1337,8 @@ def querystring(context, *args, **kwargs):
                 "querystring requires mappings for positional arguments (got "
                 "%r instead)." % d
             )
-        for key, value in d.items():
+        items = d.lists() if isinstance(d, QueryDict) else d.items()
+        for key, value in items:
             if not isinstance(key, str):
                 raise TemplateSyntaxError(
                     "querystring requires strings for mapping keys (got %r "
@@ -1336,7 +1347,8 @@ def querystring(context, *args, **kwargs):
             if value is None:
                 params.pop(key, None)
             elif isinstance(value, Iterable) and not isinstance(value, str):
-                params.setlist(key, value)
+                # Drop None values; if no values remain, the key is removed.
+                params.setlist(key, [v for v in value if v is not None])
             else:
                 params[key] = value
     query_string = params.urlencode() if params else ""
@@ -1679,3 +1691,8 @@ def do_with(parser, token):
     nodelist = parser.parse(("endwith",))
     parser.delete_first_token()
     return WithNode(None, None, nodelist, extra_context=extra_context)
+
+
+@register.simple_tag(takes_context=True)
+def csp_nonce_attr(context, media=None):
+    return csp.nonce_attr(context, media)

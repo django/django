@@ -1,15 +1,17 @@
 import sys
+from functools import cached_property
 
 from django.conf import settings
 from django.db import DatabaseError
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.utils.crypto import get_random_string
-from django.utils.functional import cached_property
 
 TEST_DATABASE_PREFIX = "test_"
 
 
 class DatabaseCreation(BaseDatabaseCreation):
+    destroy_test_db_connection_close_method = "close"
+
     @cached_property
     def _maindb_connection(self):
         """

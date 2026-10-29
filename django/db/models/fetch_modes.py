@@ -46,7 +46,7 @@ class FetchPeers(FetchMode):
 FETCH_PEERS = FetchPeers()
 
 
-class Raise(FetchMode):
+class FetchRaise(FetchMode):
     __slots__ = ()
 
     def fetch(self, fetcher, instance):
@@ -55,7 +55,7 @@ class Raise(FetchMode):
         raise FieldFetchBlocked(f"Fetching of {klass}.{field_name} blocked.") from None
 
     def __reduce__(self):
-        return "RAISE"
+        return "FETCH_RAISE"
 
 
-RAISE = Raise()
+FETCH_RAISE = FetchRaise()

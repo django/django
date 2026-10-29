@@ -33,14 +33,14 @@ sys.path.insert(1, dirname(dirname(abspath(__file__))))
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(abspath(join(dirname(__file__), "_ext")))
 
-# Use the module to GitHub url resolver, but import it after the _ext directoy
+# Use the module to GitHub url resolver, but import it after the _ext directory
 # it lives in has been added to sys.path.
 import github_links  # NOQA
 
 # -- General configuration --
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = "4.5.0"
+needs_sphinx = "7.3.0"
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -120,7 +120,7 @@ copyright = "Django Software Foundation and contributors"
 # built documents.
 #
 # The short X.Y version.
-version = "6.1"
+version = "6.2"
 # The full version, including alpha/beta/rc tags.
 try:
     from django import VERSION, get_version
@@ -130,14 +130,18 @@ else:
 
     def django_release():
         pep440ver = get_version()
-        if VERSION[3:5] == ("alpha", 0) and "dev" not in pep440ver:
+        if (
+            VERSION.status == "alpha"
+            and VERSION.iteration == 0
+            and "dev" not in pep440ver
+        ):
             return pep440ver + ".dev"
         return pep440ver
 
     release = django_release()
 
 # The "development version" of Django
-django_next_version = "6.1"
+django_next_version = "6.2"
 
 extlinks = {
     "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-%s"),
@@ -165,8 +169,9 @@ locale_dirs = ["locale/"]
 today_fmt = "%B %d, %Y"
 
 # List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-exclude_patterns = ["_build", "_theme", "requirements.txt"]
+# directories to ignore when looking for source files. If this changes, be sure
+# to update similar exclusions in Makefile, make.bat, and lint.py.
+exclude_patterns = ["_build", "_ext", "_static", "_theme", "requirements.txt"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -233,7 +238,13 @@ html_theme_path = ["_theme"]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ["_static"]
+# All files in html_static_path are bundled into epub as well. Use
+# epub_exclude_files for any that are not epub compatible.
+html_static_path = ["_static"]
+
+html_css_files = [
+    "console-tabs.css",
+]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -426,7 +437,12 @@ epub_cover = ("", "epub-cover.html")
 # epub_post_files = []
 
 # A list of files that should not be packed into the epub file.
-# epub_exclude_files = []
+epub_exclude_files = ["_static/console-tabs.css"]
+
+# Empty, rather than defaulting to html_css_files, because its only entry is
+# the console-tabs.css excluded above. Any epub compatible addition to
+# html_css_files needs repeating here.
+epub_css_files = []
 
 # The depth of the table of contents in toc.ncx.
 # epub_tocdepth = 3

@@ -1,6 +1,5 @@
 from functools import wraps
-
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 
 def no_append_slash(view_func):

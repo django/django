@@ -194,7 +194,11 @@ class DurationParseTests(unittest.TestCase):
         test_values = (
             ("P4Y", None),
             ("P4M", None),
-            ("P4W", None),
+            ("P4W", timedelta(weeks=4)),
+            ("P0.5W", timedelta(weeks=0.5)),
+            ("P0,5W", timedelta(weeks=0.5)),
+            ("-P0.5W", timedelta(weeks=-0.5)),
+            ("P1W1D", timedelta(weeks=1, days=1)),
             ("P4D", timedelta(days=4)),
             ("-P1D", timedelta(days=-1)),
             ("P0.5D", timedelta(hours=12)),

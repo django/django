@@ -2,7 +2,7 @@ import copy
 import typing
 from collections import defaultdict
 from contextlib import contextmanager
-from functools import partial
+from functools import cached_property, partial
 
 from django.apps import AppConfig
 from django.apps.registry import Apps
@@ -15,7 +15,6 @@ from django.db.models import NOT_PROVIDED
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
-from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 
@@ -192,9 +191,10 @@ class ProjectState:
     def remove_model_options(self, app_label, model_name, option_name, value_to_remove):
         model_state = self.models[app_label, model_name]
         if objs := model_state.options.get(option_name):
-            model_state.options[option_name] = [
-                obj for obj in objs if tuple(obj) != tuple(value_to_remove)
-            ]
+            new_value = [obj for obj in objs if tuple(obj) != tuple(value_to_remove)]
+            if option_name in {"index_together", "unique_together"}:
+                new_value = set(normalize_together(new_value))
+            model_state.options[option_name] = new_value
         self.reload_model(app_label, model_name, delay=True)
 
     def alter_model_managers(self, app_label, model_name, managers):
@@ -339,10 +339,10 @@ class ProjectState:
         options = model_state.options
         for option in ("index_together", "unique_together"):
             if option in options:
-                options[option] = [
-                    [new_name if n == old_name else n for n in together]
+                options[option] = {
+                    tuple(new_name if n == old_name else n for n in together)
                     for together in options[option]
-                ]
+                }
         # Fix to_fields to refer to the new field.
         delay = True
         references = get_references(self, model_key, (old_name, found))

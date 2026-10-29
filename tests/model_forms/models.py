@@ -377,6 +377,9 @@ class FlexibleDatePost(models.Model):
 class Color(models.Model):
     name = models.CharField(max_length=50)
 
+    class Meta:
+        ordering = ("name",)
+
     def __iter__(self):
         yield from range(5)
 
@@ -387,6 +390,9 @@ class Color(models.Model):
 class ColorfulItem(models.Model):
     name = models.CharField(max_length=50)
     colors = models.ManyToManyField(Color)
+
+    class Meta:
+        ordering = ("pk",)
 
 
 class CustomErrorMessage(models.Model):
@@ -541,5 +547,24 @@ class ConstraintsModel(models.Model):
                 condition=models.Q(price__gt=0),
                 name="price_gte_zero",
                 violation_error_message="Price must be greater than zero.",
+            ),
+        ]
+
+
+class AttnameConstraintsModel(models.Model):
+    left = models.ForeignKey(
+        "self", related_name="+", null=True, on_delete=models.SET_NULL
+    )
+    right = models.ForeignKey(
+        "self", related_name="+", null=True, on_delete=models.SET_NULL
+    )
+
+    class Meta:
+        required_db_features = {"supports_table_check_constraints"}
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_left_not_right",
+                # right_id here is the ForeignKey's attname, not name.
+                condition=~models.Q(left=models.F("right_id")),
             ),
         ]

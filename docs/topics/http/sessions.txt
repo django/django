@@ -77,9 +77,9 @@ cache or a non-persistent cache.
 
 The cached database backend (``cached_db``) uses a write-through cache --
 session writes are applied to both the database and cache, in that order. If
-writing to the cache fails, the exception is handled and logged via the
-:ref:`sessions logger <django-contrib-sessions-logger>`, to avoid failing an
-otherwise successful write operation.
+writing to the cache (or deleting from it) fails, the exception is handled and
+logged via the :ref:`sessions logger <django-contrib-sessions-logger>`, to
+avoid failing an otherwise successful write or delete operation.
 
 Session reads use the cache, or the database if the data has been evicted from
 the cache. To use this backend, set :setting:`SESSION_ENGINE` to
@@ -97,6 +97,11 @@ The cache backend can be made persistent by using a persistent cache, such as
 Redis with appropriate configuration. But unless your cache is definitely
 configured for sufficient persistence, opt for the cached database backend.
 This avoids edge cases caused by unreliable data storage in production.
+
+.. versionchanged:: 6.2
+
+  In earlier versions, only failed writes were caught and logged rather than
+  failed deletes.
 
 Using file-based sessions
 -------------------------
@@ -191,6 +196,17 @@ You can edit it multiple times.
 
       Example: ``'fav_color' in request.session``
 
+    .. method:: __bool__()
+
+      .. versionadded:: 6.1
+
+      Returns the inverse of :meth:`is_empty`. This allows checking if a
+      session has data::
+
+          if request.session:
+              # Session has data or a key
+              pass
+
     .. method:: get(key, default=None)
     .. method:: aget(key, default=None)
 
@@ -254,6 +270,10 @@ You can edit it multiple times.
       cookie. This is used if you want to ensure that the previous session data
       can't be accessed again from the user's browser (for example, the
       :func:`django.contrib.auth.logout` function calls it).
+
+    .. method:: is_empty()
+
+      Returns ``True`` if the session does not have a key and is empty.
 
     .. method:: set_test_cookie()
     .. method:: aset_test_cookie()
@@ -448,7 +468,7 @@ serializing these values is often straightforward
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
 was actually a string that just happened to be in the same format chosen for
-``datetime``\s).
+``datetime``\s.
 
 Your serializer class must implement two methods,
 ``dumps(self, obj)`` and ``loads(self, data)``, to serialize and deserialize

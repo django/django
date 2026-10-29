@@ -204,12 +204,25 @@ class SitesFrameworkTests(TestCase):
         self.assertEqual(self.site.natural_key(), (self.site.domain,))
 
     @override_settings(SITE_ID="1")
-    def test_check_site_id(self):
+    def test_check_site_id_incorrect_type(self):
         self.assertEqual(
             check_site_id(None),
             [
                 checks.Error(
-                    msg="The SITE_ID setting must be an integer",
+                    msg="The SITE_ID setting must be of type int.",
+                    id="sites.E101",
+                ),
+            ],
+        )
+
+    @override_settings(SITE_ID="x")
+    def test_check_site_id_failed_to_validate(self):
+        self.assertEqual(
+            check_site_id(None),
+            [
+                checks.Error(
+                    msg="The SITE_ID setting failed to validate: ['“x” value "
+                    "must be an integer.'].",
                     id="sites.E101",
                 ),
             ],
@@ -257,8 +270,9 @@ class CreateDefaultSiteTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # Delete the site created as part of the default migration process.
-        Site.objects.all().delete()
+        # Delete the sites created in post_migrate signals on test db creation.
+        for using in cls.databases:
+            Site.objects.all().using(using).delete()
 
     def setUp(self):
         self.app_config = apps.get_app_config("sites")

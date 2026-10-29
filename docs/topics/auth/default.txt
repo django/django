@@ -208,6 +208,16 @@ objects in the same way as any other :doc:`Django model
     myuser.user_permissions.remove(permission, permission, ...)
     myuser.user_permissions.clear()
 
+.. admonition:: There are community-maintained solutions!
+
+    Django has a vibrant ecosystem. There are authentication and authorization
+    solutions highlighted on the `Community Ecosystem`_ page. The Django
+    Packages `Authorization grid`_ has even more options for you!
+
+.. _Community Ecosystem: https://www.djangoproject.com/community/ecosystem/#authentication-authorization
+.. _Authorization grid: https://djangopackages.org/grids/g/authorization/
+
+
 Default permissions
 -------------------
 
@@ -225,6 +235,18 @@ permissions for new models each time you run :djadmin:`manage.py migrate
 <migrate>` (the function that creates permissions is connected to the
 :data:`~django.db.models.signals.post_migrate` signal).
 
+When a model is renamed in an installed application, Django automatically
+updates the associated default permissions to match the new model name when
+you run :djadmin:`manage.py migrate <migrate>`.
+
+If a permission with the new codename already exists
+(for example, due to a leftover permission from a previous migration),
+Django raises an error with next steps.
+
+.. versionchanged:: 6.1
+
+    Updating permissions when models are renamed was added.
+
 Assuming you have an application with an
 :attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
 to test for basic permissions you should use:
@@ -236,6 +258,15 @@ to test for basic permissions you should use:
 
 The :class:`~django.contrib.auth.models.Permission` model is rarely accessed
 directly.
+
+The :class:`~django.contrib.auth.models.Permission` model provides a helper
+property, :attr:`~django.contrib.auth.models.Permission.user_perm_str`,
+that returns the string representation that can be used to check permission
+using the :meth:`~django.contrib.auth.models.User.has_perm` method.
+
+.. versionchanged:: 6.1
+
+    The ``user_perm_str`` property was added.
 
 Groups
 ------

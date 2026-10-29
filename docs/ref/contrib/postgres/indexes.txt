@@ -146,10 +146,14 @@ available from the ``django.contrib.postgres.indexes`` module.
 .. class:: OpClass(expression, name)
 
     An ``OpClass()`` expression represents the ``expression`` with a custom
-    `operator class`_ that can be used to define functional indexes, functional
-    unique constraints, or exclusion constraints. To use it, you need to add
+    `operator class
+    <https://www.postgresql.org/docs/current/indexes-opclass.html>`__
+    that can be used to define functional indexes, functional unique
+    constraints, or exclusion constraints. To use it, you need to add
     ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`. Set the
-    ``name`` parameter to the name of the `operator class`_.
+    ``name`` parameter to the name of the
+    `operator class
+    <https://www.postgresql.org/docs/current/indexes-opclass.html>`__.
 
     For example::
 
@@ -178,5 +182,3 @@ available from the ``django.contrib.postgres.indexes`` module.
         )
 
     creates an exclusion constraint on ``circle`` using ``circle_ops``.
-
-    .. _operator class: https://www.postgresql.org/docs/current/indexes-opclass.html

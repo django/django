@@ -4,12 +4,14 @@ from importlib import import_module
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
 from django.contrib.sessions.exceptions import SessionInterrupted
+from django.middleware import MiddlewareMixin
 from django.utils.cache import patch_vary_headers
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import http_date
 
 
 class SessionMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def __init__(self, get_response):
         super().__init__(get_response)
         engine = import_module(settings.SESSION_ENGINE)
@@ -40,10 +42,11 @@ class SessionMiddleware(MiddlewareMixin):
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 samesite=settings.SESSION_COOKIE_SAMESITE,
             )
-            patch_vary_headers(response, ("Cookie",))
+            need_vary_cookie = True
         else:
-            if accessed:
-                patch_vary_headers(response, ("Cookie",))
+            # If the session was accessed, it must be varied on, regardless of
+            # whether it was modified or will be saved.
+            need_vary_cookie = accessed
             if (modified or settings.SESSION_SAVE_EVERY_REQUEST) and not empty:
                 if request.session.get_expire_at_browser_close():
                     max_age = None
@@ -74,4 +77,8 @@ class SessionMiddleware(MiddlewareMixin):
                         httponly=settings.SESSION_COOKIE_HTTPONLY or None,
                         samesite=settings.SESSION_COOKIE_SAMESITE,
                     )
+                    # With a session cookie set, it must be varied on.
+                    need_vary_cookie = True
+        if need_vary_cookie:
+            patch_vary_headers(response, ("Cookie",))
         return response

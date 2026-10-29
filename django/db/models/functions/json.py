@@ -48,17 +48,8 @@ class JSONArray(Func):
                 for expression in casted_obj.get_source_expressions()
             ]
         )
-
-        if connection.features.is_postgresql_16:
-            return casted_obj.as_native(
-                compiler, connection, returning="JSONB", **extra_context
-            )
-
-        return casted_obj.as_sql(
-            compiler,
-            connection,
-            function="JSONB_BUILD_ARRAY",
-            **extra_context,
+        return casted_obj.as_native(
+            compiler, connection, returning="JSONB", **extra_context
         )
 
     def as_oracle(self, compiler, connection, **extra_context):
@@ -107,18 +98,7 @@ class JSONObject(Func):
                 for index, expression in enumerate(copy.get_source_expressions())
             ]
         )
-
-        if connection.features.is_postgresql_16:
-            return copy.as_native(
-                compiler, connection, returning="JSONB", **extra_context
-            )
-
-        return super(JSONObject, copy).as_sql(
-            compiler,
-            connection,
-            function="JSONB_BUILD_OBJECT",
-            **extra_context,
-        )
+        return copy.as_native(compiler, connection, returning="JSONB", **extra_context)
 
     def as_oracle(self, compiler, connection, **extra_context):
         return self.as_native(compiler, connection, returning="CLOB", **extra_context)

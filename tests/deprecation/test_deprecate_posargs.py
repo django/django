@@ -1,13 +1,19 @@
 import inspect
+import unittest
+from typing import TYPE_CHECKING
 
 from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedAfterNextVersionWarning, deprecate_posargs
+from django.utils.version import PY314
+
+if TYPE_CHECKING:
+    type AnnotatedKwarg = int
 
 
 class DeprecatePosargsTests(SimpleTestCase):
     # Note: these tests use the generic RemovedAfterNextVersionWarning so they
     # don't need to be updated each release. In actual use, you must substitute
-    # a specific RemovedInDjangoXXWarning.
+    # a specific RemovedInDjangoXXXXWarning.
 
     def assertDeprecated(self, params, name):
         msg = (
@@ -353,6 +359,17 @@ class DeprecatePosargsTests(SimpleTestCase):
 
             @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
             def func(*args, b=1):
+                return args, b
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_decorator_rejects_var_positional_param_with_deferred_annotation(self):
+        with self.assertRaisesMessage(
+            TypeError,
+            "@deprecate_posargs() cannot be used with variable positional `*args`.",
+        ):
+
+            @deprecate_posargs(RemovedAfterNextVersionWarning, ["b"])
+            def func(*args, b: AnnotatedKwarg = 1):
                 return args, b
 
     def test_decorator_does_not_apply_to_class(self):

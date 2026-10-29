@@ -1,0 +1,618 @@
+#!/usr/bin/env python3
+"""
+PR quality checks for Django pull requests.
+
+Each check is an independent function that returns None on success, or an
+error message on failure. Independent checks are all run so that all issues
+are reported in a single pass. Trac status and has_patch checks are skipped
+when no ticket is found, since they require a ticket ID to be meaningful.
+
+Required environment variables:
+    GITHUB_TOKEN  GitHub API token
+    PR_NUMBER     Pull request number (unless RECHECK is true)
+    PR_REPO       Repository in "owner/repo" format
+
+Optional environment variables:
+    AUTOCLOSE     Set to "true" to close failing PRs (default: false)
+    PR_AUTHOR     PR author's GitHub login
+    PR_BODY       Pull request body text
+    PR_CREATED_AT PR creation timestamp (ISO 8601)
+    PR_TITLE      Pull request title
+    RECHECK       Set to "true" to recheck open PRs after their grace period
+"""
+
+import json
+import logging
+import os
+import re
+import sys
+import time
+import urllib.error
+import urllib.request
+from datetime import date, datetime, timedelta, timezone
+
+from github import (
+    get_comment_ids_containing_marker,
+    get_recent_commit_count,
+    github_request,
+    github_results,
+)
+from pr_quality.errors import (
+    CHECKS_FOOTER,
+    CHECKS_HEADER,
+    INCOMPLETE_CHECKLIST,
+    INVALID_TRAC_STATUS,
+    LEVEL_ERROR,
+    LEVEL_WARNING,
+    MISSING_AI_DESCRIPTION,
+    MISSING_AI_DISCLOSURE,
+    MISSING_DESCRIPTION,
+    MISSING_HAS_PATCH_FLAG,
+    MISSING_TICKET_IN_PR_TITLE,
+    MISSING_TRAC_TICKET,
+    Message,
+)
+
+LARGE_PR_THRESHOLD = 80  # additions + deletions
+MIN_WORDS = 5
+SKIPPED = object()  # Sentinel: check was not applicable and was skipped.
+TICKET_NOT_FOUND = object()  # Sentinel: Trac returned HTTP 404 for the ticket.
+URLOPEN_TIMEOUT_SECONDS = 15
+AUTOCLOSE_GRACE_PERIOD = timedelta(days=1)
+# PRs opened before these dates predate PR template additions.
+PR_TEMPLATE_DATE = date(2024, 3, 4)  # 3fcef50 -- PR template introduced
+AI_DISCLOSURE_DATE = date(2026, 1, 8)  # 4f580c4 -- AI disclosure added
+
+ALLOWED_STAGES = ("Accepted", "Ready for checkin")
+
+logger = logging.getLogger(__name__)
+
+
+def setup_logging(logger, gha_formatter=True):
+    logger.setLevel(logging.DEBUG)
+
+    if not logger.handlers and gha_formatter:
+
+        class GHAFormatter(logging.Formatter):
+            _PREFIXES = {
+                logging.DEBUG: "::debug::",
+                logging.INFO: "::notice::",
+                logging.WARNING: "::warning::",
+                logging.ERROR: "::error::",
+            }
+
+            def format(self, record):
+                msg = super().format(record)
+                prefix = self._PREFIXES.get(record.levelno, "")
+                return f"{prefix}{msg}"
+
+        handler = logging.StreamHandler()
+        handler.setFormatter(GHAFormatter())
+        logger.addHandler(handler)
+
+
+def get_pr_total_changes(pr_number, repo, token):
+    """Return total lines changed in the PR (additions + deletions)."""
+    return sum(
+        file["changes"]
+        for file in github_results(f"/pulls/{pr_number}/files", repo, token)
+    )
+
+
+def strip_html_comments(text):
+    """Return text with all HTML comments removed."""
+    return re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+
+
+def extract_ticket_id(pr_body):
+    """Return the Trac ticket ID string from the PR body, or None."""
+    match = re.search(r"\bticket-(\d+)\b", pr_body, re.IGNORECASE)
+    return match.group(1) if match else None
+
+
+def fetch_trac_ticket(ticket_id):
+    """Fetch ticket data from the Trac JSON API.
+
+    Returns a dict with ticket data on success, TICKET_NOT_FOUND if the
+    ticket does not exist (HTTP 404), or None on a non-fatal network error
+    (the caller should skip the check).
+    """
+    url = f"https://www.djangoproject.com/trac/api/tickets/{ticket_id}"
+    try:
+        with urllib.request.urlopen(url, timeout=URLOPEN_TIMEOUT_SECONDS) as response:
+            return json.loads(response.read())
+    except urllib.error.HTTPError as exc:
+        code = exc.code
+        exc.close()
+        if code == 404:
+            return TICKET_NOT_FOUND
+        logger.warning(
+            "HTTP %s fetching ticket %s -- skipping Trac check.",
+            code,
+            ticket_id,
+        )
+        return None
+    except Exception as exc:
+        logger.warning(
+            "Could not fetch ticket %s: %s -- skipping Trac check.",
+            ticket_id,
+            exc,
+        )
+        return None
+
+
+def check_trac_ticket(pr_body, total_changes, threshold=LARGE_PR_THRESHOLD):
+    """A Trac ticket must be referenced in the ticket section.
+
+    For PRs with fewer than threshold lines changed, "N/A" is also accepted
+    (e.g. for typo fixes). Larger PRs must reference a ticket.
+    """
+    # Look for the ticket reference inside the Trac ticket number section.
+    section_match = re.search(
+        r"#### Trac ticket number[^\n]*\n(.*?)(?=\r?\n####|\Z)",
+        pr_body,
+        re.DOTALL,
+    )
+    section = section_match.group(1) if section_match else pr_body
+
+    # Strip HTML comments before checking -- the template itself contains "N/A"
+    # inside a comment, which would otherwise trigger the N/A exemption below.
+    section = strip_html_comments(section)
+
+    if re.search(r"\bticket-\d+\b", section, re.IGNORECASE):  # valid ticket found
+        return None
+
+    # N/A is accepted for trivial PRs that don't warrant a ticket.
+    if total_changes < threshold and re.search(
+        r"(?:^|\s)N/A\b", section, re.IGNORECASE | re.MULTILINE
+    ):
+        return None
+
+    return Message(*MISSING_TRAC_TICKET, threshold=threshold)
+
+
+def check_trac_status(ticket_id, ticket_data):
+    """The referenced Trac ticket must be Accepted or Ready for checkin,
+    unresolved, and assigned.
+
+    ticket_data is the dict returned by fetch_trac_ticket(). Passing None
+    skips the check (non-fatal fetch error). Passing TICKET_NOT_FOUND fails
+    with a generic not-ready message.
+    """
+    if ticket_data is None:
+        return None  # Non-fatal fetch error; skip.
+    if ticket_data is TICKET_NOT_FOUND:
+        return Message(
+            *INVALID_TRAC_STATUS,
+            ticket_id=ticket_id,
+            current_state="ticket not found in Trac",
+        )
+    stage = ticket_data.get("custom", {}).get("stage", "").strip()
+    resolution = (ticket_data.get("resolution") or "").strip()
+    status = ticket_data.get("status", "").strip()
+    if stage in ALLOWED_STAGES and not resolution and status == "assigned":
+        return None
+    current_state = [
+        f"{stage=}" if stage not in ALLOWED_STAGES else "",
+        f"{resolution=}" if resolution else "",
+        f"{status=}" if status != "assigned" else "",
+    ]
+    return Message(
+        *INVALID_TRAC_STATUS,
+        ticket_id=ticket_id,
+        current_state=", ".join(s for s in current_state if s),
+    )
+
+
+def check_trac_has_patch(ticket_id, initial_data, poll_interval=1, poll_timeout=10):
+    """The referenced Trac ticket must have has_patch=1.
+
+    Uses initial_data (the dict returned by fetch_trac_ticket()) on the first
+    check, then polls via fetch_trac_ticket() every poll_interval seconds for
+    up to poll_timeout seconds. Set poll_timeout=0 for a single check with no
+    retries. Passing None for initial_data skips the check entirely.
+    """
+    deadline = time.monotonic() + poll_timeout
+    elapsed = 0
+    ticket_data = initial_data
+
+    while True:
+        logger.info(
+            "Checking has_patch flag for ticket-%s (elapsed: %ss) ...",
+            ticket_id,
+            elapsed,
+        )
+        if ticket_data is None:
+            return None  # Non-fatal fetch error; skip.
+        if ticket_data is TICKET_NOT_FOUND:
+            # Ticket not found -- already reported by check_trac_status.
+            return None
+        has_patch = ticket_data.get("custom", {}).get("has_patch", "0").strip()
+        if has_patch == "1":
+            logger.info("ticket-%s has_patch flag is set.", ticket_id)
+            return None
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        logger.info(
+            "  has_patch not yet set -- will retry in %ss.",
+            poll_interval,
+        )
+        sleep_time = min(poll_interval, remaining)
+        time.sleep(sleep_time)
+        elapsed += int(sleep_time)
+        ticket_data = fetch_trac_ticket(ticket_id)
+
+    logger.warning(
+        "ticket-%s has_patch flag was not set after %ss.",
+        ticket_id,
+        poll_timeout,
+    )
+    return Message(*MISSING_HAS_PATCH_FLAG, ticket_id=ticket_id)
+
+
+def check_pr_title_has_ticket(pr_title, ticket_id):
+    """The PR title must include the ticket number (e.g. #36991).
+
+    This enables Trac's auto-link feature, which associates the PR with the
+    ticket when the title follows the commit message format.
+    """
+    if re.search(rf"#{ticket_id}\b", pr_title):
+        return None
+    return Message(*MISSING_TICKET_IN_PR_TITLE, ticket_id=ticket_id)
+
+
+def check_branch_description(pr_body):
+    """The branch description should be at least five words long."""
+    description_match = re.search(
+        r"#### Branch description[ \t]*\r?\n(.*?)(?=\r?\n####|\Z)",
+        pr_body,
+        re.DOTALL,
+    )
+    if not description_match:
+        return Message(*MISSING_DESCRIPTION)
+
+    # Strip HTML comments before evaluating content.
+    cleaned = strip_html_comments(description_match.group(1)).strip()
+
+    if not cleaned or len(cleaned.split()) < MIN_WORDS:
+        return Message(*MISSING_DESCRIPTION)
+
+    return None
+
+
+def check_ai_disclosure(pr_body):
+    """Exactly one AI disclosure checkbox must be selected.
+
+    If the "AI tools were used" option is checked, at least five words of
+    additional description must be present in that section.
+    """
+    ai_match = re.search(
+        r"#### AI Assistance Disclosure[^\n]*\n(.*?)(?=\r?\n####|\Z)",
+        pr_body,
+        re.DOTALL,
+    )
+    if not ai_match:
+        return Message(*MISSING_AI_DISCLOSURE)
+
+    section = strip_html_comments(ai_match.group(1))
+    no_ai_checked = bool(
+        re.search(r"-\s*\[x\].*?No AI tools were used", section, re.IGNORECASE)
+    )
+    ai_used_checked = bool(
+        re.search(r"-\s*\[x\].*?If AI tools were used", section, re.IGNORECASE)
+    )
+
+    # Must check exactly one option.
+    if no_ai_checked == ai_used_checked:
+        return Message(*MISSING_AI_DISCLOSURE)
+
+    if ai_used_checked:
+        # Collect non-checkbox lines for word count.
+        extra_lines = [
+            line.strip()
+            for line in section.splitlines()
+            if line.strip() and not line.strip().startswith("- [")
+        ]
+        # Ensure PR author includes at least five words about their AI use.
+        if len(" ".join(extra_lines).split()) < MIN_WORDS:
+            return Message(*MISSING_AI_DESCRIPTION)
+
+    return None
+
+
+def check_checklist(pr_body):
+    """The first five items in the Checklist section must be checked."""
+    checklist_match = re.search(
+        r"#### Checklist[ \t]*\r?\n(.*?)(?=\r?\n####|\Z)", pr_body, re.DOTALL
+    )
+    if not checklist_match:
+        return Message(*INCOMPLETE_CHECKLIST)
+
+    checkboxes = re.findall(r"-\s*\[(.)\]", checklist_match.group(1))
+
+    if len(checkboxes) < 5 or not all(c.lower() == "x" for c in checkboxes[:5]):
+        return Message(*INCOMPLETE_CHECKLIST)
+
+    return None
+
+
+def write_job_summary(pr_number, results, summary_file=None):
+    """Write a Markdown job summary to the given file path (if provided)."""
+    if not summary_file:
+        return
+
+    lines = [
+        f"## PR #{pr_number} Quality Check Results\n",
+        "| | Check | Result |",
+        "| --- | --- | --- |",
+    ]
+    for name, result, level in results:
+        if result is SKIPPED:
+            icon, status = "⏭️", "Skipped"
+        elif result is None:
+            icon, status = "✅", "Passed"
+        else:
+            icon, status = level
+        lines.append(f"| {icon} | {name} | {status} |")
+
+    with open(summary_file, "a") as f:
+        f.write("\n".join(lines) + "\n")
+
+
+def run_checks(
+    repo,
+    token,
+    pr_body,
+    pr_number,
+    pr_title,
+    created_date,
+    commit_count,
+):
+    """Return check results without modifying the PR or its comments."""
+    if created_date is not None and created_date <= PR_TEMPLATE_DATE:
+        logger.info(
+            "PR #%s is older than PR template (%s) -- skipping all checks.",
+            pr_number,
+            PR_TEMPLATE_DATE,
+        )
+        return []
+
+    if commit_count >= 5:
+        logger.info(
+            "PR #%s author is an established contributor -- skipping all checks.",
+            pr_number,
+        )
+        return []
+
+    if commit_count == 0:
+        logger.info(
+            "PR #%s author has no commits -- setting size threshold to 0.",
+            pr_number,
+        )
+        threshold = 0
+    else:
+        threshold = LARGE_PR_THRESHOLD
+
+    pr_title_result = SKIPPED
+    total_changes = get_pr_total_changes(pr_number, repo, token)
+    ticket_result = check_trac_ticket(pr_body, total_changes, threshold)
+    ticket_status_result = SKIPPED
+    ticket_has_patch_result = SKIPPED
+    ticket_id = extract_ticket_id(pr_body) if ticket_result is None else None
+    if ticket_id:
+        pr_title_result = check_pr_title_has_ticket(pr_title, ticket_id)
+        ticket_data = fetch_trac_ticket(ticket_id)
+        ticket_status_result = check_trac_status(ticket_id, ticket_data)
+        if ticket_status_result is None:
+            # Polling is disabled (poll_timeout=0): has_patch is a non-fatal
+            # warning, and contributors often update Trac after reviewing their
+            # PR, making any fixed polling window unreliable.
+            ticket_has_patch_result = check_trac_has_patch(
+                ticket_id, ticket_data, poll_timeout=0
+            )
+        else:
+            logger.info("Trac ticket is not Accepted -- skipping has_patch check.")
+    else:
+        logger.info("No Trac ticket -- skipping status and has_patch checks.")
+
+    if created_date is not None and created_date <= AI_DISCLOSURE_DATE:
+        ai_disclosure_result = SKIPPED
+        logger.info(
+            "PR #%s is older than AI Disclosure section (%s) -- skipping AI checks.",
+            pr_number,
+            AI_DISCLOSURE_DATE,
+        )
+    else:
+        ai_disclosure_result = check_ai_disclosure(pr_body)
+
+    results = [
+        ("Trac ticket referenced", ticket_result, LEVEL_ERROR),
+        ("Trac ticket is ready for work", ticket_status_result, LEVEL_ERROR),
+        ("Trac ticket has_patch flag set", ticket_has_patch_result, LEVEL_WARNING),
+        ("PR title includes ticket number", pr_title_result, LEVEL_WARNING),
+        ("Branch description provided", check_branch_description(pr_body), LEVEL_ERROR),
+        ("AI disclosure completed", ai_disclosure_result, LEVEL_ERROR),
+        ("Checklist completed", check_checklist(pr_body), LEVEL_ERROR),
+    ]
+    return results
+
+
+def main(
+    repo,
+    token,
+    pr_author,
+    pr_body,
+    pr_number,
+    pr_title="",
+    pr_created_at=None,
+    autoclose=True,
+    summary_file=None,
+    gha_formatter=False,
+):
+    """Post quality-check feedback without closing the PR."""
+    setup_logging(logger, gha_formatter)
+
+    created_at = datetime.fromisoformat(pr_created_at) if pr_created_at else None
+    commit_count = get_recent_commit_count(
+        pr_author, repo, token, since_days=365 * 3, max_count=5
+    )
+    results = run_checks(
+        repo=repo,
+        token=token,
+        pr_body=pr_body,
+        pr_number=pr_number,
+        pr_title=pr_title,
+        created_date=created_at.date() if created_at else None,
+        commit_count=commit_count,
+    )
+    if not results:
+        return
+    write_job_summary(pr_number, results, summary_file)
+
+    failures = [
+        msg.as_details(level=level)
+        for _, msg, level in results
+        if msg is not None and msg is not SKIPPED and level == LEVEL_ERROR
+    ]
+    warning_msgs = [
+        msg.as_details(level=level)
+        for _, msg, level in results
+        if msg is not None and msg is not SKIPPED and level == LEVEL_WARNING
+    ]
+    # Remove outdated feedback, including when all checks now pass.
+    for comment_id in get_comment_ids_containing_marker(
+        pr_number, repo, token, marker=CHECKS_HEADER
+    ):
+        github_request("DELETE", f"/issues/comments/{comment_id}", token, repo)
+
+    if not failures and not warning_msgs:
+        logger.info("PR #%s passed all quality checks.", pr_number)
+        return
+
+    comment_parts = [CHECKS_HEADER]
+    if (
+        failures
+        and autoclose
+        and created_at is not None
+        and datetime.now(timezone.utc) <= created_at + timedelta(days=5)
+        and commit_count == 0
+    ):
+        comment_parts.append(
+            "Please address the issues below. A daily check may automatically "
+            "close this PR if required checks still fail once it is at least "
+            "24 hours old. Scheduled checks cover PRs up to five days old."
+        )
+    comment_parts.extend([*failures, *warning_msgs, CHECKS_FOOTER])
+
+    github_request(
+        "POST",
+        f"/issues/{pr_number}/comments",
+        token,
+        repo,
+        {"body": "\n\n".join(comment_parts)},
+    )
+    logger.warning(
+        "PR #%s has %s failure(s) and %s warning(s), adding comment with details.",
+        pr_number,
+        len(failures),
+        len(warning_msgs),
+    )
+    return 1 if failures else None
+
+
+def recheck_open_prs(repo, token, autoclose, summary_file=None, gha_formatter=False):
+    """Recheck eligible PRs and close those with failures, without commenting.
+
+    Return 1 if an exception prevents checking a PR, otherwise 0.
+    """
+    setup_logging(logger, gha_formatter)
+    if not autoclose:
+        return 0
+
+    # Collect numbers before closing any PRs, which changes pagination.
+    pr_numbers = []
+    now = datetime.now(timezone.utc)
+    oldest = now - timedelta(days=5)
+    cutoff = now - AUTOCLOSE_GRACE_PERIOD
+    for pr in github_results(
+        "/pulls",
+        repo,
+        token,
+        params={
+            "state": "open",
+            "base": "main",
+            "sort": "created",
+            "direction": "desc",
+        },
+    ):
+        created_at = datetime.fromisoformat(pr["created_at"])
+        if created_at < oldest:
+            break
+        if created_at <= cutoff:
+            pr_numbers.append(pr["number"])
+
+    failed = False
+    for pr_number in pr_numbers:
+        try:
+            # The PR may have been edited or closed since listing it.
+            pr = github_request("GET", f"/pulls/{pr_number}", token, repo)
+            if pr["state"] != "open" or pr["base"]["ref"] != "main":
+                continue
+            commit_count = get_recent_commit_count(
+                pr["user"]["login"], repo, token, since_days=365 * 3, max_count=5
+            )
+            if commit_count > 0:
+                continue
+            results = run_checks(
+                repo=repo,
+                token=token,
+                pr_body=pr["body"] or "",
+                pr_number=pr_number,
+                pr_title=pr["title"],
+                created_date=datetime.fromisoformat(pr["created_at"]).date(),
+                commit_count=commit_count,
+            )
+            write_job_summary(pr_number, results, summary_file)
+
+            has_failures = any(
+                msg is not None and msg is not SKIPPED and level == LEVEL_ERROR
+                for _, msg, level in results
+            )
+            if has_failures:
+                logger.info("PR #%s still fails required checks -- closing.", pr_number)
+                github_request(
+                    "PATCH", f"/pulls/{pr_number}", token, repo, {"state": "closed"}
+                )
+        except Exception:
+            # A failure checking one PR must not prevent checking the rest.
+            logger.exception("Could not recheck PR #%s.", pr_number)
+            failed = True
+    return int(failed)
+
+
+if __name__ == "__main__":
+    if os.environ.get("RECHECK", "").lower() == "true":
+        sys.exit(
+            recheck_open_prs(
+                repo=os.environ["PR_REPO"],
+                token=os.environ["GITHUB_TOKEN"],
+                autoclose=os.environ.get("AUTOCLOSE", "").lower() == "true",
+                summary_file=os.environ.get("GITHUB_STEP_SUMMARY"),
+                gha_formatter=os.environ.get("GITHUB_ACTIONS"),
+            )
+        )
+    sys.exit(
+        main(
+            repo=os.environ["PR_REPO"],
+            token=os.environ["GITHUB_TOKEN"],
+            pr_author=os.environ.get("PR_AUTHOR", ""),
+            pr_body=os.environ.get("PR_BODY", ""),
+            pr_number=os.environ["PR_NUMBER"],
+            pr_title=os.environ.get("PR_TITLE", ""),
+            pr_created_at=os.environ.get("PR_CREATED_AT"),
+            autoclose=os.environ.get("AUTOCLOSE", "").lower() == "true",
+            summary_file=os.environ.get("GITHUB_STEP_SUMMARY"),
+            gha_formatter=os.environ.get("GITHUB_ACTIONS"),
+        )
+    )

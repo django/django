@@ -1,4 +1,5 @@
 import json
+from unittest import mock
 
 from django.core import checks, exceptions, serializers
 from django.db import connection
@@ -91,13 +92,13 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_contained_by(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__contained_by={"a": "b", "c": "d"}),
             self.objs[:4],
         )
 
     def test_contains(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__contains={"a": "b"}), self.objs[:2]
         )
 
@@ -110,7 +111,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_has_key(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__has_key="c"), self.objs[1:3]
         )
 
@@ -120,18 +121,16 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_has_any_keys(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__has_any_keys=["a", "c"]), self.objs[:3]
         )
 
     def test_key_transform(self):
-        self.assertSequenceEqual(
-            HStoreModel.objects.filter(field__a="b"), self.objs[:2]
-        )
+        self.assertCountEqual(HStoreModel.objects.filter(field__a="b"), self.objs[:2])
 
     def test_key_transform_raw_expression(self):
         expr = RawSQL("%s::hstore", ["x => b, y => c"])
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__a=KeyTransform("x", expr)), self.objs[:2]
         )
 
@@ -153,7 +152,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_field_chaining_contains(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__a__contains="b"), self.objs[:2]
         )
 
@@ -170,7 +169,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_field_chaining_istartswith(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__cat__istartswith="kit"),
             self.objs[7:],
         )
@@ -182,13 +181,13 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_field_chaining_iendswith(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__cat__iendswith="ou"),
             self.objs[5:7],
         )
 
     def test_field_chaining_iexact(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__breed__iexact="persian"),
             self.objs[7:],
         )
@@ -200,7 +199,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_field_chaining_iregex(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__cat__iregex=r"oU$"),
             self.objs[5:7],
         )
@@ -218,27 +217,27 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_keys_contains(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__keys__contains=["a"]), self.objs[:2]
         )
 
     def test_values_overlap(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__values__overlap=["b", "d"]), self.objs[:3]
         )
 
     def test_key_isnull(self):
         obj = HStoreModel.objects.create(field={"a": None})
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__a__isnull=True),
             self.objs[2:9] + [obj],
         )
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(field__a__isnull=False), self.objs[:2]
         )
 
     def test_usage_in_subquery(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             HStoreModel.objects.filter(id__in=HStoreModel.objects.filter(field__a="b")),
             self.objs[:2],
         )
@@ -263,7 +262,7 @@ class TestQuerying(PostgreSQLTestCase):
                 HStoreModel.objects.filter(pk=OuterRef("pk")).values("field")
             ),
         ).filter(value__a="b")
-        self.assertSequenceEqual(qs, self.objs[:2])
+        self.assertCountEqual(qs, self.objs[:2])
 
 
 @isolate_apps("postgres_tests")
@@ -373,6 +372,13 @@ class TestFormField(PostgreSQLSimpleTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('{"a": "b"')
         self.assertEqual(cm.exception.messages[0], "Could not load JSON data.")
+        self.assertEqual(cm.exception.code, "invalid_json")
+
+    def test_invalid_json_deeply_nested(self):
+        field = forms.HStoreField()
+        with mock.patch.object(json, "loads", side_effect=RecursionError):
+            with self.assertRaises(exceptions.ValidationError) as cm:
+                field.clean('{"a": [[[]]]}')
         self.assertEqual(cm.exception.code, "invalid_json")
 
     def test_non_dict_json(self):

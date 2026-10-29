@@ -19,10 +19,10 @@ class BaseOrderWithRespectToTests:
         cls.q1 = cls.Question.objects.create(
             text="Which Beatle starts with the letter 'R'?"
         )
-        cls.Answer.objects.create(text="John", question=cls.q1)
-        cls.Answer.objects.create(text="Paul", question=cls.q1)
-        cls.Answer.objects.create(text="George", question=cls.q1)
-        cls.Answer.objects.create(text="Ringo", question=cls.q1)
+        cls.a1 = cls.Answer.objects.create(text="John", question=cls.q1)
+        cls.a2 = cls.Answer.objects.create(text="Paul", question=cls.q1)
+        cls.a3 = cls.Answer.objects.create(text="George", question=cls.q1)
+        cls.a4 = cls.Answer.objects.create(text="Ringo", question=cls.q1)
 
     def test_default_to_insertion_order(self):
         # Answers will always be ordered in the order they were inserted.
@@ -125,7 +125,9 @@ class BaseOrderWithRespectToTests:
                     using="other",
                 ),
             ):
-                self.q1.set_answer_order([3, 1, 2, 4])
+                self.q1.set_answer_order(
+                    [self.a3.pk, self.a1.pk, self.a2.pk, self.a4.pk]
+                )
 
     def test_bulk_create_with_empty_parent(self):
         """

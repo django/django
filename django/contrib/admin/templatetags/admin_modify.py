@@ -51,6 +51,7 @@ def prepopulated_fields_js(context):
 @register.tag(name="prepopulated_fields_js")
 def prepopulated_fields_js_tag(parser, token):
     return InclusionAdminNode(
+        "prepopulated_fields_js",
         parser,
         token,
         func=prepopulated_fields_js,
@@ -115,7 +116,7 @@ def submit_row(context):
 @register.tag(name="submit_row")
 def submit_row_tag(parser, token):
     return InclusionAdminNode(
-        parser, token, func=submit_row, template_name="submit_line.html"
+        "submit_row", parser, token, func=submit_row, template_name="submit_line.html"
     )
 
 
@@ -123,6 +124,7 @@ def submit_row_tag(parser, token):
 def change_form_object_tools_tag(parser, token):
     """Display the row of change form object tools."""
     return InclusionAdminNode(
+        "change_form_object_tools",
         parser,
         token,
         func=lambda context: context,
@@ -148,3 +150,14 @@ def cell_count(inline_admin_form):
         # Delete checkbox
         count += 1
     return count
+
+
+@register.tag(name="change_form_admin_actions")
+def admin_actions_tag(parser, token):
+    return InclusionAdminNode(
+        "change_form_admin_actions",
+        parser,
+        token,
+        func=lambda context: context,
+        template_name="change_form_actions.html",
+    )

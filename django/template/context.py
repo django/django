@@ -130,7 +130,7 @@ class BaseContext:
 
     def __eq__(self, other):
         """
-        Compare two contexts by comparing theirs 'dicts' attributes.
+        Compare two contexts by comparing their 'dicts' attributes.
         """
         if not isinstance(other, BaseContext):
             return NotImplemented

@@ -22,7 +22,6 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.sql import AND
 from django.db.models.sql.where import WhereNode
 from django.db.models.utils import AltersData
-from django.utils.functional import cached_property
 
 
 class GenericForeignKey(FieldCacheMixin, Field):
@@ -56,7 +55,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
         attname, column = super().get_attname_column()
         return attname, None
 
-    @cached_property
+    @functools.cached_property
     def ct_field_attname(self):
         return self.model._meta.get_field(self.ct_field).attname
 
@@ -153,7 +152,7 @@ class GenericForeignKey(FieldCacheMixin, Field):
             else:
                 return []
 
-    @cached_property
+    @functools.cached_property
     def cache_name(self):
         return self.name
 
@@ -599,7 +598,7 @@ class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor):
     ``post.comments`` is a ReverseGenericManyToOneDescriptor instance.
     """
 
-    @cached_property
+    @functools.cached_property
     def related_manager_cls(self):
         return create_generic_related_manager(
             self.rel.model._default_manager.__class__,
@@ -650,12 +649,13 @@ def create_generic_related_manager(superclass, rel):
             """
             Filter the queryset for the instance this manager is bound to.
             """
-            db = self._db or router.db_for_read(self.model, instance=self.instance)
-            return (
-                queryset.using(db)
-                .fetch_mode(self.instance._state.fetch_mode)
-                .filter(**self.core_filters)
-            )
+            with queryset._avoid_cloning():
+                queryset._add_hints(instance=self.instance)
+                if self._db:
+                    queryset = queryset.using(self._db)
+                return queryset.fetch_mode(self.instance._state.fetch_mode).filter(
+                    **self.core_filters
+                )
 
         def _remove_prefetched_objects(self):
             try:
@@ -671,12 +671,17 @@ def create_generic_related_manager(superclass, rel):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_querysets(self, instances, querysets=None):
-            if querysets and len(querysets) != 1:
-                raise ValueError(
-                    "querysets argument of get_prefetch_querysets() should have a "
-                    "length of 1."
-                )
-            queryset = querysets[0] if querysets else super().get_queryset()
+            _cloning_disabled = False
+            if querysets:
+                if len(querysets) != 1:
+                    raise ValueError(
+                        "querysets argument of get_prefetch_querysets() should have a "
+                        "length of 1."
+                    )
+                queryset = querysets[0]
+            else:
+                _cloning_disabled = True
+                queryset = super().get_queryset()._disable_cloning()
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
             # Group instances by content types.
@@ -697,8 +702,12 @@ def create_generic_related_manager(superclass, rel):
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
             content_type_id_field_name = "%s_id" % self.content_type_field_name
+            queryset = queryset.filter(query)
+            # Restore subsequent cloning operations.
+            if _cloning_disabled:
+                queryset._enable_cloning()
             return (
-                queryset.filter(query),
+                queryset,
                 lambda relobj: (
                     object_id_converter(getattr(relobj, self.object_id_field_name)),
                     getattr(relobj, content_type_id_field_name),

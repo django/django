@@ -21,8 +21,8 @@ from django.core.checks import Error, Warning
 from django.core.checks.urls import check_resolver
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import MultiValueDict
-from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
+from django.utils.module_loading import qualname
 from django.utils.regex_helper import _lazy_re_compile, normalize
 from django.utils.translation import get_language
 
@@ -341,8 +341,8 @@ class RoutePattern(CheckURLMixin):
             if self._route == path:
                 return "", (), {}
         # If this isn't an endpoint, the path should start with the route.
-        elif path.startswith(self._route):
-            return path.removeprefix(self._route), (), {}
+        elif path.startswith(route := str(self._route)):
+            return path.removeprefix(route), (), {}
         return None
 
     def check(self):
@@ -484,7 +484,7 @@ class URLPattern:
                 extra_kwargs=self.default_args,
             )
 
-    @cached_property
+    @functools.cached_property
     def lookup_str(self):
         """
         A string that identifies the view (e.g. 'path.to.view_function' or
@@ -495,9 +495,10 @@ class URLPattern:
             callback = callback.func
         if hasattr(callback, "view_class"):
             callback = callback.view_class
-        elif not hasattr(callback, "__name__"):
+        try:
+            return qualname(callback)
+        except ValueError:
             return callback.__module__ + "." + callback.__class__.__name__
-        return callback.__module__ + "." + callback.__qualname__
 
 
 class URLResolver:
@@ -716,14 +717,14 @@ class URLResolver:
             raise Resolver404({"tried": tried, "path": new_path})
         raise Resolver404({"path": path})
 
-    @cached_property
+    @functools.cached_property
     def urlconf_module(self):
         if isinstance(self.urlconf_name, str):
             return import_module(self.urlconf_name)
         else:
             return self.urlconf_name
 
-    @cached_property
+    @functools.cached_property
     def url_patterns(self):
         # urlconf_module might be a valid set of patterns, so we default to it
         patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)

@@ -1,5 +1,5 @@
 ============
-File Uploads
+File uploads
 ============
 
 .. currentmodule:: django.core.files.uploadedfile
@@ -222,6 +222,8 @@ uploads:
    aware that you cannot use it to put multiple files on a single model
    instance (in a single field), for example, even if the custom widget is used
    with a form field related to a model ``FileField``.
+
+.. _file-upload-handlers:
 
 Upload Handlers
 ===============

@@ -1,7 +1,8 @@
 import collections
 import json
 import re
-from functools import partial
+import warnings
+from functools import cached_property, partial
 from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
@@ -23,9 +24,10 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.utils.functional import cached_property
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.warnings import django_file_prefixes
 
 
 class PositionRef(Ref):
@@ -354,11 +356,30 @@ class SQLCompiler:
         # Avoid computing `selected_exprs` if there is no `ordering` as it's
         # relatively expensive.
         if ordering and (select := self.select):
+            distinct_fields = self.query.distinct_fields
+            annotation_select = self.query.annotation_select
+            # An expression can be selected at more than one position, e.g.
+            # when two lookup paths resolve to the same column. get_distinct()
+            # refers to such selections by expression and PostgreSQL binds an
+            # expression reference to the first position it is selected at, so
+            # ordering must refer to that position as well for the prefixes of
+            # both clauses to match. Raw selections are excluded as equal SQL
+            # is not necessarily interchangeable, e.g. a volatile function
+            # selected twice.
+            first_positions = {}
             for ordinal, (expr, _, alias) in enumerate(select, start=1):
                 pos_expr = PositionRef(ordinal, alias, expr)
+                if distinct_fields and not isinstance(expr, RawSQL):
+                    first_pos_expr = first_positions.setdefault(expr, pos_expr)
+                else:
+                    first_pos_expr = pos_expr
                 if alias:
-                    selected_exprs[alias] = pos_expr
-                selected_exprs[expr] = pos_expr
+                    # get_distinct() refers to annotations by alias, which
+                    # binds to their own position.
+                    selected_exprs[alias] = (
+                        pos_expr if alias in annotation_select else first_pos_expr
+                    )
+                selected_exprs[expr] = first_pos_expr
 
         for field in ordering:
             if hasattr(field, "resolve_expression"):
@@ -433,15 +454,13 @@ class SQLCompiler:
                 yield OrderBy(expr, descending=descending), False
                 continue
 
-            if "." in field:
+            if "." in field and field in self.query.extra_order_by:
                 # This came in through an extra(order_by=...) addition. Pass it
                 # on verbatim.
                 table, col = col.split(".", 1)
                 yield (
                     OrderBy(
-                        RawSQL(
-                            "%s.%s" % (self.quote_name_unless_alias(table), col), []
-                        ),
+                        RawSQL("%s.%s" % (self.quote_name(table), col), []),
                         descending=descending,
                     ),
                     False,
@@ -465,7 +484,7 @@ class SQLCompiler:
             else:
                 if self.query.combinator and self.select:
                     # Don't use the first model's field because other
-                    # combinated queries might define it differently.
+                    # combined queries might define it differently.
                     yield OrderBy(F(col), descending=descending), False
                 else:
                     # 'col' is of the form 'field' or 'field1__field2' or
@@ -547,27 +566,28 @@ class SQLCompiler:
                     extra_select.append((expr, (without_ordering, params), None))
         return extra_select
 
+    def quote_name(self, name):
+        """
+        A wrapper around connection.ops.quote_name that memoizes quoted
+        name values.
+        """
+        if (quoted := self.quote_cache.get(name)) is not None:
+            return quoted
+        quoted = self.connection.ops.quote_name(name)
+        self.quote_cache[name] = quoted
+        return quoted
+
+    # RemovedInDjango2028Warning: When the deprecation ends, remove.
     def quote_name_unless_alias(self, name):
-        """
-        A wrapper around connection.ops.quote_name that doesn't quote aliases
-        for table names. This avoids problems with some SQL dialects that treat
-        quoted strings specially (e.g. PostgreSQL).
-        """
-        if name in self.quote_cache:
-            return self.quote_cache[name]
-        if (
-            (name in self.query.alias_map and name not in self.query.table_map)
-            or name in self.query.extra_select
-            or (
-                self.query.external_aliases.get(name)
-                and name not in self.query.table_map
-            )
-        ):
-            self.quote_cache[name] = name
-            return name
-        r = self.connection.ops.quote_name(name)
-        self.quote_cache[name] = r
-        return r
+        warnings.warn(
+            (
+                "SQLCompiler.quote_name_unless_alias() is deprecated. "
+                "Use .quote_name() instead."
+            ),
+            category=RemovedInDjango2028Warning,
+            skip_file_prefixes=django_file_prefixes(),
+        )
+        return self.quote_name(name)
 
     def compile(self, node):
         vendor_impl = getattr(node, "as_" + self.connection.vendor, None)
@@ -1042,7 +1062,7 @@ class SQLCompiler:
         opts = self.query.get_meta()
 
         for name in self.query.distinct_fields:
-            parts = name.split(LOOKUP_SEP)
+            parts = self.query.get_names_to_join(name)
             _, targets, alias, joins, path, _, transform_function = self._setup_joins(
                 parts, opts, None
             )
@@ -1050,6 +1070,11 @@ class SQLCompiler:
             for target in targets:
                 if name in self.query.annotation_select:
                     result.append(self.connection.ops.quote_name(name))
+                elif name in self.query.annotations:
+                    raise FieldError(
+                        f"Cannot select the {name!r} alias. Use annotate() to "
+                        "promote it."
+                    )
                 else:
                     r, p = self.compile(transform_function(target, alias))
                     result.append(r)
@@ -1066,7 +1091,7 @@ class SQLCompiler:
         """
         name, order = get_order_dir(name, default_order)
         descending = order == "DESC"
-        pieces = name.split(LOOKUP_SEP)
+        pieces = self.query.get_names_to_join(name)
         (
             field,
             targets,
@@ -1167,7 +1192,7 @@ class SQLCompiler:
                 alias not in self.query.alias_map
                 or self.query.alias_refcount[alias] == 1
             ):
-                result.append(", %s" % self.quote_name_unless_alias(alias))
+                result.append(", %s" % self.quote_name(alias))
         return result, params
 
     def get_related_selections(
@@ -1496,7 +1521,7 @@ class SQLCompiler:
                 if self.connection.features.select_for_update_of_column:
                     result.append(self.compile(col)[0])
                 else:
-                    result.append(self.quote_name_unless_alias(col.alias))
+                    result.append(self.quote_name(col.alias))
         if invalid_names:
             raise FieldError(
                 "Invalid field name(s) given in select_for_update(of=(...)): %s. "
@@ -1621,9 +1646,12 @@ class SQLCompiler:
             cursor = self.connection.cursor()
         try:
             cursor.execute(sql, params)
-        except Exception:
+        except Exception as e:
             # Might fail for server-side cursors (e.g. connection closed)
-            cursor.close()
+            try:
+                cursor.close()
+            except DatabaseError:
+                raise e from None
             raise
 
         if result_type == ROW_COUNT:
@@ -1679,11 +1707,12 @@ class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
     returning_params = ()
 
-    def field_as_sql(self, field, get_placeholder, val):
+    def field_as_sql(self, field, get_placeholder_sql, val):
         """
         Take a field and a value intended to be saved on that field, and
         return placeholder SQL and accompanying params. Check for raw values,
-        expressions, and fields with get_placeholder() defined in that order.
+        fields with get_placeholder_sql(), and compilable defined in that
+        order.
 
         When field is None, consider the value raw and use it as the
         placeholder, with no corresponding parameters returned.
@@ -1691,13 +1720,13 @@ class SQLInsertCompiler(SQLCompiler):
         if field is None:
             # A field value of None means the value is raw.
             sql, params = val, []
+        elif get_placeholder_sql is not None:
+            # Some fields (e.g. geo fields) need special munging before
+            # they can be inserted.
+            sql, params = get_placeholder_sql(val, self, self.connection)
         elif hasattr(val, "as_sql"):
             # This is an expression, let's compile it.
             sql, params = self.compile(val)
-        elif get_placeholder is not None:
-            # Some fields (e.g. geo fields) need special munging before
-            # they can be inserted.
-            sql, params = get_placeholder(val, self, self.connection), [val]
         else:
             # Return the common case for the placeholder
             sql, params = "%s", [val]
@@ -1766,11 +1795,15 @@ class SQLInsertCompiler(SQLCompiler):
 
         # list of (sql, [params]) tuples for each object to be saved
         # Shape: [n_objs][n_fields][2]
-        get_placeholders = [getattr(field, "get_placeholder", None) for field in fields]
+        get_placeholder_sqls = [
+            getattr(field, "get_placeholder_sql", None) for field in fields
+        ]
         rows_of_fields_as_sql = (
             (
-                self.field_as_sql(field, get_placeholder, value)
-                for field, get_placeholder, value in zip(fields, get_placeholders, row)
+                self.field_as_sql(field, get_placeholder_sql, value)
+                for field, get_placeholder_sql, value in zip(
+                    fields, get_placeholder_sqls, row
+                )
             )
             for row in value_rows
         )
@@ -1789,9 +1822,7 @@ class SQLInsertCompiler(SQLCompiler):
         return placeholder_rows, param_rows
 
     def as_sql(self):
-        # We don't need quote_name_unless_alias() here, since these are all
-        # going to be column names (so we can avoid the extra overhead).
-        qn = self.connection.ops.quote_name
+        qn = self.quote_name
         opts = self.query.get_meta()
         insert_statement = self.connection.ops.insert_statement(
             on_conflict=self.query.on_conflict,
@@ -1808,9 +1839,13 @@ class SQLInsertCompiler(SQLCompiler):
             for field in list(fields):
                 field_prepare = partial(self.prepare_value, field)
                 field_pre_save = partial(self.pre_save_val, field)
-                field_values = [
-                    field_prepare(field_pre_save(obj)) for obj in self.query.objs
-                ]
+
+                field_values = []
+                for obj in self.query.objs:
+                    value = field_pre_save(obj)
+                    if not isinstance(value, DatabaseDefault):
+                        value = field_prepare(value)
+                    field_values.append(value)
 
                 if not field.has_db_default():
                     value_cols.append(field_values)
@@ -1986,7 +2021,7 @@ class SQLDeleteCompiler(SQLCompiler):
         )
 
     def _as_sql(self, query):
-        delete = "DELETE FROM %s" % self.quote_name_unless_alias(query.base_table)
+        delete = "DELETE FROM %s" % self.quote_name(query.base_table)
         try:
             where, params = self.compile(query.where)
         except FullResultSet:
@@ -2030,7 +2065,7 @@ class SQLUpdateCompiler(SQLCompiler):
         self.pre_sql_setup()
         if not self.query.values:
             return "", ()
-        qn = self.quote_name_unless_alias
+        qn = self.quote_name
         values, update_params = [], []
         for field, model, val in self.query.values:
             if hasattr(val, "resolve_expression"):
@@ -2063,21 +2098,20 @@ class SQLUpdateCompiler(SQLCompiler):
                     )
             val = field.get_db_prep_save(val, connection=self.connection)
 
-            # Getting the placeholder for the field.
-            if hasattr(field, "get_placeholder"):
-                placeholder = field.get_placeholder(val, self, self.connection)
-            else:
-                placeholder = "%s"
-            name = field.column
-            if hasattr(val, "as_sql"):
-                sql, params = self.compile(val)
-                values.append("%s = %s" % (qn(name), placeholder % sql))
+            quoted_name = qn(field.column)
+            if (
+                get_placeholder_sql := getattr(field, "get_placeholder_sql", None)
+            ) is not None:
+                sql, params = get_placeholder_sql(val, self, self.connection)
+                values.append(f"{quoted_name} = {sql}")
                 update_params.extend(params)
-            elif val is not None:
-                values.append("%s = %s" % (qn(name), placeholder))
-                update_params.append(val)
+            elif hasattr(val, "as_sql"):
+                sql, params = self.compile(val)
+                values.append(f"{quoted_name} = {sql}")
+                update_params.extend(params)
             else:
-                values.append("%s = NULL" % qn(name))
+                values.append(f"{quoted_name} = %s")
+                update_params.append(val)
         table = self.query.base_table
         result = [
             "UPDATE %s SET" % qn(table),

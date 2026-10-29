@@ -25,6 +25,7 @@ from django.db import (
     connections,
     models,
 )
+from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
 from django.db.migrations.autodetector import MigrationAutodetector
@@ -37,9 +38,9 @@ from django.test.utils import captured_stdout, extend_sys_path, isolate_apps
 from django.utils import timezone
 from django.utils.version import get_docs_version
 
+from .base import MigrationTestBase
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
-from .test_base import MigrationTestBase
 
 HAS_BLACK = shutil.which("black")
 
@@ -113,7 +114,7 @@ class MigrateTests(MigrationTestBase):
         out = io.StringIO()
         call_command("migrate", skip_checks=False, no_color=True, stdout=out)
         self.assertIn("Apply all migrations: migrated_app", out.getvalue())
-        mocked_check.assert_called_once()
+        mocked_check.assert_called_once_with(databases=["default"])
 
     def test_migrate_with_custom_system_checks(self):
         original_checks = registry.registered_checks.copy()
@@ -136,6 +137,25 @@ class MigrateTests(MigrationTestBase):
 
         command = CustomMigrateCommandWithSecurityChecks()
         call_command(command, skip_checks=False, stdout=io.StringIO())
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "migrations.migrations_test_apps.migrated_app",
+        ]
+    )
+    def test_migrate_runs_database_system_checks(self):
+        original_checks = registry.registered_checks.copy()
+        self.addCleanup(setattr, registry, "registered_checks", original_checks)
+
+        out = io.StringIO()
+        mock_check = mock.Mock(return_value=[])
+        register(mock_check, Tags.database)
+
+        call_command("migrate", skip_checks=False, no_color=True, stdout=out)
+        self.assertIn("Apply all migrations: migrated_app", out.getvalue())
+        mock_check.assert_called_once_with(app_configs=None, databases=["default"])
 
     @override_settings(
         INSTALLED_APPS=[
@@ -1203,10 +1223,10 @@ class MigrateTests(MigrationTestBase):
             create_table_count = len(
                 [call for call in execute.mock_calls if "CREATE TABLE" in str(call)]
             )
-            self.assertEqual(create_table_count, 2)
+            self.assertEqual(create_table_count, 3)
             # There's at least one deferred SQL for creating the foreign key
             # index.
-            self.assertGreater(len(execute.mock_calls), 2)
+            self.assertGreater(len(execute.mock_calls), 3)
         stdout = stdout.getvalue()
         self.assertIn("Synchronize unmigrated apps: unmigrated_app_syncdb", stdout)
         self.assertIn("Creating tables...", stdout)
@@ -1240,8 +1260,54 @@ class MigrateTests(MigrationTestBase):
             create_table_count = len(
                 [call for call in execute.mock_calls if "CREATE TABLE" in str(call)]
             )
-            self.assertEqual(create_table_count, 2)
+            self.assertEqual(create_table_count, 3)
+            self.assertGreater(len(execute.mock_calls), 3)
+            self.assertIn(
+                "Synchronize unmigrated app: unmigrated_app_syncdb", stdout.getvalue()
+            )
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.unmigrated_app_syncdb",
+            "migrations.migrations_test_apps.unmigrated_app_simple",
+        ]
+    )
+    def test_migrate_syncdb_installed_truncated_db_model(self):
+        """
+        Running migrate --run-syncdb doesn't try to create models with long
+        truncated name if already exist.
+        """
+        with connection.cursor() as cursor:
+            mock_existing_tables = connection.introspection.table_names(cursor)
+        # Add truncated name for the VeryLongNameModel to the list of
+        # existing table names.
+        table_name = truncate_name(
+            "long_db_table_that_should_be_truncated_before_checking",
+            connection.ops.max_name_length(),
+        )
+        mock_existing_tables.append(table_name)
+        stdout = io.StringIO()
+        with (
+            mock.patch.object(BaseDatabaseSchemaEditor, "execute") as execute,
+            mock.patch.object(
+                BaseDatabaseIntrospection,
+                "table_names",
+                return_value=mock_existing_tables,
+            ),
+        ):
+            call_command(
+                "migrate", "unmigrated_app_syncdb", run_syncdb=True, stdout=stdout
+            )
+            create_table_calls = [
+                str(call).upper()
+                for call in execute.mock_calls
+                if "CREATE TABLE" in str(call)
+            ]
+            self.assertEqual(len(create_table_calls), 2)
             self.assertGreater(len(execute.mock_calls), 2)
+            self.assertFalse(
+                any([table_name.upper() in call for call in create_table_calls])
+            )
             self.assertIn(
                 "Synchronize unmigrated app: unmigrated_app_syncdb", stdout.getvalue()
             )
@@ -1535,7 +1601,7 @@ class MigrateTests(MigrationTestBase):
                 for migration in recorder.applied_migrations()
                 if migration[0] in ["migrations", "migrations2"]
             ]
-            self.assertEqual(
+            self.assertCountEqual(
                 applied_migrations,
                 [
                     ("migrations", "0001_squashed_0002"),
@@ -3141,6 +3207,60 @@ class SquashMigrationsTests(MigrationTestBase):
                 app_label for app_label, _ in recorder.applied_migrations()
             ]
             self.assertNotIn("migrations", applied_app_labels)
+
+    def test_double_replaced_migrations_are_checked_correctly(self):
+        """
+        If replaced migrations are already applied and replacing migrations
+        are not, then migrate should not fail with
+        InconsistentMigrationHistory.
+        """
+        with self.temporary_migration_module():
+            call_command(
+                "makemigrations",
+                "migrations",
+                "--empty",
+                interactive=False,
+                verbosity=0,
+            )
+            call_command(
+                "makemigrations",
+                "migrations",
+                "--empty",
+                interactive=False,
+                verbosity=0,
+            )
+            call_command(
+                "makemigrations",
+                "migrations",
+                "--empty",
+                interactive=False,
+                verbosity=0,
+            )
+            call_command(
+                "makemigrations",
+                "migrations",
+                "--empty",
+                interactive=False,
+                verbosity=0,
+            )
+            call_command("migrate", "migrations", interactive=False, verbosity=0)
+            call_command(
+                "squashmigrations",
+                "migrations",
+                "0001",
+                "0002",
+                interactive=False,
+                verbosity=0,
+            )
+            call_command(
+                "squashmigrations",
+                "migrations",
+                "0001_initial_squashed",
+                "0003",
+                interactive=False,
+                verbosity=0,
+            )
+            call_command("migrate", "migrations", interactive=False, verbosity=0)
 
     def test_squashmigrations_initial_attribute(self):
         with self.temporary_migration_module(

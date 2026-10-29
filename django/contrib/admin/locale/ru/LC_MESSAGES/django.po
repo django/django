@@ -10,16 +10,16 @@
 # Sergey <inoks@mail.ru>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2025
+# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2026
 # Дмитрий <nerosketch@gmail.com>, 2019
 # Bobsans <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2025\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2026-03-09 07:05+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022-2026\n"
 "Language-Team: Russian (http://app.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -339,11 +339,8 @@ msgstr ""
 "Произошла ошибка. О ней сообщено администраторам сайта по электронной почте, "
 "ошибка должна быть вскоре исправлена. Благодарим вас за терпение."
 
-msgid "Run the selected action"
-msgstr "Выполнить выбранное действие"
-
-msgid "Go"
-msgstr "Выполнить"
+msgid "Run"
+msgstr "Запустить"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Нажмите здесь, чтобы выбрать объекты на всех страницах"
@@ -455,6 +452,9 @@ msgstr "Показать счётчики"
 msgid "Clear all filters"
 msgstr "Сбросить все фильтры"
 
+msgid "Save"
+msgstr "Сохранить"
+
 msgid "Remove from sorting"
 msgstr "Удалить из сортировки"
 
@@ -476,29 +476,30 @@ msgstr "Переключить тему (текущая: тёмная)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Удаление %(object_name)s '%(escaped_object)s' приведет к удалению связанных "
-"объектов, но ваша учетная запись не имеет прав для удаления следующих типов "
-"объектов:"
+"Удаление объекта типа %(object_name)s\"%(escaped_object)s\" потребовало бы "
+"удаления следующих объектов, связанных с ним, но у вашей учётной записи нет "
+"прав на удаление этого типа объектов:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Удаление %(object_name)s '%(escaped_object)s' потребует удаления следующих "
-"связанных защищенных объектов:"
+"Удаление объекта типа %(object_name)s \"%(escaped_object)s\" потребовало бы "
+"удаления следующих защищённых объектов, связанных с ним:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Вы уверены, что хотите удалить %(object_name)s \"%(escaped_object)s\"? Все "
-"следующие связанные объекты также будут удалены:"
+"Вы уверены, что хотите удалить объект "
+"типа%(object_name)s\"%(escaped_object)s\"? Указанные ниже связанные объекты "
+"при этом будут также удалены:"
 
 msgid "Objects"
 msgstr "Объекты"
@@ -607,6 +608,10 @@ msgstr "Пользователь"
 msgid "Action"
 msgstr "Действие"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Паджинация записей %(name)s "
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "запись"
@@ -621,14 +626,19 @@ msgstr ""
 "Данный объект не имеет истории изменений. Возможно, он был добавлен не через "
 "данный административный сайт."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Паджинация %(name)s"
+
 msgid "Show all"
 msgstr "Показать все"
 
-msgid "Save"
-msgstr "Сохранить"
-
 msgid "Popup closing…"
 msgstr "Всплывающее окно закрывается..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Искать %(name)s"
 
 msgid "Search"
 msgstr "Найти"

@@ -2,7 +2,7 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018-2019
-# Igor Jerosimić, 2019-2021,2023-2025
+# Igor Jerosimić, 2019-2021,2023-2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Igor Jerosimić, 2019-2021,2023-2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 06:49+0000\n"
+"Last-Translator: Igor Jerosimić, 2019-2021,2023-2026\n"
 "Language-Team: Serbian (http://app.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -144,6 +144,9 @@ msgstr "хрватски"
 
 msgid "Upper Sorbian"
 msgstr "горњолужичкосрпски"
+
+msgid "Haitian Creole"
+msgstr "Хаићански креолски"
 
 msgid "Hungarian"
 msgstr "мађарски"
@@ -497,6 +500,9 @@ msgstr "%(model_name)s са пољем %(field_labels)s већ постоји."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Ограничење „%(name)s“ је прекршено."
 
+msgid "- Select an option -"
+msgstr "- Изаберите опцију -"
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Вредност %(value)r није валидна."
@@ -566,8 +572,8 @@ msgstr "Датум (без времена)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
+"HH:MM[:ss[.uuuuuu]][TZ] format."
 msgstr ""
 "Вредност \"%(value)s\" нема исправан формат. Мора бити у формату ГГГГ-ММ-ДД "
 "ЧЧ:ММ[:сс[.uuuuuu]][TZ] ."
@@ -592,8 +598,8 @@ msgstr "Децимални број"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-"uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] format."
 msgstr ""
 "Вредност \"%(value)s\" нема исправан формат. Мора бити у формату [ДД] [ЧЧ:"
 "[ММ:]]сс[.uuuuuu]."
@@ -661,8 +667,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Вредност \"%(value)s\" нема исправан формат. Мора бити у формату ЧЧ:ММ[:сс[."
-"uuuuuu]] ."
+"Вредност \"%(value)s\" нема исправан формат. Мора бити у формату "
+"ЧЧ:ММ[:сс[.uuuuuu]] ."
 
 #, python-format
 msgid ""
@@ -680,6 +686,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Сирови бинарни подаци"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr "“%(value)s” није исправна бинарна вредност."
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -722,8 +732,8 @@ msgid "Many-to-many relationship"
 msgstr "Релација више на више"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -889,6 +899,28 @@ msgstr "Да"
 
 msgid "No"
 msgstr "Не"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr "Ниједан %s се не поклапа са датим упитом."
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Спремно"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Покренуто"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Неуспешно"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Успешно"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
@@ -1285,8 +1317,8 @@ msgstr "Недоступни објекти %(verbose_name_plural)s"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because %(class_name)s."
-"allow_future is False."
+"Future %(verbose_name_plural)s not available because "
+"%(class_name)s.allow_future is False."
 msgstr ""
 "Опција „future“ није доступна за „%(verbose_name_plural)s“ јер "
 "%(class_name)s.allow_future има вредност False."

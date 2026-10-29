@@ -12,7 +12,7 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.core.validators import ProhibitNullCharactersValidator
-from django.db.models.utils import AltersData
+from django.db.models.utils import AltersData, get_blank_choice_label
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
@@ -736,7 +736,14 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         pk_required = i < self.initial_form_count()
         if pk_required:
             if self.is_bound:
-                pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
+                # Avoid initializing the form only to compute its prefix when
+                # it uses BaseForm.add_prefix().
+                if self.form.add_prefix is BaseForm.add_prefix:
+                    pk_key = "%s-%s" % (self.add_prefix(i), self.model._meta.pk.name)
+                else:
+                    form_kwargs = {"prefix": self.add_prefix(i), **kwargs}
+                    pk_form = self.form(**form_kwargs)
+                    pk_key = pk_form.add_prefix(self.model._meta.pk.name)
                 try:
                     pk = self.data[pk_key]
                 except KeyError:
@@ -776,8 +783,9 @@ class BaseModelFormSet(BaseFormSet, AltersData):
             # If the queryset isn't already ordered we need to add an
             # artificial ordering here to make sure that all formsets
             # constructed from this queryset have the same form order.
-            if not qs.ordered:
-                qs = qs.order_by(self.model._meta.pk.name)
+            if not qs.totally_ordered:
+                current_ordering = qs.query.order_by or qs.model._meta.ordering or []
+                qs = qs.order_by(*current_ordering, "pk")
 
             # Removed queryset limiting here. As per discussion re: #13023
             # on django-dev, max_num should not prevent existing
@@ -955,11 +963,12 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         forms_to_delete = self.deleted_forms
         for form in self.initial_forms:
             obj = form.instance
-            # If the pk is None, it means either:
-            # 1. The object is an unexpected empty model, created by invalid
-            #    POST data such as an object outside the formset's queryset.
+            # If the pk is unset or the instance is being added, it could mean:
+            # 1. The object is an unexpected unfetched instance, created by
+            #    invalid POST data such as an object outside the formset's
+            #    queryset, or a formset with edit_only=True.
             # 2. The object was already deleted from the database.
-            if not obj._is_pk_set():
+            if not obj._is_pk_set() or obj._state.adding:
                 continue
             if form in forms_to_delete:
                 self.deleted_objects.append(obj)
@@ -1401,7 +1410,7 @@ class InlineForeignKeyField(Field):
                 return None
             # if there is no value act as we did before.
             return self.parent_instance
-        # ensure the we compare the values as equal types.
+        # ensure we compare the values as equal types.
         if self.to_field:
             orig = getattr(self.parent_instance, self.to_field)
         else:
@@ -1480,7 +1489,7 @@ class ModelChoiceField(ChoiceField):
         self,
         queryset,
         *,
-        empty_label="---------",
+        empty_label="",
         required=True,
         widget=None,
         label=None,
@@ -1507,6 +1516,8 @@ class ModelChoiceField(ChoiceField):
         ):
             self.empty_label = None
         else:
+            if empty_label == "":
+                empty_label = get_blank_choice_label()
             self.empty_label = empty_label
         self.queryset = queryset
         self.limit_choices_to = limit_choices_to  # limit the queryset later.

@@ -28,10 +28,7 @@ class SQLDeleteCompiler(BaseSQLDeleteCompiler):
             # window functions as it doesn't allow for GROUP BY/HAVING clauses
             # and the subquery wrapping (necessary to emulate QUALIFY).
             return super().as_sql()
-        result = [
-            "DELETE %s FROM"
-            % self.quote_name_unless_alias(self.query.get_initial_alias())
-        ]
+        result = ["DELETE %s FROM" % self.quote_name(self.query.get_initial_alias())]
         from_sql, params = self.get_from_clause()
         result.extend(from_sql)
         try:

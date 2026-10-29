@@ -2,7 +2,9 @@ import gettext as gettext_module
 import os
 import re
 import stat
+import sys
 import unittest
+from functools import cached_property
 from io import StringIO
 from pathlib import Path
 from subprocess import run
@@ -14,7 +16,6 @@ from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
-from django.utils.functional import cached_property
 from django.utils.translation import gettext
 
 from .utils import RunInTmpDirMixin, copytree
@@ -43,6 +44,7 @@ class PoFileTests(MessageCompilationTests):
         self.assertIn("file has a BOM (Byte Order Mark)", stderr.getvalue())
         self.assertFalse(os.path.exists(self.MO_FILE))
 
+    @unittest.skipIf(sys.platform == "win32", "Windows only partially supports chmod.")
     def test_no_write_access(self):
         mo_file_en = Path(self.MO_FILE_EN)
         err_buffer = StringIO()

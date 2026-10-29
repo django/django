@@ -96,3 +96,59 @@ class NowTagTests(SimpleTestCase):
             TemplateSyntaxError, "'now' statement takes one argument"
         ):
             self.engine.render_to_string("no_args")
+
+    @setup({"now_var": "{% now my_format %}"})
+    def test_now_variable(self):
+        output = self.engine.render_to_string("now_var", {"my_format": "j n Y"})
+        self.assertEqual(
+            output,
+            "%d %d %d"
+            % (
+                datetime.now().day,
+                datetime.now().month,
+                datetime.now().year,
+            ),
+        )
+
+    @setup({"now_var_as": "{% now my_format as N %}-{{ N }}-"})
+    def test_now_variable_as(self):
+        output = self.engine.render_to_string("now_var_as", {"my_format": "j n Y"})
+        self.assertEqual(
+            output,
+            "-%d %d %d-"
+            % (
+                datetime.now().day,
+                datetime.now().month,
+                datetime.now().year,
+            ),
+        )
+
+    @setup(
+        {
+            "literal": (
+                r'{% now "\<\i\m\g ' r'\s\r\c=\x\o\n\e\r\r\o\r=\a\l\e\r\t\(1\)\>" %}'
+            ),
+            "variable": "{% now my_format %}",
+            "filtered": '{% now ""|add:my_format %}',
+            "variable_as": "{% now my_format as N %}{{ N }}",
+            "autoescape_off": (
+                "{% autoescape off %}{% now my_format %}{% endautoescape %}"
+            ),
+        }
+    )
+    def test_now_format_escaping(self):
+        evil_format = r"\<\i\m\g \s\r\c=\x\o\n\e\r\r\o\r=\a\l\e\r\t\(1\)\>"
+        raw = "<img src=xonerror=alert(1)>"
+        escaped = "&lt;img src=xonerror=alert(1)&gt;"
+        for template, expected in (
+            ("literal", raw),
+            ("variable", escaped),
+            ("filtered", escaped),
+            ("variable_as", escaped),
+            ("autoescape_off", raw),
+        ):
+            with self.subTest(template=template):
+                self.assertEqual(
+                    self.engine.render_to_string(template, {"my_format": evil_format}),
+                    expected,
+                )

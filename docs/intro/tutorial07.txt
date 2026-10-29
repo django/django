@@ -109,12 +109,12 @@ the database. Django knows that a :class:`~django.db.models.ForeignKey` should
 be represented in the admin as a ``<select>`` box. In our case, only one
 question exists at this point.
 
-Also note the "Add another question" link next to "Question." Every object with
-a ``ForeignKey`` relationship to another gets this for free. When you click
-"Add another question", you'll get a popup window with the "Add question" form.
-If you add a question in that window and click "Save", Django will save the
-question to the database and dynamically add it as the selected choice on the
-"Add choice" form you're looking at.
+Also note the "Add another question" button (displayed as a plus sign) to the
+right of the "Question" field. Every ``ForeignKey`` relationship gets this
+button for free. When you click this button, you'll get a popup window with the
+"Add question" form. If you add a question in that window and click "Save",
+Django will save the question to the database and dynamically add it as the
+selected choice on the "Add choice" form you're looking at.
 
 But, really, this is an inefficient way of adding ``Choice`` objects to the
 system. It'd be better if you could add a bunch of Choices directly when you

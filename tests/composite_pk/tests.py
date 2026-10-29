@@ -17,7 +17,7 @@ from django.db.models import CompositePrimaryKey
 from django.forms import modelform_factory
 from django.test import TestCase
 
-from .models import Comment, Post, Tenant, TimeStamped, User
+from .models import Comment, Post, PostDbDefault, Tenant, TimeStamped, Token, User
 
 
 class CommentForm(forms.ModelForm):
@@ -63,6 +63,24 @@ class CompositePKTests(TestCase):
         self.assertEqual(user.tenant_id, 9132)
         self.assertIsNone(user.id)
         self.assertIs(user._is_pk_set(), False)
+
+    def test_pk_not_set_db_default(self):
+        post = PostDbDefault(tenant=self.tenant)
+        self.assertEqual(post.tenant_id, self.tenant.pk)
+        self.assertIsNotNone(post.id)
+        self.assertIs(post._is_pk_set(), False)
+
+    def test_eq(self):
+        self.assertEqual(User(pk=(1, 2)), User(pk=(1, 2)))
+        self.assertEqual(User(tenant_id=2, id=3), User(tenant_id=2, id=3))
+        self.assertNotEqual(User(pk=(1, 2)), User(pk=(1, 3)))
+        self.assertNotEqual(User(pk=(1, 2)), object())
+        unset = User()
+        self.assertEqual(unset, unset)
+        self.assertNotEqual(User(), unset)
+        self.assertNotEqual(User(tenant_id=1), User(tenant_id=1))
+        self.assertNotEqual(User(id=1), User(id=1))
+        self.assertNotEqual(User(tenant_id=1), User(pk=(1, 2)))
 
     def test_hash(self):
         self.assertEqual(hash(User(pk=(1, 2))), hash((1, 2)))
@@ -149,23 +167,20 @@ class CompositePKTests(TestCase):
 
     def test_in_bulk_batching(self):
         Comment.objects.all().delete()
-        batching_required = connection.features.max_query_params is not None
-        expected_queries = 2 if batching_required else 1
+        num_objects = 10
+        connection.features.__dict__.pop("max_query_params", None)
         with unittest.mock.patch.object(
-            type(connection.features), "max_query_params", 10
+            type(connection.features), "max_query_params", num_objects
         ):
-            num_requiring_batching = (
-                connection.ops.bulk_batch_size([Comment._meta.pk], []) + 1
-            )
             comments = [
                 Comment(id=i, tenant=self.tenant, user=self.user)
-                for i in range(1, num_requiring_batching + 1)
+                for i in range(1, num_objects + 1)
             ]
             Comment.objects.bulk_create(comments)
             id_list = list(Comment.objects.values_list("pk", flat=True))
-            with self.assertNumQueries(expected_queries):
+            with self.assertNumQueries(2):
                 comment_dict = Comment.objects.in_bulk(id_list=id_list)
-        self.assertQuerySetEqual(comment_dict, id_list)
+        self.assertCountEqual(comment_dict, id_list)
 
     def test_in_bulk_values(self):
         result = Comment.objects.values().in_bulk([self.comment.pk])
@@ -284,6 +299,16 @@ class CompositePKTests(TestCase):
             FieldError, "Unknown field(s) (pk) specified for Comment"
         ):
             self.assertIsNone(modelform_factory(Comment, fields=["pk"]))
+
+    def test_totally_ordered(self):
+        """
+        QuerySet.totally_ordered returns True when ordering by all fields of a
+        composite primary key and False when ordering by a subset.
+        """
+        qs_ordered = Token.objects.order_by("tenant_id", "id")
+        self.assertIs(qs_ordered.totally_ordered, True)
+        qs_partial = Token.objects.order_by("tenant_id")
+        self.assertIs(qs_partial.totally_ordered, False)
 
 
 class CompositePKFixturesTests(TestCase):
@@ -411,6 +436,11 @@ class CompositePKFixturesTests(TestCase):
         result = serializers.serialize("xml", users)
         self.assertIn('<object model="composite_pk.user" pk=\'["1", "1"]\'>', result)
         self.assert_deserializer(format="xml", users=users, serialized_users=result)
+
+    def test_serialize_unsaved_user_xml_omits_pk(self):
+        result = serializers.serialize("xml", [User()])
+        self.assertIn('<object model="composite_pk.user">', result)
+        self.assertNotIn(" pk=", result)
 
     def test_serialize_post_uuid(self):
         posts = Post.objects.filter(pk=(2, "11111111-1111-1111-1111-111111111111"))

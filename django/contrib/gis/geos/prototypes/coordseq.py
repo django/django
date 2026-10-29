@@ -1,7 +1,15 @@
 from ctypes import POINTER, c_byte, c_double, c_int, c_uint
 
-from django.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR, GEOSFuncFactory
-from django.contrib.gis.geos.prototypes.errcheck import GEOSException, last_arg_byref
+from django.contrib.gis.geos.libgeos import (
+    CS_PTR,
+    GEOM_PTR,
+    GEOSFuncFactory,
+)
+from django.contrib.gis.geos.prototypes.errcheck import (
+    GEOSException,
+    check_predicate,
+    last_arg_byref,
+)
 
 
 # ## Error-checking routines specific to coordinate sequences. ##
@@ -67,6 +75,12 @@ class CsOutput(GEOSFuncFactory):
         return result
 
 
+class CsUnaryPredicate(GEOSFuncFactory):
+    argtypes = [CS_PTR]
+    restype = c_byte
+    errcheck = staticmethod(check_predicate)
+
+
 # ## Coordinate Sequence ctypes prototypes ##
 
 # Coordinate Sequence constructors & cloning.
@@ -78,19 +92,24 @@ get_cs = CsOutput("GEOSGeom_getCoordSeq", argtypes=[GEOM_PTR])
 cs_getordinate = CsOperation("GEOSCoordSeq_getOrdinate", ordinate=True, get=True)
 cs_setordinate = CsOperation("GEOSCoordSeq_setOrdinate", ordinate=True)
 
-# For getting, x, y, z
+# For getting, x, y, z, m
 cs_getx = CsOperation("GEOSCoordSeq_getX", get=True)
 cs_gety = CsOperation("GEOSCoordSeq_getY", get=True)
 cs_getz = CsOperation("GEOSCoordSeq_getZ", get=True)
+cs_getm = CsOperation("GEOSCoordSeq_getM", get=True)
 
-# For setting, x, y, z
+# For setting, x, y, z, m
 cs_setx = CsOperation("GEOSCoordSeq_setX")
 cs_sety = CsOperation("GEOSCoordSeq_setY")
 cs_setz = CsOperation("GEOSCoordSeq_setZ")
+cs_setm = CsOperation("GEOSCoordSeq_setM")
 
 # These routines return size & dimensions.
 cs_getsize = CsInt("GEOSCoordSeq_getSize")
 cs_getdims = CsInt("GEOSCoordSeq_getDimensions")
+
+# Unary Predicates
+cs_hasm = CsUnaryPredicate("GEOSCoordSeq_hasM")
 
 cs_is_ccw = GEOSFuncFactory(
     "GEOSCoordSeq_isCCW", restype=c_int, argtypes=[CS_PTR, POINTER(c_byte)]

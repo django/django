@@ -296,6 +296,7 @@ class PollAdmin(admin.ModelAdmin):
 class ChapterInline(admin.TabularInline):
     model = Chapter
     readonly_fields = ["call_me"]
+    delete_confirmation_max_display = 3
 
     def call_me(self, obj):
         return "Callable in ChapterInline"
@@ -314,6 +315,11 @@ class ReadOnlyChapterInline(admin.TabularInline):
 
 class NovelReadonlyChapterAdmin(admin.ModelAdmin):
     inlines = [ReadOnlyChapterInline]
+
+
+class ZeroDisplayChapterInline(admin.TabularInline):
+    model = Chapter
+    delete_confirmation_max_display = 0
 
 
 class ConsigliereInline(admin.TabularInline):
@@ -537,3 +543,5 @@ site3 = admin.AdminSite(name="stacked_inline_hidden_field_in_group_admin")
 site3.register(SomeParentModel, inlines=[ChildHiddenFieldInFieldsGroupStackedInline])
 site4 = admin.AdminSite(name="stacked_inline_hidden_field_on_single_line_admin")
 site4.register(SomeParentModel, inlines=[ChildHiddenFieldOnSingleLineStackedInline])
+site5 = admin.AdminSite(name="zero_display_site")
+site5.register(Novel, inlines=[ZeroDisplayChapterInline])

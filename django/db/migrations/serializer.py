@@ -18,7 +18,8 @@ from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.db.models.deletion import DatabaseOnDelete
 from django.utils.functional import LazyObject, Promise
-from django.utils.version import get_docs_version
+from django.utils.module_loading import qualname
+from django.utils.version import PY315, get_docs_version
 
 FUNCTION_TYPES = (types.FunctionType, types.BuiltinFunctionType, types.MethodType)
 
@@ -153,6 +154,12 @@ class DictionarySerializer(BaseSerializer):
         return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
 
 
+class FrozenDictionarySerializer(DictionarySerializer):
+    def serialize(self):
+        value, imports = super().serialize()
+        return f"frozendict({value})", imports
+
+
 class EnumSerializer(BaseSerializer):
     def serialize(self):
         enum_class = self.value.__class__
@@ -202,14 +209,15 @@ class FunctionTypeSerializer(BaseSerializer):
 
         module_name = self.value.__module__
 
-        if "<" not in self.value.__qualname__:  # Qualname can include <locals>
-            return "%s.%s" % (module_name, self.value.__qualname__), {
-                "import %s" % self.value.__module__
-            }
+        try:
+            name = qualname(self.value)
+        except ValueError as e:
+            raise ValueError(
+                "Could not find function %s in %s.\n"
+                % (self.value.__name__, module_name)
+            ) from e
 
-        raise ValueError(
-            "Could not find function %s in %s.\n" % (self.value.__name__, module_name)
-        )
+        return name, {"import %s" % module_name}
 
 
 class FunctoolsPartialSerializer(BaseSerializer):
@@ -220,6 +228,17 @@ class FunctoolsPartialSerializer(BaseSerializer):
             (self.value.func, *self.value.args),
             self.value.keywords,
         )
+
+
+class GenericAliasSerializer(BaseSerializer):
+    def serialize(self):
+        imports = set()
+        # Avoid iterating self.value, because it returns itself.
+        # https://github.com/python/cpython/issues/103450
+        for item in self.value.__args__:
+            _, item_imports = serializer_factory(item).serialize()
+            imports.update(item_imports)
+        return repr(self.value), imports
 
 
 class IterableSerializer(BaseSerializer):
@@ -331,9 +350,7 @@ class TypeSerializer(BaseSerializer):
             if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
-                return "%s.%s" % (module, self.value.__qualname__), {
-                    "import %s" % module
-                }
+                return qualname(self.value), {"import %s" % module}
 
 
 class UUIDSerializer(BaseSerializer):
@@ -353,6 +370,7 @@ class Serializer:
         list: SequenceSerializer,
         set: SetSerializer,
         tuple: TupleSerializer,
+        **({frozendict: FrozenDictionarySerializer} if PY315 else {}),
         dict: DictionarySerializer,
         models.Choices: ChoicesSerializer,
         enum.Enum: EnumSerializer,
@@ -364,6 +382,7 @@ class Serializer:
         decimal.Decimal: DecimalSerializer,
         (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
         FUNCTION_TYPES: FunctionTypeSerializer,
+        types.GenericAlias: GenericAliasSerializer,
         collections.abc.Iterable: IterableSerializer,
         (COMPILED_REGEX_TYPE, RegexObject): RegexSerializer,
         uuid.UUID: UUIDSerializer,

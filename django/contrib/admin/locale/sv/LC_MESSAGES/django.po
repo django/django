@@ -8,6 +8,7 @@
 # d7bcbd5f5cbecdc2b959899620582440, 2011
 # Cybjit <cybjit@gmail.com>, 2012
 # d7bcbd5f5cbecdc2b959899620582440, 2011
+# Daniel Nylander <po@danielnylander.se>, 2025
 # Elias Johnstone <eli87as@gmail.com>, 2022
 # Henrik Palmlund Wahlgren <henrik@pwit.se>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -30,9 +31,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 07:05+0000\n"
-"Last-Translator: Mikko Hellsing <mikko@aino.se>, 2011\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -342,11 +343,8 @@ msgstr ""
 "Ett fel har inträffat. Felet är rapporterat till sidans administratörer via "
 "e-post och bör vara åtgärdat inom kort. Tack för ditt tålamod."
 
-msgid "Run the selected action"
-msgstr "Kör markerade operationer"
-
-msgid "Go"
-msgstr "Utför"
+msgid "Run"
+msgstr "Kör"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Klicka här för att välja alla objekt från alla sidor"
@@ -455,6 +453,9 @@ msgstr "Visa antal"
 msgid "Clear all filters"
 msgstr "Rensa alla filter"
 
+msgid "Save"
+msgstr "Spara"
+
 msgid "Remove from sorting"
 msgstr "Ta bort från sortering"
 
@@ -476,29 +477,29 @@ msgstr "Växla tema (aktuellt tema: mörkt)"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Att ta bort %(object_name)s '%(escaped_object)s' skulle innebära att "
-"relaterade objekt togs bort, men ditt konto har inte rättigheter att ta bort "
-"följande objekttyper:"
+"Om du tar bort %(object_name)s “%(escaped_object)s” kommer relaterade objekt "
+"att tas bort, men ditt konto har inte behörighet att ta bort följande typer "
+"av objekt:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Borttagning av %(object_name)s '%(escaped_object)s'  kräver borttagning av "
-"följande skyddade relaterade objekt:"
+"För att ta bort %(object_name)s “%(escaped_object)s” måste följande skyddade "
+"relaterade objekt tas bort:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Är du säker på att du vill ta bort %(object_name)s \"%(escaped_object)s\"? "
-"Följande relaterade objekt kommer att tas bort:"
+"Är du säker på att du vill ta bort %(object_name)s “%(escaped_object)s”? "
+"Alla följande relaterade objekt kommer att tas bort:"
 
 msgid "Objects"
 msgstr "Objekt"
@@ -607,6 +608,10 @@ msgstr "Användare"
 msgid "Action"
 msgstr "Händelse"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "Sidnumrering %(name)s-poster"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "post"
@@ -619,14 +624,19 @@ msgstr ""
 "Det här objektet har ingen förändringshistorik. Det var antagligen inte "
 "tillagt via den här admin-sidan."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "Sidnumrering %(name)s"
+
 msgid "Show all"
 msgstr "Visa alla"
 
-msgid "Save"
-msgstr "Spara"
-
 msgid "Popup closing…"
 msgstr "Popup stängs…"
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "Sök efter %(name)s"
 
 msgid "Search"
 msgstr "Sök"

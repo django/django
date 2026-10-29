@@ -140,7 +140,7 @@ class AuthContextProcessorTests(TestCase):
         user = authenticate(username="super", password="secret")
         response = self.client.get("/auth_processor_user/")
         self.assertContains(response, "unicode: super")
-        self.assertContains(response, "id: %d" % self.superuser.pk)
+        self.assertContains(response, "id: %s" % self.superuser.pk)
         self.assertContains(response, "username: super")
         # bug #12037 is tested by the {% url %} in the template:
         self.assertContains(response, "url: /userpage/super/")

@@ -1,4 +1,4 @@
-from datetime import datetime
+import warnings
 
 from django.conf import settings
 from django.db.models.expressions import Func
@@ -19,6 +19,7 @@ from django.db.models.lookups import (
     YearLte,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango2029Warning, django_file_prefixes
 
 
 class TimezoneMixin:
@@ -36,6 +37,25 @@ class TimezoneMixin:
             else:
                 tzname = timezone._get_timezone_name(self.tzinfo)
         return tzname
+
+    def deconstruct(self):
+        path, args, kwargs = super().deconstruct()
+        if self.tzinfo is None and settings.USE_TZ:
+            warnings.warn(
+                f"The {self.__class__.__name__}() database function's tzinfo "
+                "argument is not provided, which can lead to inconsistent "
+                "behavior if TIME_ZONE changes. In Django 2029, the current "
+                "time zone will be captured in migrations when tzinfo is "
+                "omitted. Pass an explicit tzinfo to suppress this warning.",
+                category=RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
+            # RemovedInDjango2029Warning: when the deprecation ends, replace
+            # the warning with the following, so that the current timezone is
+            # captured in migrations instead of being silently resolved at run
+            # time (get_tzname() is left unchanged for query-time usage):
+            # kwargs["tzinfo"] = timezone.get_current_timezone()
+        return path, args, kwargs
 
 
 class Extract(TimezoneMixin, Transform):
@@ -344,23 +364,7 @@ class TruncBase(TimezoneMixin, Transform):
         return copy
 
     def convert_value(self, value, expression, connection):
-        if isinstance(self.output_field, DateTimeField):
-            if not settings.USE_TZ:
-                pass
-            elif value is not None:
-                value = value.replace(tzinfo=None)
-                value = timezone.make_aware(value, self.tzinfo)
-            elif not connection.features.has_zoneinfo_database:
-                raise ValueError(
-                    "Database returned an invalid datetime value. Are time "
-                    "zone definitions for your database installed?"
-                )
-        elif isinstance(value, datetime):
-            if isinstance(self.output_field, DateField):
-                value = value.date()
-            elif isinstance(self.output_field, TimeField):
-                value = value.time()
-        return value
+        return connection.ops.convert_trunc_expression(value, expression)
 
 
 class Trunc(TruncBase):

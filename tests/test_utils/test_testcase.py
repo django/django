@@ -82,10 +82,9 @@ def assert_no_queries(test):
     return inner
 
 
-# On databases with no transaction support (for instance, MySQL with the MyISAM
-# engine), setUpTestData() is called before each test, so there is no need to
-# clone class level test data.
-@skipUnlessDBFeature("supports_transactions")
+# On databases without savepoint support, setUpTestData() is called before each
+# test, so there's no need to clone class-level test data.
+@skipUnlessDBFeature("uses_savepoints")
 class TestDataTests(TestCase):
     # setUpTestData re-assignment are also wrapped in TestData.
     jim_douglas = None

@@ -2,7 +2,7 @@ from secrets import token_urlsafe
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
-from django.utils.csp import CSP, LazyNonce, build_policy
+from django.utils.csp import CSP, LazyNonce, build_policy, generate_nonce
 from django.utils.functional import empty
 
 basic_config = {
@@ -135,6 +135,37 @@ class CSPBuildPolicyTest(SimpleTestCase):
         policy = {"default-src": []}
         self.assertPolicyEqual(build_policy(policy), "")
 
+    def test_config_with_nonce_only_directive_without_nonce(self):
+        """
+        A directive whose only source is CSP.NONCE emits 'none' when the
+        nonce was never generated, so the policy fails closed.
+        """
+        policy = {
+            "default-src": [CSP.SELF],
+            "script-src": [CSP.NONCE],
+        }
+        self.assertPolicyEqual(
+            build_policy(policy), "default-src 'self'; script-src 'none'"
+        )
+
+    def test_config_with_nonce_only_directive_as_string(self):
+        policy = {"script-src": CSP.NONCE}
+        self.assertPolicyEqual(build_policy(policy), "script-src 'none'")
+
+    def test_config_with_nonce_only_directive_with_nonce(self):
+        policy = {"script-src": [CSP.NONCE]}
+        self.assertPolicyEqual(
+            build_policy(policy, nonce="abc123"), "script-src 'nonce-abc123'"
+        )
+
+    def test_config_with_mixed_directive_without_nonce(self):
+        """
+        Directives with sources other than CSP.NONCE still have the unused
+        nonce sentinel removed without emitting 'none'.
+        """
+        policy = {"default-src": [CSP.SELF, CSP.NONCE]}
+        self.assertPolicyEqual(build_policy(policy), "default-src 'self'")
+
 
 class LazyNonceTests(SimpleTestCase):
     def test_generates_on_usage(self):
@@ -155,6 +186,7 @@ class LazyNonceTests(SimpleTestCase):
         self.assertTrue(nonce)
         self.assertEqual(nonce, val)
         self.assertIsInstance(nonce, str)
+        self.assertEqual(repr(nonce), f"<LazyNonce: '{nonce}'>")
         self.assertEqual(len(val), 22)  # Based on secrets.token_urlsafe of 16 bytes.
         self.assertEqual(generated_tokens, [nonce])
         # Also test the wrapped value.
@@ -166,3 +198,10 @@ class LazyNonceTests(SimpleTestCase):
         second = str(nonce)
 
         self.assertEqual(first, second)
+
+    def test_repr(self):
+        nonce = LazyNonce()
+        self.assertEqual(repr(nonce), f"<LazyNonce: {repr(generate_nonce)}>")
+
+        str(nonce)  # Force nonce generation.
+        self.assertRegex(repr(nonce), r"<LazyNonce: '[^']+'>")

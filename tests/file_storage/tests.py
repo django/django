@@ -671,9 +671,11 @@ class OverwritingStorageTests(FileStorageTests):
         content_1 = b"content one"
         content_2 = b"second content"
         f_1 = TemporaryUploadedFile("tmp1", "text/plain", 11, "utf8")
+        self.addCleanup(f_1.close)
         f_1.write(content_1)
         f_1.seek(0)
         f_2 = TemporaryUploadedFile("tmp2", "text/plain", 14, "utf8")
+        self.addCleanup(f_2.close)
         f_2.write(content_2)
         f_2.seek(0)
         stored_name_1 = self.storage.save(name, f_1)
@@ -1131,8 +1133,9 @@ class FileStoragePermissions(unittest.TestCase):
         self.storage = FileSystemStorage(self.storage_dir)
         name = self.storage.save("the_directory/subdir/the_file", ContentFile("data"))
         file_path = Path(self.storage.path(name))
-        self.assertEqual(file_path.parent.stat().st_mode & 0o777, 0o765)
-        self.assertEqual(file_path.parent.parent.stat().st_mode & 0o777, 0o765)
+        expected_mode = 0o765 & ~self.umask
+        self.assertEqual(file_path.parent.stat().st_mode & 0o777, expected_mode)
+        self.assertEqual(file_path.parent.parent.stat().st_mode & 0o777, expected_mode)
 
     @override_settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=None)
     def test_file_upload_directory_default_permissions(self):

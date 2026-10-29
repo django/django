@@ -6,6 +6,7 @@ vector files (e.g. SHP files) to Geographic-enabled Django models.
 For more information, please consult the GeoDjango documentation:
   https://docs.djangoproject.com/en/dev/ref/contrib/gis/layermapping/
 """
+
 import sys
 from decimal import Decimal
 from decimal import InvalidOperation as DecimalInvalidOperation
@@ -589,7 +590,7 @@ class LayerMapping:
          progress:
            When this keyword is set, status information will be printed giving
            the number of features processed and successfully saved. By default,
-           progress information will pe printed every 1000 features processed,
+           progress information will be printed every 1000 features processed,
            however, this default may be overridden by setting this keyword with
            an integer for the desired interval.
 

@@ -4,6 +4,8 @@ of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
 
+from contextlib import aclosing
+
 from django.http import (
     Http404,
     HttpResponse,
@@ -13,6 +15,7 @@ from django.http import (
 from django.template import loader
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import Promise
+from django.utils.http import MAX_URL_REDIRECT_LENGTH
 from django.utils.translation import gettext as _
 
 
@@ -27,7 +30,14 @@ def render(
     return HttpResponse(content, content_type, status)
 
 
-def redirect(to, *args, permanent=False, preserve_request=False, **kwargs):
+def redirect(
+    to,
+    *args,
+    permanent=False,
+    preserve_request=False,
+    max_length=MAX_URL_REDIRECT_LENGTH,
+    **kwargs,
+):
     """
     Return an HttpResponseRedirect to the appropriate URL for the arguments
     passed.
@@ -51,6 +61,7 @@ def redirect(to, *args, permanent=False, preserve_request=False, **kwargs):
     return redirect_class(
         resolve_url(to, *args, **kwargs),
         preserve_request=preserve_request,
+        max_length=max_length,
     )
 
 
@@ -153,7 +164,8 @@ async def aget_list_or_404(klass, *args, **kwargs):
             "First argument to aget_list_or_404() must be a Model, Manager, or "
             f"QuerySet, not '{klass__name}'."
         )
-    obj_list = [obj async for obj in queryset.filter(*args, **kwargs)]
+    async with aclosing(aiter(queryset.filter(*args, **kwargs))) as it:
+        obj_list = [obj async for obj in it]
     if not obj_list:
         raise Http404(
             _("No %s matches the given query.") % queryset.model._meta.object_name

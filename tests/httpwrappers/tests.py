@@ -1,9 +1,11 @@
 import copy
+import itertools
 import json
 import os
 import pickle
 import unittest
 import uuid
+from contextlib import aclosing
 
 from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
@@ -23,7 +25,10 @@ from django.http import (
     parse_cookie,
 )
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango2029Warning
+from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazystr
+from django.utils.http import MAX_URL_REDIRECT_LENGTH
 
 
 class QueryDictTests(SimpleTestCase):
@@ -485,17 +490,64 @@ class HttpResponseTests(SimpleTestCase):
         r.writelines(["foo\n", "bar\n", "baz\n"])
         self.assertEqual(r.content, b"foo\nbar\nbaz\n")
 
+    def test_redirect_url_max_length(self):
+        base_url = "https://example.com/"
+        for length, response_class in itertools.product(
+            (MAX_URL_REDIRECT_LENGTH - 1, MAX_URL_REDIRECT_LENGTH),
+            (HttpResponseRedirect, HttpResponsePermanentRedirect),
+        ):
+            long_url = base_url + "x" * (length - len(base_url))
+            with self.subTest(length=length, response_class=response_class):
+                response = response_class(long_url)
+                self.assertEqual(response.url, long_url)
+
+    def test_redirect_url_max_length_checks_encoded_location(self):
+        long_url = "/" + "é" * (MAX_URL_REDIRECT_LENGTH - 1)
+        self.assertLessEqual(len(long_url), MAX_URL_REDIRECT_LENGTH)
+        self.assertGreater(len(iri_to_uri(long_url)), MAX_URL_REDIRECT_LENGTH)
+        for response_class in (HttpResponseRedirect, HttpResponsePermanentRedirect):
+            msg = f"Unsafe redirect exceeding {MAX_URL_REDIRECT_LENGTH} characters"
+            with (
+                self.subTest(response_class=response_class),
+                self.assertRaisesMessage(DisallowedRedirect, msg),
+            ):
+                response_class(long_url)
+
+    def test_redirect_url_max_length_override_via_param(self):
+        base_url = "https://example.com/"
+        for (max_length, length), response_class in itertools.product(
+            ((None, MAX_URL_REDIRECT_LENGTH + 1), (100, 99), (100, 100)),
+            (HttpResponseRedirect, HttpResponsePermanentRedirect),
+        ):
+            long_url = base_url + "x" * (length - len(base_url))
+            with self.subTest(length=length, response_class=response_class):
+                response = response_class(long_url, max_length=max_length)
+                self.assertEqual(response.url, long_url)
+
     def test_unsafe_redirect(self):
         bad_urls = [
             'data:text/html,<script>window.alert("xss")</script>',
             "mailto:test@example.com",
             "file:///etc/passwd",
+            "é" * (MAX_URL_REDIRECT_LENGTH + 1),
         ]
-        for url in bad_urls:
-            with self.assertRaises(DisallowedRedirect):
-                HttpResponseRedirect(url)
-            with self.assertRaises(DisallowedRedirect):
-                HttpResponsePermanentRedirect(url)
+        for url, response_class in itertools.product(
+            bad_urls, (HttpResponseRedirect, HttpResponsePermanentRedirect)
+        ):
+            with (
+                self.subTest(url=url, response_class=response_class),
+                self.assertRaises(DisallowedRedirect),
+            ):
+                response_class(url)
+
+    def test_unsafe_redirect_via_max_length(self):
+        url = "https://example.com/"
+        for response_class in (HttpResponseRedirect, HttpResponsePermanentRedirect):
+            with (
+                self.subTest(response_class=response_class),
+                self.assertRaises(DisallowedRedirect),
+            ):
+                response_class(url, max_length=len(url) - 1)
 
     def test_header_deletion(self):
         r = HttpResponse("hello")
@@ -653,25 +705,31 @@ class JsonResponseTests(SimpleTestCase):
         response = JsonResponse(data)
         self.assertEqual(json.loads(response.text), data)
 
-    def test_json_response_raises_type_error_with_default_setting(self):
-        with self.assertRaisesMessage(
-            TypeError,
-            "In order to allow non-dict objects to be serialized set the "
-            "safe parameter to False",
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
+    def test_json_response_raises_type_error_with_safe_arg(self):
+        with (
+            self.assertRaisesMessage(
+                TypeError,
+                "In order to allow non-dict objects to be serialized set the "
+                "safe parameter to False",
+            ),
+            self.assertWarnsMessage(
+                RemovedInDjango2029Warning, "The safe parameter is deprecated."
+            ),
         ):
-            JsonResponse([1, 2, 3])
+            JsonResponse([1, 2, 3], safe=True)
 
     def test_json_response_text(self):
-        response = JsonResponse("foobar", safe=False)
+        response = JsonResponse("foobar")
         self.assertEqual(json.loads(response.text), "foobar")
 
     def test_json_response_list(self):
-        response = JsonResponse(["foo", "bar"], safe=False)
+        response = JsonResponse(["foo", "bar"])
         self.assertEqual(json.loads(response.text), ["foo", "bar"])
 
     def test_json_response_uuid(self):
         u = uuid.uuid4()
-        response = JsonResponse(u, safe=False)
+        response = JsonResponse(u)
         self.assertEqual(json.loads(response.text), str(u))
 
     def test_json_response_custom_encoder(self):
@@ -799,6 +857,22 @@ class StreamingHttpResponseTests(SimpleTestCase):
 
         with self.assertRaisesMessage(AttributeError, msg):
             r.text
+
+    async def test_streaming_response_closes_user_generator_promptly(self):
+        finally_ran = False
+
+        async def body():
+            nonlocal finally_ran
+            try:
+                yield b"chunk"
+            finally:
+                finally_ran = True
+
+        response = StreamingHttpResponse(body())
+        async with aclosing(aiter(response)) as content:
+            async for _ in content:
+                break
+        self.assertTrue(finally_ran)
 
 
 class FileCloseTests(SimpleTestCase):

@@ -21,6 +21,11 @@ Usage example:
     >>> from django.contrib.postgres.functions import RandomUUID
     >>> Article.objects.update(uuid=RandomUUID())
 
+.. admonition:: Use :class:`django.db.models.functions.UUID4` instead.
+
+    :class:`django.db.models.functions.UUID4` is a cross-database version of
+    this function. ``RandomUUID`` may be deprecated in the future.
+
 ``TransactionNow``
 ==================
 

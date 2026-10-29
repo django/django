@@ -2,6 +2,7 @@ import datetime
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models.utils import get_blank_choice_label
 from django.forms.models import ModelChoiceIterator, ModelChoiceIteratorValue
 from django.forms.widgets import CheckboxSelectMultiple
 from django.template import Context, Template
@@ -24,7 +25,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", "---------"),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
                 (self.c3.pk, "Third"),
@@ -102,7 +103,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", "---------"),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
             ],
@@ -118,7 +119,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(gen_two),
             [
-                ("", "---------"),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
             ],
@@ -130,7 +131,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", "---------"),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "category Entertainment"),
                 (self.c2.pk, "category A test"),
                 (self.c3.pk, "category Third"),
@@ -143,7 +144,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", "---------"),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
                 (self.c3.pk, "Third"),
@@ -154,7 +155,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(
             list(f.choices),
             [
-                ("", "---------"),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
                 (self.c3.pk, "Third"),
@@ -174,6 +175,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertIs(bool(f.choices), True)
 
     def test_choices_radio_blank(self):
+        blank_choice = [("", get_blank_choice_label())]
         choices = [
             (self.c1.pk, "Entertainment"),
             (self.c2.pk, "A test"),
@@ -190,7 +192,7 @@ class ModelChoiceFieldTests(TestCase):
                     )
                     self.assertEqual(
                         list(f.choices),
-                        [("", "---------")] + choices if blank else choices,
+                        (blank_choice + choices if blank else choices),
                     )
 
     def test_deepcopies_widget(self):
@@ -347,11 +349,11 @@ class ModelChoiceFieldTests(TestCase):
             field.widget.render("name", []),
             (
                 "<div>"
-                '<div><label><input type="checkbox" name="name" value="%d" '
+                '<div><label><input type="checkbox" name="name" value="%s" '
                 'data-slug="entertainment">Entertainment</label></div>'
-                '<div><label><input type="checkbox" name="name" value="%d" '
+                '<div><label><input type="checkbox" name="name" value="%s" '
                 'data-slug="test">A test</label></div>'
-                '<div><label><input type="checkbox" name="name" value="%d" '
+                '<div><label><input type="checkbox" name="name" value="%s" '
                 'data-slug="third-test">Third</label></div>'
                 "</div>"
             )
@@ -393,17 +395,16 @@ class ModelChoiceFieldTests(TestCase):
             field.widget.render("name", []),
             """
             <div><div>
-            <label><input type="checkbox" name="name" value="%d"
+            <label><input type="checkbox" name="name" value="%s"
                 data-slug="entertainment">Entertainment
             </label></div>
             <div><label>
-            <input type="checkbox" name="name" value="%d" data-slug="test">A test
+            <input type="checkbox" name="name" value="%s" data-slug="test">A test
             </label></div>
             <div><label>
-            <input type="checkbox" name="name" value="%d" data-slug="third-test">Third
+            <input type="checkbox" name="name" value="%s" data-slug="third-test">Third
             </label></div></div>
-            """
-            % (self.c1.pk, self.c2.pk, self.c3.pk),
+            """ % (self.c1.pk, self.c2.pk, self.c3.pk),
         )
 
     def test_choice_value_hash(self):
@@ -425,7 +426,7 @@ class ModelChoiceFieldTests(TestCase):
         self.assertCountEqual(
             list(f.choices),
             [
-                ("", "---------"),
+                ("", get_blank_choice_label()),
                 (self.c1.pk, "Entertainment"),
                 (self.c2.pk, "A test"),
                 (self.c3.pk, "Third"),

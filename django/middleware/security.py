@@ -2,10 +2,12 @@ import re
 
 from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 
 
 class SecurityMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def __init__(self, get_response):
         super().__init__(get_response)
         self.sts_seconds = settings.SECURE_HSTS_SECONDS

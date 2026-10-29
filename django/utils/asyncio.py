@@ -1,8 +1,27 @@
+import contextlib
 import os
 from asyncio import get_running_loop
 from functools import wraps
 
 from django.core.exceptions import SynchronousOnlyOperation
+
+
+def maybe_aclosing(iterator):
+    """
+    Return a context manager that calls ``aclose()`` on *iterator* on exit
+    if it has one, otherwise a no-op context manager that yields *iterator*
+    unchanged.
+
+    Use to consume a caller-supplied async iterable that may or may not be
+    a real async generator. Wrapping with :func:`contextlib.aclosing`
+    unconditionally would raise ``AttributeError`` at ``__aexit__`` for any
+    iterator without ``aclose()``.
+    """
+    return (
+        contextlib.aclosing(iterator)
+        if hasattr(iterator, "aclose")
+        else contextlib.nullcontext(iterator)
+    )
 
 
 def async_unsafe(message):

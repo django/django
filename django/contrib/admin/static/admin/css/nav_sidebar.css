@@ -52,11 +52,11 @@
 }
 
 .toggle-nav-sidebar::before {
-    content: '\00BB';
+    content: "\00BB";
 }
 
 .main.shifted .toggle-nav-sidebar::before {
-    content: '\00AB';
+    content: "\00AB";
 }
 
 .main > #nav-sidebar {
@@ -117,7 +117,8 @@
 }
 
 @media (max-width: 767px) {
-    #nav-sidebar, #toggle-nav-sidebar {
+    #nav-sidebar,
+    #toggle-nav-sidebar {
         display: none;
     }
 

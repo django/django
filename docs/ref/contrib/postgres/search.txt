@@ -119,10 +119,6 @@ Examples:
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
 
-.. versionchanged:: 6.0
-
-    :class:`Lexeme` objects were added.
-
 ``SearchRank``
 ==============
 
@@ -284,8 +280,6 @@ floats to :class:`SearchRank` as ``weights`` in the same order above:
 ``Lexeme``
 ==========
 
-.. versionadded:: 6.0
-
 .. class:: Lexeme(value, output_field=None, *, invert=False, prefix=False, weight=None)
 
 ``Lexeme`` objects allow search operators to be safely used with strings from
@@ -367,6 +361,31 @@ if it were an annotated ``SearchVector``:
     <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]>
 
 .. _PostgreSQL documentation: https://www.postgresql.org/docs/current/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
+
+Using ``GeneratedField``
+------------------------
+
+An alternative method is to use a :class:`~django.db.models.GeneratedField`,
+which has PostgreSQL maintain the column rather than a trigger::
+
+    from django.contrib.postgres.indexes import GinIndex
+    from django.contrib.postgres.search import SearchVector, SearchVectorField
+    from django.db import models
+
+
+    class Entry(models.Model):
+        headline = models.CharField(max_length=255)
+        body_text = models.TextField()
+
+        search_vector = models.GeneratedField(
+            expression=SearchVector("headline", weight="A", config="english")
+            + SearchVector("body_text", weight="B", config="english"),
+            output_field=SearchVectorField(),
+            db_persist=True,
+        )
+
+        class Meta:
+            indexes = [GinIndex(fields=["search_vector"])]
 
 Trigram similarity
 ==================

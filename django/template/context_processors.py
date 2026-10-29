@@ -12,6 +12,7 @@ import itertools
 from django.conf import settings
 from django.middleware.csp import get_nonce
 from django.middleware.csrf import get_token
+from django.utils.csp import CONTEXT_KEY as CSP_CONTEXT_KEY
 from django.utils.functional import SimpleLazyObject, lazy
 
 
@@ -94,4 +95,4 @@ def csp(request):
     """
     Add the CSP nonce to the context.
     """
-    return {"csp_nonce": get_nonce(request)}
+    return {CSP_CONTEXT_KEY: get_nonce(request)}

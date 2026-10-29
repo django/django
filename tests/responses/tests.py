@@ -2,7 +2,7 @@ import io
 
 from django.conf import settings
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.http import BadHeaderError, HttpResponse
 from django.http.response import HttpResponseBase
 from django.test import SimpleTestCase
 
@@ -102,6 +102,20 @@ class HttpResponseTests(SimpleTestCase):
         resp = HttpResponse(status=419, reason=reason)
         self.assertEqual(resp.status_code, 419)
         self.assertEqual(resp.reason_phrase, reason)
+
+    def test_invalid_reason_phrase(self):
+        msg = "reason_phrase can't contain control characters."
+        invalid_reasons = [
+            "OK\r\nX-Injected-header: yes",
+            "OK\x00",
+            "OK\x1f",
+            "OK\x7f",
+            "OK\x9f",
+        ]
+        for reason in invalid_reasons:
+            with self.subTest(reason=reason):
+                with self.assertRaisesMessage(BadHeaderError, msg):
+                    HttpResponse(reason=reason)
 
     def test_charset_detection(self):
         """HttpResponse should parse charset from content_type."""

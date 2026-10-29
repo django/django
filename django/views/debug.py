@@ -17,6 +17,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
+from django.utils.text import trim_value
 from django.utils.version import get_docs_version
 from django.views.decorators.csp import csp_override, csp_report_only_override
 from django.views.decorators.debug import coroutine_functions_to_sensitive_variables
@@ -185,6 +186,17 @@ class SafeExceptionReporterFilter:
         """
         return settings.DEBUG is False
 
+    def _cleanse_multivaluedict(self, multivaluedict, sensitive_post_parameters):
+        # The no-argument form of sensitive_post_parameters() marks every
+        # parameter as sensitive.
+        cleansed = multivaluedict.copy()
+        if sensitive_post_parameters == "__ALL__":
+            sensitive_post_parameters = list(multivaluedict)
+        for param in sensitive_post_parameters:
+            if param in multivaluedict:
+                cleansed[param] = self.cleansed_substitute
+        return cleansed
+
     def get_cleansed_multivaluedict(self, request, multivaluedict):
         """
         Replace the keys in a MultiValueDict marked as sensitive with stars.
@@ -193,10 +205,9 @@ class SafeExceptionReporterFilter:
         """
         sensitive_post_parameters = getattr(request, "sensitive_post_parameters", [])
         if self.is_active(request) and sensitive_post_parameters:
-            multivaluedict = multivaluedict.copy()
-            for param in sensitive_post_parameters:
-                if param in multivaluedict:
-                    multivaluedict[param] = self.cleansed_substitute
+            return self._cleanse_multivaluedict(
+                multivaluedict, sensitive_post_parameters
+            )
         return multivaluedict
 
     def get_post_parameters(self, request):
@@ -206,25 +217,10 @@ class SafeExceptionReporterFilter:
         """
         if request is None:
             return {}
-        else:
-            sensitive_post_parameters = getattr(
-                request, "sensitive_post_parameters", []
-            )
-            if self.is_active(request) and sensitive_post_parameters:
-                cleansed = request.POST.copy()
-                if sensitive_post_parameters == "__ALL__":
-                    # Cleanse all parameters.
-                    for k in cleansed:
-                        cleansed[k] = self.cleansed_substitute
-                    return cleansed
-                else:
-                    # Cleanse only the specified parameters.
-                    for param in sensitive_post_parameters:
-                        if param in cleansed:
-                            cleansed[param] = self.cleansed_substitute
-                    return cleansed
-            else:
-                return request.POST
+        sensitive_post_parameters = getattr(request, "sensitive_post_parameters", [])
+        if self.is_active(request) and sensitive_post_parameters:
+            return self._cleanse_multivaluedict(request.POST, sensitive_post_parameters)
+        return request.POST
 
     def cleanse_special_types(self, request, value):
         try:
@@ -357,11 +353,9 @@ class ExceptionReporter:
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-                    v = pprint(v)
                     # Trim large blobs of data
-                    if len(v) > 4096:
-                        v = "%s… <trimmed %d bytes string>" % (v[0:4096], len(v))
-                    frame_vars.append((k, v))
+                    v, suffix = trim_value(pprint(v))
+                    frame_vars.append((k, v + suffix))
                 frame["vars"] = frame_vars
             frames[i] = frame
 
@@ -673,6 +667,8 @@ def technical_404_response(request, exception):
     return HttpResponseNotFound(t.render(c))
 
 
+@csp_override({})
+@csp_report_only_override({})
 def default_urlconf(request):
     """Create an empty URLconf 404 error response."""
     with builtin_template_path("default_urlconf.html").open(encoding="utf-8") as fh:

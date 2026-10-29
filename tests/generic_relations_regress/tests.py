@@ -194,10 +194,10 @@ class GenericRelationTests(TestCase):
         self.assertSequenceEqual(HasLinkThing.objects.filter(links=l1), [hs3])
         self.assertSequenceEqual(HasLinkThing.objects.filter(links=l2), [hs4])
         self.assertSequenceEqual(
-            HasLinkThing.objects.exclude(links=l2), [hs1, hs2, hs3]
+            HasLinkThing.objects.exclude(links=l2).order_by("pk"), [hs1, hs2, hs3]
         )
         self.assertSequenceEqual(
-            HasLinkThing.objects.exclude(links=l1), [hs1, hs2, hs4]
+            HasLinkThing.objects.exclude(links=l1).order_by("pk"), [hs1, hs2, hs4]
         )
 
     def test_ticket_20564(self):

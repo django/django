@@ -1,4 +1,4 @@
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 from django.conf import settings
 from django.contrib.auth import models

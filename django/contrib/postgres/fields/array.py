@@ -70,7 +70,7 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
                 )
             )
         else:
-            base_checks = self.base_field.check()
+            base_checks = self.base_field.check(**kwargs)
             if base_checks:
                 error_messages = "\n    ".join(
                     "%s (%s)" % (base_check.msg, base_check.id)
@@ -124,8 +124,12 @@ class ArrayField(CheckPostgresInstalledMixin, CheckFieldDefaultMixin, Field):
         db_params["collation"] = self.db_collation
         return db_params
 
-    def get_placeholder(self, value, compiler, connection):
-        return "%s::{}".format(self.db_type(connection))
+    def get_placeholder_sql(self, value, compiler, connection):
+        db_type = self.db_type(connection)
+        if hasattr(value, "as_sql"):
+            sql, params = compiler.compile(value)
+            return f"{sql}::{db_type}", params
+        return f"%s::{db_type}", (value,)
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, (list, tuple)):

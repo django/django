@@ -2,15 +2,16 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011-2012,2015
-# Besnik Bleta <besnik@programeshqip.org>, 2020-2023,2025
+# Besnik Bleta <besnik@programeshqip.org>, 2020-2023,2025-2026
 # Besnik Bleta <besnik@programeshqip.org>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2023,2025\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-08-05 07:59+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, "
+"2020-2023,2025-2026\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -99,12 +100,12 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
 "Keni përzgjedhur një veprim dhe s’keni bërë ndonjë ndryshim te fusha "
-"individuale. Ndoshta po kërkonit për butonin “Shko”, në vend se për butonin "
-"“Ruaje”."
+"individuale. Ndoshta po kërkonit për butonin “Xhiroje”, në vend se për "
+"butonin “Ruaje”."
 
 msgid "Now"
 msgstr "Tani"
@@ -121,17 +122,26 @@ msgstr "Mesditë"
 msgid "6 p.m."
 msgstr "6 p.m."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Shënim: Jeni %s orë para kohës së shërbyesit."
-msgstr[1] "Shënim: Jeni %s orë para kohës së shërbyesit."
+msgid "server"
+msgstr ""
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Shënim: Jeni %s orë pas kohës së shërbyesit."
-msgstr[1] "Shënim: Jeni %s orë pas kohës së shërbyesit."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Choose a Time"
 msgstr "Zgjidhni një Kohë"
@@ -145,14 +155,29 @@ msgstr "Anuloje"
 msgid "Today"
 msgstr "Sot"
 
+msgid "Today (%(date)s)"
+msgstr ""
+
 msgid "Choose a Date"
 msgstr "Zgjidhni një Datë"
 
 msgid "Yesterday"
 msgstr "Dje"
 
+msgid "Yesterday (%(date)s)"
+msgstr ""
+
 msgid "Tomorrow"
 msgstr "Nesër"
+
+msgid "Tomorrow (%(date)s)"
+msgstr ""
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr ""
+
+msgid "Next (%(month)s %(year)s)"
+msgstr ""
 
 msgid "January"
 msgstr "Janar"
@@ -314,3 +339,18 @@ msgstr "P"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (today)"
+msgstr ""
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr ""

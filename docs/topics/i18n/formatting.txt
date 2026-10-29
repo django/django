@@ -47,6 +47,14 @@ argument::
         product = forms.CharField()
         revenue = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
 
+Locale specific helpers
+-----------------------
+
+For country specific form fields, validation, and data formats that are not
+included in Django itself, consider using the :pypi:`django-localflavor`
+package, which provides localized form fields and utilities for many countries
+and regions (`documentation <https://django-localflavor.readthedocs.io/>`_).
+
 .. _topic-l10n-templates:
 
 Controlling localization in templates

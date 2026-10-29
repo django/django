@@ -40,7 +40,7 @@ The ``File`` class
             object`. In these cases, this attribute may itself be a
             :class:`File` subclass (and not necessarily the same subclass).
             Whenever possible, use the attributes and methods of the subclass
-            itself rather than the those of the subclass's ``file`` attribute.
+            itself rather than those of the subclass's ``file`` attribute.
 
     .. attribute:: mode
 

@@ -1,5 +1,7 @@
 import sys
+import unittest
 from datetime import date
+from typing import TYPE_CHECKING
 from unittest import mock
 from unittest.mock import patch
 
@@ -30,6 +32,7 @@ from django.test import (
     override_settings,
 )
 from django.urls import reverse
+from django.utils.version import PY314
 from django.views.debug import ExceptionReporter, technical_500_response
 from django.views.decorators.debug import sensitive_variables
 
@@ -40,6 +43,10 @@ from .models import (
     ExtensionUser,
     UUIDUser,
 )
+
+if TYPE_CHECKING:
+    type AnnotatedUsername = str
+    type AnnotatedPassword = str
 
 
 class FilteredExceptionReporter(ExceptionReporter):
@@ -490,6 +497,22 @@ class BaseModelBackendTest:
         CountingMD5PasswordHasher.calls = 0
         await aauthenticate(username="no_such_user", password="test")
         self.assertEqual(CountingMD5PasswordHasher.calls, 1)
+
+    async def test_aauthentication_timing_async_bridge(self):
+        with patch(
+            "django.contrib.auth.hashers.sync_to_async",
+            return_value=mock.AsyncMock(return_value=(True, False)),
+        ) as mocked_adapter:
+            username = getattr(self.user, self.UserModel.USERNAME_FIELD)
+            await aauthenticate(username=username, password="test")
+            mocked_adapter.assert_called_once()
+
+        with patch(
+            "django.contrib.auth.sync_to_async", return_value=mock.AsyncMock()
+        ) as mocked_adapter:
+            username = getattr(self.user, self.UserModel.USERNAME_FIELD)
+            await aauthenticate(username="no_such_user", password="test")
+            mocked_adapter.assert_called_once()
 
     @override_settings(
         PASSWORD_HASHERS=["auth_tests.test_auth_backends.CountingMD5PasswordHasher"]
@@ -1139,6 +1162,42 @@ class AuthenticateTests(TestCase):
             status_code=500,
         )
 
+    @override_settings(AUTH_USER_MODEL="auth_tests.ErrorAdminUser")
+    def test_model_backend_authenticate_sensitive_variables(self):
+        try:
+            authenticate(username="testusername", password=self.sensitive_password)
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(
+            response,
+            '<tr><td>password</td><td class="code">'
+            "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
+    @override_settings(AUTH_USER_MODEL="auth_tests.ErrorAdminUser")
+    async def test_model_backend_async_authenticate_sensitive_variables(self):
+        try:
+            await aauthenticate(
+                username="testusername", password=self.sensitive_password
+            )
+        except TypeError:
+            exc_info = sys.exc_info()
+        rf = RequestFactory()
+        response = technical_500_response(rf.get("/"), *exc_info)
+        self.assertNotContains(response, self.sensitive_password, status_code=500)
+        self.assertContains(
+            response,
+            '<tr><td>password</td><td class="code">'
+            "<pre>&#39;********************&#39;</pre></td></tr>",
+            html=True,
+            status_code=500,
+        )
+
     def test_clean_credentials_sensitive_variables(self):
         try:
             # Passing in a list to cause an exception
@@ -1284,6 +1343,29 @@ class AuthenticateTests(TestCase):
     )
     def test_skips_backends_with_decorated_method(self):
         self.assertEqual(authenticate(username="test", password="test"), self.user1)
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "auth_tests.test_auth_backends.AnnotatedBackend",
+        ],
+    )
+    def test_backend_uses_deferred_annotations(self):
+        class AnnotatedBackend:
+            invariant_user = self.user1
+
+            def authenticate(
+                self,
+                request: HttpRequest,
+                username: AnnotatedUsername,
+                password: AnnotatedPassword,
+            ) -> User | None:
+                return self.invariant_user
+
+        with unittest.mock.patch(
+            "django.contrib.auth.import_string", return_value=AnnotatedBackend
+        ):
+            self.assertEqual(authenticate(username="test", password="test"), self.user1)
 
 
 class ImproperlyConfiguredUserModelTest(TestCase):

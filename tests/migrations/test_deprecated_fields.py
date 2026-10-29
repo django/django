@@ -1,7 +1,7 @@
 from django.core.management import call_command
 from django.test import override_settings
 
-from .test_base import MigrationTestBase
+from .base import MigrationTestBase
 
 
 class Tests(MigrationTestBase):

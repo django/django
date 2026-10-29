@@ -57,14 +57,16 @@ import warnings
 from enum import Enum
 
 from django.template.context import BaseContext
-from django.utils.deprecation import django_file_prefixes
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.formats import localize
 from django.utils.html import conditional_escape
+from django.utils.inspect import getfullargspec, signature
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import get_text_list, smart_split, unescape_string_literal
 from django.utils.timezone import template_localtime
 from django.utils.translation import gettext_lazy, pgettext_lazy
+from django.utils.warnings import django_file_prefixes
 
 from .exceptions import TemplateSyntaxError
 
@@ -88,7 +90,9 @@ UNKNOWN_SOURCE = "<unknown source>"
 # Match BLOCK_TAG_*, VARIABLE_TAG_*, and COMMENT_TAG_* tags and capture the
 # entire tag, including start/end delimiters. Using re.compile() is faster
 # than instantiating SimpleLazyObject with _lazy_re_compile().
-tag_re = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
+tag_re = re.compile(r"({%[\s\S]*?%}|{{.*?}}|{#.*?#})")
+# RemovedInDjango2029Warning.
+tag_re_legacy = re.compile(r"({%.*?%}|{{.*?}}|{#.*?#})")
 
 logger = logging.getLogger("django.template")
 
@@ -182,9 +186,19 @@ class Template:
         template source.
         """
         if self.engine.debug:
-            lexer = DebugLexer(self.source)
+            # RemovedInDjango2029Warning: When the deprecation ends, replace:
+            # lexer = DebugLexer(self.source)
+            lexer = DebugLexer(
+                self.source,
+                allow_multiline_tags=self.engine.allow_multiline_tags,
+            )
         else:
-            lexer = Lexer(self.source)
+            # RemovedInDjango2029Warning: When the deprecation ends, replace:
+            # lexer = Lexer(self.source)
+            lexer = Lexer(
+                self.source,
+                allow_multiline_tags=self.engine.allow_multiline_tags,
+            )
 
         tokens = lexer.tokenize()
         parser = Parser(
@@ -255,11 +269,16 @@ class Template:
         source_lines = []
         before = during = after = ""
         for num, next in enumerate(linebreak_iter(self.source)):
-            if start >= upto and end <= next:
+            if start >= upto and start < next:
                 line = num
                 before = self.source[upto:start]
                 during = self.source[start:end]
-                after = self.source[end:next]
+                after_end = self.source.find("\n", end)
+                if after_end == -1:
+                    after_end = len(self.source)
+                else:
+                    after_end += 1
+                after = self.source[end:after_end]
             source_lines.append((num, self.source[upto:next]))
             upto = next
         total = len(source_lines)
@@ -355,7 +374,14 @@ def linebreak_iter(template_source):
 
 
 class Token:
-    def __init__(self, token_type, contents, position=None, lineno=None):
+    def __init__(
+        self,
+        token_type,
+        contents,
+        position=None,
+        lineno=None,
+        raw_contents=None,
+    ):
         """
         A token representing a string from the template.
 
@@ -373,11 +399,16 @@ class Token:
         lineno
             The line number the token appears on in the template source.
             This is used for traceback information and gettext files.
+
+        raw_contents
+            The original token raw contents, including its opening and closing
+            delimiters.
         """
         self.token_type = token_type
         self.contents = contents
         self.lineno = lineno
         self.position = position
+        self.raw_contents = raw_contents
 
     def __repr__(self):
         token_name = self.token_type.name.capitalize()
@@ -403,16 +434,97 @@ class Token:
 
 
 class Lexer:
-    def __init__(self, template_string):
+    _raw_start_re = re.compile(
+        r"%s\s*(?:comment|verbatim)\b" % re.escape(BLOCK_TAG_START)
+    )
+    _comment_end_re = re.compile(
+        r"%s\s*endcomment\s*%s" % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END))
+    )
+    _verbatim_end_re = re.compile(
+        r"%s\s*endverbatim\s*%s"
+        % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END))
+    )
+
+    # RemovedInDjango2029Warning: When the deprecation ends, replace with:
+    # def __init__(self, template_string):
+    def __init__(self, template_string, allow_multiline_tags=True):
         self.template_string = template_string
-        self.verbatim = False
+        # RemovedInDjango2029Warning.
+        self.tag_re = tag_re if allow_multiline_tags else tag_re_legacy
+        self.allow_multiline_tags = allow_multiline_tags
 
     def __repr__(self):
-        return '<%s template_string="%s...", verbatim=%s>' % (
+        return '<%s template_string="%s...">' % (
             self.__class__.__qualname__,
             self.template_string[:20].replace("\n", ""),
-            self.verbatim,
         )
+
+    def _raw_end_tag_re(self, token_string):
+        """
+        Return a closing-tag regex for a comment or verbatim opening tag.
+        Return None for other tags. Content inside these blocks is treated as
+        text until the matching closing tag.
+        """
+        if not token_string.startswith(BLOCK_TAG_START):
+            return None
+
+        bits = token_string[2:-2].strip().split()
+        if not bits or bits[0] not in ("comment", "verbatim"):
+            return None
+        if bits[0] == "comment":
+            return self._comment_end_re
+        if len(bits) == 1:
+            return self._verbatim_end_re
+        # RemovedInDjango2029Warning: When the deprecation ends, replace with:
+        # end_bits = ["endverbatim", *bits[1:]]
+        # end_content = r"\s*".join(re.escape(bit) for bit in end_bits)
+        if self.allow_multiline_tags:
+            end_bits = ["endverbatim", *bits[1:]]
+            end_content = r"\s*".join(re.escape(bit) for bit in end_bits)
+        else:
+            end_content = re.escape("end" + token_string[2:-2].strip())
+        return re.compile(
+            r"%s\s*%s\s*%s"
+            % (
+                re.escape(BLOCK_TAG_START),
+                end_content,
+                re.escape(BLOCK_TAG_END),
+            )
+        )
+
+    def _tag_re_split(self):
+        """
+        Yield alternating text and tags as (text, (start, end)) pairs.
+
+        Inside comment and verbatim blocks, search only for the matching
+        closing tag so template syntax in the content remains text.
+        """
+        last = 0
+        raw_end_re = None
+        # RemovedInDjango2029Warning: When the deprecation ends, replace with:
+        # regex = tag_re
+        regex = self.tag_re
+
+        while match := regex.search(self.template_string, last):
+            start, end = match.span()
+            token_string = match.group()
+            # Always yield the text, even when empty. tokenize() relies on
+            # alternating text and tags.
+            yield self.template_string[last:start], (last, start)
+            yield token_string, (start, end)
+            last = end
+
+            if raw_end_re is None:
+                raw_end_re = self._raw_end_tag_re(token_string)
+            else:
+                # The matched tag closed the current raw block.
+                raw_end_re = None
+            # RemovedInDjango2029Warning: When the deprecation ends, replace
+            # with:
+            # regex = raw_end_re if raw_end_re is not None else tag_re
+            regex = raw_end_re if raw_end_re is not None else self.tag_re
+
+        yield self.template_string[last:], (last, len(self.template_string))
 
     def tokenize(self):
         """
@@ -421,7 +533,16 @@ class Lexer:
         in_tag = False
         lineno = 1
         result = []
-        for token_string in tag_re.split(self.template_string):
+        # Use the faster regex split when no raw opening tag is present.
+        # False positives use the raw-aware splitter.
+        if self._raw_start_re.search(self.template_string) is None:
+            # RemovedInDjango2029Warning: When the deprecation ends, replace
+            # with:
+            # token_strings = tag_re.split(self.template_string)
+            token_strings = self.tag_re.split(self.template_string)
+        else:
+            token_strings = (token_string for token_string, _ in self._tag_re_split())
+        for token_string in token_strings:
             if token_string:
                 result.append(self.create_token(token_string, None, lineno, in_tag))
                 lineno += token_string.count("\n")
@@ -441,48 +562,28 @@ class Lexer:
             # different, but it's not likely that the TAG_START values will
             # change anytime soon.
             token_start = token_string[0:2]
-            if token_start == BLOCK_TAG_START:
-                content = token_string[2:-2].strip()
-                if self.verbatim:
-                    # Then a verbatim block is being processed.
-                    if content != self.verbatim:
-                        return Token(TokenType.TEXT, token_string, position, lineno)
-                    # Otherwise, the current verbatim block is ending.
-                    self.verbatim = False
-                elif content[:9] in ("verbatim", "verbatim "):
-                    # Then a verbatim block is starting.
-                    self.verbatim = "end%s" % content
-                return Token(TokenType.BLOCK, content, position, lineno)
-            if not self.verbatim:
-                content = token_string[2:-2].strip()
-                if token_start == VARIABLE_TAG_START:
-                    return Token(TokenType.VAR, content, position, lineno)
-                # BLOCK_TAG_START was handled above.
-                assert token_start == COMMENT_TAG_START
-                return Token(TokenType.COMMENT, content, position, lineno)
+            content = token_string[2:-2].strip()
+            token_type_match = {
+                BLOCK_TAG_START: TokenType.BLOCK,
+                VARIABLE_TAG_START: TokenType.VAR,
+                COMMENT_TAG_START: TokenType.COMMENT,
+            }
+            return Token(
+                token_type_match[token_start],
+                content,
+                position,
+                lineno,
+                raw_contents=token_string if "\n" in token_string else None,
+            )
         return Token(TokenType.TEXT, token_string, position, lineno)
 
 
 class DebugLexer(Lexer):
-    def _tag_re_split_positions(self):
-        last = 0
-        for match in tag_re.finditer(self.template_string):
-            start, end = match.span()
-            yield last, start
-            yield start, end
-            last = end
-        yield last, len(self.template_string)
-
-    # This parallels the use of tag_re.split() in Lexer.tokenize().
-    def _tag_re_split(self):
-        for position in self._tag_re_split_positions():
-            yield self.template_string[slice(*position)], position
-
     def tokenize(self):
         """
-        Split a template string into tokens and annotates each token with its
-        start and end position in the source. This is slower than the default
-        lexer so only use it when debug is True.
+        Split a template string into tokens and annotate each token with its
+        start and end position in the source for debugging. Used when the
+        engine's debug setting is True.
         """
         # For maintainability, it is helpful if the implementation below can
         # continue to closely parallel Lexer.tokenize()'s implementation.
@@ -554,6 +655,23 @@ class Parser:
                 except TemplateSyntaxError as e:
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
+                if filter_expression.is_var and ".." in filter_expression.var.var:
+                    warnings.warn(
+                        "Support for double-dot lookups '..' which maps to a "
+                        "lookup of the empty string is deprecated.\n"
+                        f"  Template: {self.origin.name}\n"
+                        f"  Line: {token.lineno}",
+                        RemovedInDjango2028Warning,
+                        skip_file_prefixes=django_file_prefixes(),
+                    )
+
+                    # RemovedInDjango2028Warning
+                    # When deprecation ends elevate the warning to an error.
+                    # raise self.error(
+                    #     token,
+                    #     ("Variable contains '..' on line %d" % token.lineno),
+                    # )
+
                 self.extend_nodelist(nodelist, var_node, token)
             elif token_type == 2:  # TokenType.BLOCK
                 try:
@@ -628,23 +746,46 @@ class Parser:
             e.token = token
         return e
 
+    def _multiline_block_tag_message(self, token, opening=False):
+        if token.raw_contents is None or "\n" not in token.raw_contents:
+            return ""
+
+        source = token.raw_contents
+        if len(source) > 200:
+            source = f"{source[:100]}[…]{source[-100:]}"
+
+        end_lineno = token.lineno + token.raw_contents.count("\n")
+        if opening:
+            message = (
+                f"\nThe opening tag spans lines {token.lineno}-{end_lineno}: "
+                f"{source!r}."
+            )
+        else:
+            message = (
+                f"\nDjango interpreted lines {token.lineno}-{end_lineno} as a single "
+                f"block tag: {source!r}."
+            )
+
+        return message + (
+            "\nIf the '{%' and '%}' sequences were intended as text, use "
+            "'{% templatetag openblock %}' and "
+            "'{% templatetag closeblock %}', respectively."
+        )
+
     def invalid_block_tag(self, token, command, parse_until=None):
         if parse_until:
-            raise self.error(
-                token,
-                "Invalid block tag on line %d: '%s', expected %s. Did you "
-                "forget to register or load this tag?"
-                % (
-                    token.lineno,
-                    command,
-                    get_text_list(["'%s'" % p for p in parse_until], "or"),
-                ),
+            expected = get_text_list(["'%s'" % p for p in parse_until], "or")
+            error_msg = (
+                f"Invalid block tag on line {token.lineno}: '{command}', "
+                f"expected {expected}. Did you forget to register or load this tag?"
             )
-        raise self.error(
-            token,
-            "Invalid block tag on line %d: '%s'. Did you forget to register "
-            "or load this tag?" % (token.lineno, command),
-        )
+        else:
+            error_msg = (
+                f"Invalid block tag on line {token.lineno}: '{command}'. "
+                "Did you forget to register or load this tag?"
+            )
+        error_msg += self._multiline_block_tag_message(token)
+        raise self.error(token, error_msg)
 
     def unclosed_block_tag(self, parse_until):
         command, token = self.command_stack.pop()
@@ -653,6 +794,7 @@ class Parser:
             command,
             ", ".join(parse_until),
         )
+        msg += self._multiline_block_tag_message(token, opening=True)
         raise self.error(token, msg)
 
     def next_token(self):
@@ -825,7 +967,7 @@ class FilterExpression:
         # Check to see if a decorator is providing the real function.
         func = inspect.unwrap(func)
 
-        args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
+        args, _, _, defaults, _, _, _ = getfullargspec(func)
         alen = len(args)
         dlen = len(defaults or [])
         # Not enough OR Too many
@@ -998,12 +1140,12 @@ class Variable:
                             current = current()
                         except TypeError:
                             try:
-                                signature = inspect.signature(current)
+                                current_signature = signature(current)
                             except ValueError:  # No signature found.
                                 current = context.template.engine.string_if_invalid
                             else:
                                 try:
-                                    signature.bind()
+                                    current_signature.bind()
                                 except TypeError:  # Arguments *were* required.
                                     # Invalid method call.
                                     current = context.template.engine.string_if_invalid

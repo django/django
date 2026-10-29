@@ -66,6 +66,9 @@ class SessionBase:
         del self._session[key]
         self.modified = True
 
+    def __bool__(self):
+        return not self.is_empty()
+
     @property
     def key_salt(self):
         return "django.contrib.sessions." + self.__class__.__qualname__

@@ -1,8 +1,9 @@
+from functools import cached_property
+
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
 from django.db.backends.oracle.features import (
     DatabaseFeatures as OracleDatabaseFeatures,
 )
-from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
@@ -22,6 +23,18 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
                 "Oracle doesn't support spatial operators in constraints.": {
                     "gis_tests.gis_migrations.test_operations.OperationTests."
                     "test_add_check_constraint",
+                },
+                "Oracle doesn't support nested geometry collections.": {
+                    "gis_tests.geoapp.tests.SaveLoadTests."
+                    "test_geometrycollectionfield_default_max_ignored_on_read",
+                },
+                "Oracle unpacks 1-element geometry collections.": {
+                    "gis_tests.geogapp.tests.GeographyTest."
+                    "test05_geography_layermapping",
+                    "gis_tests.layermap.tests.LayerMapTest."
+                    "test_layermap_unique_multigeometry_fk",
+                    "gis_tests.layermap.tests.LayerMapTest.test_null_geom_with_unique",
+                    "gis_tests.layermap.tests.LayerMapTest.test_test_fid_range_step",
                 },
             }
         )

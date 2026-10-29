@@ -1,5 +1,5 @@
+from django.middleware import MiddlewareMixin
 from django.utils.cache import patch_vary_headers
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import acompress_sequence, compress_sequence, compress_string
 
@@ -13,6 +13,7 @@ class GZipMiddleware(MiddlewareMixin):
     on the Accept-Encoding header.
     """
 
+    async_capable = False
     max_random_bytes = 100
 
     def process_response(self, request, response):

@@ -176,11 +176,12 @@ class ExistingRelatedInstancesTests(TestCase):
 
     def test_multilevel_reverse_fk_select_related(self):
         with self.assertNumQueries(2):
-            p = list(
+            p = (
                 Tournament.objects.filter(id=self.t2.id)
                 .annotate(
                     style=FilteredRelation("pool__another_style"),
                 )
                 .select_related("style")
+                .filter(style__isnull=False)
             )
-            self.assertEqual(p[0].style.another_pool, self.p3)
+            self.assertEqual(p.get().style.another_pool, self.p3)

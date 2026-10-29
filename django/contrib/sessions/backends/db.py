@@ -1,4 +1,5 @@
 import logging
+from functools import cached_property
 
 from asgiref.sync import sync_to_async
 
@@ -6,7 +7,6 @@ from django.contrib.sessions.backends.base import CreateError, SessionBase, Upda
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, IntegrityError, router, transaction
 from django.utils import timezone
-from django.utils.functional import cached_property
 
 
 class SessionStore(SessionBase):
@@ -144,7 +144,7 @@ class SessionStore(SessionBase):
         obj = await self.acreate_model_instance(data)
         using = router.db_for_write(self.model, instance=obj)
         try:
-            # This code MOST run in a transaction, so it requires
+            # This code MUST run in a transaction, so it requires
             # @sync_to_async wrapping until transaction.atomic() supports
             # async.
             @sync_to_async

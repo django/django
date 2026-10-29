@@ -32,8 +32,7 @@ class SelectDateWidgetTest(WidgetTest):
             self.widget,
             "mydate",
             "",
-            html=(
-                """
+            html=("""
             <select name="mydate_month" id="id_mydate_month">
                 <option selected value="">---</option>
                 <option value="1">January</option>
@@ -98,8 +97,7 @@ class SelectDateWidgetTest(WidgetTest):
                 <option value="2015">2015</option>
                 <option value="2016">2016</option>
             </select>
-            """
-            ),
+            """),
         )
 
     def test_render_none(self):
@@ -116,8 +114,7 @@ class SelectDateWidgetTest(WidgetTest):
             self.widget,
             "mydate",
             "2010-04-15",
-            html=(
-                """
+            html=("""
             <select name="mydate_month" id="id_mydate_month">
                 <option value="">---</option>
                 <option value="1">January</option>
@@ -182,8 +179,7 @@ class SelectDateWidgetTest(WidgetTest):
                 <option value="2015">2015</option>
                 <option value="2016">2016</option>
             </select>
-            """
-            ),
+            """),
         )
 
     def test_render_datetime(self):
@@ -200,8 +196,7 @@ class SelectDateWidgetTest(WidgetTest):
             self.widget,
             "mydate",
             "2010-02-31",
-            html=(
-                """
+            html=("""
             <select name="mydate_month" id="id_mydate_month">
                 <option value="">---</option>
                 <option value="1">January</option>
@@ -266,8 +261,7 @@ class SelectDateWidgetTest(WidgetTest):
                 <option value="2015">2015</option>
                 <option value="2016">2016</option>
             </select>
-            """
-            ),
+            """),
         )
 
     def test_custom_months(self):
@@ -276,8 +270,7 @@ class SelectDateWidgetTest(WidgetTest):
             widget,
             "mydate",
             "",
-            html=(
-                """
+            html=("""
             <select name="mydate_month" id="id_mydate_month">
                 <option selected value="">---</option>
                 <option value="1">Jan.</option>
@@ -333,8 +326,7 @@ class SelectDateWidgetTest(WidgetTest):
                 <option selected value="">---</option>
                 <option value="2013">2013</option>
             </select>
-            """
-            ),
+            """),
         )
 
     def test_selectdate_required(self):
@@ -651,8 +643,7 @@ class SelectDateWidgetTest(WidgetTest):
             widget,
             "mydate",
             "",
-            html=(
-                """
+            html=("""
             <select name="mydate_month" id="id_mydate_month">
                 <option selected value="">---</option>
                 <option value="1">January</option>
@@ -706,8 +697,7 @@ class SelectDateWidgetTest(WidgetTest):
                 <option selected value="">---</option>
                 <option value="2007">2007</option>
             </select>
-            """
-            ),
+            """),
         )
 
     def test_fieldset(self):
@@ -718,7 +708,7 @@ class SelectDateWidgetTest(WidgetTest):
         form = TestForm()
         self.assertIs(self.widget.use_fieldset, True)
         self.assertHTMLEqual(
-            '<div><fieldset><legend for="id_field_month">Field:</legend>'
+            "<div><fieldset><legend>Field:</legend>"
             '<select name="field_month" required id="id_field_month">'
             '<option value="1">January</option><option value="2">February</option>'
             '<option value="3">March</option><option value="4">April</option>'

@@ -1,12 +1,13 @@
+import gzip
 import json
 import sys
-from unittest.mock import patch
+from contextlib import aclosing
 
 from django.core.exceptions import SuspiciousFileOperation
 from django.test import SimpleTestCase
 from django.utils import text
 from django.utils.functional import lazystr
-from django.utils.text import format_lazy
+from django.utils.text import acompress_sequence, format_lazy
 from django.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = len("\U0001f4a9") == 1
@@ -136,23 +137,6 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator("foo</p>")
         self.assertEqual("foo</p>", truncator.chars(5, html=True))
 
-    @patch("django.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
-    def test_truncate_chars_html_size_limit(self):
-        max_len = text.Truncator.MAX_LENGTH_HTML
-        bigger_len = text.Truncator.MAX_LENGTH_HTML + 1
-        valid_html = "<p>Joel is a slug</p>"  # 14 chars
-        perf_test_values = [
-            ("</a" + "\t" * (max_len - 6) + "//>", "</a>"),
-            ("</p" + "\t" * bigger_len + "//>", "</p>"),
-            ("&" * bigger_len, ""),
-            ("_X<<<<<<<<<<<>", "_X&lt;&lt;&lt;&lt;&lt;&lt;&lt;…"),
-            (valid_html * bigger_len, "<p>Joel is a…</p>"),  # 10 chars
-        ]
-        for value, expected in perf_test_values:
-            with self.subTest(value=value):
-                truncator = text.Truncator(value)
-                self.assertEqual(expected, truncator.chars(10, html=True))
-
     def test_truncate_chars_html_with_newline_inside_tag(self):
         truncator = text.Truncator(
             '<p>The quick <a href="xyz.html"\n id="mylink">brown fox</a> jumped over '
@@ -201,6 +185,16 @@ class TestUtilsText(SimpleTestCase):
         )
         truncator = text.Truncator("<p>I &lt;3 python, what about you?</p>")
         self.assertEqual("<p>I &lt;3 python, wh…</p>", truncator.chars(16, html=True))
+
+    def test_truncate_chars_html_with_misnested_tags(self):
+        # LIFO removal keeps all tags when a middle tag is closed out of order.
+        # With <a><b><c></b>, the </b> doesn't match <c>, so all tags remain
+        # in the stack and are properly closed at truncation.
+        truncator = text.Truncator("<a><b><c></b>XXXX")
+        self.assertEqual(
+            truncator.chars(2, html=True, truncate=""),
+            "<a><b><c></b>XX</c></b></a>",
+        )
 
     def test_truncate_words(self):
         truncator = text.Truncator("The quick brown fox jumped over the lazy dog.")
@@ -319,24 +313,6 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(truncator.words(3, html=True), "hello &gt;&lt;…")
         self.assertEqual(truncator.words(4, html=True), "hello &gt;&lt; world")
 
-    @patch("django.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
-    def test_truncate_words_html_size_limit(self):
-        max_len = text.Truncator.MAX_LENGTH_HTML
-        bigger_len = text.Truncator.MAX_LENGTH_HTML + 1
-        valid_html = "<p>Joel is a slug</p>"  # 4 words
-        perf_test_values = [
-            ("</a" + "\t" * (max_len - 6) + "//>", "</a>"),
-            ("</p" + "\t" * bigger_len + "//>", "</p>"),
-            ("&" * max_len, ""),
-            ("&" * bigger_len, ""),
-            ("_X<<<<<<<<<<<>", "_X&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&gt;"),
-            (valid_html * bigger_len, valid_html * 12 + "<p>Joel is…</p>"),  # 50 words
-        ]
-        for value, expected in perf_test_values:
-            with self.subTest(value=value):
-                truncator = text.Truncator(value)
-                self.assertEqual(expected, truncator.words(50, html=True))
-
     def test_wrap(self):
         digits = "1234 67 9"
         self.assertEqual(text.wrap(digits, 100), "1234 67 9")
@@ -429,14 +405,57 @@ class TestUtilsText(SimpleTestCase):
         with self.assertRaisesMessage(SuspiciousFileOperation, msg):
             text.get_valid_filename("$.$.$")
 
+    def test_trim_value(self):
+        tests = [
+            ("", ("", "")),
+            ("POINT (0 0)", ("POINT (0 0)", "")),
+            ("x" * 4096, ("x" * 4096, "")),
+            ("x" * 4097, ("x" * 4096, "… <trimmed 1 chars out of 4097>")),
+        ]
+        for value, expected in tests:
+            with self.subTest(length=len(value)):
+                self.assertEqual(text.trim_value(value), expected)
+
+    def test_trim_value_custom_limit(self):
+        self.assertEqual(
+            text.trim_value("abcdef", limit=3),
+            ("abc", "… <trimmed 3 chars out of 6>"),
+        )
+
+    def test_trim_value_non_string(self):
+        for value in [None, 42, b"x" * 5000, ["x"] * 5000]:
+            with self.subTest(value_type=type(value)):
+                self.assertEqual(text.trim_value(value), (value, ""))
+
     def test_compress_sequence(self):
-        data = [{"key": i} for i in range(10)]
-        seq = list(json.JSONEncoder().iterencode(data))
-        seq = [s.encode() for s in seq]
-        actual_length = len(b"".join(seq))
-        out = text.compress_sequence(seq)
-        compressed_length = len(b"".join(out))
-        self.assertLess(compressed_length, actual_length)
+        data = [{"key": i} for i in range(100)]
+        seq = [s.encode() for s in json.JSONEncoder().iterencode(data)]
+        original = b"".join(seq)
+        batch_size = 256
+        batched_seq = (
+            original[i : i + batch_size] for i in range(0, len(original), batch_size)
+        )
+        compressed_chunks = list(text.compress_sequence(batched_seq))
+        out = b"".join(compressed_chunks)
+        self.assertEqual(gzip.decompress(out), original)
+        self.assertLess(len(out), len(original))
+        self.assertGreater(len(compressed_chunks), 2)
+
+    async def test_acompress_sequence_closes_inner_sequence_promptly(self):
+        finally_ran = False
+
+        async def sequence():
+            nonlocal finally_ran
+            try:
+                yield b"chunk1" * 1024
+                yield b"chunk2" * 1024
+            finally:
+                finally_ran = True
+
+        async with aclosing(acompress_sequence(sequence())) as compressed:
+            await anext(compressed)  # gzip header
+            await anext(compressed)  # first sequence-derived chunk
+        self.assertTrue(finally_ran)
 
     def test_format_lazy(self):
         self.assertEqual("django/test", format_lazy("{}/{}", "django", lazystr("test")))

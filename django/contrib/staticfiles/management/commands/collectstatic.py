@@ -1,4 +1,5 @@
 import os
+from functools import cached_property
 
 from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
@@ -7,7 +8,6 @@ from django.core.checks import Tags
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.utils.functional import cached_property
 
 
 class Command(BaseCommand):
@@ -154,7 +154,11 @@ class Command(BaseCommand):
                     # Add a blank line before the traceback, otherwise it's
                     # too easy to miss the relevant part of the error message.
                     self.stderr.write()
-                    raise processed
+                    # Re-raise exceptions as CommandError and display notes.
+                    message = str(processed)
+                    if hasattr(processed, "__notes__"):
+                        message += "\n" + "\n".join(processed.__notes__)
+                    raise CommandError(message) from processed
                 if processed:
                     self.log(
                         "Post-processed '%s' as '%s'" % (original_path, processed_path),

@@ -3,10 +3,10 @@ from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.mail import mail_managers
+from django.core.mail import MailerDoesNotExist, mail_managers, mailers
 from django.http import HttpResponsePermanentRedirect
+from django.middleware import MiddlewareMixin
 from django.urls import is_valid_path
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import escape_leading_slashes
 
 
@@ -29,6 +29,7 @@ class CommonMiddleware(MiddlewareMixin):
           overriding the response_redirect_class attribute.
     """
 
+    async_capable = False
     response_redirect_class = HttpResponsePermanentRedirect
 
     def process_request(self, request):
@@ -78,12 +79,18 @@ class CommonMiddleware(MiddlewareMixin):
         Return the full path of the request with a trailing slash appended.
 
         Raise a RuntimeError if settings.DEBUG is True and request.method is
-        DELETE, POST, PUT, or PATCH.
+        DELETE, POST, PUT, PATCH, or QUERY.
         """
         new_path = request.get_full_path(force_append_slash=True)
         # Prevent construction of scheme relative urls.
         new_path = escape_leading_slashes(new_path)
-        if settings.DEBUG and request.method in ("DELETE", "POST", "PUT", "PATCH"):
+        if settings.DEBUG and request.method in (
+            "DELETE",
+            "POST",
+            "PUT",
+            "PATCH",
+            "QUERY",
+        ):
             raise RuntimeError(
                 "You called this URL via %(method)s, but the URL doesn't end "
                 "in a slash and you have APPEND_SLASH set. Django can't "
@@ -118,6 +125,10 @@ class CommonMiddleware(MiddlewareMixin):
 
 
 class BrokenLinkEmailsMiddleware(MiddlewareMixin):
+    async_capable = False
+    # Set to override the mail.mailers alias used for sending the email.
+    using = None
+
     def process_response(self, request, response):
         """Send broken link emails for relevant 404 NOT FOUND responses."""
         if response.status_code == 404 and not settings.DEBUG:
@@ -128,7 +139,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
             if not self.is_ignorable_request(request, path, domain, referer):
                 ua = request.META.get("HTTP_USER_AGENT", "<none>")
                 ip = request.META.get("REMOTE_ADDR", "<none>")
-                mail_managers(
+                self.send_mail(
                     "Broken %slink on %s"
                     % (
                         (
@@ -140,9 +151,19 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
                     ),
                     "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
                     "IP address: %s\n" % (referer, path, ua, ip),
-                    fail_silently=True,
                 )
         return response
+
+    def send_mail(self, subject, message, *args, **kwargs):
+        # RemovedInDjango2028Warning.
+        if not mailers._is_configured:
+            mail_managers(subject, message, *args, fail_silently=True, **kwargs)
+            return
+
+        try:
+            mail_managers(subject, message, *args, using=self.using, **kwargs)
+        except MailerDoesNotExist:
+            pass
 
     def is_internal_request(self, domain, referer):
         """

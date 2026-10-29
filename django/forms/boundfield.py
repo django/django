@@ -1,9 +1,9 @@
 import re
+from functools import cached_property
 
 from django.core.exceptions import ValidationError
 from django.forms.utils import RenderableFieldMixin, pretty_name
 from django.forms.widgets import MultiWidget, Textarea, TextInput
-from django.utils.functional import cached_property
 from django.utils.html import format_html, html_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -190,11 +190,12 @@ class BoundField(RenderableFieldMixin):
         widget = self.field.widget
         id_ = widget.attrs.get("id") or self.auto_id
         if id_:
+            attrs = {**(attrs or {})}
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
-                attrs = {**(attrs or {}), "for": id_for_label}
+                if tag != "legend":
+                    attrs = {**attrs, "for": id_for_label}
             if self.field.required and hasattr(self.form, "required_css_class"):
-                attrs = attrs or {}
                 if "class" in attrs:
                     attrs["class"] += " " + self.form.required_css_class
                 else:

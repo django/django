@@ -6,7 +6,7 @@ malicious site loading resources from your site in a hidden frame.
 """
 
 from django.conf import settings
-from django.utils.deprecation import MiddlewareMixin
+from django.middleware import MiddlewareMixin
 
 
 class XFrameOptionsMiddleware(MiddlewareMixin):
@@ -21,6 +21,8 @@ class XFrameOptionsMiddleware(MiddlewareMixin):
     To enable the response to be loaded on a frame within the same site, set
     X_FRAME_OPTIONS in your project's Django settings to 'SAMEORIGIN'.
     """
+
+    async_capable = False
 
     def process_response(self, request, response):
         # Don't set it if it's already in the response

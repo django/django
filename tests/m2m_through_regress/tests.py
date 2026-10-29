@@ -113,8 +113,7 @@ class M2MThroughSerializationTestCase(TestCase):
     <field type="CharField" name="name">Roll</field>
   </object>
 </django-objects>
-        """.strip()
-            % pks,
+        """.strip() % pks,
         )
 
 

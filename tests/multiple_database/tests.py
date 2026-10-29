@@ -10,7 +10,7 @@ from django.core import management
 from django.db import DEFAULT_DB_ALIAS, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings, skipIfDBFeature
 
 from .models import Book, Person, Pet, Review, UserProfile
 from .routers import AuthRouter, TestRouter, WriteRouter
@@ -899,8 +899,7 @@ class QueryTestCase(TestCase):
 
         new_bob_profile = UserProfile(flavor="spring surprise")
 
-        # assigning a profile requires an explicit pk as the object isn't saved
-        charlie = User(pk=51, username="charlie", email="charlie@example.com")
+        charlie = User(username="charlie", email="charlie@example.com")
         charlie.set_unusable_password()
 
         # initially, no db assigned
@@ -932,8 +931,8 @@ class QueryTestCase(TestCase):
             list(User.objects.using("default").values_list("username", flat=True)),
             ["alice"],
         )
-        self.assertEqual(
-            list(User.objects.using("other").values_list("username", flat=True)),
+        self.assertCountEqual(
+            User.objects.using("other").values_list("username", flat=True),
             ["bob", "charlie"],
         )
         self.assertEqual(
@@ -1882,10 +1881,10 @@ class RouterTestCase(TestCase):
         managers
         """
         pro = Book.objects.using("other").create(
-            pk=1, title="Pro Django", published=datetime.date(2008, 12, 16)
+            title="Pro Django", published=datetime.date(2008, 12, 16)
         )
 
-        marty = Person.objects.using("other").create(pk=1, name="Marty Alchin")
+        marty = Person.objects.using("other").create(name="Marty Alchin")
 
         self.assertEqual(pro.authors.db, "other")
         self.assertEqual(pro.authors.db_manager("default").db, "default")
@@ -1900,9 +1899,8 @@ class RouterTestCase(TestCase):
         FK reverse relations are represented by managers, and can be controlled
         like managers.
         """
-        marty = Person.objects.using("other").create(pk=1, name="Marty Alchin")
+        marty = Person.objects.using("other").create(name="Marty Alchin")
         Book.objects.using("other").create(
-            pk=1,
             title="Pro Django",
             published=datetime.date(2008, 12, 16),
             editor=marty,
@@ -1927,6 +1925,21 @@ class RouterTestCase(TestCase):
         self.assertEqual(pro.reviews.db, "other")
         self.assertEqual(pro.reviews.db_manager("default").db, "default")
         self.assertEqual(pro.reviews.db_manager("default").all().db, "default")
+
+    def test_generic_key_subquery(self):
+        book = Book.objects.create(
+            title="Pro Django", published=datetime.date(2008, 12, 16)
+        )
+        reviews = Review.objects.filter(pk__in=book.reviews.all())
+        self.assertSequenceEqual(reviews, [])
+
+    def test_generic_relation_queryset_uses_instance_database(self):
+        book = Book.objects.using("default").create(
+            title="Pro Django", published=datetime.date(2008, 12, 16)
+        )
+        queryset = book.reviews.all()
+        self.assertIsNone(queryset._db)
+        self.assertEqual(queryset.db, "default")
 
     def test_subquery(self):
         """Make sure as_sql works with subqueries and primary/replica."""
@@ -1967,6 +1980,37 @@ class RouterTestCase(TestCase):
             Book.objects.using("default").get(pk=b.pk).published,
             datetime.date(2009, 5, 4),
         )
+
+    @skipIfDBFeature("interprets_empty_strings_as_nulls")
+    def test_reverse_foreign_object_related_queryset_routes_once(self):
+        """
+        Queryset construction only consults the router for empty related
+        fields, and does so once even when both related fields are empty.
+        """
+
+        class SpyRouter(TestRouter):
+            def db_for_read(self, model, instance=None, **hints):
+                spy.append(model)
+                return super().db_for_read(model, instance=instance, **hints)
+
+        owner = Person.objects.create(name="Bob")
+        for name, first_name, expected_read_router_calls in [
+            ("Wart", "Bob", []),
+            ("", "", [Pet]),
+        ]:
+            with self.subTest(name=name, first_name=first_name):
+                user = User.objects.create(username=name, first_name=first_name)
+                pet = Pet.objects.create(
+                    name=name, owner=owner, owner_first_name=first_name
+                )
+
+                spy = []
+                with override_settings(DATABASE_ROUTERS=[SpyRouter()]):
+                    queryset = user.related_pets.all()
+                    self.assertEqual(spy, expected_read_router_calls)
+                    spy.clear()
+                    self.assertEqual(list(queryset), [pet])
+                    self.assertEqual(spy, [Pet])
 
 
 @override_settings(DATABASE_ROUTERS=[AuthRouter()])

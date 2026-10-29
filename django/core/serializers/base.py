@@ -209,6 +209,34 @@ class Serializer:
         if callable(getattr(self.stream, "getvalue", None)):
             return self.stream.getvalue()
 
+    def _resolve_natural_key(self, obj):
+        """Return a natural key tuple for the given object when available."""
+        try:
+            return obj.natural_key()
+        except AttributeError:
+            return None
+
+    def _resolve_fk_natural_key(self, obj, field):
+        """
+        Return the natural key for a ForeignKey's related object, or None if
+        not supported.
+        """
+        if not self._model_supports_natural_key(field.remote_field.model):
+            return None
+
+        related = getattr(obj, field.name, None)
+        try:
+            return related.natural_key()
+        except AttributeError:
+            return None
+
+    def _model_supports_natural_key(self, model):
+        """Return True if the model defines a natural_key() method."""
+        try:
+            return callable(model.natural_key)
+        except AttributeError:
+            return False
+
 
 class Deserializer:
     """
@@ -262,11 +290,11 @@ class DeserializedObject:
     def save(self, save_m2m=True, using=None, **kwargs):
         # Call save on the Model baseclass directly. This bypasses any
         # model-defined save. The save is also forced to be raw.
-        # raw=True is passed to any pre/post_save signals.
+        # raw=True is passed to any pre/post_save and m2m_changed signals.
         models.Model.save_base(self.object, using=using, raw=True, **kwargs)
         if self.m2m_data and save_m2m:
             for accessor_name, object_list in self.m2m_data.items():
-                getattr(self.object, accessor_name).set(object_list)
+                getattr(self.object, accessor_name).set_base(object_list, raw=True)
 
         # prevent a second (possibly accidental) call to save() from saving
         # the m2m data twice.

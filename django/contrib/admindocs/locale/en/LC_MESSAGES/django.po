@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -131,8 +131,8 @@ msgstr ""
 #: contrib/admindocs/templates/admin_doc/missing_docutils.html:17
 #, python-format
 msgid ""
-"The admin documentation system requires Python’s <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
 
 #: contrib/admindocs/templates/admin_doc/missing_docutils.html:19
@@ -301,59 +301,59 @@ msgid ""
 "code>.\n"
 msgstr ""
 
-#: contrib/admindocs/views.py:72 contrib/admindocs/views.py:73
-#: contrib/admindocs/views.py:75
+#: contrib/admindocs/views.py:87 contrib/admindocs/views.py:89
+#: contrib/admindocs/views.py:92
 msgid "tag:"
 msgstr ""
 
-#: contrib/admindocs/views.py:103 contrib/admindocs/views.py:104
-#: contrib/admindocs/views.py:106
+#: contrib/admindocs/views.py:124 contrib/admindocs/views.py:127
+#: contrib/admindocs/views.py:131
 msgid "filter:"
 msgstr ""
 
-#: contrib/admindocs/views.py:162 contrib/admindocs/views.py:163
-#: contrib/admindocs/views.py:165
+#: contrib/admindocs/views.py:195 contrib/admindocs/views.py:196
+#: contrib/admindocs/views.py:198
 msgid "view:"
 msgstr ""
 
-#: contrib/admindocs/views.py:192
+#: contrib/admindocs/views.py:240
 #, python-format
 msgid "App %(app_label)r not found"
 msgstr ""
 
-#: contrib/admindocs/views.py:196
+#: contrib/admindocs/views.py:245
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr ""
 
-#: contrib/admindocs/views.py:201 contrib/admindocs/views.py:202
-#: contrib/admindocs/views.py:217 contrib/admindocs/views.py:240
-#: contrib/admindocs/views.py:245 contrib/admindocs/views.py:260
-#: contrib/admindocs/views.py:301 contrib/admindocs/views.py:306
+#: contrib/admindocs/views.py:253 contrib/admindocs/views.py:254
+#: contrib/admindocs/views.py:273 contrib/admindocs/views.py:300
+#: contrib/admindocs/views.py:311 contrib/admindocs/views.py:331
+#: contrib/admindocs/views.py:388 contrib/admindocs/views.py:399
 msgid "model:"
 msgstr ""
 
-#: contrib/admindocs/views.py:213
+#: contrib/admindocs/views.py:266
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr ""
 
-#: contrib/admindocs/views.py:233 contrib/admindocs/views.py:293
+#: contrib/admindocs/views.py:291 contrib/admindocs/views.py:378
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr ""
 
-#: contrib/admindocs/views.py:240 contrib/admindocs/views.py:301
+#: contrib/admindocs/views.py:300 contrib/admindocs/views.py:388
 #, python-format
 msgid "all %s"
 msgstr ""
 
-#: contrib/admindocs/views.py:245 contrib/admindocs/views.py:306
+#: contrib/admindocs/views.py:309 contrib/admindocs/views.py:397
 #, python-format
 msgid "number of %s"
 msgstr ""
 
-#: contrib/admindocs/views.py:398
+#: contrib/admindocs/views.py:507
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr ""

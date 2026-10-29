@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="753" height="493" viewBox="0 0 753 493">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .axis { fill: #ffffff; stroke: #ffffff; }
+      .text { fill: #ffffff; }
+      .group { stroke: #6a6a6a; }
+      .maintainers { stroke: #d6d6d6; }
+      .community { fill: #232323; stroke: #6a6a6a; }
+      .triager { fill: #392f3f; stroke: #9577a3; }
+      .fixer { fill: #1d293b; stroke: #5c79a3; }
+      .reviewer { fill: #281d00; stroke: #6d5100; }
+      .merger { fill: #1f2f1e; stroke: #446e2c; }
+    }
+  </style>
+  <g transform="translate(0.5,0.5)">
+    <g class="axis" fill="#000000" stroke="#000000">
+      <path d="M 9.54 63.07 L 692.76 63.07" fill="none" stroke-width="2"/>
+      <path d="M 698.76 63.07 L 690.76 67.07 L 692.76 63.07 L 690.76 59.07 Z" stroke-width="2"/>
+      <path d="M 43.11 80.15 L 43.11 46"/>
+      <path d="M 146.61 80.15 L 146.61 46"/>
+      <path d="M 248.36 80.15 L 248.36 46"/>
+      <path d="M 350.8 80.15 L 350.8 46"/>
+      <path d="M 453.44 80.15 L 453.28 46"/>
+      <path d="M 555.59 80.15 L 555.59 46"/>
+      <path d="M 658.32 80.15 L 658.32 46"/>
+    </g>
+    <rect class="group" x="129.05" y="97.22" width="281.71" height="187.81" fill="none" stroke="#999999"/>
+    <rect class="maintainers" x="181" y="316" width="200" height="175.4" fill="none" stroke="#1b1b1b"/>
+    <rect class="community" x="200.51" y="345" width="160.49" height="110.27" fill="#ebebeb" stroke="#999999"/>
+    <g fill="#9673a6" stroke="#9673a6" stroke-width="2">
+      <path d="M 103.44 156.98 L 137.89 156.98" fill="none"/>
+      <path d="M 143.89 156.98 L 135.89 160.98 L 137.89 156.98 L 135.89 152.98 Z"/>
+      <path d="M 52.2 182.59 L 52.2 302.2 L 590.36 302.2" fill="none"/>
+      <path d="M 596.36 302.2 L 588.36 306.2 L 590.36 302.2 L 588.36 298.2 Z"/>
+    </g>
+    <g fill="#6c8ebf" stroke="#6c8ebf" stroke-width="2">
+      <path d="M 248.56 156.98 L 281.3 156.98" fill="none"/>
+      <path d="M 287.3 156.98 L 279.3 160.98 L 281.3 156.98 L 279.3 152.98 Z"/>
+      <path d="M 366.37 215.66 L 366.37 190.82" fill="none"/>
+      <path d="M 366.37 184.82 L 370.37 192.82 L 366.37 190.82 L 362.37 192.82 Z"/>
+    </g>
+    <g fill="#d6b656" stroke="#d6b656" stroke-width="2">
+      <path d="M 391.98 156.98 L 436.67 156.98" fill="none"/>
+      <path d="M 442.67 156.98 L 434.67 160.98 L 436.67 156.98 L 434.67 152.98 Z"/>
+      <path d="M 315.15 182.59 L 315.31 208.5" fill="none"/>
+      <path d="M 315.35 214.5 L 311.3 206.52 L 315.31 208.5 L 319.3 206.47 Z"/>
+    </g>
+    <g fill="#82b366" stroke="#82b366" stroke-width="2">
+      <path d="M 547.34 156.98 L 590.32 156.98" fill="none"/>
+      <path d="M 596.32 156.98 L 588.32 160.98 L 590.32 156.98 L 588.32 152.98 Z"/>
+    </g>
+  </g>
+  <g stroke-width="3">
+    <rect class="triager" x="1" y="131.37" width="102.44" height="51.22" fill="#e1d5e7" stroke="#9673a6"/>
+    <rect class="fixer" x="146.12" y="131.37" width="102.44" height="51.22" fill="#dae8fc" stroke="#6c8ebf"/>
+    <rect class="reviewer" x="289.54" y="131.37" width="102.44" height="51.22" fill="#fff2cc" stroke="#d6b656"/>
+    <rect class="reviewer" x="444.9" y="131.37" width="102.44" height="51.22" fill="#fff2cc" stroke="#d6b656"/>
+    <rect class="merger" x="598.56" y="131.37" width="102.44" height="51.22" fill="#d5e8d4" stroke="#82b366"/>
+    <rect class="fixer" x="288.68" y="216.73" width="106.71" height="51.22" fill="#dae8fc" stroke="#6c8ebf"/>
+    <rect class="triager" x="598.56" y="250.88" width="152.44" height="102.44" fill="#e1d5e7" stroke="#9673a6"/>
+    <rect class="triager" x="296.8" y="372.57" width="54.2" height="18.38" fill="#e1d5e7" stroke="#9673a6"/>
+    <rect class="fixer" x="296.8" y="401.05" width="54.2" height="18.38" fill="#dae8fc" stroke="#6c8ebf"/>
+    <rect class="reviewer" x="296.8" y="428.62" width="54.2" height="18.38" fill="#fff2cc" stroke="#d6b656"/>
+    <rect class="merger" x="296.8" y="463.11" width="54.2" height="19.72" fill="#d5e8d4" stroke="#82b366"/>
+  </g>
+  <g class="text" fill="#000000" font-family="Helvetica, Arial, sans-serif" font-size="12" text-anchor="middle">
+    <text x="384" y="22" font-size="24">Ticket Progress</text>
+    <text x="45" y="29" font-size="18">5%</text>
+    <text x="655" y="30" font-size="18">100%</text>
+    <g font-weight="bold">
+      <text x="270" y="116">Accepted</text>
+      <text x="52" y="161">Needs Triage</text>
+      <text x="197" y="161">Needs Patch</text>
+      <text x="341" y="154">Needs PR<tspan x="341" dy="14.4">Review</tspan></text>
+      <text x="496" y="154">Ready For<tspan x="496" dy="14.4">Checkin</tspan></text>
+      <text x="342" y="239">Waiting On<tspan x="342" dy="14.4">Author</tspan></text>
+      <text x="650" y="154">Closed<tspan x="650" dy="14.4" font-weight="normal">fixed</tspan></text>
+      <text x="675" y="263">Closed<tspan font-weight="normal"><tspan x="675" dy="14.4">duplicate</tspan><tspan x="675" dy="14.4">invalid</tspan><tspan x="675" dy="14.4">needsinfo</tspan><tspan x="675" dy="14.4">needsnewfeatureprocess</tspan><tspan x="675" dy="14.4">wontfix</tspan><tspan x="675" dy="14.4">worksforme</tspan></tspan></text>
+      <text x="281" y="335">Django Maintainers</text>
+      <text x="281" y="364">Anyone in the Community</text>
+    </g>
+    <text x="250" y="385">Triagers</text>
+    <text x="250" y="414">Bug Fixers</text>
+    <text x="250" y="441">Reviewers</text>
+    <text x="250" y="477">Mergers</text>
+  </g>
+</svg>

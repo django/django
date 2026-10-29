@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-04-01 15:04-0500\n"
+"POT-Creation-Date: 2025-09-17 18:23-0300\n"
+"PO-Revision-Date: 2025-12-03 06:49+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2025\n"
 "Language-Team: Albanian (http://app.transifex.com/django/django/language/"
 "sq/)\n"
@@ -142,6 +142,9 @@ msgstr "Kroatisht"
 
 msgid "Upper Sorbian"
 msgstr "Sorbishte e Sipërme"
+
+msgid "Haitian Creole"
+msgstr "Kreole Haiti"
 
 msgid "Hungarian"
 msgstr "Hungarisht"
@@ -693,7 +696,7 @@ msgstr "Vlera duhet të jetë JSON i vlefshëm."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
-msgstr ""
+msgstr "Instanca %(model)s me %(field)s %(value)r s’është zgjedhje e vlefshme."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Kyç i Jashtëm (lloj i përcaktuar nga fusha përkatëse)"
@@ -713,8 +716,8 @@ msgid "Many-to-many relationship"
 msgstr "Marrëdhënie shumë-për-shumë"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -883,6 +886,22 @@ msgstr "Po"
 
 msgid "No"
 msgstr "Jo"
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Gati"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Po xhiron"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Dështoi"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Me sukses"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"

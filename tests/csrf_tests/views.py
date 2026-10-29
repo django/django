@@ -1,9 +1,9 @@
 from django.http import HttpResponse
+from django.middleware import MiddlewareMixin
 from django.middleware.csrf import get_token, rotate_token
 from django.template import Context, RequestContext, Template
 from django.template.context_processors import csrf
 from django.utils.decorators import decorator_from_middleware
-from django.utils.deprecation import MiddlewareMixin
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 
 
@@ -62,13 +62,11 @@ def sandwiched_rotate_token_view(request):
 
 def post_form_view(request):
     """Return a POST form (without a token)."""
-    return HttpResponse(
-        content="""
+    return HttpResponse(content="""
 <html>
 <body><h1>\u00a1Unicode!<form method="post"><input type="text"></form></body>
 </html>
-"""
-    )
+""")
 
 
 def token_view(request):

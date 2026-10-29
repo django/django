@@ -1,4 +1,4 @@
-from asgiref.sync import iscoroutinefunction
+from inspect import iscoroutinefunction
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
@@ -182,7 +182,7 @@ class CsrfExemptTests(SimpleTestCase):
             return HttpResponse()
 
         self.assertIs(sync_view.csrf_exempt, True)
-        self.assertIsInstance(sync_view(HttpRequest()), HttpResponse)
+        self.assertIs(type(sync_view(HttpRequest())), HttpResponse)
 
     async def test_csrf_exempt_decorator_async_view(self):
         @csrf_exempt
@@ -190,4 +190,4 @@ class CsrfExemptTests(SimpleTestCase):
             return HttpResponse()
 
         self.assertIs(async_view.csrf_exempt, True)
-        self.assertIsInstance(await async_view(HttpRequest()), HttpResponse)
+        self.assertIs(type(await async_view(HttpRequest())), HttpResponse)

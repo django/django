@@ -1,33 +1,11 @@
-import os
 import warnings
 
-import django
 from django.test import SimpleTestCase
 from django.utils.deprecation import (
     RemovedAfterNextVersionWarning,
+    RemovedInDjango2028Warning,
     RenameMethodsBase,
-    django_file_prefixes,
 )
-
-
-class DjangoFilePrefixesTests(SimpleTestCase):
-    def setUp(self):
-        django_file_prefixes.cache_clear()
-        self.addCleanup(django_file_prefixes.cache_clear)
-
-    def test_no_file(self):
-        orig_file = django.__file__
-        try:
-            del django.__file__
-            self.assertEqual(django_file_prefixes(), ())
-        finally:
-            django.__file__ = orig_file
-
-    def test_with_file(self):
-        prefixes = django_file_prefixes()
-        self.assertIsInstance(prefixes, tuple)
-        self.assertEqual(len(prefixes), 1)
-        self.assertTrue(prefixes[0].endswith(f"{os.path.sep}django"))
 
 
 class RenameManagerMethods(RenameMethodsBase):
@@ -204,3 +182,16 @@ class RenameMethodsTests(SimpleTestCase):
         self.assertTrue(
             issubclass(RemovedAfterNextVersionWarning, PendingDeprecationWarning)
         )
+
+
+# RemovedInDjango2028Warning.
+class DeprecatedWarningsTests(SimpleTestCase):
+    def test_removed_in_django_70_warning_alias(self):
+        msg = (
+            "RemovedInDjango2028Warning should be used instead of "
+            "RemovedInDjango70Warning."
+        )
+        with self.assertWarnsMessage(UserWarning, msg):
+            from django.utils.deprecation import RemovedInDjango70Warning
+
+        self.assertIs(RemovedInDjango70Warning, RemovedInDjango2028Warning)

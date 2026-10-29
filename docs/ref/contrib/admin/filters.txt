@@ -178,7 +178,7 @@ allows to store::
 
 By defining a filter using the ``__in`` lookup, it is possible to filter for
 any of a group of values. You need to override the ``expected_parameters``
-method, and the specify the ``lookup_kwargs`` attribute with the appropriate
+method, and then specify the ``lookup_kwargs`` attribute with the appropriate
 field name. By default, multiple values in the query string will be separated
 with commas, but this can be customized via the ``list_separator`` attribute.
 The following example shows such a filter using the vertical-pipe character as

@@ -16,10 +16,13 @@ from django.core.exceptions import FieldError
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
-from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
+from django.utils.log import log_message
+from django.utils.text import trim_value
 
 logger = logging.getLogger("django.db.models")
+
+PROHIBITED_FILTER_KWARGS = frozenset(["_connector", "_negated"])
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -48,13 +51,26 @@ class Q(tree.Node):
     XOR = "XOR"
     default = AND
     conditional = True
+    connectors = (None, AND, OR, XOR)
 
     def __init__(self, *args, _connector=None, _negated=False, **kwargs):
+        self._check_connector(_connector)
         super().__init__(
             children=[*args, *sorted(kwargs.items())],
             connector=_connector,
             negated=_negated,
         )
+
+    @classmethod
+    def create(cls, children=None, connector=None, negated=False):
+        cls._check_connector(connector)
+        return super().create(children=children, connector=connector, negated=negated)
+
+    @classmethod
+    def _check_connector(cls, connector):
+        if connector not in cls.connectors:
+            connector_reprs = ", ".join(f"{conn!r}" for conn in cls.connectors[1:])
+            raise ValueError(f"connector must be one of {connector_reprs}, or None.")
 
     def _combine(self, other, conn):
         if getattr(other, "conditional", False) is False:
@@ -159,8 +175,7 @@ class Q(tree.Node):
         matches against the expressions.
         """
         # Avoid circular imports.
-        from django.db.models import BooleanField, Value
-        from django.db.models.functions import Coalesce
+        from django.db.models import Value
         from django.db.models.sql import Query
         from django.db.models.sql.constants import SINGLE
 
@@ -172,10 +187,7 @@ class Q(tree.Node):
         query.add_annotation(Value(1), "_check")
         connection = connections[using]
         # This will raise a FieldError if a field is missing in "against".
-        if connection.features.supports_comparing_boolean_expr:
-            query.add_q(Q(Coalesce(self, True, output_field=BooleanField())))
-        else:
-            query.add_q(self)
+        query.add_q(self)
         compiler = query.get_compiler(using=using)
         context_manager = (
             transaction.atomic(using=using)
@@ -186,7 +198,15 @@ class Q(tree.Node):
             with context_manager:
                 return compiler.execute_sql(SINGLE) is not None
         except DatabaseError as e:
-            logger.warning("Got a database error calling check() on %r: %s", self, e)
+            # Trim large values, keeping the suffix out of the escaped args.
+            error, suffix = trim_value(str(e))
+            log_message(
+                logger,
+                "Got a database error calling check() on %r: %s" + suffix,
+                self,
+                error,
+                level="warning",
+            )
             return True
 
     def deconstruct(self):
@@ -201,7 +221,7 @@ class Q(tree.Node):
             kwargs["_negated"] = True
         return path, args, kwargs
 
-    @cached_property
+    @functools.cached_property
     def identity(self):
         path, args, kwargs = self.deconstruct()
         identity = [path, *kwargs.items()]
@@ -222,7 +242,7 @@ class Q(tree.Node):
     def __hash__(self):
         return hash(self.identity)
 
-    @cached_property
+    @functools.cached_property
     def referenced_base_fields(self):
         """
         Retrieve all base fields referenced directly or through F expressions
@@ -290,7 +310,7 @@ class DeferredAttribute:
         db = instances[0]._state.db
         value_by_pk = (
             self.field.model._base_manager.using(db)
-            .values_list(attname)
+            .values_list(attname, flat=True)
             .in_bulk({i.pk for i in instances})
         )
         for instance in instances:

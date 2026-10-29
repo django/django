@@ -35,6 +35,7 @@ class ManyToManySignalsTest(TestCase):
             "action": kwargs["action"],
             "reverse": kwargs["reverse"],
             "model": kwargs["model"],
+            "raw": kwargs["raw"],
         }
         if kwargs["pk_set"]:
             message["objects"] = list(
@@ -114,6 +115,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.doors, self.engine, self.wheelset],
             }
         )
@@ -123,6 +125,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.doors, self.engine, self.wheelset],
             }
         )
@@ -136,6 +139,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_add",
                 "reverse": True,
                 "model": Car,
+                "raw": False,
                 "objects": [self.bmw, self.toyota],
             }
         )
@@ -145,6 +149,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_add",
                 "reverse": True,
                 "model": Car,
+                "raw": False,
                 "objects": [self.bmw, self.toyota],
             }
         )
@@ -163,6 +168,7 @@ class ManyToManySignalsTest(TestCase):
                     "action": "pre_remove",
                     "reverse": False,
                     "model": Part,
+                    "raw": False,
                     "objects": [self.airbag, self.engine],
                 },
                 {
@@ -170,6 +176,7 @@ class ManyToManySignalsTest(TestCase):
                     "action": "post_remove",
                     "reverse": False,
                     "model": Part,
+                    "raw": False,
                     "objects": [self.airbag, self.engine],
                 },
             ],
@@ -188,6 +195,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.airbag, self.sunroof],
             }
         )
@@ -197,6 +205,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.airbag, self.sunroof],
             }
         )
@@ -210,6 +219,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_add",
                 "reverse": True,
                 "model": Car,
+                "raw": False,
                 "objects": [self.bmw, self.toyota],
             }
         )
@@ -219,6 +229,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_add",
                 "reverse": True,
                 "model": Car,
+                "raw": False,
                 "objects": [self.bmw, self.toyota],
             }
         )
@@ -237,6 +248,7 @@ class ManyToManySignalsTest(TestCase):
                     "action": "pre_remove",
                     "reverse": True,
                     "model": Car,
+                    "raw": False,
                     "objects": [self.vw],
                 },
                 {
@@ -244,6 +256,7 @@ class ManyToManySignalsTest(TestCase):
                     "action": "post_remove",
                     "reverse": True,
                     "model": Car,
+                    "raw": False,
                     "objects": [self.vw],
                 },
             ],
@@ -261,12 +274,14 @@ class ManyToManySignalsTest(TestCase):
                     "action": "pre_clear",
                     "reverse": False,
                     "model": Part,
+                    "raw": False,
                 },
                 {
                     "instance": self.vw,
                     "action": "post_clear",
                     "reverse": False,
                     "model": Part,
+                    "raw": False,
                 },
             ],
         )
@@ -283,12 +298,14 @@ class ManyToManySignalsTest(TestCase):
                     "action": "pre_clear",
                     "reverse": True,
                     "model": Car,
+                    "raw": False,
                 },
                 {
                     "instance": self.doors,
                     "action": "post_clear",
                     "reverse": True,
                     "model": Car,
+                    "raw": False,
                 },
             ],
         )
@@ -306,12 +323,14 @@ class ManyToManySignalsTest(TestCase):
                     "action": "pre_clear",
                     "reverse": True,
                     "model": Car,
+                    "raw": False,
                 },
                 {
                     "instance": self.airbag,
                     "action": "post_clear",
                     "reverse": True,
                     "model": Car,
+                    "raw": False,
                 },
             ],
         )
@@ -330,6 +349,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [p6],
             }
         )
@@ -339,6 +359,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [p6],
             }
         )
@@ -352,6 +373,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_remove",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [p6],
             }
         )
@@ -361,6 +383,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_remove",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [p6],
             }
         )
@@ -370,6 +393,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.doors, self.engine, self.wheelset],
             }
         )
@@ -379,6 +403,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.doors, self.engine, self.wheelset],
             }
         )
@@ -397,6 +422,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_clear",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
             }
         )
         expected_messages.append(
@@ -405,6 +431,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_clear",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
             }
         )
         expected_messages.append(
@@ -413,6 +440,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.doors, self.engine, self.wheelset],
             }
         )
@@ -422,6 +450,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.doors, self.engine, self.wheelset],
             }
         )
@@ -435,6 +464,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_remove",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.engine],
             }
         )
@@ -444,6 +474,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_remove",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.engine],
             }
         )
@@ -464,6 +495,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.doors],
             }
         )
@@ -473,6 +505,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_add",
                 "reverse": False,
                 "model": Part,
+                "raw": False,
                 "objects": [self.doors],
             }
         )
@@ -485,6 +518,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "pre_add",
                 "reverse": True,
                 "model": Car,
+                "raw": False,
                 "objects": [c4b],
             }
         )
@@ -494,6 +528,7 @@ class ManyToManySignalsTest(TestCase):
                 "action": "post_add",
                 "reverse": True,
                 "model": Car,
+                "raw": False,
                 "objects": [c4b],
             }
         )
@@ -519,6 +554,7 @@ class ManyToManySignalsTest(TestCase):
                     "action": "pre_add",
                     "reverse": False,
                     "model": Person,
+                    "raw": False,
                     "objects": [self.bob, self.chuck],
                 },
                 {
@@ -526,6 +562,7 @@ class ManyToManySignalsTest(TestCase):
                     "action": "post_add",
                     "reverse": False,
                     "model": Person,
+                    "raw": False,
                     "objects": [self.bob, self.chuck],
                 },
             ],
@@ -542,6 +579,7 @@ class ManyToManySignalsTest(TestCase):
                     "action": "pre_add",
                     "reverse": False,
                     "model": Person,
+                    "raw": False,
                     "objects": [self.daisy],
                 },
                 {
@@ -549,6 +587,7 @@ class ManyToManySignalsTest(TestCase):
                     "action": "post_add",
                     "reverse": False,
                     "model": Person,
+                    "raw": False,
                     "objects": [self.daisy],
                 },
             ],
@@ -565,6 +604,7 @@ class ManyToManySignalsTest(TestCase):
                     "action": "pre_add",
                     "reverse": True,
                     "model": Person,
+                    "raw": False,
                     "objects": [self.alice, self.bob],
                 },
                 {
@@ -572,6 +612,89 @@ class ManyToManySignalsTest(TestCase):
                     "action": "post_add",
                     "reverse": True,
                     "model": Person,
+                    "raw": False,
+                    "objects": [self.alice, self.bob],
+                },
+            ],
+        )
+
+    def test_m2m_relations_set_base_raw(self):
+        self.chuck.idols.add(self.daisy)
+        self._initialize_signal_person()
+        self.chuck.idols.set_base([self.alice, self.bob], raw=True)
+        self.assertEqual(
+            self.m2m_changed_messages,
+            [
+                {
+                    "instance": self.chuck,
+                    "action": "pre_remove",
+                    "reverse": True,
+                    "model": Person,
+                    "raw": True,
+                    "objects": [self.daisy],
+                },
+                {
+                    "instance": self.chuck,
+                    "action": "post_remove",
+                    "reverse": True,
+                    "model": Person,
+                    "raw": True,
+                    "objects": [self.daisy],
+                },
+                {
+                    "instance": self.chuck,
+                    "action": "pre_add",
+                    "reverse": True,
+                    "model": Person,
+                    "raw": True,
+                    "objects": [self.alice, self.bob],
+                },
+                {
+                    "instance": self.chuck,
+                    "action": "post_add",
+                    "reverse": True,
+                    "model": Person,
+                    "raw": True,
+                    "objects": [self.alice, self.bob],
+                },
+            ],
+        )
+
+    def test_m2m_relations_set_base_raw_clear(self):
+        self.chuck.idols.set([self.daisy, self.bob])
+        self._initialize_signal_person()
+        self.chuck.idols.set_base([self.alice, self.bob], clear=True, raw=True)
+        self.assertEqual(
+            self.m2m_changed_messages,
+            [
+                {
+                    "instance": self.chuck,
+                    "action": "pre_clear",
+                    "reverse": True,
+                    "model": Person,
+                    "raw": True,
+                },
+                {
+                    "instance": self.chuck,
+                    "action": "post_clear",
+                    "reverse": True,
+                    "model": Person,
+                    "raw": True,
+                },
+                {
+                    "instance": self.chuck,
+                    "action": "pre_add",
+                    "reverse": True,
+                    "model": Person,
+                    "raw": True,
+                    "objects": [self.alice, self.bob],
+                },
+                {
+                    "instance": self.chuck,
+                    "action": "post_add",
+                    "reverse": True,
+                    "model": Person,
+                    "raw": True,
                     "objects": [self.alice, self.bob],
                 },
             ],

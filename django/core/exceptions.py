@@ -58,7 +58,7 @@ class DisallowedHost(SuspiciousOperation):
 
 
 class DisallowedRedirect(SuspiciousOperation):
-    """Redirect to scheme not in allowed list"""
+    """Redirect was too long or scheme was not in allowed list."""
 
     pass
 
@@ -254,7 +254,7 @@ class EmptyResultSet(Exception):
 
 
 class FullResultSet(Exception):
-    """A database query predicate is matches everything."""
+    """A database query predicate that matches everything."""
 
     pass
 

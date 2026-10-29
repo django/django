@@ -45,9 +45,10 @@ The CSRF protection is based on the following things:
 
    This part is done by the :ttag:`csrf_token` template tag.
 
-#. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
-   TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
-   must be present and correct. If it isn't, the user will get a 403 error.
+#. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS,
+   QUERY, or TRACE, a CSRF cookie must be present, and the
+   'csrfmiddlewaretoken' field must be present and correct. If it isn't, the
+   user will get a 403 error.
 
    When validating the 'csrfmiddlewaretoken' field value, only the secret,
    not the full token, is compared with the secret in the cookie value.
@@ -85,12 +86,12 @@ The CSRF protection is based on the following things:
 This ensures that only forms that have originated from trusted domains can be
 used to POST data back.
 
-It deliberately ignores GET requests (and other requests that are defined as
-'safe' by :rfc:`9110#section-9.2.1`). These requests ought never to have any
-potentially dangerous side effects, and so a CSRF attack with a GET request
-ought to be harmless. :rfc:`9110#section-9.2.1` defines POST, PUT, and DELETE
-as 'unsafe', and all other methods are also assumed to be unsafe, for maximum
-protection.
+It deliberately ignores GET and QUERY requests (and other requests that are
+defined as 'safe' by :rfc:`9110#section-9.2.1`). These requests ought never to
+have any potentially dangerous side effects, and so a CSRF attack with a GET
+request ought to be harmless. :rfc:`9110#section-9.2.1` defines POST, PUT, and
+DELETE as 'unsafe', and all other methods are also assumed to be unsafe, for
+maximum protection.
 
 The CSRF protection cannot protect against man-in-the-middle attacks, so use
 :ref:`HTTPS <security-recommendation-ssl>` with
@@ -99,6 +100,10 @@ the HOST header <host-headers-virtual-hosting>` and that there aren't any
 :ref:`cross-site scripting vulnerabilities <cross-site-scripting>` on your site
 (because XSS vulnerabilities already let an attacker do anything a CSRF
 vulnerability allows and much worse).
+
+.. versionchanged:: 6.2
+
+    ``QUERY`` was added to the exempt methods.
 
 .. admonition:: Removing the ``Referer`` header
 

@@ -4,16 +4,17 @@
 # Antoni Aloy <aaloy@apsl.net>, 2015,2017
 # duub qnnp, 2015
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
+# Isaac Torres, 2026
 # Manel Clos <manelclos@gmail.com>, 2020
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
-"Language-Team: Catalan (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2026-06-01 09:22+0000\n"
+"Last-Translator: Isaac Torres, 2026\n"
+"Language-Team: Catalan (http://app.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -100,13 +101,14 @@ msgstr "S'han facilitat claus desconegudes: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
 msgstr ""
-"Asseguri's que aquest rang és completament menor o igual a %(limit_value)s."
+"Assegureu-vos que el límit superior de l'interval no sigui superior a "
+"%(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
 msgstr ""
-"Asseguri's que aquest rang és completament major o igual a %(limit_value)s."
+"Assegureu-vos que el límit inferior de l'interval no sigui inferior a "
+"%(limit_value)s."

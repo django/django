@@ -381,6 +381,15 @@ class GeneratedFieldTestMixin:
         with self.assertNumQueries(expected_num_queries):
             self.assertEqual(m2.lower_name, "name")
 
+    def test_nullable_exclude(self):
+        m1 = self.nullable_model.objects.create()
+        m2 = self.nullable_model.objects.create(name="NaMe")
+        self.nullable_model.objects.create(name="Other")
+        self.assertSequenceEqual(
+            self.nullable_model.objects.exclude(lower_name="other").order_by("pk"),
+            [m1, m2],
+        )
+
 
 @skipUnlessDBFeature("supports_stored_generated_columns")
 class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
@@ -413,7 +422,7 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
         obj = GeneratedModelNonAutoPk.objects.create(id=1, a=2)
         self.assertEqual(obj.id, 1)
         self.assertEqual(obj.a, 2)
-        self.assertEqual(obj.b, 2)
+        self.assertEqual(obj.b, 3)
 
 
 @skipUnlessDBFeature("supports_virtual_generated_columns")

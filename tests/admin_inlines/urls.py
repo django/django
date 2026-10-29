@@ -7,4 +7,5 @@ urlpatterns = [
     path("admin2/", admin.site2.urls),
     path("admin3/", admin.site3.urls),
     path("admin4/", admin.site4.urls),
+    path("admin5/", admin.site5.urls),
 ]

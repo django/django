@@ -1,10 +1,13 @@
 import json
+import textwrap
 import unittest
 
+from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.base import DeserializationError, DeserializedObject
 from django.core.serializers.json import Deserializer as JsonDeserializer
 from django.core.serializers.jsonl import Deserializer as JsonlDeserializer
 from django.core.serializers.python import Deserializer
+from django.core.serializers.xml_serializer import Deserializer as XMLDeserializer
 from django.test import SimpleTestCase
 
 from .models import Author
@@ -133,3 +136,22 @@ class TestDeserializer(SimpleTestCase):
 
         self.assertEqual(first_item.object, self.jane)
         self.assertEqual(second_item.object, self.joe)
+
+    def test_crafted_xml_rejected(self):
+        depth = 100
+        leaf_text_len = 1000
+        nested_open = "<nested>" * depth
+        nested_close = "</nested>" * depth
+        leaf = "x" * leaf_text_len
+        field_content = f"{nested_open}{leaf}{nested_close}"
+        crafted_xml = textwrap.dedent(f"""
+        <django-objects version="1.0">
+            <object model="contenttypes.contenttype" pk="1">
+                <field name="app_label">{field_content}</field>
+                <field name="model">m</field>
+            </object>
+        </django-objects>""")
+
+        msg = "Unexpected element: 'nested'"
+        with self.assertRaisesMessage(SuspiciousOperation, msg):
+            list(XMLDeserializer(crafted_xml))

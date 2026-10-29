@@ -6,6 +6,7 @@ from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError, no_translations
 from django.core.management.sql import emit_post_migrate_signal, emit_pre_migrate_signal
 from django.db import DEFAULT_DB_ALIAS, connections, router
+from django.db.backends.utils import truncate_name
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
@@ -447,8 +448,9 @@ class Command(BaseCommand):
         def model_installed(model):
             opts = model._meta
             converter = connection.introspection.identifier_converter
+            max_name_length = connection.ops.max_name_length()
             return not (
-                (converter(opts.db_table) in tables)
+                (converter(truncate_name(opts.db_table, max_name_length)) in tables)
                 or (
                     opts.auto_created
                     and converter(opts.auto_created._meta.db_table) in tables

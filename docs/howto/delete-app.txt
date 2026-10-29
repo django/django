@@ -19,7 +19,7 @@ application safely.
 #. :ref:`Squash <migration-squashing>` out references to the app in other apps'
    migrations.
 
-#. Apply migrations locally, runs tests, and verify the correctness of your
+#. Apply migrations locally, run tests, and verify the correctness of your
    project.
 
 #. Deploy/release your updated Django project.

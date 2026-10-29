@@ -671,9 +671,6 @@ This assumes we've imported a ``MyFormField`` field class (which has its own
 default widget). This document doesn't cover the details of writing custom form
 fields.
 
-.. _helper functions: ../forms/#generating-forms-for-models
-.. _forms documentation: ../forms/
-
 .. _emulating-built-in-field-types:
 
 Emulating built-in field types

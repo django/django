@@ -1,8 +1,13 @@
 import subprocess
 import unittest
+from typing import TYPE_CHECKING
 
 from django.shortcuts import aget_object_or_404
 from django.utils import inspect
+from django.utils.version import PY314
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
 
 
 class Person:
@@ -17,6 +22,9 @@ class Person:
 
     def all_kinds(self, name, address="home", age=25, *args, **kwargs):
         return kwargs
+
+    def pos_and_kw_only(self, pos_only, /, normal, *, kw_only):
+        return pos_only, normal, kw_only
 
     @classmethod
     def cls_all_kinds(cls, name, address="home", age=25, *args, **kwargs):
@@ -84,24 +92,39 @@ class TestInspectMethods(unittest.TestCase):
         self.assertIs(inspect.method_has_no_args(Person().one_argument), False)
 
     def test_func_supports_parameter(self):
-        self.assertIs(
-            inspect.func_supports_parameter(Person.all_kinds, "address"), True
-        )
-        self.assertIs(
-            inspect.func_supports_parameter(Person().all_kinds, "address"),
-            True,
-        )
-        self.assertIs(inspect.func_supports_parameter(Person.all_kinds, "zone"), False)
-        self.assertIs(
-            inspect.func_supports_parameter(Person().all_kinds, "zone"),
-            False,
-        )
+        cases = [
+            (Person.all_kinds, "address", True),
+            (Person().all_kinds, "address", True),
+            (Person.all_kinds, "zone", False),
+            (Person().all_kinds, "zone", False),
+            # Variable *args and **kwargs cannot be passed by name.
+            (Person.all_kinds, "args", False),
+            (Person.all_kinds, "kwargs", False),
+            # Positional-only arguments cannot be passed by name.
+            (Person.pos_and_kw_only, "pos_only", False),
+            # Regular and keyword-only arguments can be passed by name.
+            (Person.pos_and_kw_only, "normal", True),
+            (Person.pos_and_kw_only, "kw_only", True),
+        ]
+        for func, name, expected in cases:
+            with self.subTest(func=func.__name__, name=name):
+                self.assertIs(inspect.func_supports_parameter(func, name), expected)
 
     def test_func_accepts_kwargs(self):
         self.assertIs(inspect.func_accepts_kwargs(Person.just_args), False)
         self.assertIs(inspect.func_accepts_kwargs(Person().just_args), False)
         self.assertIs(inspect.func_accepts_kwargs(Person.all_kinds), True)
         self.assertIs(inspect.func_accepts_kwargs(Person().just_args), False)
+
+    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
+    def test_func_accepts_kwargs_deferred_annotations(self):
+
+        def func_with_annotations(self, name: str, complex: SafeString) -> None:
+            pass
+
+        # Inspection fails with deferred annotations with python 3.14+. Earlier
+        # Python versions trigger the NameError on module initialization.
+        self.assertIs(inspect.func_accepts_kwargs(func_with_annotations), False)
 
 
 class IsModuleLevelFunctionTestCase(unittest.TestCase):

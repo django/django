@@ -2,8 +2,6 @@
 Content Security Policy
 =======================
 
-.. versionadded:: 6.0
-
 .. module:: django.middleware.csp
    :synopsis: Middleware for Content Security Policy headers
 
@@ -59,7 +57,7 @@ configured using the following settings:
      protection against active threats.
    * Use *both* to maintain an enforced baseline while experimenting with
      changes. Even for well-established policies, continuing to collect reports
-     reports can help detect regressions, unexpected changes in behavior, or
+     can help detect regressions, unexpected changes in behavior, or
      potential tampering in production environments.
 
 .. _csp-reports:
@@ -138,7 +136,8 @@ with the CSP specification.
 
       Represents ``'unsafe-inline'``. Allows execution of inline scripts,
       styles, and ``javascript:`` URLs. Generally discouraged, especially for
-      scripts.
+      scripts. Ignored by browsers when the same directive contains a nonce or
+      hash source. See :ref:`csp-nonce-generation` for details.
 
    .. attribute:: WASM_UNSAFE_EVAL
 
@@ -260,30 +259,94 @@ expression into the CSP header.
 
 To use this nonce in templates, the
 :func:`~django.template.context_processors.csp` context processor needs to be
-enabled. It adds a ``csp_nonce`` variable to the template context, allowing
-inline elements to include a matching ``nonce={{ csp_nonce }}`` attribute in
-inline scripts or styles.
+enabled. It adds a ``csp_nonce`` variable to the template context.
+
+.. versionchanged:: 6.1
+
+    The :ttag:`csp_nonce_attr` template tag was added, including support for
+    rendering :class:`~django.forms.Media` objects.
+
+For inline ``<script>`` and ``<style>`` elements, include the nonce directly
+using the context variable:
+
+.. code-block:: html+django
+
+    <script nonce="{{ csp_nonce }}">
+      // This inline JavaScript will be allowed.
+    </script>
+
+For external ``<script src="...">`` and ``<link rel="stylesheet">`` elements,
+use the :ttag:`csp_nonce_attr` template tag:
+
+.. code-block:: html+django
+
+    <script src="/path/to/script.js" {% csp_nonce_attr %}></script>
+    <link rel="stylesheet" href="/path/to/style.css" {% csp_nonce_attr %}>
+
+To render a :class:`~django.forms.Media` object's assets with the nonce
+applied, pass the object to the :ttag:`csp_nonce_attr` template tag:
+
+.. code-block:: html+django
+
+    {% csp_nonce_attr form.media %}
 
 The browser will only execute inline elements that include a ``nonce=<value>``
 attribute matching the one specified in the ``Content-Security-Policy`` (or
 ``Content-Security-Policy-Report-Only``) header. This mechanism provides
 fine-grained control over which inline code is allowed to run.
 
-If a template includes ``{{ csp_nonce }}`` but the policy does not include
+If a template includes the CSP nonce but the policy does not include
 :attr:`~django.utils.csp.CSP.NONCE`, the HTML will include a nonce attribute,
 but the header will lack the required source expression. In this case, the
 browser will block the inline script or style (or report it for report-only
 configurations).
 
-Nonce generation and caching
-----------------------------
+If a directive's only source is :attr:`~django.utils.csp.CSP.NONCE` and the
+nonce is never used, the directive is emitted as ``'none'`` instead (e.g.
+``script-src 'none'``), keeping the policy restrictive.
 
-Django's nonce generation is **lazy**: the middleware only generates a nonce if
-``{{ csp_nonce }}`` is accessed during template rendering. This avoids
-unnecessary work for pages that do not use nonces.
+.. versionchanged:: 6.2
 
-However, because nonces must be unique per request, extra care is needed when
-using full-page caching (e.g., Django's cache middleware, CDN caching). Serving
+    Emitting ``'none'`` for nonce-only directives with an unused nonce was
+    added.
+
+.. _csp-nonce-generation:
+
+Nonce generation
+----------------
+
+Django's nonce generation is **lazy** for non-streaming responses: the
+middleware generates a nonce when it is accessed while constructing the
+response, for example by ``{{ csp_nonce }}`` or :ttag:`csp_nonce_attr`.
+
+For streaming responses (:class:`~django.http.StreamingHttpResponse` and
+:class:`~django.http.FileResponse`), the middleware generates a nonce before
+adding a CSP header for a policy configured with
+:attr:`~django.utils.csp.CSP.NONCE`. The response body may access the nonce
+after the header has been sent, so the header will include a nonce even if the
+body never uses it.
+
+.. admonition:: Using ``UNSAFE_INLINE`` with ``NONCE`` in streaming responses
+
+    For streaming responses, Django includes a nonce in the CSP header even if
+    the response body does not use it. Browsers ignore ``'unsafe-inline'`` in
+    ``script-src`` and ``style-src`` directives containing a nonce, which may
+    block inline scripts, styles, and event handlers.
+
+    To allow style attributes or inline event handlers while using nonces for
+    ``<style>`` or ``<script>`` elements, configure ``style-src-attr`` or
+    ``script-src-attr``, respectively.
+
+.. versionchanged:: 6.2
+
+    CSP nonces are now generated before headers are added to streaming
+    responses, even if the response body never uses the nonce.
+
+Nonce and caching
+-----------------
+
+Because nonces must be unique per request, extra care is needed when using
+full-page caching (e.g., Django's cache middleware, CDN caching). Serving
 cached responses with previously generated nonces may result in reuse across
 users and requests. Although such responses may still appear to work (since the
 nonce in the CSP header and HTML content match), reuse defeats the purpose of
@@ -291,7 +354,8 @@ the nonce and weakens security.
 
 To ensure nonce-based policies remain effective:
 
-* Avoid caching full responses that include ``{{ csp_nonce }}``.
+* Avoid caching full responses that include ``{{ csp_nonce }}`` or
+  :ttag:`csp_nonce_attr`.
 * If caching is necessary, use a strategy that injects a fresh nonce on each
   request, or consider refactoring your application to avoid inline scripts and
   styles altogether.

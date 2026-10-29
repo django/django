@@ -1,4 +1,5 @@
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.functional import cached_property, classproperty, lazy
 
 
@@ -80,6 +81,8 @@ class FunctionalTests(SimpleTestCase):
             self.assertTrue(callable(obj.other_value))
             self.assertTrue(callable(subobj.other_value))
 
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_cached_property(self):
         """cached_property caches its value and behaves like a property."""
 
@@ -104,6 +107,8 @@ class FunctionalTests(SimpleTestCase):
         for attr in attrs:
             self.assertCachedPropertyWorks(attr, Class)
 
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_cached_property_auto_name(self):
         """
         cached_property caches its value and behaves like a property
@@ -126,6 +131,8 @@ class FunctionalTests(SimpleTestCase):
         for attr in attrs:
             self.assertCachedPropertyWorks(attr, Class)
 
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_cached_property_reuse_different_names(self):
         """
         Disallow this case because the decorated function wouldn't be cached.
@@ -146,6 +153,8 @@ class FunctionalTests(SimpleTestCase):
 
                 b = a
 
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_cached_property_reuse_same_name(self):
         """
         Reusing a cached_property on different classes under the same name is
@@ -171,6 +180,8 @@ class FunctionalTests(SimpleTestCase):
         self.assertEqual(b.cp, 2)
         self.assertEqual(a.cp, 1)
 
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
     def test_cached_property_set_name_not_called(self):
         cp = cached_property(lambda s: None)
 
@@ -183,6 +194,16 @@ class FunctionalTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(TypeError, msg):
             Foo().cp
+
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
+    def test_cached_property_deprecation_warning(self):
+        msg = (
+            "django.utils.functional.cached_property is deprecated. "
+            "Use functools.cached_property instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            cached_property(lambda s: None)
+        self.assertEqual(ctx.filename, __file__)
 
     def test_lazy_add_int(self):
         lazy_4 = lazy(lambda: 4, int)

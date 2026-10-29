@@ -4,12 +4,13 @@ MySQL database backend for Django.
 Requires mysqlclient: https://pypi.org/project/mysqlclient/
 """
 
+from functools import cached_property
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.asyncio import async_unsafe
-from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 
 try:
@@ -334,6 +335,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 for column_name, (
                     referenced_column_name,
                     referenced_table_name,
+                    _,
                 ) in relations.items():
                     cursor.execute(
                         """
@@ -398,16 +400,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # Select some server variables and test if the time zone
             # definitions are installed. CONVERT_TZ returns NULL if 'UTC'
             # timezone isn't loaded into the mysql.time_zone table.
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT VERSION(),
                        @@sql_mode,
                        @@default_storage_engine,
                        @@sql_auto_is_null,
                        @@lower_case_table_names,
                        CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC') IS NOT NULL
-            """
-            )
+            """)
             row = cursor.fetchone()
         return {
             "version": row[0],

@@ -87,9 +87,8 @@ class ExplainTests(TestCase):
             {"summary": True},
             {"settings": True},
             {"analyze": True, "wal": True},
+            {"generic_plan": True},
         ]
-        if connection.features.is_postgresql_16:
-            test_options.append({"generic_plan": True})
         if connection.features.is_postgresql_17:
             test_options.append({"memory": True})
             test_options.append({"serialize": "TEXT", "analyze": True})

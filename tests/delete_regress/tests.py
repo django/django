@@ -58,9 +58,9 @@ class DeleteLockingTest(TransactionTestCase):
     def test_concurrent_delete(self):
         """Concurrent deletes don't collide and lock the database (#9479)."""
         with transaction.atomic():
-            Book.objects.create(id=1, pagecount=100)
-            Book.objects.create(id=2, pagecount=200)
-            Book.objects.create(id=3, pagecount=300)
+            Book.objects.create(pagecount=100)
+            book = Book.objects.create(pagecount=200)
+            Book.objects.create(pagecount=300)
 
         with transaction.atomic():
             # Start a transaction on the main connection.
@@ -68,7 +68,9 @@ class DeleteLockingTest(TransactionTestCase):
 
             # Delete something using another database connection.
             with self.conn2.cursor() as cursor2:
-                cursor2.execute("DELETE from delete_regress_book WHERE id = 1")
+                cursor2.execute(
+                    "DELETE from delete_regress_book WHERE id = %s", [book.pk]
+                )
             self.conn2.commit()
 
             # In the same transaction on the main connection, perform a
@@ -115,7 +117,7 @@ class DeleteCascadeTests(TestCase):
         self.assertEqual(PlayedWithNote.objects.count(), 0)
 
     def test_15776(self):
-        policy = Policy.objects.create(pk=1, policy_number="1234")
+        policy = Policy.objects.create(policy_number="1234")
         version = Version.objects.create(policy=policy)
         location = Location.objects.create(version=version)
         Item.objects.create(version=version, location=location)

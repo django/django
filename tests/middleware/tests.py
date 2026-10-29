@@ -7,6 +7,9 @@ from io import BytesIO
 from unittest import mock
 from urllib.parse import quote
 
+from mail import override_deprecated_email_settings
+from mail.custombackend import FailingEmailBackend
+
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import PermissionDenied
@@ -111,8 +114,8 @@ class CommonMiddlewareTest(SimpleTestCase):
     def test_append_slash_no_redirect_in_DEBUG(self):
         """
         While in debug mode, an exception is raised with a warning
-        when a failed attempt is made to DELETE, POST, PUT, or PATCH to an URL
-        which would normally be redirected to a slashed version.
+        when a failed attempt is made to DELETE, POST, PUT, PATCH, or QUERY to
+        an URL which would normally be redirected to a slashed version.
         """
         msg = "maintaining %s data. Change your form to point to testserver/slash/"
         request = self.rf.get("/slash")
@@ -128,6 +131,9 @@ class CommonMiddlewareTest(SimpleTestCase):
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
             CommonMiddleware(get_response_404)(request)
         request = self.rf.delete("/slash")
+        with self.assertRaisesMessage(RuntimeError, msg % request.method):
+            CommonMiddleware(get_response_404)(request)
+        request = self.rf.query("/slash")
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
             CommonMiddleware(get_response_404)(request)
 
@@ -404,6 +410,7 @@ class CommonMiddlewareTest(SimpleTestCase):
 @override_settings(
     IGNORABLE_404_URLS=[re.compile(r"foo")],
     MANAGERS=["manager@example.com"],
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
 )
 class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
     rf = RequestFactory()
@@ -457,7 +464,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
     def test_referer_equal_to_requested_url(self):
         """
         Some bots set the referer to the current URL to avoid being blocked by
-        an referer check (#25302).
+        a referer check (#25302).
         """
         self.req.META["HTTP_REFERER"] = self.req.path
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
@@ -498,6 +505,48 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.req.META["HTTP_REFERER"] = self.req.path_info[:-1]
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
+
+    # RemovedInDjango2028Warning.
+    @override_deprecated_email_settings(
+        EMAIL_BACKEND="mail.custombackend.FailingEmailBackend"
+    )
+    def test_sends_using_fail_silently(self):
+        del settings.MAILERS
+        self.addCleanup(FailingEmailBackend.reset)
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        BrokenLinkEmailsMiddleware(self.get_response)(self.req)
+        self.assertIs(FailingEmailBackend.init_kwargs[0]["fail_silently"], True)
+
+    def test_sends_using_default_mailer(self):
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        BrokenLinkEmailsMiddleware(self.get_response)(self.req)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].sent_using, "default")
+
+    @override_settings(MAILERS={})
+    def test_no_error_when_email_not_configured(self):
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        BrokenLinkEmailsMiddleware(self.get_response)(self.req)
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(
+        MAILERS={
+            "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+        },
+    )
+    def test_custom_send_mail(self):
+        class SubclassedMiddleware(BrokenLinkEmailsMiddleware):
+            using = "custom"
+
+            def send_mail(self, subject, message, *args, **kwargs):
+                super().send_mail("custom subject", "custom message", *args, **kwargs)
+
+        self.req.META["HTTP_REFERER"] = "/another/url/"
+        SubclassedMiddleware(self.get_response)(self.req)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].sent_using, "custom")
+        self.assertEqual(mail.outbox[0].subject, "[Django] custom subject")
+        self.assertEqual(mail.outbox[0].body, "custom message")
 
 
 @override_settings(ROOT_URLCONF="middleware.cond_get_urls")
@@ -549,11 +598,33 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             ConditionalGetMiddleware(self.get_response)(self.req).has_header("ETag")
         )
 
+    def test_no_etag_no_store_cache_whitespace(self):
+        # A no-store directive with surrounding whitespace (e.g. from a
+        # multi-value header where split(",") leaves leading space) must still
+        # prevent ETag generation.
+        for cc in (" no-store", "\tno-store", "no-cache, no-store"):
+            with self.subTest(cache_control=cc):
+                self.resp_headers["Cache-Control"] = cc
+                self.assertFalse(
+                    ConditionalGetMiddleware(self.get_response)(self.req).has_header(
+                        "ETag"
+                    )
+                )
+
     def test_etag_extended_cache_control(self):
         self.resp_headers["Cache-Control"] = 'my-directive="my-no-store"'
         self.assertTrue(
             ConditionalGetMiddleware(self.get_response)(self.req).has_header("ETag")
         )
+
+    def test_no_etag_no_store_qualified(self):
+        # A qualified no-store directive (including whitespace around "=")
+        # reduces to its name and must still prevent ETag generation.
+        for cc in ('no-store="x"', 'no-store ="x"', "no-store = x"):
+            with self.subTest(cache_control=cc):
+                self.resp_headers["Cache-Control"] = cc
+                response = ConditionalGetMiddleware(self.get_response)(self.req)
+                self.assertIs(response.has_header("ETag"), False)
 
     def test_if_none_match_and_no_etag(self):
         self.req.META["HTTP_IF_NONE_MATCH"] = "spam"
@@ -726,6 +797,17 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         request = self.request_factory.head("/")
         conditional_get_response = ConditionalGetMiddleware(get_200_response)(request)
         self.assertNotIn("ETag", conditional_get_response)
+
+
+class ConditionalQueryMiddlewareTest(ConditionalGetMiddlewareTest):
+    """
+    ConditionalGetMiddleware handles a QUERY request (RFC 10008) the same way
+    as a GET request.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.req = self.request_factory.query("/")
 
 
 class XFrameOptionsMiddlewareTest(SimpleTestCase):

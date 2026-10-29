@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, management
-from django.db import DEFAULT_DB_ALIAS, models
+from django.db import DEFAULT_DB_ALIAS, models, transaction
 from django.db.models import signals
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
@@ -104,8 +104,8 @@ class ProxyModelTests(TestCase):
 
     def test_proxy_included_in_ancestors(self):
         """
-        Proxy models are included in the ancestors for a model's DoesNotExist
-        and MultipleObjectsReturned
+        Proxy models are included in the ancestors for a model's DoesNotExist,
+        MultipleObjectsReturned, and NotUpdated
         """
         Person.objects.create(name="Foo McBar")
         MyPerson.objects.create(name="Bazza del Frob")
@@ -118,6 +118,8 @@ class ProxyModelTests(TestCase):
             MyPersonProxy.objects.get(id__lt=max_id + 1)
         with self.assertRaises(Person.DoesNotExist):
             StatusPerson.objects.get(name="Zathras")
+        with self.assertRaises(Person.NotUpdated), transaction.atomic():
+            StatusPerson(id=999).save(update_fields={"name"})
 
         StatusPerson.objects.create(name="Bazza Jr.")
         StatusPerson.objects.create(name="Foo Jr.")
@@ -295,7 +297,7 @@ class ProxyModelTests(TestCase):
         User.objects.create(name="Bruce")
         u2 = UserProxy.objects.create(name="George")
 
-        resp = [u.name for u in UserProxy.objects.all()]
+        resp = [u.name for u in UserProxy.objects.order_by("name")]
         self.assertEqual(resp, ["Bruce", "George"])
 
         u2.delete()
@@ -318,17 +320,17 @@ class ProxyModelTests(TestCase):
         country = Country.objects.create(name="Australia")
         State.objects.create(name="New South Wales", country=country)
 
-        resp = [s.name for s in State.objects.select_related()]
+        resp = [s.name for s in State.objects.select_related("country")]
         self.assertEqual(resp, ["New South Wales"])
 
-        resp = [s.name for s in StateProxy.objects.select_related()]
+        resp = [s.name for s in StateProxy.objects.select_related("country")]
         self.assertEqual(resp, ["New South Wales"])
 
         self.assertEqual(
             StateProxy.objects.get(name="New South Wales").name, "New South Wales"
         )
 
-        resp = StateProxy.objects.select_related().get(name="New South Wales")
+        resp = StateProxy.objects.select_related("country").get(name="New South Wales")
         self.assertEqual(resp.name, "New South Wales")
 
     def test_filter_proxy_relation_reverse(self):
@@ -367,15 +369,19 @@ class ProxyModelTests(TestCase):
         self.assertEqual(repr(resp), "<ProxyBug: ProxyBug:fix this>")
 
         # Select related + filter on proxy
-        resp = ProxyBug.objects.select_related().get(version__icontains="beta")
+        resp = ProxyBug.objects.select_related("reporter").get(
+            version__icontains="beta"
+        )
         self.assertEqual(repr(resp), "<ProxyBug: ProxyBug:fix this>")
 
         # Proxy of proxy, select_related + filter
-        resp = ProxyProxyBug.objects.select_related().get(version__icontains="beta")
+        resp = ProxyProxyBug.objects.select_related("reporter").get(
+            version__icontains="beta"
+        )
         self.assertEqual(repr(resp), "<ProxyProxyBug: ProxyProxyBug:fix this>")
 
         # Select related + filter on a related proxy field
-        resp = ProxyImprovement.objects.select_related().get(
+        resp = ProxyImprovement.objects.select_related("reporter").get(
             reporter__name__icontains="butor"
         )
         self.assertEqual(
@@ -383,7 +389,7 @@ class ProxyModelTests(TestCase):
         )
 
         # Select related + filter on a related proxy of proxy field
-        resp = ProxyImprovement.objects.select_related().get(
+        resp = ProxyImprovement.objects.select_related("associated_bug").get(
             associated_bug__summary__icontains="fix"
         )
         self.assertEqual(

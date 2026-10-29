@@ -63,6 +63,8 @@ and two directions (forward and reverse) for a total of six combinations.
    ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
 
+from functools import cached_property
+
 from asgiref.sync import sync_to_async
 
 from django.core.exceptions import FieldError
@@ -81,7 +83,6 @@ from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet, prefetch_related_objects
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.utils import AltersData, resolve_callables
-from django.utils.functional import cached_property
 
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):
@@ -172,14 +173,18 @@ class ForwardManyToOneDescriptor:
         ).fetch_mode(instance._state.fetch_mode)
 
     def get_prefetch_querysets(self, instances, querysets=None):
-        if querysets and len(querysets) != 1:
-            raise ValueError(
-                "querysets argument of get_prefetch_querysets() should have a length "
-                "of 1."
-            )
-        queryset = (
-            querysets[0] if querysets else self.get_queryset(instance=instances[0])
-        )
+        _cloning_disabled = False
+        if querysets:
+            if len(querysets) != 1:
+                raise ValueError(
+                    "querysets argument of get_prefetch_querysets() should have a "
+                    "length of 1."
+                )
+            queryset = querysets[0]
+            queryset._add_hints(instance=instances[0])
+        else:
+            _cloning_disabled = True
+            queryset = self.get_queryset(instance=instances[0])._disable_cloning()
 
         rel_obj_attr = self.field.get_foreign_related_value
         instance_attr = self.field.get_local_related_value
@@ -203,6 +208,9 @@ class ForwardManyToOneDescriptor:
         # There can be only one object prefetched for each instance so clear
         # ordering if the query allows it without side effects.
         queryset.query.clear_ordering()
+        # Restore subsequent cloning operations.
+        if _cloning_disabled:
+            queryset._enable_cloning()
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -466,14 +474,18 @@ class ReverseOneToOneDescriptor:
         ).fetch_mode(instance._state.fetch_mode)
 
     def get_prefetch_querysets(self, instances, querysets=None):
-        if querysets and len(querysets) != 1:
-            raise ValueError(
-                "querysets argument of get_prefetch_querysets() should have a length "
-                "of 1."
-            )
-        queryset = (
-            querysets[0] if querysets else self.get_queryset(instance=instances[0])
-        )
+        _cloning_disabled = False
+        if querysets:
+            if len(querysets) != 1:
+                raise ValueError(
+                    "querysets argument of get_prefetch_querysets() should have a "
+                    "length of 1."
+                )
+            queryset = querysets[0]
+            queryset._add_hints(instance=instances[0])
+        else:
+            _cloning_disabled = True
+            queryset = self.get_queryset(instance=instances[0])._disable_cloning()
 
         rel_obj_attr = self.related.field.get_local_related_value
         instance_attr = self.related.field.get_foreign_related_value
@@ -483,6 +495,9 @@ class ReverseOneToOneDescriptor:
         # There can be only one object prefetched for each instance so clear
         # ordering if the query allows it without side effects.
         queryset.query.clear_ordering()
+        # Restore subsequent cloning operations.
+        if _cloning_disabled:
+            queryset._enable_cloning()
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -730,24 +745,31 @@ def create_reverse_many_to_one_manager(superclass, rel):
                         f'"{field.attname}" before this relationship can be used.'
                     )
 
+        def _empty_strings_as_null(self):
+            db = self._db or router.db_for_read(self.model, instance=self.instance)
+            return connections[db].features.interprets_empty_strings_as_nulls
+
         def _apply_rel_filters(self, queryset):
             """
             Filter the queryset for the instance this manager is bound to.
             """
-            db = self._db or router.db_for_read(self.model, instance=self.instance)
-            empty_strings_as_null = connections[
-                db
-            ].features.interprets_empty_strings_as_nulls
-            queryset._add_hints(instance=self.instance)
-            if self._db:
-                queryset = queryset.using(self._db)
-            queryset._fetch_mode = self.instance._state.fetch_mode
-            queryset._defer_next_filter = True
-            queryset = queryset.filter(**self.core_filters)
+            with queryset._avoid_cloning():
+                queryset._add_hints(instance=self.instance)
+                if self._db:
+                    queryset = queryset.using(self._db)
+                queryset._fetch_mode = self.instance._state.fetch_mode
+                queryset._defer_next_filter = True
+                queryset = queryset.filter(**self.core_filters)
+            empty_strings_as_null = None
             for field in self.field.foreign_related_fields:
                 val = getattr(self.instance, field.attname)
-                if val is None or (val == "" and empty_strings_as_null):
+                if val is None:
                     return queryset.none()
+                if val == "":
+                    if empty_strings_as_null is None:
+                        empty_strings_as_null = self._empty_strings_as_null()
+                    if empty_strings_as_null:
+                        return queryset.none()
             if self.field.many_to_one:
                 # Guard against field-like objects such as GenericRelation
                 # that abuse create_reverse_many_to_one_manager() with reverse
@@ -797,12 +819,18 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_querysets(self, instances, querysets=None):
-            if querysets and len(querysets) != 1:
-                raise ValueError(
-                    "querysets argument of get_prefetch_querysets() should have a "
-                    "length of 1."
-                )
-            queryset = querysets[0] if querysets else super().get_queryset()
+            _cloning_disabled = False
+            if querysets:
+                if len(querysets) != 1:
+                    raise ValueError(
+                        "querysets argument of get_prefetch_querysets() should have a "
+                        "length of 1."
+                    )
+                queryset = querysets[0]
+            else:
+                _cloning_disabled = True
+                queryset = super().get_queryset()._disable_cloning()
+
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
 
@@ -810,6 +838,9 @@ def create_reverse_many_to_one_manager(superclass, rel):
             instance_attr = self.field.get_foreign_related_value
             instances_dict = {instance_attr(inst): inst for inst in instances}
             queryset = _filter_prefetch_queryset(queryset, self.field.name, instances)
+            # Restore subsequent cloning operations.
+            if _cloning_disabled:
+                queryset._enable_cloning()
 
             # Since we just bypassed this class' get_queryset(), we must manage
             # the reverse relation manually.
@@ -1057,38 +1088,41 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
     """
 
     class ManyRelatedManager(superclass, AltersData):
+        if not reverse:
+            model = rel.model
+            query_field_name = rel.field.related_query_name()
+            prefetch_cache_name = rel.field.name
+            source_field_name = rel.field.m2m_field_name()
+            target_field_name = rel.field.m2m_reverse_field_name()
+            symmetrical = rel.symmetrical
+        else:
+            model = rel.related_model
+            query_field_name = rel.field.name
+            prefetch_cache_name = rel.field.related_query_name()
+            source_field_name = rel.field.m2m_reverse_field_name()
+            target_field_name = rel.field.m2m_field_name()
+            symmetrical = False
+
+        through = rel.through
+        source_field = through._meta.get_field(source_field_name)
+        target_field = through._meta.get_field(target_field_name)
+        pk_field_names = {
+            lh_field.name: rh_field.name
+            for lh_field, rh_field in source_field.related_fields
+        }
+
         def __init__(self, instance=None):
             super().__init__()
 
+            # BaseManager.__init__() sets the instance's model to None.
+            self.model = self.__class__.model
             self.instance = instance
-
-            if not reverse:
-                self.model = rel.model
-                self.query_field_name = rel.field.related_query_name()
-                self.prefetch_cache_name = rel.field.name
-                self.source_field_name = rel.field.m2m_field_name()
-                self.target_field_name = rel.field.m2m_reverse_field_name()
-                self.symmetrical = rel.symmetrical
-            else:
-                self.model = rel.related_model
-                self.query_field_name = rel.field.name
-                self.prefetch_cache_name = rel.field.related_query_name()
-                self.source_field_name = rel.field.m2m_reverse_field_name()
-                self.target_field_name = rel.field.m2m_field_name()
-                self.symmetrical = False
-
-            self.through = rel.through
             self.reverse = reverse
 
-            self.source_field = self.through._meta.get_field(self.source_field_name)
-            self.target_field = self.through._meta.get_field(self.target_field_name)
-
             self.core_filters = {}
-            self.pk_field_names = {}
-            for lh_field, rh_field in self.source_field.related_fields:
+            for rh_field in self.source_field.foreign_related_fields:
                 core_filter_key = "%s__%s" % (self.query_field_name, rh_field.name)
                 self.core_filters[core_filter_key] = getattr(instance, rh_field.attname)
-                self.pk_field_names[lh_field.name] = rh_field.name
 
             self.related_val = self.source_field.get_foreign_related_value(instance)
             if None in self.related_val:
@@ -1140,12 +1174,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             """
             Filter the queryset for the instance this manager is bound to.
             """
-            queryset._add_hints(instance=self.instance)
-            if self._db:
-                queryset = queryset.using(self._db)
-            queryset._fetch_mode = self.instance._state.fetch_mode
-            queryset._defer_next_filter = True
-            return queryset._next_is_sticky().filter(**self.core_filters)
+            with queryset._avoid_cloning():
+                queryset._add_hints(instance=self.instance)
+                if self._db:
+                    queryset = queryset.using(self._db)
+                queryset._fetch_mode = self.instance._state.fetch_mode
+                queryset._defer_next_filter = True
+                return queryset._next_is_sticky().filter(**self.core_filters)
 
         def get_prefetch_cache(self):
             # Walk up the ancestor-chain (if cached) to try and find a prefetch
@@ -1174,12 +1209,18 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_querysets(self, instances, querysets=None):
-            if querysets and len(querysets) != 1:
-                raise ValueError(
-                    "querysets argument of get_prefetch_querysets() should have a "
-                    "length of 1."
-                )
-            queryset = querysets[0] if querysets else super().get_queryset()
+            _cloning_disabled = False
+            if querysets:
+                if len(querysets) != 1:
+                    raise ValueError(
+                        "querysets argument of get_prefetch_querysets() should have a "
+                        "length of 1."
+                    )
+                queryset = querysets[0]
+            else:
+                _cloning_disabled = True
+                queryset = super().get_queryset()._disable_cloning()
+
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
             queryset = _filter_prefetch_queryset(
@@ -1205,6 +1246,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     for f in fk.local_related_fields
                 }
             )
+            # Restore subsequent cloning operations.
+            if _cloning_disabled:
+                queryset._enable_cloning()
+
             return (
                 queryset,
                 lambda result: tuple(
@@ -1262,15 +1307,16 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             else:
                 return super().count()
 
-        def add(self, *objs, through_defaults=None):
-            self._remove_prefetched_objects()
-            db = router.db_for_write(self.through, instance=self.instance)
+        def _add_base(self, *objs, through_defaults=None, using=None, raw=False):
+            db = using or router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 self._add_items(
                     self.source_field_name,
                     self.target_field_name,
                     *objs,
                     through_defaults=through_defaults,
+                    using=db,
+                    raw=raw,
                 )
                 # If this is a symmetrical m2m relation to self, add the mirror
                 # entry in the m2m table.
@@ -1280,7 +1326,14 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         self.source_field_name,
                         *objs,
                         through_defaults=through_defaults,
+                        using=db,
+                        raw=raw,
                     )
+
+        def add(self, *objs, through_defaults=None):
+            self._remove_prefetched_objects()
+            db = router.db_for_write(self.through, instance=self.instance)
+            self._add_base(*objs, through_defaults=through_defaults, using=db)
 
         add.alters_data = True
 
@@ -1291,9 +1344,16 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         aadd.alters_data = True
 
+        def _remove_base(self, *objs, using=None, raw=False):
+            db = using or router.db_for_write(self.through, instance=self.instance)
+            self._remove_items(
+                self.source_field_name, self.target_field_name, *objs, using=db, raw=raw
+            )
+
         def remove(self, *objs):
             self._remove_prefetched_objects()
-            self._remove_items(self.source_field_name, self.target_field_name, *objs)
+            db = router.db_for_write(self.through, instance=self.instance)
+            self._remove_base(*objs, using=db)
 
         remove.alters_data = True
 
@@ -1302,8 +1362,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         aremove.alters_data = True
 
-        def clear(self):
-            db = router.db_for_write(self.through, instance=self.instance)
+        def _clear_base(self, using=None, raw=False):
+            db = using or router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 signals.m2m_changed.send(
                     sender=self.through,
@@ -1313,8 +1373,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model,
                     pk_set=None,
                     using=db,
+                    raw=raw,
                 )
-                self._remove_prefetched_objects()
                 filters = self._build_remove_filters(super().get_queryset().using(db))
                 self.through._default_manager.using(db).filter(filters).delete()
 
@@ -1326,7 +1386,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model,
                     pk_set=None,
                     using=db,
+                    raw=raw,
                 )
+
+        def clear(self):
+            self._remove_prefetched_objects()
+            db = router.db_for_write(self.through, instance=self.instance)
+            self._clear_base(using=db)
 
         clear.alters_data = True
 
@@ -1335,16 +1401,19 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         aclear.alters_data = True
 
-        def set(self, objs, *, clear=False, through_defaults=None):
+        def set_base(self, objs, *, clear=False, through_defaults=None, raw=False):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
 
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
+                self._remove_prefetched_objects()
                 if clear:
-                    self.clear()
-                    self.add(*objs, through_defaults=through_defaults)
+                    self._clear_base(using=db, raw=raw)
+                    self._add_base(
+                        *objs, through_defaults=through_defaults, using=db, raw=raw
+                    )
                 else:
                     old_ids = set(
                         self.using(db).values_list(
@@ -1364,8 +1433,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         else:
                             new_objs.append(obj)
 
-                    self.remove(*old_ids)
-                    self.add(*new_objs, through_defaults=through_defaults)
+                    self._remove_base(*old_ids, using=db, raw=raw)
+                    self._add_base(
+                        *new_objs, through_defaults=through_defaults, using=db, raw=raw
+                    )
+
+        def set(self, objs, *, clear=False, through_defaults=None):
+            self.set_base(objs, clear=clear, through_defaults=through_defaults)
 
         set.alters_data = True
 
@@ -1516,7 +1590,13 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             )
 
         def _add_items(
-            self, source_field_name, target_field_name, *objs, through_defaults=None
+            self,
+            source_field_name,
+            target_field_name,
+            *objs,
+            through_defaults=None,
+            using=None,
+            raw=False,
         ):
             # source_field_name: the PK fieldname in join table for the source
             # object target_field_name: the PK fieldname in join table for the
@@ -1527,7 +1607,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
             through_defaults = dict(resolve_callables(through_defaults or {}))
             target_ids = self._get_target_ids(target_field_name, objs)
-            db = router.db_for_write(self.through, instance=self.instance)
+            db = using or router.db_for_write(self.through, instance=self.instance)
             can_ignore_conflicts, must_send_signals, can_fast_add = self._get_add_plan(
                 db, source_field_name
             )
@@ -1559,6 +1639,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         model=self.model,
                         pk_set=missing_target_ids,
                         using=db,
+                        raw=raw,
                     )
                 # Add the ones that aren't there already.
                 self.through._default_manager.using(db).bulk_create(
@@ -1584,9 +1665,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         model=self.model,
                         pk_set=missing_target_ids,
                         using=db,
+                        raw=raw,
                     )
 
-        def _remove_items(self, source_field_name, target_field_name, *objs):
+        def _remove_items(
+            self, source_field_name, target_field_name, *objs, using=None, raw=False
+        ):
             # source_field_name: the PK colname in join table for the source
             # object target_field_name: the PK colname in join table for the
             # target object *objs - objects to remove. Either object instances,
@@ -1603,7 +1687,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 else:
                     old_ids.add(obj)
 
-            db = router.db_for_write(self.through, instance=self.instance)
+            db = using or router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 # Send a signal to the other end if need be.
                 signals.m2m_changed.send(
@@ -1614,6 +1698,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model,
                     pk_set=old_ids,
                     using=db,
+                    raw=raw,
                 )
                 target_model_qs = super().get_queryset()
                 if target_model_qs._has_filters():
@@ -1633,6 +1718,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model,
                     pk_set=old_ids,
                     using=db,
+                    raw=raw,
                 )
 
     return ManyRelatedManager

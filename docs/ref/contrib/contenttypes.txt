@@ -117,7 +117,8 @@ model it represents, or to retrieve objects from that model:
 .. method:: ContentType.model_class()
 
     Returns the model class represented by this
-    :class:`~django.contrib.contenttypes.models.ContentType` instance.
+    :class:`~django.contrib.contenttypes.models.ContentType` instance, or
+    ``None`` in case of a stale content type for a deleted model.
 
 For example, we could look up the
 :class:`~django.contrib.contenttypes.models.ContentType` for the
@@ -181,8 +182,16 @@ The ``ContentTypeManager``
         :class:`~django.contrib.contenttypes.models.ContentType` to keep track
         of models for which it has created
         :class:`~django.contrib.contenttypes.models.ContentType` instances. You
-        probably won't ever need to call this method yourself; Django will call
-        it automatically when it's needed.
+        probably won't need to call this method in application code yourself;
+        Django will call it automatically when it's needed.
+
+        You may need to clear the cache when testing, to reset between tests,
+        or after preparing test state. For example::
+
+            class ContentTypesTests(TestCase):
+                def setUp(self):
+                    ContentType.objects.clear_cache()
+                    self.addCleanup(ContentType.objects.clear_cache)
 
     .. method:: get_for_id(id)
 

@@ -1,3 +1,4 @@
+import unittest
 from unittest.mock import patch
 
 from django.db import NotSupportedError, connection
@@ -12,6 +13,7 @@ from django.db.models import (
     Value,
     When,
 )
+from django.db.models.fields.tuple_lookups import TupleIn
 from django.db.models.functions import Cast
 from django.db.models.lookups import Exact
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -539,6 +541,22 @@ class CompositePKFilterTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Comment.objects.filter(pk=pk)
 
+    def test_filter_by_pk_exact_rhs_f_object(self):
+        self.assertEqual(
+            Comment.objects.filter(pk=F("pk")).count(),
+            Comment.objects.count(),
+        )
+
+    @unittest.expectedFailure
+    def test_filter_by_pk_in_rhs_f_object_lhs(self):
+        # This no longer hangs, but it should not raise ValueError (#37383).
+        self.assertCountEqual(
+            Comment.objects.filter(
+                TupleIn(F("pk"), Comment.objects.values("pk").query)
+            ),
+            Comment.objects.all(),
+        )
+
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_filter_comments_by_pk_exact_subquery(self):
         self.assertSequenceEqual(
@@ -607,3 +625,30 @@ class CompositePKFilterTupleLookupFallbackTests(CompositePKFilterTests):
         )
         self.enterContext(feature_patch_1)
         self.enterContext(feature_patch_2)
+
+
+class CompositePKExcludeNoneTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.tenant = Tenant.objects.create()
+        cls.user = User.objects.create(
+            tenant=cls.tenant, id=1, email="exclude@example.com"
+        )
+
+    def test_filter_pk_in_partial_none(self):
+        self.assertQuerySetEqual(
+            User.objects.filter(pk__in=[(self.user.pk[0], None)]), []
+        )
+
+    def test_filter_pk_in_full_none(self):
+        self.assertQuerySetEqual(User.objects.filter(pk__in=[(None, None)]), [])
+
+    def test_exclude_pk_in_partial_none(self):
+        self.assertQuerySetEqual(
+            User.objects.exclude(pk__in=[(self.user.pk[0], None)]), [self.user]
+        )
+
+    def test_exclude_pk_in_full_none(self):
+        self.assertQuerySetEqual(
+            User.objects.exclude(pk__in=[(None, None)]), [self.user]
+        )

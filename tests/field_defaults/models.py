@@ -13,7 +13,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.db import models
-from django.db.models.functions import Coalesce, ExtractYear, Now, Pi
+from django.db.models.functions import UUID4, Coalesce, ExtractYear, Now, Pi
 from django.db.models.lookups import GreaterThan
 
 
@@ -68,3 +68,33 @@ class DBDefaultsFK(models.Model):
     language_code = models.ForeignKey(
         DBDefaultsPK, db_default="fr", on_delete=models.CASCADE
     )
+
+
+class DBDefaultsOneToOnePK(models.Model):
+    language_code = models.OneToOneField(
+        DBDefaultsPK,
+        primary_key=True,
+        default="tr",
+        db_default="kr",
+        on_delete=models.CASCADE,
+    )
+
+
+class DBDefaultsFunctionPK(models.Model):
+    uuid = models.UUIDField(primary_key=True, db_default=UUID4())
+
+    class Meta:
+        required_db_features = {
+            "supports_uuid4_function_in_default",
+            "supports_expression_defaults",
+        }
+
+
+class DBDefaultsFunctionFK(models.Model):
+    parent = models.ForeignKey(DBDefaultsFunctionPK, models.CASCADE)
+
+    class Meta:
+        required_db_features = {
+            "supports_uuid4_function_in_default",
+            "supports_expression_defaults",
+        }

@@ -1,6 +1,8 @@
+from itertools import chain
+
 from django.db.models import F, Sum
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import Company, Employee, JSONFieldModel
 
@@ -31,37 +33,47 @@ class ValuesExpressionsTests(TestCase):
 
     def test_values_expression(self):
         self.assertSequenceEqual(
-            Company.objects.values(salary=F("ceo__salary")),
+            Company.objects.values(salary=F("ceo__salary")).order_by("salary"),
             [{"salary": 10}, {"salary": 20}, {"salary": 30}],
         )
 
     def test_values_expression_containing_percent_sign_deprecation_warns_once(self):
         msg = "Using percent signs in a column alias is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango70Warning, msg) as cm:
+        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as cm:
             Company.objects.values(**{"alias%": F("id")})
         self.assertEqual(len(cm.warnings), 1)
 
     def test_values_expression_alias_sql_injection(self):
-        crafted_alias = """injected_name" from "expressions_company"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, quotation "
-            "marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            Company.objects.values(**{crafted_alias: F("ceo__salary")})
+        for crafted_alias in [
+            """injected_name" from "expressions_company"; --""",
+            # Control characters.
+            *(f"name{chr(c)}" for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    Company.objects.values(**{crafted_alias: F("ceo__salary")})
 
     @skipUnlessDBFeature("supports_json_field")
     def test_values_expression_alias_sql_injection_json_field(self):
-        crafted_alias = """injected_name" from "expressions_company"; --"""
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, quotation "
-            "marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, "
+            "control characters, quotation marks, semicolons, or SQL comments."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            JSONFieldModel.objects.values(f"data__{crafted_alias}")
+        for crafted_alias in [
+            """injected_name" from "expressions_company"; --""",
+            # Control characters.
+            *(chr(c) for c in chain(range(32), range(0x7F, 0xA0))),
+        ]:
+            with self.subTest(crafted_alias):
+                with self.assertRaisesMessage(ValueError, msg):
+                    JSONFieldModel.objects.values(f"data__{crafted_alias}")
 
-        with self.assertRaisesMessage(ValueError, msg):
-            JSONFieldModel.objects.values_list(f"data__{crafted_alias}")
+                with self.assertRaisesMessage(ValueError, msg):
+                    JSONFieldModel.objects.values_list(f"data__{crafted_alias}")
 
     def test_values_expression_group_by(self):
         # values() applies annotate() first, so values selected are grouped by

@@ -1,9 +1,11 @@
 import asyncio
+import contextvars
 import logging
 import threading
 import weakref
+from inspect import iscoroutinefunction
 
-from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.utils.inspect import func_accepts_kwargs
 
@@ -20,6 +22,47 @@ NONE_ID = _make_id(None)
 
 # A marker for caching
 NO_RECEIVERS = object()
+
+
+def _restore_context(context):
+    """
+    Check for changes in contextvars, and set them to the current
+    context for downstream consumers.
+    """
+    for cvar in context:
+        cvalue = context.get(cvar)
+        try:
+            if cvar.get() != cvalue:
+                cvar.set(cvalue)
+        except LookupError:
+            cvar.set(cvalue)
+
+
+async def _run_parallel(*coros):
+    """
+    Execute multiple asynchronous coroutines in parallel,
+    sharing the current context between them.
+    """
+    context = contextvars.copy_context()
+
+    if len(coros) == 0:
+        return []
+
+    async def run(i, coro):
+        results[i] = await coro
+
+    try:
+        async with asyncio.TaskGroup() as tg:
+            results = [None] * len(coros)
+            for i, coro in enumerate(coros):
+                tg.create_task(run(i, coro), context=context)
+        return results
+    except BaseExceptionGroup as exception_group:
+        if len(exception_group.exceptions) == 1:
+            raise exception_group.exceptions[0]
+        raise
+    finally:
+        _restore_context(context=context)
 
 
 class Signal:
@@ -111,13 +154,10 @@ class Signal:
 
         if weak:
             ref = weakref.ref
-            receiver_object = receiver
             # Check for bound methods
             if hasattr(receiver, "__self__") and hasattr(receiver, "__func__"):
                 ref = weakref.WeakMethod
-                receiver_object = receiver.__self__
-            receiver = ref(receiver)
-            weakref.finalize(receiver_object, self._flag_dead_receivers)
+            receiver = ref(receiver, self._flag_dead_receivers)
 
         # Keep a weakref to sender if possible to ensure associated receivers
         # are cleared if it gets garbage collected. This ensures there is no
@@ -186,7 +226,7 @@ class Signal:
 
         If any receivers are asynchronous, they are called after all the
         synchronous receivers via a single call to async_to_sync(). They are
-        also executed concurrently with asyncio.gather().
+        also executed concurrently with asyncio.TaskGroup().
 
         Arguments:
 
@@ -211,7 +251,7 @@ class Signal:
         if async_receivers:
 
             async def asend():
-                async_responses = await asyncio.gather(
+                async_responses = await _run_parallel(
                     *(
                         receiver(signal=self, sender=sender, **named)
                         for receiver in async_receivers
@@ -235,7 +275,7 @@ class Signal:
         sync_to_async() adaption before executing any asynchronous receivers.
 
         If any receivers are asynchronous, they are grouped and executed
-        concurrently with asyncio.gather().
+        concurrently with asyncio.TaskGroup().
 
         Arguments:
 
@@ -253,6 +293,7 @@ class Signal:
         ):
             return []
         sync_receivers, async_receivers = self._live_receivers(sender)
+
         if sync_receivers:
 
             @sync_to_async
@@ -268,14 +309,12 @@ class Signal:
             async def sync_send():
                 return []
 
-        responses, async_responses = await asyncio.gather(
-            sync_send(),
-            asyncio.gather(
-                *(
-                    receiver(signal=self, sender=sender, **named)
-                    for receiver in async_receivers
-                )
-            ),
+        responses = await sync_send()
+        async_responses = await _run_parallel(
+            *(
+                receiver(signal=self, sender=sender, **named)
+                for receiver in async_receivers
+            )
         )
         responses.extend(zip(async_receivers, async_responses))
         return responses
@@ -294,7 +333,7 @@ class Signal:
 
         If any receivers are asynchronous, they are called after all the
         synchronous receivers via a single call to async_to_sync(). They are
-        also executed concurrently with asyncio.gather().
+        also executed concurrently with asyncio.TaskGroup().
 
         Arguments:
 
@@ -340,7 +379,7 @@ class Signal:
                 return response
 
             async def asend():
-                async_responses = await asyncio.gather(
+                async_responses = await _run_parallel(
                     *(
                         asend_and_wrap_exception(receiver)
                         for receiver in async_receivers
@@ -359,7 +398,7 @@ class Signal:
         sync_to_async() adaption before executing any asynchronous receivers.
 
         If any receivers are asynchronous, they are grouped and executed
-        concurrently with asyncio.gather.
+        concurrently with asyncio.TaskGroup.
 
         Arguments:
 
@@ -414,11 +453,9 @@ class Signal:
                 return err
             return response
 
-        responses, async_responses = await asyncio.gather(
-            sync_send(),
-            asyncio.gather(
-                *(asend_and_wrap_exception(receiver) for receiver in async_receivers),
-            ),
+        responses = await sync_send()
+        async_responses = await _run_parallel(
+            *(asend_and_wrap_exception(receiver) for receiver in async_receivers),
         )
         responses.extend(zip(async_receivers, async_responses))
         return responses

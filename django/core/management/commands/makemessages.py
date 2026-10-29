@@ -1,8 +1,9 @@
 import glob
+import locale
 import os
 import re
 import sys
-from functools import total_ordering
+from functools import cached_property, total_ordering
 from itertools import dropwhile
 from pathlib import Path
 
@@ -18,7 +19,6 @@ from django.core.management.utils import (
     popen_wrapper,
 )
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
-from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import get_text_list
 from django.utils.translation import templatize
@@ -208,6 +208,7 @@ class Command(BaseCommand):
     translatable_file_class = TranslatableFile
     build_file_class = BuildFile
 
+    requires_settings = False
     requires_system_checks = []
 
     msgmerge_options = ["-q", "--backup=none", "--previous", "--update"]
@@ -662,8 +663,14 @@ class Command(BaseCommand):
             return
 
         input_files = [bf.work_path for bf in build_files]
-        with NamedTemporaryFile(mode="w+") as input_files_list:
-            input_files_list.write("\n".join(input_files))
+        # xgettext opens the listed paths as raw bytes, which Windows reads
+        # in the ANSI code page regardless of Python's UTF-8 mode.
+        if os.name == "nt":
+            files_list = "\n".join(input_files).encode(locale.getencoding())
+        else:
+            files_list = b"\n".join(os.fsencode(path) for path in input_files)
+        with NamedTemporaryFile(mode="w+b") as input_files_list:
+            input_files_list.write(files_list)
             input_files_list.flush()
             args.extend(["--files-from", input_files_list.name])
             args.extend(self.xgettext_options)

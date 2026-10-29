@@ -1,7 +1,6 @@
 import copy
 import datetime
 import functools
-import inspect
 from collections import defaultdict
 from decimal import Decimal
 from enum import Enum
@@ -13,10 +12,11 @@ from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.query_utils import Q
+from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, Q
 from django.utils.deconstruct import deconstructible
-from django.utils.functional import cached_property, classproperty
+from django.utils.functional import classproperty
 from django.utils.hashable import make_hashable
+from django.utils.inspect import signature
 
 
 class SQLiteNumericMixin:
@@ -250,26 +250,26 @@ class BaseExpression:
         """
         raise NotImplementedError("Subclasses must implement as_sql()")
 
-    @cached_property
+    @functools.cached_property
     def contains_aggregate(self):
         return any(
             expr and expr.contains_aggregate for expr in self.get_source_expressions()
         )
 
-    @cached_property
+    @functools.cached_property
     def contains_over_clause(self):
         return any(
             expr and expr.contains_over_clause for expr in self.get_source_expressions()
         )
 
-    @cached_property
+    @functools.cached_property
     def contains_column_references(self):
         return any(
             expr and expr.contains_column_references
             for expr in self.get_source_expressions()
         )
 
-    @cached_property
+    @functools.cached_property
     def contains_subquery(self):
         return any(
             expr and (getattr(expr, "subquery", False) or expr.contains_subquery)
@@ -322,7 +322,7 @@ class BaseExpression:
     def field(self):
         return self.output_field
 
-    @cached_property
+    @functools.cached_property
     def output_field(self):
         """Return the output type of this expressions."""
         output_field = self._resolve_output_field()
@@ -377,7 +377,7 @@ class BaseExpression:
     def _convert_value_noop(value, expression, connection):
         return value
 
-    @cached_property
+    @functools.cached_property
     def convert_value(self):
         """
         Expressions provide their own converters because users have the option
@@ -426,7 +426,7 @@ class BaseExpression:
         clone = self.copy()
         clone.set_source_expressions(
             [
-                expr.replace_expressions(replacements) if expr else None
+                None if expr is None else expr.replace_expressions(replacements)
                 for expr in source_expressions
             ]
         )
@@ -523,7 +523,7 @@ class Expression(BaseExpression, Combinable):
     @classproperty
     @functools.lru_cache(maxsize=128)
     def _constructor_signature(cls):
-        return inspect.signature(cls.__init__)
+        return signature(cls.__init__)
 
     @classmethod
     def _identity(cls, value):
@@ -537,7 +537,7 @@ class Expression(BaseExpression, Combinable):
             return type(value)
         return make_hashable(value)
 
-    @cached_property
+    @functools.cached_property
     def identity(self):
         args, kwargs = self._constructor_args
         signature = self._constructor_signature.bind_partial(self, *args, **kwargs)
@@ -705,10 +705,14 @@ def register_combinable_fields(lhs, connector, rhs, result):
     _connector_combinators[connector].append((lhs, rhs, result))
 
 
-for d in _connector_combinations:
-    for connector, field_types in d.items():
-        for lhs, rhs, result in field_types:
-            register_combinable_fields(lhs, connector, rhs, result)
+def _register_combinable_fields():
+    for d in _connector_combinations:
+        for connector, field_types in d.items():
+            for lhs, rhs, result in field_types:
+                register_combinable_fields(lhs, connector, rhs, result)
+
+
+_register_combinable_fields()
 
 
 @functools.lru_cache(maxsize=128)
@@ -769,7 +773,7 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         # order of precedence
         expression_wrapper = "(%s)"
         sql = connection.ops.combine_expression(self.connector, expressions)
-        return expression_wrapper % sql, expression_params
+        return expression_wrapper % sql, tuple(expression_params)
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
@@ -803,7 +807,7 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
                 return TemporalSubtraction(resolved.lhs, resolved.rhs)
         return resolved
 
-    @cached_property
+    @functools.cached_property
     def allowed_default(self):
         return self.lhs.allowed_default and self.rhs.allowed_default
 
@@ -835,7 +839,7 @@ class DurationExpression(CombinedExpression):
         # order of precedence
         expression_wrapper = "(%s)"
         sql = connection.ops.combine_duration_expression(self.connector, expressions)
-        return expression_wrapper % sql, expression_params
+        return expression_wrapper % sql, tuple(expression_params)
 
     def as_sqlite(self, compiler, connection, **extra_context):
         sql, params = self.as_sql(compiler, connection, **extra_context)
@@ -1135,13 +1139,13 @@ class Func(SQLiteNumericMixin, Expression):
         copy.extra = self.extra.copy()
         return copy
 
-    @cached_property
+    @functools.cached_property
     def allowed_default(self):
         return all(expression.allowed_default for expression in self.source_expressions)
 
 
 @deconstructible(path="django.db.models.Value")
-class Value(SQLiteNumericMixin, Expression):
+class Value(Expression):
     """Represent a wrapped value as a node within an expression."""
 
     # Provide a default value for `for_save` in order to allow unresolved
@@ -1173,14 +1177,30 @@ class Value(SQLiteNumericMixin, Expression):
                 val = output_field.get_db_prep_save(val, connection=connection)
             else:
                 val = output_field.get_db_prep_value(val, connection=connection)
-            if hasattr(output_field, "get_placeholder"):
-                return output_field.get_placeholder(val, compiler, connection), [val]
+            try:
+                get_placeholder_sql = output_field.get_placeholder_sql
+            except AttributeError:
+                pass
+            else:
+                return get_placeholder_sql(val, compiler, connection)
         if val is None:
             # oracledb does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
             # use a literal SQL NULL
-            return "NULL", []
-        return "%s", [val]
+            return "NULL", ()
+        return "%s", (val,)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        sql, params = self.as_sql(compiler, connection, **extra_context)
+        try:
+            if self.output_field.get_internal_type() == "DecimalField":
+                if isinstance(self.value, Decimal):
+                    sql = "(CAST(%s AS REAL))" % sql
+                else:
+                    sql = "(CAST(%s AS NUMERIC))" % sql
+        except FieldError:
+            pass
+        return sql, params
 
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
@@ -1219,6 +1239,30 @@ class Value(SQLiteNumericMixin, Expression):
     @property
     def empty_result_set_value(self):
         return self.value
+
+
+@deconstructible(path="django.db.models.JSONNull")
+class JSONNull(Value):
+    """Represent JSON `null` primitive."""
+
+    def __init__(self):
+        from django.db.models import JSONField
+
+        super().__init__(None, output_field=JSONField())
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}()"
+
+    def as_sql(self, compiler, connection):
+        value = self.output_field.get_db_prep_value(self.value, connection)
+        if value is None:
+            value = "null"
+        return "%s", (value,)
+
+    def as_mysql(self, compiler, connection):
+        sql, params = self.as_sql(compiler, connection)
+        sql = "JSON_EXTRACT(%s, '$')"
+        return sql, params
 
 
 class RawSQL(Expression):
@@ -1261,7 +1305,7 @@ class Star(Expression):
         return "'*'"
 
     def as_sql(self, compiler, connection):
-        return "*", []
+        return "*", ()
 
 
 class DatabaseDefault(Expression):
@@ -1301,7 +1345,7 @@ class DatabaseDefault(Expression):
     def as_sql(self, compiler, connection):
         if not connection.features.supports_default_keyword_in_insert:
             return compiler.compile(self.expression)
-        return "DEFAULT", []
+        return "DEFAULT", ()
 
 
 class Col(Expression):
@@ -1322,7 +1366,7 @@ class Col(Expression):
     def as_sql(self, compiler, connection):
         alias, column = self.alias, self.target.column
         identifiers = (alias, column) if alias else (column,)
-        sql = ".".join(map(compiler.quote_name_unless_alias, identifiers))
+        sql = ".".join(map(compiler.quote_name, identifiers))
         return sql, ()
 
     def relabeled_clone(self, relabels):
@@ -1386,7 +1430,7 @@ class ColPairs(Expression):
             cols_sql.append(sql)
             cols_params.extend(params)
 
-        return ", ".join(cols_sql), cols_params
+        return ", ".join(cols_sql), tuple(cols_params)
 
     def relabeled_clone(self, relabels):
         return self.__class__(
@@ -1435,7 +1479,7 @@ class Ref(Expression):
         return clone
 
     def as_sql(self, compiler, connection):
-        return connection.ops.quote_name(self.refs), []
+        return connection.ops.quote_name(self.refs), ()
 
     def get_group_by_cols(self):
         return [self]
@@ -1596,6 +1640,9 @@ class When(Expression):
 
     def __init__(self, condition=None, then=None, **lookups):
         if lookups:
+            if invalid_kwargs := PROHIBITED_FILTER_KWARGS.intersection(lookups):
+                invalid_str = ", ".join(f"'{k}'" for k in sorted(invalid_kwargs))
+                raise TypeError(f"The following kwargs are invalid: {invalid_str}")
             if condition is None:
                 condition, lookups = Q(**lookups), None
             elif getattr(condition, "conditional", False):
@@ -1661,7 +1708,7 @@ class When(Expression):
             cols.extend(source.get_group_by_cols())
         return cols
 
-    @cached_property
+    @functools.cached_property
     def allowed_default(self):
         return self.condition.allowed_default and self.result.allowed_default
 
@@ -1752,14 +1799,14 @@ class Case(SQLiteNumericMixin, Expression):
         sql = template % template_params
         if self._output_field_or_none is not None:
             sql = connection.ops.unification_cast_sql(self.output_field) % sql
-        return sql, sql_params
+        return sql, tuple(sql_params)
 
     def get_group_by_cols(self):
         if not self.cases:
             return self.default.get_group_by_cols()
         return super().get_group_by_cols()
 
-    @cached_property
+    @functools.cached_property
     def allowed_default(self):
         return self.default.allowed_default and all(
             case_.allowed_default for case_ in self.cases
@@ -2136,7 +2183,7 @@ class WindowFrame(Expression):
                 "end": end,
                 "exclude": self.get_exclusion(),
             },
-            [],
+            (),
         )
 
     def __repr__(self):

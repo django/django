@@ -37,6 +37,20 @@ class AuthTemplateTests(TestCase):
         )
         self.assertContains(response, "<h1>Password reset</h1>")
 
+    def test_password_reset_view_error_form(self):
+        response = self.client.post(reverse("password_reset"), {})
+        self.assertContains(
+            response,
+            '<div class="flex-container">'
+            '<label for="id_email">Email address:</label>'
+            '<ul class="errorlist" id="id_email_error">'
+            "<li>This field is required.</li></ul>"
+            '<input type="email" name="email" autocomplete="email" maxlength="254" '
+            'required  aria-invalid="true" aria-describedby="id_email_error" '
+            'id="id_email"></div>',
+            html=True,
+        )
+
     def test_password_reset_view_error_title(self):
         response = self.client.post(reverse("password_reset"), {})
         self.assertContains(
@@ -94,6 +108,38 @@ class AuthTemplateTests(TestCase):
         response = client.post(url, {})
         self.assertContains(
             response, "<title>Error: Enter new password | Django site admin</title>"
+        )
+
+    def test_password_reset_confirm_view_error_form(self):
+        client = PasswordResetConfirmClient()
+        default_token_generator = PasswordResetTokenGenerator()
+        token = default_token_generator.make_token(self.user)
+        uidb64 = urlsafe_base64_encode(str(self.user.pk).encode())
+        url = reverse(
+            "password_reset_confirm", kwargs={"uidb64": uidb64, "token": token}
+        )
+        response = client.post(url, {})
+        self.assertContains(
+            response,
+            '<div class="flex-container errors">'
+            '<label for="id_new_password1">New password:</label>'
+            '<ul class="errorlist" id="id_new_password1_error">'
+            "<li>This field is required.</li></ul>"
+            '<input type="password" name="new_password1" autocomplete="new-password" '
+            'required aria-invalid="true" aria-describedby="id_new_password1_error" '
+            'id="id_new_password1"></div>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<div class="flex-container errors">'
+            '<label for="id_new_password2">Confirm password:</label>'
+            '<ul class="errorlist" id="id_new_password2_error">'
+            "<li>This field is required.</li></ul>"
+            '<input type="password" name="new_password2" autocomplete="new-password" '
+            'required aria-invalid="true" aria-describedby="id_new_password2_helptext '
+            'id_new_password2_error" id="id_new_password2"></div>',
+            html=True,
         )
 
     @override_settings(AUTH_USER_MODEL="auth_tests.CustomUser")

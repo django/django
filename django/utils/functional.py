@@ -1,9 +1,11 @@
 import copy
 import itertools
 import operator
+import warnings
 from functools import wraps
 
 
+# RemovedInDjango2029Warning: When the deprecation ends, remove.
 class cached_property:
     """
     Decorator that converts a method with a single self argument into a
@@ -23,6 +25,17 @@ class cached_property:
         )
 
     def __init__(self, func):
+        # Avoid a circular import: django.utils.deprecation indirectly imports
+        # this module.
+        from django.utils.deprecation import RemovedInDjango2029Warning
+        from django.utils.warnings import django_file_prefixes
+
+        warnings.warn(
+            "django.utils.functional.cached_property is deprecated. "
+            "Use functools.cached_property instead.",
+            category=RemovedInDjango2029Warning,
+            skip_file_prefixes=django_file_prefixes(),
+        )
         self.real_func = func
         self.__doc__ = getattr(func, "__doc__")
 
@@ -407,7 +420,11 @@ class SimpleLazyObject(LazyObject):
     # without evaluating the wrapped object.
     def __repr__(self):
         if self._wrapped is empty:
-            repr_attr = self._setupfunc
+            # Avoid recursion if setupfunc is a bound method of this instance.
+            if getattr(self._setupfunc, "__self__", None) is self:
+                repr_attr = f"<bound method {self._setupfunc.__name__}>"
+            else:
+                repr_attr = self._setupfunc
         else:
             repr_attr = self._wrapped
         return "<%s: %r>" % (type(self).__name__, repr_attr)

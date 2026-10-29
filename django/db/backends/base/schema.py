@@ -36,7 +36,10 @@ def _is_relevant_relation(relation, altered_field):
         # Foreign key constraint on the primary key, which is being altered.
         return True
     # Is the constraint targeting the field being altered?
-    return altered_field.name in field.to_fields
+    return (
+        altered_field.name in field.to_fields
+        or altered_field.attname in field.to_fields
+    )
 
 
 def _all_related_fields(model):
@@ -153,6 +156,9 @@ class BaseDatabaseSchemaEditor:
         self.collect_sql = collect_sql
         if self.collect_sql:
             self.collected_sql = []
+            # Tables renamed while collecting SQL don't exist under their new
+            # name in the database, so introspection must target the old name.
+            self.collected_table_renames = {}
         self.atomic_migration = self.connection.features.can_rollback_ddl and atomic
 
     # State-managing methods
@@ -452,10 +458,14 @@ class BaseDatabaseSchemaEditor:
             params = []
         return sql % default_sql, params
 
+    def _column_generated_persistency_sql(self, field):
+        """Return the SQL to define the persistency of generated fields."""
+        return "STORED" if field.db_persist else "VIRTUAL"
+
     def _column_generated_sql(self, field):
         """Return the SQL to use in a GENERATED ALWAYS clause."""
         expression_sql, params = field.generated_sql(self.connection)
-        persistency_sql = "STORED" if field.db_persist else "VIRTUAL"
+        persistency_sql = self._column_generated_persistency_sql(field)
         if self.connection.features.requires_literal_defaults:
             expression_sql = expression_sql % tuple(self.quote_value(p) for p in params)
             params = ()
@@ -651,6 +661,26 @@ class BaseDatabaseSchemaEditor:
         }
         meta_index_names = {constraint.name for constraint in model._meta.indexes}
         columns = [model._meta.get_field(field).column for field in fields]
+
+        # Check if the constraint is still in deferred_sql. This happens when
+        # CreateModel with unique_together is followed by AlterUniqueTogether
+        # in the same migration. index_together is not affected because its
+        # indexes are created immediately in CreateModel.database_forwards.
+        is_unique_constraint = constraint_kwargs.get("unique") is True
+        table = model._meta.db_table
+        if is_unique_constraint:
+            for deferred in list(self.deferred_sql):
+                if (
+                    isinstance(deferred, Statement)
+                    and deferred.references_table(table)
+                    and all(
+                        deferred.references_column(table, column) for column in columns
+                    )
+                    and deferred.parts["columns"].columns == columns
+                ):
+                    self.deferred_sql.remove(deferred)
+                    return
+
         constraint_names = self._constraint_names(
             model,
             columns,
@@ -658,7 +688,7 @@ class BaseDatabaseSchemaEditor:
             **constraint_kwargs,
         )
         if (
-            constraint_kwargs.get("unique") is True
+            is_unique_constraint
             and constraint_names
             and self.connection.features.allows_multiple_constraints_on_same_fields
         ):
@@ -693,6 +723,14 @@ class BaseDatabaseSchemaEditor:
                 "new_table": self.quote_name(new_db_table),
             }
         )
+        if self.collect_sql:
+            # The rename isn't executed, so later introspection of the new
+            # table name must be redirected to the still-existing old one,
+            # following any earlier rename of the same table in this batch.
+            existing_table = self.collected_table_renames.pop(
+                old_db_table, old_db_table
+            )
+            self.collected_table_renames[new_db_table] = existing_table
         # Rename all references to the old table name.
         for sql in self.deferred_sql:
             if isinstance(sql, Statement):
@@ -906,6 +944,15 @@ class BaseDatabaseSchemaEditor:
             else:
                 new_field_sql = new_field.generated_sql(self.connection)
                 modifying_generated_field = old_field_sql != new_field_sql
+                db_features = self.connection.features
+                # Some databases (e.g. Oracle) don't allow altering a data type
+                # for generated columns.
+                if (
+                    not modifying_generated_field
+                    and old_type != new_type
+                    and not db_features.supports_alter_generated_column_data_type
+                ):
+                    modifying_generated_field = True
         if modifying_generated_field:
             raise ValueError(
                 f"Modifying GeneratedFields is not supported - the field {new_field} "
@@ -925,7 +972,7 @@ class BaseDatabaseSchemaEditor:
 
     def _field_db_check(self, field, field_db_params):
         # Always check constraints with the same mocked column name to avoid
-        # recreating constrains when the column is renamed.
+        # recreating constraints when the column is renamed.
         check_constraints = self.connection.data_type_check_constraints
         data = field.db_type_parameters(self.connection)
         data["column"] = "__column_name__"
@@ -1037,6 +1084,9 @@ class BaseDatabaseSchemaEditor:
             and (not new_field.db_index or new_field.unique)
         ):
             # Find the index for this field
+            meta_constraint_names = {
+                constraint.name for constraint in model._meta.constraints
+            }
             meta_index_names = {index.name for index in model._meta.indexes}
             # Retrieve only BTREE indexes since this is what's created with
             # db_index=True.
@@ -1045,7 +1095,7 @@ class BaseDatabaseSchemaEditor:
                 [old_field.column],
                 index=True,
                 type_=Index.suffix,
-                exclude=meta_index_names,
+                exclude=meta_constraint_names | meta_index_names,
             )
             for index_name in index_names:
                 # The only way to check if an index was created with
@@ -1104,6 +1154,7 @@ class BaseDatabaseSchemaEditor:
             or (
                 self.connection.features.supports_comments
                 and old_field.db_comment != new_field.db_comment
+                and not self.connection.features.supports_independent_comment_alteration
             )
         ):
             fragment, other_actions = self._alter_column_type_sql(
@@ -1111,6 +1162,15 @@ class BaseDatabaseSchemaEditor:
             )
             actions.append(fragment)
             post_actions.extend(other_actions)
+        elif (
+            self.connection.features.supports_comments
+            and old_field.db_comment != new_field.db_comment
+            and self.connection.features.supports_independent_comment_alteration
+        ):
+            sql, params = self._alter_column_comment_sql(
+                model, new_field, new_type, new_field.db_comment
+            )
+            post_actions.append((sql, params))
 
         if new_field.has_db_default():
             if (
@@ -1677,7 +1737,7 @@ class BaseDatabaseSchemaEditor:
         _, old_path, old_args, old_kwargs = old_field.deconstruct()
         _, new_path, new_args, new_kwargs = new_field.deconstruct()
         # Don't alter when:
-        # - changing only a field name
+        # - changing only a field name (unless it's a many-to-many)
         # - changing an attribute that doesn't affect the schema
         # - changing an attribute in the provided set of ignored attributes
         # - adding only a db_column and the column name is not changed
@@ -1695,7 +1755,7 @@ class BaseDatabaseSchemaEditor:
         ):
             old_kwargs.pop("to", None)
             new_kwargs.pop("to", None)
-        # db_default can take many form but result in the same SQL.
+        # db_default can take many forms but result in the same SQL.
         if (
             old_kwargs.get("db_default")
             and new_kwargs.get("db_default")
@@ -1703,11 +1763,19 @@ class BaseDatabaseSchemaEditor:
         ):
             old_kwargs.pop("db_default")
             new_kwargs.pop("db_default")
-        return (
+        if (
             old_field.concrete
             and new_field.concrete
             and (self.quote_name(old_field.column) != self.quote_name(new_field.column))
-        ) or (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
+        ):
+            return True
+        if (
+            old_field.many_to_many
+            and new_field.many_to_many
+            and old_field.name != new_field.name
+        ):
+            return True
+        return (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
 
     def _field_should_be_indexed(self, model, field):
         return field.db_index and not field.unique
@@ -1998,9 +2066,12 @@ class BaseDatabaseSchemaEditor:
                 )
                 for name in column_names
             ]
+        table_name = model._meta.db_table
+        if self.collect_sql:
+            table_name = self.collected_table_renames.get(table_name, table_name)
         with self.connection.cursor() as cursor:
             constraints = self.connection.introspection.get_constraints(
-                cursor, model._meta.db_table
+                cursor, table_name
             )
         result = []
         for name, infodict in constraints.items():

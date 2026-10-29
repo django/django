@@ -52,8 +52,6 @@ them. In that case, connect to your Django database and run the query
 
     .. attribute:: hints
 
-        .. versionadded:: 6.0
-
         The optional ``hints`` argument will be passed as ``**hints`` to the
         :meth:`allow_migrate` method of database routers to assist them in
         :ref:`making routing decisions <topics-db-multi-db-hints>`.
@@ -66,8 +64,6 @@ them. In that case, connect to your Django database and run the query
     Installs the ``bloom`` extension.
 
     .. attribute:: hints
-
-        .. versionadded:: 6.0
 
         The optional ``hints`` argument will be passed as ``**hints`` to the
         :meth:`allow_migrate` method of database routers to assist them in
@@ -82,8 +78,6 @@ them. In that case, connect to your Django database and run the query
 
     .. attribute:: hints
 
-        .. versionadded:: 6.0
-
         The optional ``hints`` argument will be passed as ``**hints`` to the
         :meth:`allow_migrate` method of database routers to assist them in
         :ref:`making routing decisions <topics-db-multi-db-hints>`.
@@ -96,8 +90,6 @@ them. In that case, connect to your Django database and run the query
     Installs the ``btree_gist`` extension.
 
     .. attribute:: hints
-
-        .. versionadded:: 6.0
 
         The optional ``hints`` argument will be passed as ``**hints`` to the
         :meth:`allow_migrate` method of database routers to assist them in
@@ -112,8 +104,6 @@ them. In that case, connect to your Django database and run the query
 
     .. attribute:: hints
 
-        .. versionadded:: 6.0
-
         The optional ``hints`` argument will be passed as ``**hints`` to the
         :meth:`allow_migrate` method of database routers to assist them in
         :ref:`making routing decisions <topics-db-multi-db-hints>`.
@@ -126,8 +116,6 @@ them. In that case, connect to your Django database and run the query
     Installs the ``pgcrypto`` extension.
 
     .. attribute:: hints
-
-        .. versionadded:: 6.0
 
         The optional ``hints`` argument will be passed as ``**hints`` to the
         :meth:`allow_migrate` method of database routers to assist them in
@@ -143,8 +131,6 @@ them. In that case, connect to your Django database and run the query
 
     .. attribute:: hints
 
-        .. versionadded:: 6.0
-
         The optional ``hints`` argument will be passed as ``**hints`` to the
         :meth:`allow_migrate` method of database routers to assist them in
         :ref:`making routing decisions <topics-db-multi-db-hints>`.
@@ -158,8 +144,6 @@ them. In that case, connect to your Django database and run the query
 
     .. attribute:: hints
 
-        .. versionadded:: 6.0
-
         The optional ``hints`` argument will be passed as ``**hints`` to the
         :meth:`allow_migrate` method of database routers to assist them in
         :ref:`making routing decisions <topics-db-multi-db-hints>`.
@@ -172,8 +156,6 @@ them. In that case, connect to your Django database and run the query
     Installs the ``unaccent`` extension.
 
     .. attribute:: hints
-
-        .. versionadded:: 6.0
 
         The optional ``hints`` argument will be passed as ``**hints`` to the
         :meth:`allow_migrate` method of database routers to assist them in

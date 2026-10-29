@@ -1,5 +1,6 @@
 import os
 import re
+import sqlite3
 import tempfile
 import threading
 import unittest
@@ -10,6 +11,7 @@ from unittest import mock
 from django.core.exceptions import ImproperlyConfigured
 from django.db import (
     DEFAULT_DB_ALIAS,
+    InterfaceError,
     NotSupportedError,
     connection,
     connections,
@@ -30,13 +32,17 @@ class Tests(TestCase):
     def test_aggregation(self):
         """Raise NotSupportedError when aggregating on date/time fields."""
         for aggregate in (Sum, Avg, Variance, StdDev):
-            with self.assertRaises(NotSupportedError):
+            msg = (
+                f"SQLite does not support {aggregate.__name__} on date or "
+                "time fields, because they are stored as text."
+            )
+            with self.assertRaisesMessage(NotSupportedError, msg):
                 Item.objects.aggregate(aggregate("time"))
-            with self.assertRaises(NotSupportedError):
+            with self.assertRaisesMessage(NotSupportedError, msg):
                 Item.objects.aggregate(aggregate("date"))
-            with self.assertRaises(NotSupportedError):
+            with self.assertRaisesMessage(NotSupportedError, msg):
                 Item.objects.aggregate(aggregate("last_modified"))
-            with self.assertRaises(NotSupportedError):
+            with self.assertRaisesMessage(NotSupportedError, msg):
                 Item.objects.aggregate(
                     **{
                         "complex": aggregate("last_modified")
@@ -139,6 +145,74 @@ class Tests(TestCase):
         finally:
             connections["default"]._close()
 
+    def test_nested_path_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            settings_dict = {
+                "default": {
+                    "ENGINE": "django.db.backends.sqlite3",
+                    "NAME": Path(tmp) / "subdir" / "subsubdir" / "test.db",
+                },
+            }
+            connections = ConnectionHandler(settings_dict)
+            connections["default"].ensure_connection()
+            connections["default"].close()
+            self.assertTrue(
+                os.path.isfile(os.path.join(tmp, "subdir", "subsubdir", "test.db"))
+            )
+
+    def test_nested_str_path_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            settings_dict = {
+                "default": {
+                    "ENGINE": "django.db.backends.sqlite3",
+                    "NAME": os.path.join(tmp, "subdir", "test.db"),
+                },
+            }
+            connections = ConnectionHandler(settings_dict)
+            connections["default"].ensure_connection()
+            connections["default"].close()
+            self.assertTrue(os.path.isfile(os.path.join(tmp, "subdir", "test.db")))
+
+    def test_database_name_with_file_in_path_not_allowed(self):
+        tests = ("subdir/test.db", "subdir/subsubdir/test.db")
+        for db_path in tests:
+            with self.subTest(db_path):
+                with tempfile.TemporaryDirectory() as tmp:
+                    settings_dict = {
+                        "default": {
+                            "ENGINE": "django.db.backends.sqlite3",
+                            "NAME": Path(tmp) / db_path,
+                        },
+                    }
+                    # write a file to the parent path
+                    (Path(tmp) / "subdir").write_text("test")
+                    connections = ConnectionHandler(settings_dict)
+                    with self.assertRaisesMessage(
+                        InterfaceError,
+                        "Error creating path to SQLite database",
+                    ):
+                        connections["default"].ensure_connection()
+
+    @mock.patch(
+        "django.db.backends.sqlite3.base.Path.mkdir",
+        side_effect=OSError(1, "A mock error"),
+    )
+    def test_make_parent_path_oserror(self, mock_oserror):
+        with tempfile.TemporaryDirectory() as tmp:
+            settings_dict = {
+                "default": {
+                    "ENGINE": "django.db.backends.sqlite3",
+                    "NAME": Path(tmp) / "db" / "test.db",
+                },
+            }
+
+            connections = ConnectionHandler(settings_dict)
+            with self.assertRaisesMessage(
+                InterfaceError,
+                "Error creating path to SQLite database: [Errno 1] A mock error",
+            ):
+                connections["default"].ensure_connection()
+
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
 @isolate_apps("backends")
@@ -215,15 +289,28 @@ class LastExecutedQueryTest(TestCase):
         substituted = "SELECT '\"''\\'"
         self.assertEqual(connection.queries[-1]["sql"], substituted)
 
-    def test_large_number_of_parameters(self):
-        # If SQLITE_MAX_VARIABLE_NUMBER (default = 999) has been changed to be
-        # greater than SQLITE_MAX_COLUMN (default = 2000), last_executed_query
-        # can hit the SQLITE_MAX_COLUMN limit (#26063).
-        with connection.cursor() as cursor:
-            sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 2001)
-            params = list(range(2001))
-            # This should not raise an exception.
-            cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
+    def test_parameter_count_exceeds_variable_or_column_limit(self):
+        sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 1001)
+        params = list(range(1001))
+        for label, limit, current_limit in [
+            (
+                "variable",
+                sqlite3.SQLITE_LIMIT_VARIABLE_NUMBER,
+                connection.features.max_query_params,
+            ),
+            (
+                "column",
+                sqlite3.SQLITE_LIMIT_COLUMN,
+                connection.connection.getlimit(sqlite3.SQLITE_LIMIT_COLUMN),
+            ),
+        ]:
+            with self.subTest(limit=label):
+                connection.connection.setlimit(limit, 1000)
+                self.addCleanup(connection.connection.setlimit, limit, current_limit)
+                with connection.cursor() as cursor:
+                    # This should not raise an exception.
+                    cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
+                connection.connection.setlimit(limit, current_limit)
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")

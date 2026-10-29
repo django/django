@@ -1,10 +1,14 @@
-import time
+from io import BytesIO
 
+from playwright_tests import PlaywrightTestCase
 from utils_tests.test_csp import basic_config, basic_policy
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from django.test import SimpleTestCase
-from django.test.selenium import SeleniumTestCase
+from django.http import FileResponse, HttpResponse, StreamingHttpResponse
+from django.middleware.csp import ContentSecurityPolicyMiddleware
+from django.template import Context, Template
+from django.template.context_processors import csp
+from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import modify_settings, override_settings
 from django.utils.csp import CSP
 
@@ -54,6 +58,44 @@ class CSPMiddlewareTest(SimpleTestCase):
         nonce = response.text
         self.assertIsNotNone(nonce)
         self.assertEqual(response[CSP.HEADER_ENFORCE], basic_policy)
+
+    @override_settings(SECURE_CSP={"script-src": [CSP.NONCE]})
+    def test_csp_nonce_only_directive_emits_none(self):
+        """
+        A directive whose only source is CSP.NONCE is emitted as 'none' when
+        the nonce is never used, so the policy fails closed.
+        """
+        response = self.client.get("/csp-base/")
+        self.assertEqual(response[CSP.HEADER_ENFORCE], "script-src 'none'")
+
+    @override_settings(SECURE_CSP={"script-src": CSP.NONCE})
+    def test_csp_nonce_only_directive_as_string_emits_none(self):
+        response = self.client.get("/csp-base/")
+        self.assertEqual(response[CSP.HEADER_ENFORCE], "script-src 'none'")
+
+    @override_settings(
+        SECURE_CSP=None, SECURE_CSP_REPORT_ONLY={"script-src": [CSP.NONCE]}
+    )
+    def test_csp_report_only_nonce_only_directive(self):
+        response = self.client.get("/csp-base/")
+        self.assertNotIn(CSP.HEADER_ENFORCE, response)
+        self.assertEqual(response[CSP.HEADER_REPORT_ONLY], "script-src 'none'")
+
+    @override_settings(
+        SECURE_CSP={
+            "default-src": [CSP.SELF],
+            "script-src": [CSP.SELF, CSP.NONCE],
+        }
+    )
+    def test_csp_mixed_directive_omits_unused_nonce(self):
+        """
+        Directives with sources other than CSP.NONCE still have an unused
+        nonce sentinel removed without emitting 'none'.
+        """
+        response = self.client.get("/csp-base/")
+        self.assertEqual(
+            response[CSP.HEADER_ENFORCE], "default-src 'self'; script-src 'self'"
+        )
 
     @override_settings(SECURE_CSP=None, SECURE_CSP_REPORT_ONLY=basic_config)
     def test_csp_report_only_basic(self):
@@ -175,20 +217,73 @@ class CSPMiddlewareWithDecoratedViewsTest(SimpleTestCase):
         )
 
 
+class CSPStreamingTests(SimpleTestCase):
+    def test_nonce_generated_during_streaming_is_in_header(self):
+        request = RequestFactory().get("/")
+        template = Template('<script nonce="{{ csp_nonce }}"></script>')
+
+        def view(request):
+            def content():
+                yield template.render(Context(csp(request)))
+
+            return StreamingHttpResponse(content())
+
+        csp_setting = {
+            "default-src": [CSP.SELF],
+            "script-src": [CSP.NONCE],
+        }
+        for csp_header, setting in [
+            (CSP.HEADER_ENFORCE, {"SECURE_CSP": csp_setting}),
+            (CSP.HEADER_REPORT_ONLY, {"SECURE_CSP_REPORT_ONLY": csp_setting}),
+        ]:
+            with self.subTest(csp_header=csp_header):
+                with override_settings(**setting):
+                    response = ContentSecurityPolicyMiddleware(view)(request)
+                    body = b"".join(response.streaming_content).decode()
+                    nonce = body.split('nonce="', 1)[1].split('"', 1)[0]
+                    self.assertTrue(nonce)
+                    self.assertIn(f"'nonce-{nonce}'", response[csp_header])
+
+    @override_settings(
+        SECURE_CSP={
+            "style-src": [CSP.SELF, CSP.UNSAFE_INLINE, CSP.NONCE],
+        }
+    )
+    def test_unused_nonce_with_unsafe_inline(self):
+        body = b'<div style="color: red">Hello</div>'
+        responses = (
+            HttpResponse(body),
+            StreamingHttpResponse(iter([body])),
+            FileResponse(BytesIO(body), content_type="text/html"),
+        )
+
+        for response in responses:
+            with self.subTest(response=type(response).__name__):
+                request = RequestFactory().get("/")
+                try:
+                    response = ContentSecurityPolicyMiddleware(
+                        lambda request: response
+                    )(request)
+                    header = response[CSP.HEADER_ENFORCE]
+                    self.assertIn("'unsafe-inline'", header)
+                    if response.streaming:
+                        self.assertRegex(
+                            header,
+                            r"^style-src 'self' 'unsafe-inline' 'nonce-[^']+'$",
+                        )
+                    else:
+                        self.assertEqual(header, "style-src 'self' 'unsafe-inline'")
+                finally:
+                    response.close()
+
+
 @override_settings(
     ROOT_URLCONF="middleware.urls",
-    SECURE_CSP_REPORT_ONLY={
-        "default-src": [CSP.NONE],
-        "img-src": [CSP.SELF],
-        "script-src": [CSP.SELF],
-        "style-src": [CSP.SELF],
-        "report-uri": "/csp-report/",
-    },
 )
 @modify_settings(
     MIDDLEWARE={"append": "django.middleware.csp.ContentSecurityPolicyMiddleware"}
 )
-class CSPSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
+class CSPPlaywrightTestCase(PlaywrightTestCase, StaticLiveServerTestCase):
     available_apps = ["middleware"]
 
     def setUp(self):
@@ -197,10 +292,10 @@ class CSPSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     def test_reports_are_generated(self):
         url = self.live_server_url + "/csp-failure/"
-        self.selenium.get(url)
-        time.sleep(1)  # Allow time for the CSP report to be sent.
+        self.page.goto(url)
+        self.page.wait_for_load_state("networkidle")
         reports = sorted(
             (r["csp-report"]["document-uri"], r["csp-report"]["violated-directive"])
             for r in csp_reports
         )
-        self.assertEqual(reports, [(url, "img-src"), (url, "style-src-elem")])
+        self.assertEqual(reports, [(url, "style-src-elem")])

@@ -168,17 +168,17 @@ Implementing caching should not be regarded as an alternative to improving code
 that's performing poorly because it has been written badly. It's one of the
 final steps toward producing well-performing code, not a shortcut.
 
-:class:`~django.utils.functional.cached_property`
--------------------------------------------------
+:func:`functools.cached_property`
+---------------------------------
 
 It's common to have to call a class instance's method more than once. If
 that function is expensive, then doing so can be wasteful.
 
-Using the :class:`~django.utils.functional.cached_property` decorator saves the
-value returned by a property; the next time the function is called on that
-instance, it will return the saved value rather than re-computing it. Note that
-this only works on methods that take ``self`` as their only argument and that
-it changes the method to a property.
+Using the :func:`~functools.cached_property` decorator saves the value returned
+by a property; the next time the function is called on that instance, it will
+return the saved value rather than re-computing it. Note that this only works
+on methods that take ``self`` as their only argument and that it changes the
+method to a property.
 
 Certain Django components also have their own caching functionality; these are
 discussed below in the sections related to those components.
@@ -425,6 +425,12 @@ A key aim of the PyPy project is `compatibility
 Django is compatible with versions of PyPy corresponding to the supported
 Python versions, but you will need to check the compatibility of other
 libraries you rely on.
+
+That said, a lot of a web framework's work is done by concatenating
+strings, and PyPy has an issue with that (see
+`this PyPy blog
+<https://pypy.org/posts/2023/01/string-concatenation-quadratic.html>`_).
+This may cause performance issues, depending on your use.
 
 C implementations of Python libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

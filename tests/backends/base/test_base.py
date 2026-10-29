@@ -10,7 +10,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.runner import DebugSQLTextTestResult
-from django.test.utils import CaptureQueriesContext, override_settings
+from django.test.utils import CaptureQueriesContext, override_settings, requires_gil
 
 from ..models import Person, Square
 
@@ -62,15 +62,18 @@ class DatabaseWrapperTests(SimpleTestCase):
         with patch.object(connection.features, "minimum_database_version", None):
             connection.check_database_version_supported()
 
+    @requires_gil
     def test_release_memory_without_garbage_collection(self):
         # Schedule the restore of the garbage collection settings.
+        self.addCleanup(gc.garbage.clear)
         self.addCleanup(gc.set_debug, 0)
         self.addCleanup(gc.enable)
 
-        # Disable automatic garbage collection to control when it's triggered,
-        # then run a full collection cycle to ensure `gc.garbage` is empty.
+        # Disable automatic garbage collection to control when it's triggered.
         gc.disable()
         gc.collect()
+        # gc.collect() doesn't remove objects already retained in gc.garbage.
+        gc.garbage.clear()
 
         # The garbage list isn't automatically populated to avoid CPU overhead,
         # so debugging needs to be enabled to track all unreachable items and
@@ -93,6 +96,7 @@ class DatabaseWrapperTests(SimpleTestCase):
         self.assertEqual(gc.garbage, [])
 
 
+@skipUnlessDBFeature("supports_transactions")
 class DatabaseWrapperLoggingTests(TransactionTestCase):
     available_apps = ["backends"]
 

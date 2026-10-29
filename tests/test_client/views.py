@@ -75,6 +75,21 @@ def put_view(request):
     return HttpResponse(t.render(c))
 
 
+def query_view(request):
+    if request.method == "QUERY":
+        t = Template("Query received: {{ data }} is the body.", name="QUERY Template")
+        c = Context(
+            {
+                "Content-Type": request.META["CONTENT_TYPE"],
+                "data": request.body.decode(),
+            }
+        )
+    else:
+        t = Template("Viewing GET page.", name="Empty GET Template")
+        c = Context()
+    return HttpResponse(t.render(c))
+
+
 def post_view(request):
     """A view that expects a POST, and returns a different template depending
     on whether any POST data is available
@@ -304,11 +319,11 @@ def _permission_protected_view(request):
     return HttpResponse(t.render(c))
 
 
-permission_protected_view = permission_required("permission_not_granted")(
+permission_protected_view = permission_required("auth.add_user")(
     _permission_protected_view
 )
 permission_protected_view_exception = permission_required(
-    "permission_not_granted", raise_exception=True
+    "auth.add_user", raise_exception=True
 )(_permission_protected_view)
 
 
@@ -323,7 +338,7 @@ class _ViewManager:
         c = Context({"user": request.user})
         return HttpResponse(t.render(c))
 
-    @method_decorator(permission_required("permission_not_granted"))
+    @method_decorator(permission_required("auth.add_user"))
     def permission_protected_view(self, request):
         t = Template(
             "This is a permission protected test using a method. "
@@ -381,7 +396,7 @@ def mass_mail_sending_view(request):
         ["second@example.com", "third@example.com"],
     )
 
-    c = mail.get_connection()
+    c = mail.mailers.default
     c.send_messages([m1, m2])
 
     return HttpResponse("Mail sent")

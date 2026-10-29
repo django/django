@@ -8,3 +8,9 @@ class CacheClass(LocMemCache):
 
     async def aset(self, *args, **kwargs):
         raise Exception("Faked exception saving to cache")
+
+    def delete(self, *args, **kwargs):
+        raise Exception("Faked exception deleting from cache")
+
+    async def adelete(self, *args, **kwargs):
+        raise Exception("Faked exception deleting from cache")

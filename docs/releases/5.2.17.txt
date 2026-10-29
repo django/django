@@ -1,0 +1,96 @@
+===========================
+Django 5.2.17 release notes
+===========================
+
+*August 4, 2026*
+
+Django 5.2.17 fixes one security issue with severity "high", two security
+issues with severity "moderate", and one security issue with severity "low" in
+5.2.16.
+
+CVE-2026-15307: Server-side file-write and request forgery via spatial lookups
+==============================================================================
+
+Spatial lookups allowed ``str`` and ``dict`` lookup values to be passed to
+:class:`~django.contrib.gis.gdal.GDALRaster` when they represented rasters.
+Depending on the raster driver, this could write a file to disk (in some cases
+enabling remote code execution) or issue a network request as the Django
+process user. Because the admin changelist permits filtering via
+:meth:`~django.contrib.admin.ModelAdmin.lookup_allowed`, the flaw was reachable
+by staff users with view permission on any registered model containing a
+spatial field.
+
+The following types are now disallowed by spatial lookups:
+
+- ``dict``
+- A ``str`` that is not a valid
+  :class:`~django.contrib.gis.geos.GEOSGeometry`, e.g. a serialized dictionary
+
+This is a backward incompatible change. As a reminder, all untrusted user input
+should be validated before use. For that reason, assignments to model fields
+are unaffected and still accept these input types.
+
+For guidance on how to keep using these types in spatial lookups, on validating
+untrusted input, and on further security considerations, see
+:ref:`raster security considerations <raster-security>`.
+
+This issue has severity "high" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-15337: Potential denial-of-service vulnerability in ``check_for_language()``
+=====================================================================================
+
+:func:`~django.utils.translation.check_for_language` was subject to a potential
+denial-of-service attack when checking many distinct, very long language codes.
+Each code was used as a key in an in-memory cache, consuming process memory.
+
+The ``language`` value reaches this function through the
+:func:`django.views.i18n.set_language` view (not active by default) from POST
+data. Since request data is limited by :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
+and the cache is configured to store a maximum number of entries, the memory
+that could be consumed was bounded.
+
+To mitigate this vulnerability, language codes longer than 500 characters are
+now rejected before the cached lookup.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-15830: Potential denial-of-service vulnerability via nested geometry collections
+=========================================================================================
+
+:class:`~django.contrib.gis.geos.GEOSGeometry` was subject to a potential
+denial-of-service attack when provided deeply nested ``GEOMETRYCOLLECTION``
+objects, leading to a segmentation fault in GEOS. A maximum depth of 198
+``GEOMETRYCOLLECTION``\s is now enforced for the well-known text (WKT) format,
+and a maximum number of 198 ``GEOMETRYCOLLECTION``\s in total (breadth and
+depth) is enforced for well-known binary (WKB).
+
+:ref:`Lookups against spatial fields <spatial-lookups-intro>` and the
+:class:`~django.contrib.gis.forms.GeometryField` form field were also affected.
+
+The limit can be customized through the new ``max_geom_collections`` argument,
+available on :class:`~django.contrib.gis.geos.GEOSGeometry`, the
+:attr:`form field <django.contrib.gis.forms.Field.max_geom_collections>`,
+and the :attr:`model field
+<django.contrib.gis.db.models.GeometryField.max_geom_collections>`. The limit
+is not applied to GeoJSON inputs, as they were parsed by GDAL and are not
+affected.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
+
+CVE-2026-15920: Potential cross-site scripting via ``URLField`` values in the admin
+===================================================================================
+
+The admin renders :class:`~django.db.models.URLField` values as clickable links
+on changelist views and read-only fields. The link was generated without
+validating the value as a safe URL, so a stored value using a potentially
+dangerous scheme was rendered as a link.
+
+``URLField`` values shown via ``display_for_field`` are now validated using
+:class:`~django.core.validators.URLValidator` before a link is rendered, and
+displayed as plain text if validation is failed.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.

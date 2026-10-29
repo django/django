@@ -23,10 +23,12 @@ rather than the HTML rendered to the end-user.
 import copy
 import itertools
 import tempfile
+from contextlib import aclosing
 from unittest import mock
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.test import (
     AsyncRequestFactory,
@@ -37,7 +39,9 @@ from django.test import (
     modify_settings,
     override_settings,
 )
+from django.test.client import aclosing_iterator_wrapper
 from django.urls import reverse_lazy
+from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import async_only_middleware
 from django.views.generic import RedirectView
 
@@ -61,7 +65,10 @@ def async_middleware_urlconf(get_response):
     return middleware
 
 
-@override_settings(ROOT_URLCONF="test_client.urls")
+@override_settings(
+    ROOT_URLCONF="test_client.urls",
+    MAILERS={"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}},
+)
 class ClientTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -154,7 +161,7 @@ class ClientTest(TestCase):
 
     def test_json_serialization(self):
         """The test client serializes JSON data."""
-        methods = ("post", "put", "patch", "delete")
+        methods = ("post", "put", "patch", "delete", "query")
         tests = (
             ({"value": 37}, {"value": 37}),
             ([37, True], [37, True]),
@@ -193,6 +200,13 @@ class ClientTest(TestCase):
         self.assertEqual(response.templates[0].name, "PUT Template")
         self.assertEqual(response.context["data"], "{'foo': 'bar'}")
         self.assertEqual(response.context["Content-Length"], "14")
+
+    def test_query(self):
+        response = self.client.query("/query_view/", data="q=django")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, "QUERY Template")
+        self.assertEqual(response.context["data"], "q=django")
+        self.assertEqual(response.context["Content-Type"], "application/octet-stream")
 
     def test_trace(self):
         """TRACE a view"""
@@ -349,7 +363,17 @@ class ClientTest(TestCase):
         """
         A 307 or 308 redirect preserves the request method after the redirect.
         """
-        methods = ("get", "post", "head", "options", "put", "patch", "delete", "trace")
+        methods = (
+            "get",
+            "post",
+            "head",
+            "options",
+            "put",
+            "patch",
+            "delete",
+            "trace",
+            "query",
+        )
         codes = (307, 308)
         for method, code in itertools.product(methods, codes):
             with self.subTest(method=method, code=code):
@@ -362,7 +386,7 @@ class ClientTest(TestCase):
                 self.assertEqual(response.request["REQUEST_METHOD"], method.upper())
 
     def test_follow_307_and_308_preserves_query_string(self):
-        methods = ("post", "options", "put", "patch", "delete", "trace")
+        methods = ("post", "options", "put", "patch", "delete", "trace", "query")
         codes = (307, 308)
         for method, code in itertools.product(methods, codes):
             with self.subTest(method=method, code=code):
@@ -406,6 +430,16 @@ class ClientTest(TestCase):
             with self.subTest(code=code):
                 response = self.client.put(
                     "/redirect_view_%s/?to=/put_view/" % code, data="a=b", follow=True
+                )
+                self.assertContains(response, "a=b is the body")
+
+    def test_follow_307_and_308_preserves_query_body(self):
+        for code in (307, 308):
+            with self.subTest(code=code):
+                response = self.client.query(
+                    "/redirect_view_%s/?to=/query_view/" % code,
+                    data="a=b",
+                    follow=True,
                 )
                 self.assertContains(response, "a=b is the body")
 
@@ -791,6 +825,25 @@ class ClientTest(TestCase):
         self.client.force_login(self.u1)
         self.assertEqual(self.u1.backend, "django.contrib.auth.backends.ModelBackend")
 
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "test_client.auth_backends.PermissionOnlyBackend",
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+    )
+    def test_force_login_skips_noop_get_user_backend(self):
+        """force_login() skips auth backends without concrete get_user()."""
+        self.client.force_login(self.u1)
+        self.assertEqual(self.u1.backend, "django.contrib.auth.backends.ModelBackend")
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            "test_client.auth_backends.PermissionOnlyBackend",
+        ]
+    )
+    def test_force_login_all_backends_noop(self):
+        self.assertIsNone(self.client._get_backend())
+
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
         self.test_logout()
@@ -814,7 +867,15 @@ class ClientTest(TestCase):
             response, "/accounts/login/?next=/permission_protected_view/"
         )
 
-        # TODO: Log in with right permissions and request the page again
+        permission = Permission.objects.get(
+            content_type__app_label="auth", codename="add_user"
+        )
+        self.u1.user_permissions.add(permission)
+
+        # Request the page again. Access is granted.
+        response = self.client.get("/permission_protected_view/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["user"].username, "testclient")
 
     def test_view_with_permissions_exception(self):
         """
@@ -853,7 +914,15 @@ class ClientTest(TestCase):
             response, "/accounts/login/?next=/permission_protected_method_view/"
         )
 
-        # TODO: Log in with right permissions and request the page again
+        permission = Permission.objects.get(
+            content_type__app_label="auth", codename="add_user"
+        )
+        self.u1.user_permissions.add(permission)
+
+        # Request the page again. Access is granted.
+        response = self.client.get("/permission_protected_method_view/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["user"].username, "testclient")
 
     def test_external_redirect(self):
         response = self.client.get("/django_project_redirect/")
@@ -867,6 +936,16 @@ class ClientTest(TestCase):
             "/redirect_to_different_hostname/", follow=True, HTTP_HOST="hostname1"
         )
         self.assertEqual(response.content, b"hostname2")
+
+    @override_settings(PREPEND_WWW=True, ALLOWED_HOSTS=["testserver", "www.testserver"])
+    def test_prepend_www_follow_redirect(self):
+        response = self.client.get("/get_view/", follow=True)
+        self.assertRedirects(
+            response,
+            "http://www.testserver/get_view/",
+            status_code=301,
+            target_status_code=200,
+        )
 
     def test_external_redirect_without_trailing_slash(self):
         """
@@ -1007,6 +1086,23 @@ class ClientTest(TestCase):
             )
         self.assertEqual(response.content, b"named_temp_file")
 
+    def test_uploading_file_and_field_with_same_name(self):
+        """
+        A form field and file uploads sharing the same name in a
+        MultiValueDict are both preserved when posted by the test client.
+        """
+        file = SimpleUploadedFile("file.txt", b"content")
+        response = self.client.post(
+            "/upload_view/",
+            data=MultiValueDict({"shared": ["field_value", file]}),
+        )
+        request = response.wsgi_request
+        self.assertEqual(request.POST.getlist("shared"), ["field_value"])
+        self.assertEqual(
+            [f.name for f in request.FILES.getlist("shared")],
+            ["file.txt"],
+        )
+
     def test_query_params(self):
         tests = (
             "get",
@@ -1017,6 +1113,7 @@ class ClientTest(TestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
@@ -1036,6 +1133,13 @@ class ClientTest(TestCase):
                         data={"example": "data"},
                         query_params={"q": "terms"},
                     )
+
+    def test_follow_redirect_with_query_params(self):
+        response = self.client.get(
+            "/redirect_view/", query_params={"next": "x"}, follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.wsgi_request.get_full_path(), "/get_view/?next=x")
 
 
 @override_settings(
@@ -1172,12 +1276,16 @@ class RequestFactoryTest(SimpleTestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
                 factory = getattr(self.request_factory, method)
-                request = factory("/somewhere", query_params={"example": "data"})
+                request = factory(
+                    "/somewhere", query_params={"example": "data", "empty": []}
+                )
                 self.assertEqual(request.GET["example"], "data")
+                self.assertNotIn("empty", request.GET)
 
 
 @override_settings(ROOT_URLCONF="test_client.urls")
@@ -1186,6 +1294,23 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.get("/async_get_view/")
         self.assertTrue(hasattr(response, "resolver_match"))
         self.assertEqual(response.resolver_match.url_name, "async_get_view")
+
+    async def test_aclosing_iterator_wrapper_closes_inner_iterable_promptly(self):
+        finally_ran = False
+
+        async def iterable():
+            nonlocal finally_ran
+            try:
+                yield b"chunk"
+            finally:
+                finally_ran = True
+
+        async with aclosing(
+            aclosing_iterator_wrapper(iterable(), close=lambda: None)
+        ) as wrapped:
+            async for _ in wrapped:
+                break
+        self.assertTrue(finally_ran)
 
     @modify_settings(
         MIDDLEWARE={"prepend": "test_client.tests.async_middleware_urlconf"},
@@ -1208,6 +1333,7 @@ class AsyncClientTest(TestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method_name in tests:
             with self.subTest(method=method_name):
@@ -1231,6 +1357,10 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.post("/post_view/", {"value": 37})
         self.assertContains(response, "Data received: 37 is the value.")
 
+    async def test_query_data(self):
+        response = await self.async_client.query("/query_view/", data="q=django")
+        self.assertContains(response, "Query received: q=django is the body.")
+
     async def test_body_read_on_get_data(self):
         response = await self.async_client.get("/post_view/")
         self.assertContains(response, "Viewing GET page.")
@@ -1245,6 +1375,7 @@ class AsyncClientTest(TestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
@@ -1269,6 +1400,7 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method_name in tests:
             with self.subTest(method=method_name):
@@ -1359,6 +1491,7 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):

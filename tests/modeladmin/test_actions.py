@@ -79,11 +79,11 @@ class AdminActionsTests(TestCase):
             actions = None
 
         ma1 = AdminA(Band, admin.AdminSite())
-        action_names = [name for _, name, _ in ma1._get_base_actions()]
+        action_names = [action.name for action in ma1._get_base_actions()]
         self.assertEqual(action_names, ["delete_selected", "custom_action"])
         # `actions = None` removes actions from superclasses.
         ma2 = AdminB(Band, admin.AdminSite())
-        action_names = [name for _, name, _ in ma2._get_base_actions()]
+        action_names = [action.name for action in ma2._get_base_actions()]
         self.assertEqual(action_names, ["delete_selected"])
 
     def test_global_actions_description(self):
@@ -104,7 +104,7 @@ class AdminActionsTests(TestCase):
 
         ma = BandAdmin(Band, admin_site)
         self.assertEqual(
-            [description for _, _, description in ma._get_base_actions()],
+            [action.description for action in ma._get_base_actions()],
             [
                 "Delete selected %(verbose_name_plural)s",
                 "Site-wide admin action 1.",
@@ -139,9 +139,9 @@ class AdminActionsTests(TestCase):
         self.assertEqual(ma.check(), [])
         self.assertEqual(
             [
-                desc
-                for _, name, desc in ma._get_base_actions()
-                if name.startswith("custom_action")
+                action.description
+                for action in ma._get_base_actions()
+                if action.name.startswith("custom_action")
             ],
             [
                 "Local admin action 1.",

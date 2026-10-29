@@ -1,6 +1,5 @@
 import datetime
 
-from django.contrib.sites.models import Site
 from django.http import Http404
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, TestCase
@@ -52,7 +51,6 @@ class DefaultsTests(TestCase):
             author=author,
             date_created=datetime.datetime(2001, 1, 1, 21, 22, 23),
         )
-        Site(id=1, domain="testserver", name="testserver").save()
 
     def test_page_not_found(self):
         "A 404 status is returned by the page_not_found view"

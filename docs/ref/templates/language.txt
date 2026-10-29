@@ -28,7 +28,6 @@ or Jinja2_, you should feel right at home with Django's templates.
     extensions </howto/custom-template-tags>` to the template language as
     needed).
 
-.. _`The Django template language: For Python programmers`: ../templates_python/
 .. _Smarty: https://www.smarty.net/
 .. _Jinja2: https://palletsprojects.com/p/jinja/
 
@@ -202,6 +201,25 @@ some load external information into the template to be used by later variables.
 
 Some tags require beginning and ending tags (i.e. ``{% tag %} ... tag contents
 ... {% endtag %}``).
+
+Tags can span multiple lines, which can make tags with several arguments
+easier to read:
+
+.. code-block:: html+django
+
+    {% include
+        "blog/includes/article_card.html"
+        with
+            article=article
+            show_author=True
+            show_publication_date=True
+            extra_classes="featured-article"
+        only
+    %}
+
+.. versionchanged:: 6.2
+
+    Support for template tags spanning multiple lines was added.
 
 Django ships with about two dozen built-in template tags. You can read all
 about them in the :ref:`built-in tag reference <ref-templates-builtins-tags>`.
@@ -480,8 +498,6 @@ wouldn't know which one of the blocks' content to use.
 
 Template partials
 =================
-
-.. versionadded:: 6.0
 
 Template partials define reusable template fragments within a template file.
 They are self-contained components that can be rendered multiple times within

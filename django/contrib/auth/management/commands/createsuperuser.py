@@ -5,6 +5,7 @@ Management utility to create superusers.
 import getpass
 import os
 import sys
+from functools import cached_property
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management import get_default_username
@@ -12,7 +13,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.utils.functional import cached_property
 from django.utils.text import capfirst
 
 
@@ -298,9 +298,13 @@ class Command(BaseCommand):
             for unique_constraint in self.UserModel._meta.total_unique_constraints
         )
 
+    @cached_property
+    def natural_key_defined(self):
+        return hasattr(self.UserModel._default_manager, "get_by_natural_key")
+
     def _validate_username(self, username, verbose_field_name, database):
         """Validate username. If invalid, return a string error message."""
-        if self.username_is_unique:
+        if self.username_is_unique and self.natural_key_defined:
             try:
                 self.UserModel._default_manager.db_manager(database).get_by_natural_key(
                     username

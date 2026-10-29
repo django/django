@@ -124,7 +124,7 @@ _PYTHON_DOMAIN = re.compile(f":py:{SIMPLENAME}:`{_ROLE_BODY}`")
 @sphinxlint_checker(".rst", enabled=False, rst_only=True)
 def check_python_domain_in_roles(file, lines, options=None):
     """
-    :py: indicates the Python language domain. This means code writen in
+    :py: indicates the Python language domain. This means code written in
     Python, not Python built-ins in particular.
 
     Bad:    :py:class:`email.message.EmailMessage`
@@ -173,9 +173,13 @@ if __name__ == "__main__":
                 "--ignore",
                 "_build",
                 "--ignore",
+                "_ext",
+                "--ignore",
+                "_static",
+                "--ignore",
                 "_theme",
                 "--ignore",
-                "_ext",
+                "requirements.txt",
                 "--enable",
                 "all",
                 "--disable",

@@ -1,9 +1,182 @@
 import os
+import stat
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 from django.core.exceptions import SuspiciousFileOperation
-from django.utils._os import safe_join, to_path
+from django.utils._os import safe_join, safe_makedirs, to_path
+
+
+class SafeMakeDirsTests(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.base = tmp.name
+        self.addCleanup(tmp.cleanup)
+        # `umask()` returns the current mask, so it'll be restored on cleanup.
+        self.addCleanup(os.umask, os.umask(0o022))
+
+    def assertDirMode(self, path, expected):
+        self.assertIs(os.path.isdir(path), True)
+        if sys.platform == "win32":
+            # Windows partially supports chmod: dirs always end up with 0o777.
+            expected = 0o777
+        self.assertEqual(stat.S_IMODE(os.stat(path).st_mode), expected)
+
+    def test_creates_directory_hierarchy_with_permissions(self):
+        path = os.path.join(self.base, "a", "b", "c")
+        safe_makedirs(path, mode=0o755)
+
+        self.assertDirMode(os.path.join(self.base, "a"), 0o755)
+        self.assertDirMode(os.path.join(self.base, "a", "b"), 0o755)
+        self.assertDirMode(path, 0o755)
+
+    def test_existing_directory_exist_ok(self):
+        path = os.path.join(self.base, "a")
+        os.mkdir(path, 0o700)
+
+        safe_makedirs(path, mode=0o755, exist_ok=True)
+
+        self.assertDirMode(path, 0o700)
+
+    def test_existing_directory_exist_ok_false_raises(self):
+        path = os.path.join(self.base, "a")
+        os.mkdir(path)
+
+        with self.assertRaises(FileExistsError):
+            safe_makedirs(path, mode=0o755, exist_ok=False)
+
+    def test_existing_file_at_target_raises(self):
+        path = os.path.join(self.base, "a")
+        with open(path, "w") as f:
+            f.write("x")
+
+        with self.assertRaises(FileExistsError):
+            safe_makedirs(path, mode=0o755, exist_ok=False)
+
+        with self.assertRaises(FileExistsError):
+            safe_makedirs(path, mode=0o755, exist_ok=True)
+
+    def test_file_in_intermediate_path_raises(self):
+        file_path = os.path.join(self.base, "a")
+        with open(file_path, "w") as f:
+            f.write("x")
+
+        path = os.path.join(file_path, "b")
+
+        expected = FileNotFoundError if sys.platform == "win32" else NotADirectoryError
+
+        with self.assertRaises(expected):
+            safe_makedirs(path, mode=0o755, exist_ok=False)
+
+        with self.assertRaises(expected):
+            safe_makedirs(path, mode=0o755, exist_ok=True)
+
+    def test_existing_parent_preserves_permissions(self):
+        a = os.path.join(self.base, "a")
+        b = os.path.join(a, "b")
+
+        os.mkdir(a, 0o700)
+
+        safe_makedirs(b, mode=0o755, exist_ok=False)
+
+        self.assertDirMode(a, 0o700)
+        self.assertDirMode(b, 0o755)
+
+        c = os.path.join(a, "c")
+        safe_makedirs(c, mode=0o750, exist_ok=True)
+
+        self.assertDirMode(a, 0o700)
+        self.assertDirMode(c, 0o750)
+
+    def test_path_is_normalized(self):
+        path = os.path.join(self.base, "a", "b", "..", "c")
+        safe_makedirs(path, mode=0o755)
+
+        self.assertDirMode(os.path.normpath(path), 0o755)
+        self.assertIs(os.path.isdir(os.path.join(self.base, "a", "c")), True)
+
+    def test_permissions_restricted_by_process_umask(self):
+        path = os.path.join(self.base, "a", "b", "c")
+        # `umask()` returns the current mask, so it'll be restored on cleanup.
+        self.addCleanup(os.umask, os.umask(0o077))
+
+        safe_makedirs(path, mode=0o755)
+
+        expected = 0o700
+        self.assertDirMode(os.path.join(self.base, "a"), expected)
+        self.assertDirMode(os.path.join(self.base, "a", "b"), expected)
+        self.assertDirMode(path, expected)
+
+    def test_permissions_unchanged_with_zero_umask(self):
+        path = os.path.join(self.base, "a", "b", "c")
+        # `umask()` returns the current mask, so it'll be restored on cleanup.
+        self.addCleanup(os.umask, os.umask(0o000))
+
+        mode = 0o750
+        safe_makedirs(path, mode=mode)
+
+        self.assertDirMode(os.path.join(self.base, "a"), mode)
+        self.assertDirMode(os.path.join(self.base, "a", "b"), mode)
+        self.assertDirMode(path, mode)
+
+    @unittest.skipIf(
+        sys.platform == "win32", "Windows only partially supports umasks and chmod."
+    )
+    def test_process_umask_unchanged(self):
+        path = os.path.join(self.base, "a", "b", "c")
+        umask = 0o027
+        # `umask()` returns the current mask, so it'll be restored on cleanup.
+        self.addCleanup(os.umask, os.umask(umask))
+
+        safe_makedirs(path, mode=0o755)
+
+        # `umask()` can only be read by setting it.
+        self.assertEqual(os.umask(umask), umask)
+        self.assertDirMode(os.path.join(self.base, "a"), 0o750)
+        self.assertDirMode(os.path.join(self.base, "a", "b"), 0o750)
+        self.assertDirMode(path, 0o750)
+
+    def test_race_condition_exist_ok_false(self):
+        path = os.path.join(self.base, "a", "b")
+
+        original_mkdir = os.mkdir
+        call_count = [0]
+
+        # `safe_makedirs()` calls `os.mkdir()` for each level in the path.
+        # For path "a/b", mkdir is called twice: once for "a", once for "b".
+        def mkdir_with_race(p, mode):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                original_mkdir(p, mode)
+            else:
+                raise FileExistsError(f"Directory exists: '{p}'")
+
+        with unittest.mock.patch("os.mkdir", side_effect=mkdir_with_race):
+            with self.assertRaises(FileExistsError):
+                safe_makedirs(path, mode=0o755, exist_ok=False)
+
+    def test_race_condition_exist_ok_true(self):
+        path = os.path.join(self.base, "a", "b")
+
+        original_mkdir = os.mkdir
+        call_count = [0]
+
+        def mkdir_with_race(p, mode):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                original_mkdir(p, mode)
+            else:
+                # Simulate other thread creating the directory during the race.
+                # The directory needs to exist for `exist_ok=True` to succeed.
+                original_mkdir(p, mode)
+                raise FileExistsError(f"Directory exists: '{p}'")
+
+        with unittest.mock.patch("os.mkdir", side_effect=mkdir_with_race):
+            safe_makedirs(path, mode=0o755, exist_ok=True)
+
+        self.assertIs(os.path.isdir(path), True)
 
 
 class SafeJoinTests(unittest.TestCase):

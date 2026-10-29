@@ -2,26 +2,17 @@
 Sphinx plugins for Django documentation.
 """
 
-import json
-import os
-import re
-
 from docutils import nodes
-from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
+from github_links import get_branch
 from sphinx import addnodes
-from sphinx import version_info as sphinx_version
-from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.directives.code import CodeBlock
 from sphinx.domains.std import Cmdoption
-from sphinx.errors import ExtensionError
 from sphinx.util import logging
-from sphinx.util.console import bold
+from sphinx.util.nodes import split_explicit_title
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
-# RE for option descriptions without a '--' prefix
-simple_option_desc_re = re.compile(r"([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)")
 
 
 def setup(app):
@@ -53,11 +44,7 @@ def setup(app):
     )
     app.add_directive("django-admin-option", Cmdoption)
     app.add_config_value("django_next_version", "0.0", True)
-    app.add_directive("versionadded", VersionDirective)
-    app.add_directive("versionchanged", VersionDirective)
-    app.add_builder(DjangoStandaloneHTMLBuilder)
-    app.set_translator("djangohtml", DjangoHTMLTranslator)
-    app.set_translator("json", DjangoHTMLTranslator)
+    app.connect("builder-inited", set_django_html_translator)
     app.add_node(
         ConsoleNode,
         html=(visit_console_html, None),
@@ -67,112 +54,20 @@ def setup(app):
         texinfo=(visit_console_dummy, depart_console_dummy),
     )
     app.add_directive("console", ConsoleDirective)
-    app.connect("html-page-context", html_page_context_hook)
     app.add_role("default-role-error", default_role_error)
+    app.add_role("sourcefile", sourcefile)
     return {"parallel_read_safe": True}
 
 
-class VersionDirective(Directive):
-    has_content = True
-    required_arguments = 1
-    optional_arguments = 1
-    final_argument_whitespace = True
-    option_spec = {}
-
-    def run(self):
-        if len(self.arguments) > 1:
-            msg = """Only one argument accepted for directive '{directive_name}::'.
-            Comments should be provided as content,
-            not as an extra argument.""".format(
-                directive_name=self.name
-            )
-            raise self.error(msg)
-
-        env = self.state.document.settings.env
-        ret = []
-        node = addnodes.versionmodified()
-        ret.append(node)
-
-        if self.arguments[0] == env.config.django_next_version:
-            node["version"] = "Development version"
-        else:
-            node["version"] = self.arguments[0]
-
-        node["type"] = self.name
-        if self.content:
-            self.state.nested_parse(self.content, self.content_offset, node)
-        try:
-            env.get_domain("changeset").note_changeset(node)
-        except ExtensionError:
-            # Sphinx < 1.8: Domain 'changeset' is not registered
-            env.note_versionchange(node["type"], node["version"], node, self.lineno)
-        return ret
+def set_django_html_translator(app):
+    if app.builder.format == "html":
+        app.set_translator(app.builder.name, DjangoHTMLTranslator, override=True)
 
 
 class DjangoHTMLTranslator(HTMLTranslator):
     """
     Django-specific reST to HTML tweaks.
     """
-
-    # Don't use border=1, which docutils does by default.
-    def visit_table(self, node):
-        self.context.append(self.compact_p)
-        self.compact_p = True
-        # Needed by Sphinx.
-        self._table_row_indices.append(0)
-        self.body.append(self.starttag(node, "table", CLASS="docutils"))
-
-    def depart_table(self, node):
-        self.compact_p = self.context.pop()
-        self._table_row_indices.pop()
-        self.body.append("</table>\n")
-
-    def visit_desc_parameterlist(self, node):
-        self.body.append("(")  # by default sphinx puts <big> around the "("
-        self.optional_param_level = 0
-        self.param_separator = node.child_text_separator
-        # Counts 'parameter groups' being either a required parameter, or a set
-        # of contiguous optional ones.
-        required_params = [
-            isinstance(c, addnodes.desc_parameter) for c in node.children
-        ]
-        # How many required parameters are left.
-        self.required_params_left = sum(required_params)
-        if sphinx_version < (7, 1):
-            self.first_param = 1
-        else:
-            self.is_first_param = True
-            self.params_left_at_level = 0
-            self.param_group_index = 0
-            self.list_is_required_param = required_params
-            self.multi_line_parameter_list = False
-
-    def depart_desc_parameterlist(self, node):
-        self.body.append(")")
-
-    #
-    # Turn the "new in version" stuff (versionadded/versionchanged) into a
-    # better callout -- the Sphinx default is just a little span,
-    # which is a bit less obvious that I'd like.
-    #
-    # FIXME: these messages are all hardcoded in English. We need to change
-    # that to accommodate other language docs, but I can't work out how to make
-    # that work.
-    #
-    version_text = {
-        "versionchanged": "Changed in Django %s",
-        "versionadded": "New in Django %s",
-    }
-
-    def visit_versionmodified(self, node):
-        self.body.append(self.starttag(node, "div", CLASS=node["type"]))
-        version_text = self.version_text.get(node["type"])
-        if version_text:
-            title = "%s%s" % (version_text % node["version"], ":" if len(node) else ".")
-            self.body.append('<span class="title">%s</span> ' % title)
-
-    def depart_versionmodified(self, node):
-        self.body.append("</div>\n")
 
     # Give each section a unique ID -- nice for custom CSS hooks
     def visit_section(self, node):
@@ -189,36 +84,6 @@ def parse_django_admin_node(env, sig, signode):
     title = "django-admin %s" % sig
     signode += addnodes.desc_name(title, title)
     return command
-
-
-class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
-    """
-    Subclass to add some extra things we need.
-    """
-
-    name = "djangohtml"
-
-    def finish(self):
-        super().finish()
-        logger.info(bold("writing templatebuiltins.js..."))
-        xrefs = self.env.domaindata["std"]["objects"]
-        templatebuiltins = {
-            "ttags": [
-                n
-                for ((t, n), (k, a)) in xrefs.items()
-                if t == "templatetag" and k == "ref/templates/builtins"
-            ],
-            "tfilters": [
-                n
-                for ((t, n), (k, a)) in xrefs.items()
-                if t == "templatefilter" and k == "ref/templates/builtins"
-            ],
-        }
-        outfilename = os.path.join(self.outdir, "templatebuiltins.js")
-        with open(outfilename, "w") as fp:
-            fp.write("var django_template_builtins = ")
-            json.dump(templatebuiltins, fp)
-            fp.write(";\n")
 
 
 class ConsoleNode(nodes.literal_block):
@@ -250,42 +115,43 @@ def depart_console_dummy(self, node):
 
 def visit_console_html(self, node):
     """Generate HTML for the console directive."""
-    if self.builder.name in ("djangohtml", "json") and node["win_console_text"]:
-        # Put a mark on the document object signaling the fact the directive
-        # has been used on it.
-        self.document._console_directive_used_flag = True
+    # The epub builder uses the HTML format but produces XHTML for e-readers,
+    # where the CSS-driven tabs neither work nor validate as XML, so fall back
+    # to a plain literal block there (as the non-HTML formats already do).
+    if (
+        self.builder.format == "html"
+        and self.builder.name != "epub"
+        and node["win_console_text"]
+    ):
         uid = node["uid"]
-        self.body.append(
-            """\
-<div class="console-block" id="console-block-%(id)s">
-<input class="c-tab-unix" id="c-tab-%(id)s-unix" type="radio" name="console-%(id)s" \
+        # The <input> radio buttons are visually hidden. Each <label> is
+        # rendered as a tab, and only the checked radio's <section> is shown.
+        self.body.append(f"""\
+<div class="console-block" id="console-block-{uid}">
+<input class="c-tab-unix" id="c-tab-{uid}-unix" type="radio" name="console-{uid}" \
 checked>
-<label for="c-tab-%(id)s-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
-<input class="c-tab-win" id="c-tab-%(id)s-win" type="radio" name="console-%(id)s">
-<label for="c-tab-%(id)s-win" title="Windows">&#xf17a</label>
-<section class="c-content-unix" id="c-content-%(id)s-unix">\n"""
-            % {"id": uid}
-        )
+<label for="c-tab-{uid}-unix">Unix/macOS</label>
+<input class="c-tab-win" id="c-tab-{uid}-win" type="radio" name="console-{uid}">
+<label for="c-tab-{uid}-win">Windows</label>
+<section class="c-content-unix" id="c-content-{uid}-unix">\n""")
         try:
             self.visit_literal_block(node)
         except nodes.SkipNode:
             pass
         self.body.append("</section>\n")
 
-        self.body.append(
-            '<section class="c-content-win" id="c-content-%(id)s-win">\n' % {"id": uid}
-        )
+        self.body.append(f'<section class="c-content-win" id="c-content-{uid}-win">\n')
         win_text = node["win_console_text"]
-        highlight_args = {"force": True}
-        linenos = node.get("linenos", False)
-
-        def warner(msg):
-            self.builder.warn(msg, (self.builder.current_docname, node.line))
-
-        highlighted = self.highlighter.highlight_block(
-            win_text, "doscon", warn=warner, linenos=linenos, **highlight_args
-        )
-        self.body.append(highlighted)
+        win_node = nodes.literal_block(win_text, win_text)
+        win_node.update_all_atts(node)
+        win_node["language"] = "doscon"
+        win_node["ids"] = []
+        win_node["names"] = []
+        win_node["dupnames"] = []
+        try:
+            self.visit_literal_block(win_node)
+        except nodes.SkipNode:
+            pass
         self.body.append("</section>\n")
         self.body.append("</div>\n")
         raise nodes.SkipNode
@@ -364,16 +230,10 @@ class ConsoleDirective(CodeBlock):
                 return ViewList(lines)
             return None
 
-        env = self.state.document.settings.env
         self.arguments = ["console"]
         lit_blk_obj = super().run()[0]
 
-        # Only do work when the djangohtml HTML Sphinx builder is being used,
-        # invoke the default behavior for the rest.
-        if env.app.builder.name not in ("djangohtml", "json"):
-            return [lit_blk_obj]
-
-        lit_blk_obj["uid"] = str(env.new_serialno("console"))
+        lit_blk_obj["uid"] = str(self.env.new_serialno("console"))
         # Only add the tabbed UI if there is actually a Windows-specific
         # version of the CLI example.
         win_content = code_block_to_win(self.content)
@@ -388,16 +248,6 @@ class ConsoleDirective(CodeBlock):
         return [ConsoleNode(lit_blk_obj)]
 
 
-def html_page_context_hook(app, pagename, templatename, context, doctree):
-    # Put a bool on the context used to render the template. It's used to
-    # control inclusion of console-tabs.css and activation of the JavaScript.
-    # This way it's include only from HTML files rendered from reST files where
-    # the ConsoleDirective is used.
-    context["include_console_assets"] = getattr(
-        doctree, "_console_directive_used_flag", False
-    )
-
-
 def default_role_error(
     name, rawtext, text, lineno, inliner, options=None, content=None
 ):
@@ -407,3 +257,34 @@ def default_role_error(
     )
     logger.warning(msg, location=(inliner.document.current_source, lineno))
     return [nodes.Text(text)], []
+
+
+def sourcefile(
+    name,
+    rawtext,
+    text,
+    lineno,
+    inliner,
+    options=None,
+    content=None,
+):
+    options = options or {}
+
+    _, title, target = split_explicit_title(text)
+
+    env = inliner.document.settings.env
+    branch = get_branch(
+        version=env.config.version,
+        next_version=env.config.django_next_version,
+    )
+    url = f"https://github.com/django/django/blob/{branch}/{target}"
+
+    literal = nodes.literal(title, title)
+    reference = nodes.reference(
+        rawtext,
+        "",
+        literal,
+        refuri=url,
+        **options,
+    )
+    return [reference], []

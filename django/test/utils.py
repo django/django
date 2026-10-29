@@ -8,13 +8,12 @@ import time
 import warnings
 from contextlib import contextmanager
 from functools import wraps
+from inspect import iscoroutinefunction
 from io import StringIO
 from itertools import chain
 from types import SimpleNamespace
 from unittest import TestCase, skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
-
-from asgiref.sync import iscoroutinefunction
 
 from django.apps import apps
 from django.apps.registry import Apps
@@ -143,8 +142,17 @@ def setup_test_environment(debug=None):
     saved_data.debug = settings.DEBUG
     settings.DEBUG = debug
 
-    saved_data.email_backend = settings.EMAIL_BACKEND
-    settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+    # RemovedInDjango2028Warning: Override MAILERS unconditionally;
+    # remove EMAIL_BACKEND override.
+    if hasattr(settings, "MAILERS"):
+        saved_data.mailers = settings.MAILERS
+        settings.MAILERS = {
+            alias: {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}
+            for alias in settings.MAILERS
+        }
+    else:
+        saved_data.email_backend = settings.EMAIL_BACKEND
+        settings.EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
     saved_data.template_render = Template._render
     saved_data.partial_template_render = PartialTemplate._render
@@ -165,7 +173,12 @@ def teardown_test_environment():
 
     settings.ALLOWED_HOSTS = saved_data.allowed_hosts
     settings.DEBUG = saved_data.debug
-    settings.EMAIL_BACKEND = saved_data.email_backend
+    # RemovedInDjango2028Warning: Restore MAILERS unconditionally;
+    # remove EMAIL_BACKEND support.
+    if hasattr(saved_data, "mailers"):
+        settings.MAILERS = saved_data.mailers
+    if hasattr(saved_data, "email_backend"):
+        settings.EMAIL_BACKEND = saved_data.email_backend
     Template._render = saved_data.template_render
     PartialTemplate._render = saved_data.partial_template_render
 
@@ -745,18 +758,51 @@ class CaptureQueriesContext:
 
 
 class ignore_warnings(TestContextDecorator):
-    def __init__(self, **kwargs):
-        self.ignore_kwargs = kwargs
-        if "message" in self.ignore_kwargs or "module" in self.ignore_kwargs:
-            self.filter_func = warnings.filterwarnings
-        else:
-            self.filter_func = warnings.simplefilter
+    """
+    Ignore warnings matching the given criteria, as a decorator or context
+    manager.
+
+    Use the optional `message` argument to match a literal, case-sensitive
+    substring of the warning message. Alternatively, use the optional
+    `message_re` argument to match a case-insensitive regular expression at
+    the start of the warning message.
+
+    The optional `category`, `module`, and `lineno` arguments are passed to
+    warnings.filterwarnings().
+    """
+
+    def __init__(
+        self,
+        category=None,
+        message=None,
+        *,
+        module=None,
+        lineno=None,
+        message_re=None,
+    ):
+        if message is not None and message_re is not None:
+            raise TypeError("Cannot specify both message and message_re.")
+
+        self.ignore_kwargs = {}
+        if category is not None:
+            self.ignore_kwargs["category"] = category
+        if message is not None:
+            # Allow any prefix, including newlines, and disable the
+            # case-insensitive matching used by warnings.filterwarnings().
+            self.ignore_kwargs["message"] = rf"(?s:.*)(?-i:{re.escape(message)})"
+        if message_re is not None:
+            self.ignore_kwargs["message"] = message_re
+        if module is not None:
+            self.ignore_kwargs["module"] = module
+        if lineno is not None:
+            self.ignore_kwargs["lineno"] = lineno
+
         super().__init__()
 
     def enable(self):
         self.catch_warnings = warnings.catch_warnings()
         self.catch_warnings.__enter__()
-        self.filter_func("ignore", **self.ignore_kwargs)
+        warnings.filterwarnings("ignore", **self.ignore_kwargs)
 
     def disable(self):
         self.catch_warnings.__exit__(*sys.exc_info())
@@ -771,6 +817,17 @@ requires_tz_support = skipUnless(
     TZ_SUPPORT,
     "This test relies on the ability to run a program in an arbitrary "
     "time zone, but your operating system isn't able to do that.",
+)
+
+
+requires_gil = skipUnless(
+    # sys._is_gil_enabled() is available on Python 3.13+, and only returns
+    # False on a free-threaded build with the GIL disabled. Assume the GIL is
+    # enabled otherwise.
+    getattr(sys, "_is_gil_enabled", lambda: True)(),
+    "This test relies on CPython's reference counting to free objects as soon "
+    "as they become unreachable, which isn't guaranteed on a free-threaded "
+    "build where the cyclic garbage collector may reclaim them instead.",
 )
 
 

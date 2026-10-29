@@ -227,9 +227,17 @@ Configurable attributes
 
 .. attribute:: AppConfig.default_auto_field
 
-    The implicit primary key type to add to models within this app. You can
-    use this to keep :class:`~django.db.models.AutoField` as the primary key
-    type for third party applications.
+    The implicit primary key type to add to models within this app.
+
+    Reusable applications that define models **must** set this attribute to
+    ensure migrations included in the application match the models. Otherwise,
+    migrations will be generated for the application when a user runs
+    :djadmin:`makemigrations` with a different :setting:`DEFAULT_AUTO_FIELD`,
+    which may conflict with future migrations shipped by the application.
+
+    For example, to keep using :class:`~django.db.models.AutoField`::
+
+        default_auto_field = "django.db.models.AutoField"
 
     By default, this is the value of :setting:`DEFAULT_AUTO_FIELD`.
 
