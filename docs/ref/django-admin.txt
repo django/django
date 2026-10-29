@@ -1753,6 +1753,14 @@ Example usage:
 
     django-admin changepassword ringo
 
+.. django-admin-option:: --noinput, --no-input
+
+Suppresses all user prompts.
+
+.. django-admin-option:: --stdin
+
+Read new password from stdin rather than prompting. Default is False
+
 ``createsuperuser``
 ~~~~~~~~~~~~~~~~~~~
 
