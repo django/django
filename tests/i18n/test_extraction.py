@@ -192,6 +192,15 @@ class BasicExtractorTests(ExtractorTests):
         self.assertIn("processing locale ar_002", out.getvalue())
         self.assertIs(Path("locale/ar_002/LC_MESSAGES/django.po").exists(), True)
 
+    def test_valid_locale_with_numeric_region_code_en_001(self):
+        out = StringIO()
+        management.call_command(
+            "makemessages", locale=["en_001"], stdout=out, verbosity=1
+        )
+        self.assertNotIn("invalid locale en_001", out.getvalue())
+        self.assertIn("processing locale en_001", out.getvalue())
+        self.assertIs(Path("locale/en_001/LC_MESSAGES/django.po").exists(), True)
+
     def test_valid_locale_tachelhit_latin_morocco(self):
         out = StringIO()
         management.call_command(
@@ -227,6 +236,15 @@ class BasicExtractorTests(ExtractorTests):
         self.assertIn("invalid locale pl-PL, did you mean pl_PL?", out.getvalue())
         self.assertNotIn("processing locale pl-PL", out.getvalue())
         self.assertIs(Path("locale/pl-PL/LC_MESSAGES/django.po").exists(), False)
+
+    def test_invalid_locale_mixed_case_script(self):
+        out = StringIO()
+        management.call_command(
+            "makemessages", locale=["zh-hans"], stdout=out, verbosity=1
+        )
+        self.assertIn("invalid locale zh-hans, did you mean zh_Hans?", out.getvalue())
+        self.assertNotIn("processing locale zh-hans", out.getvalue())
+        self.assertIs(Path("locale/zh-hans/LC_MESSAGES/django.po").exists(), False)
 
     def test_invalid_locale_lower_country(self):
         out = StringIO()
