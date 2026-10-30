@@ -286,6 +286,9 @@ to remove usage of these features.
 * Using a percent sign in a column alias or annotation now raises
   ``ValueError``.
 
+* Support for setting the ``ADMINS`` or ``MANAGERS`` settings to a list of
+  (name, address) tuples is removed.
+
 See :ref:`deprecated-features-6.1` for details on these changes, including how
 to remove usage of these features.
 

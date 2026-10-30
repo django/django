@@ -294,16 +294,6 @@ def _send_server_message(
     if not recipients:
         return
 
-    # RemovedInDjango2028Warning.
-    if all(isinstance(a, (list, tuple)) and len(a) == 2 for a in recipients):
-        warnings.warn(
-            f"Using (name, address) pairs in the {setting_name} setting is deprecated."
-            " Replace with a list of email address strings.",
-            RemovedInDjango2028Warning,
-            stacklevel=2,
-        )
-        recipients = [a[1] for a in recipients]
-
     if not isinstance(recipients, (list, tuple)) or not all(
         isinstance(address, (str, Promise, Address)) for address in recipients
     ):
