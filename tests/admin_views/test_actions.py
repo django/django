@@ -1,5 +1,4 @@
 import json
-import warnings
 
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.views.main import IS_POPUP_VAR
@@ -12,17 +11,14 @@ from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
-from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .admin import SubscriberAdmin
-from .admin import __file__ as admin_filename
 from .forms import MediaActionForm
 from .models import (
     Actor,
     Answer,
     Book,
     ExternalSubscriber,
-    ModelAction,
     Question,
     Subscriber,
     UnchangeableObject,
@@ -901,64 +897,3 @@ class AdminDetailActionsTest(TestCase):
         self.assertRedirects(response, change_url, fetch_redirect_response=False)
         response = self.client.get(response.url)
         self.assertContains(response, "No action selected.")
-
-    # RemovedInDjango2028Warning.
-    def test_overridden_admin_action_methods(self):
-        self.client.force_login(self.superuser)
-        obj = ModelAction.objects.create()
-        change_url = reverse("admin:admin_views_modelaction_change", args=[obj.pk])
-        get_actions_overridden_msg = (
-            "Overriding get_actions() without the 'action_location' parameter is "
-            "deprecated. Update the signature to get_actions(self, request, "
-            "action_location=ActionLocation.CHANGE_LIST)."
-        )
-        with self.assertWarnsMessage(
-            RemovedInDjango2028Warning, get_actions_overridden_msg
-        ) as warning:
-            response = self.client.get(change_url)
-        self.assertEqual(warning.filename, admin_filename)
-        self.assertNotContains(response, "<div class='actions'>", html=True)
-
-        changelist_url = reverse("admin:admin_views_modelaction_changelist")
-        with warnings.catch_warnings(record=True) as warning_list:
-            warnings.simplefilter("always", RemovedInDjango2028Warning)
-            response = self.client.get(changelist_url)
-
-            message_warnings = [str(warning.message) for warning in warning_list]
-            expected_warnings = {
-                get_actions_overridden_msg,
-                "Overriding get_action_choices() without the 'action_location' "
-                "parameter is deprecated. Update the signature to "
-                "get_action_choices(self, request, default_choices=None, "
-                "action_location=ActionLocation.CHANGE_LIST).",
-                "Unpacking an action tuple is deprecated. "
-                "Use Action attributes instead.",
-                "Using indexes on an action tuple is deprecated. "
-                "Use Action attributes instead.",
-            }
-            self.assertEqual(set(message_warnings), expected_warnings)
-            self.assertEqual(
-                {warning.filename for warning in warning_list}, {admin_filename}
-            )
-        self.assertContains(response, "Delete selected model actions (extra)")
-
-        action_data = {
-            ACTION_CHECKBOX_NAME: [obj.pk],
-            "action": "delete_selected",
-            "index": 0,
-        }
-        get_actions_overridden_msg = (
-            "Overriding get_actions() without the 'action_location' parameter is "
-            "deprecated. Update the signature to get_actions(self, request, "
-            "action_location=ActionLocation.CHANGE_LIST)."
-        )
-        with self.assertWarnsMessage(
-            RemovedInDjango2028Warning, get_actions_overridden_msg
-        ) as warning:
-            response = self.client.post(
-                reverse("admin:admin_views_modelaction_changelist"), action_data
-            )
-        self.assertEqual(warning.filename, admin_filename)
-        self.assertContains(
-            response, "Are you sure you want to delete the selected model action?"
-        )
