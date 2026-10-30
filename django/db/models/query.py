@@ -1574,12 +1574,7 @@ class QuerySet(AltersData):
     def _values(self, *fields, **expressions):
         clone = self._chain()
         if expressions:
-            # RemovedInDjango2028Warning: When the deprecation ends, deindent:
-            # clone = clone.annotate(**expressions)
-            with warnings.catch_warnings(
-                action="ignore", category=RemovedInDjango2028Warning
-            ):
-                clone = clone.annotate(**expressions)
+            clone = clone.annotate(**expressions)
         clone._fields = fields
         clone.query.set_values(fields)
         return clone

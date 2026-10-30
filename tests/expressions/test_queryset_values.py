@@ -2,7 +2,6 @@ from itertools import chain
 
 from django.db.models import F, Sum
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import Company, Employee, JSONFieldModel
 
@@ -37,16 +36,10 @@ class ValuesExpressionsTests(TestCase):
             [{"salary": 10}, {"salary": 20}, {"salary": 30}],
         )
 
-    def test_values_expression_containing_percent_sign_deprecation_warns_once(self):
-        msg = "Using percent signs in a column alias is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as cm:
-            Company.objects.values(**{"alias%": F("id")})
-        self.assertEqual(len(cm.warnings), 1)
-
     def test_values_expression_alias_sql_injection(self):
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, "
-            "control characters, quotation marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, control "
+            "characters, quotation marks, semicolons, percent signs, or SQL comments."
         )
         for crafted_alias in [
             """injected_name" from "expressions_company"; --""",
@@ -60,8 +53,8 @@ class ValuesExpressionsTests(TestCase):
     @skipUnlessDBFeature("supports_json_field")
     def test_values_expression_alias_sql_injection_json_field(self):
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, "
-            "control characters, quotation marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, control "
+            "characters, quotation marks, semicolons, percent signs, or SQL comments."
         )
         for crafted_alias in [
             """injected_name" from "expressions_company"; --""",

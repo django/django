@@ -283,6 +283,9 @@ to remove usage of these features.
 
 * The ``URLIZE_ASSUME_HTTPS`` transitional setting is removed.
 
+* Using a percent sign in a column alias or annotation now raises
+  ``ValueError``.
+
 See :ref:`deprecated-features-6.1` for details on these changes, including how
 to remove usage of these features.
 
