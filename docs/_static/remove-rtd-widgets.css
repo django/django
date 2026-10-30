@@ -1,0 +1,6 @@
+/* Remove the Read the Docs visual diff and flyout menu widgets that
+ * overlap key navigation content in preview builds. */
+readthedocs-filetreediff,
+readthedocs-flyout {
+    display: none !important;
+}

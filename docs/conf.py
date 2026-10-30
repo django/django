@@ -257,6 +257,7 @@ html_static_path = ["_static"]
 html_css_files = [
     "console-tabs.css",
     "custom.css",
+    "remove-rtd-widgets.css",
 ]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
@@ -453,6 +454,7 @@ epub_cover = ("", "epub-cover.html")
 epub_exclude_files = [
     join("_static", "console-tabs.css"),
     join("_static", "custom.css"),
+    join("_static", "remove-rtd-widgets.css"),
 ]
 
 # Empty, rather than defaulting to html_css_files, because its only entry is

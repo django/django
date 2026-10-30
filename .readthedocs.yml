@@ -16,4 +16,4 @@ python:
   install:
     - requirements: docs/requirements.txt
 
-formats: all
+# formats: all
