@@ -331,6 +331,10 @@ to remove usage of these features.
 * Support for overriding ``ModelAdmin.get_action_choices()`` without the new
   ``action_location`` parameter is removed.
 
+* The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is removed.
+
+* The ``USE_BLANK_CHOICE_DASH`` transitional setting is removed.
+
 See :ref:`deprecated-features-6.2` for details on these changes, including how
 to remove usage of these features.
 

@@ -3243,23 +3243,6 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-.. setting:: USE_BLANK_CHOICE_DASH
-
-``USE_BLANK_CHOICE_DASH``
-------------------------------------
-
-Default: ``False``
-
-The default blank choice label in ``Select`` widgets was changed from
-``"---------"`` to ``django.db.models.fields.BLANK_CHOICE_LABEL``. Set this
-transitional setting to ``True`` to revert to the previous label.
-
-.. deprecated:: 6.1
-
-    This setting will be removed in Django 2028. To use a custom default blank
-    choice label, override ``django.db.models.fields.BLANK_CHOICE_LABEL`` in
-    the app's ``ready()`` method.
-
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -4054,7 +4037,6 @@ File uploads
 Forms
 -----
 * :setting:`FORM_RENDERER`
-* :setting:`USE_BLANK_CHOICE_DASH`
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------

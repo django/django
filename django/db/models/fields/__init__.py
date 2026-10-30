@@ -42,8 +42,6 @@ from django.utils.warnings import django_file_prefixes
 
 __all__ = [
     "AutoField",
-    # RemovedInDjango2028Warning
-    "BLANK_CHOICE_DASH",
     "BLANK_CHOICE_LABEL",
     "BigAutoField",
     "BigIntegerField",
@@ -86,12 +84,8 @@ class NOT_PROVIDED:
     pass
 
 
-# RemovedInDjango2028Warning: From Django 6.1, the values to use for "blank"
-# in SelectFields will be defined by the below BLANK_CHOICE_LABEL constant.
-# Will be appended to the start of most "choices" lists.
-# BLANK_CHOICE_DASH is still available as a constant in Django 6.1.
-BLANK_CHOICE_DASH = [("", "---------")]
-# This allows any app's ready() method to overwrite BLANK_CHOICE_LABEL.
+# The label of the "blank" choice prepended to most "choices" lists. Any app's
+# ready() method can overwrite BLANK_CHOICE_LABEL.
 BLANK_CHOICE_LABEL = _("- Select an option -")
 
 

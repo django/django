@@ -261,8 +261,8 @@ Forms
 * The new constant ``django.db.models.fields.BLANK_CHOICE_LABEL`` defines a
   more accessible and translatable default label for the blank choice in
   forms, which is appended to most ``choices`` lists. The transitional setting
-  :setting:`USE_BLANK_CHOICE_DASH` allows you to revert back to the old
-  default label.
+  ``USE_BLANK_CHOICE_DASH`` allows you to revert back to the old default
+  label.
 
 * :class:`~django.forms.FilePathField` now provides a
   :meth:`~django.forms.FilePathField.set_choices` method to scan the
@@ -688,10 +688,10 @@ Miscellaneous
   unaffected by this deprecation.
 
 * The undocumented ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is
-  deprecated. See the :setting:`USE_BLANK_CHOICE_DASH` transitional setting for
+  deprecated. See the ``USE_BLANK_CHOICE_DASH`` transitional setting for
   migration advice.
 
-* The :setting:`USE_BLANK_CHOICE_DASH` transitional setting is deprecated.
+* The ``USE_BLANK_CHOICE_DASH`` transitional setting is deprecated.
 
 * The :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` transitional setting is
   deprecated.

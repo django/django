@@ -69,13 +69,10 @@ class AltersData:
         super().__init_subclass__(**kwargs)
 
 
-# RemovedInDjango2028Warning: At the end of the deprecation, remove this
-# function and use .fields.BLANK_CHOICE_LABEL directly instead.
 def get_blank_choice_label():
-    from django.conf import settings
+    # Imported here, not at module level, to avoid a circular import
+    # (django.db.models.fields imports this module) and to read
+    # BLANK_CHOICE_LABEL after apps had a chance to overwrite it.
+    from .fields import BLANK_CHOICE_LABEL
 
-    from .fields import BLANK_CHOICE_DASH, BLANK_CHOICE_LABEL
-
-    if settings.USE_BLANK_CHOICE_DASH:
-        return BLANK_CHOICE_DASH[0][1]
     return BLANK_CHOICE_LABEL
