@@ -10,21 +10,30 @@ from django.db import connection
 from django.db.models import (
     Aggregate,
     Avg,
+    BooleanField,
     Case,
     CharField,
     Count,
     DecimalField,
+    Exists,
     F,
+    FilteredRelation,
     IntegerField,
     Max,
+    Min,
+    OuterRef,
     Q,
     StdDev,
+    Subquery,
     Sum,
     Value,
     Variance,
     When,
+    Window,
 )
-from django.db.models.functions import Cast, Concat
+from django.db.models.expressions import RawSQL
+from django.db.models.functions import Cast, Concat, RowNumber
+from django.db.models.lookups import Exact, GreaterThan
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate, ignore_warnings
 from django.utils.deprecation import RemovedInDjango2028Warning
@@ -1476,6 +1485,585 @@ class AggregationTests(TestCase):
         self.assertIs(qs.query.alias_map["aggregation_regress_book"].join_type, None)
         # The query executes without problems.
         self.assertEqual(len(qs.exclude(publisher=-1)), 6)
+
+    def test_filter_after_aggregation_reverse_fk(self):
+        qs = (
+            Publisher.objects.annotate(
+                num_books=Count("book"), total_pages=Sum("book__pages")
+            )
+            .filter(book__rating__gte=4)
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_books", "total_pages"),
+            [
+                ("Apress", 2, 747),
+                ("Morgan Kaufmann", 1, 946),
+                ("Prentice Hall", 2, 1482),
+            ],
+        )
+        self.assertIn(" IN (SELECT", str(qs.query))
+
+    def test_filter_after_aggregation_single_valued_relation(self):
+        qs = Book.objects.annotate(num_authors=Count("authors")).filter(
+            publisher__name="Apress"
+        )
+        self.assertNotIn(" IN (SELECT", str(qs.query))
+        self.assertCountEqual(
+            qs.values_list("pk", "num_authors"), [(self.b1.pk, 2), (self.b3.pk, 1)]
+        )
+
+    def test_filter_after_aggregation_m2m(self):
+        qs = (
+            Author.objects.annotate(num_books=Count("book"))
+            .filter(book__pages__gt=900)
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_books"),
+            [("Peter Norvig", 2), ("Stuart Russell", 1)],
+        )
+
+    def test_filter_after_aggregation_generic_relation(self):
+        for tag in ["django", "python"]:
+            ItemTag.objects.create(tag=tag, content_object=self.b1)
+        qs = Book.objects.annotate(num_authors=Count("authors")).filter(
+            tags__tag__in=["django", "python"]
+        )
+        self.assertSequenceEqual(qs.values_list("num_authors", flat=True), [2])
+
+    def test_filter_after_aggregation_values(self):
+        qs = (
+            Book.objects.values("rating")
+            .annotate(num_books=Count("pk"))
+            .filter(authors__age__gt=40)
+            .order_by("rating")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("rating", "num_books"), [(3.0, 1), (4.0, 1), (5.0, 1)]
+        )
+
+    def test_filter_after_aggregation_alias(self):
+        qs = (
+            Publisher.objects.alias(total_pages=Sum("book__pages"))
+            .filter(book__rating__gte=4)
+            .filter(total_pages__gt=1000)
+        )
+        self.assertSequenceEqual(qs, [self.p3])
+
+    def test_filter_after_aggregation_in_queryset(self):
+        qs = (
+            Publisher.objects.annotate(total_pages=Sum("book__pages"))
+            .filter(book__in=Book.objects.filter(rating__gte=4))
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "total_pages"),
+            [("Apress", 747), ("Morgan Kaufmann", 946), ("Prentice Hall", 1482)],
+        )
+
+    def test_filter_after_aggregation_filtered_relation(self):
+        qs = (
+            Publisher.objects.annotate(
+                long_books=FilteredRelation("book", condition=Q(book__pages__gt=300)),
+                num_books=Count("book"),
+            )
+            .filter(long_books__rating__gte=4)
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_books"),
+            [("Apress", 2), ("Morgan Kaufmann", 1), ("Prentice Hall", 2)],
+        )
+
+    def test_filter_after_aggregation_isnull(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            book__rating__isnull=True
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_books"), [("Jonno's House of Books", 0)]
+        )
+
+    def test_filter_after_aggregation_same_filter_shares_join(self):
+        qs = Publisher.objects.annotate(num_books=Count("book"))
+        self.assertSequenceEqual(
+            qs.filter(book__rating__gte=4, book__pages__gt=300)
+            .order_by("name")
+            .values_list("name", "num_books"),
+            [("Apress", 2), ("Morgan Kaufmann", 1), ("Prentice Hall", 2)],
+        )
+        self.assertSequenceEqual(qs.filter(book__rating__gt=4, book__pages__lt=400), [])
+
+    def test_filter_after_aggregation_chained_filters(self):
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__rating__gte=4)
+            .filter(book__pages__lt=1000)
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_books"),
+            [("Apress", 2), ("Morgan Kaufmann", 1), ("Prentice Hall", 2)],
+        )
+        self.assertSequenceEqual(
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__rating__gt=4)
+            .filter(book__pages__lt=400)
+            .values_list("name", "num_books"),
+            [("Apress", 2)],
+        )
+
+    def test_filter_after_aggregation_base_table_lookup_in_subquery(self):
+        qs = (
+            Publisher.objects.filter(pk=self.p1.pk)
+            .annotate(num_books=Count("book"))
+            .filter(book__rating__gt=4)
+        )
+        sql = str(qs.query)
+        pk = "%s.%s = %s" % (
+            connection.ops.quote_name("U0"),
+            connection.ops.quote_name("id"),
+            self.p1.pk,
+        )
+        self.assertIn(pk, sql[sql.index(" IN (SELECT") :])
+        self.assertSequenceEqual(qs.values_list("name", "num_books"), [("Apress", 2)])
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_filter_after_aggregation_base_table_lookup_in_subquery_qualify(self):
+        qs = (
+            Publisher.objects.filter(pk=self.p1.pk)
+            .annotate(
+                num_books=Count("book"),
+                row_number=Window(RowNumber(), order_by=F("name")),
+            )
+            .filter(book__rating__gt=4)
+            .filter(row_number=1)
+        )
+        sql = str(qs.query)
+        pk = "%s.%s = %s" % (
+            connection.ops.quote_name("U0"),
+            connection.ops.quote_name("id"),
+            self.p1.pk,
+        )
+        self.assertIn(pk, sql[sql.index(" IN (SELECT") :])
+        self.assertSequenceEqual(qs.values_list("name", "num_books"), [("Apress", 2)])
+
+    def test_filter_after_aggregation_base_table_lookup_not_shared(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            book__rating__gt=3
+        )
+        self.assertSequenceEqual(
+            qs.filter(pk=self.p1.pk).values_list("name", "num_books"),
+            [("Apress", 2)],
+        )
+        self.assertCountEqual(
+            qs.values_list("name", "num_books"),
+            [("Apress", 2), ("Morgan Kaufmann", 1), ("Prentice Hall", 2)],
+        )
+
+    def test_filter_after_aggregation_base_table_lookup_not_required(self):
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(Q(pk=self.p1.pk) | Q(name="Prentice Hall"), ~Q(name="Apress"))
+            .filter(book__rating__gt=3)
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_books"), [("Prentice Hall", 2)]
+        )
+
+    def test_filter_after_aggregation_base_table_expression_not_pushed(self):
+        qs = (
+            Publisher.objects.alias(awards=F("num_awards") + 1)
+            .annotate(num_books=Count("book"))
+            .filter(awards__gt=4)
+            .filter(book__rating__gt=3)
+        )
+        self.assertCountEqual(
+            qs.values_list("name", "num_books"),
+            [("Morgan Kaufmann", 1), ("Prentice Hall", 2)],
+        )
+
+    def test_filter_after_aggregation_trimmed_join(self):
+        qs = (
+            Book.objects.filter(publisher__pk__gt=0)
+            .annotate(num_authors=Count("authors"))
+            .filter(publisher__book__rating__gt=4)
+        )
+        self.assertNotIn(
+            Publisher._meta.db_table, str(qs.query).split(" IN (SELECT")[0]
+        )
+        self.assertCountEqual(
+            qs.values_list("pk", "num_authors"),
+            [(self.b1.pk, 2), (self.b3.pk, 1), (self.b6.pk, 1)],
+        )
+
+    def test_filter_after_aggregation_join_reused_by_values(self):
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__rating__gt=4)
+            .order_by("name")
+            .values_list("name", "book__rating")
+        )
+        self.assertSequenceEqual(qs, [("Apress", 4.5), ("Morgan Kaufmann", 5.0)])
+        self.assertNotIn(" IN (SELECT", str(qs.query))
+
+    def test_filter_after_aggregation_join_reused_by_order_by(self):
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__rating__gt=4)
+            .order_by("book__pages")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", flat=True), ["Apress", "Morgan Kaufmann"]
+        )
+        self.assertNotIn(" IN (SELECT", str(qs.query))
+
+    def test_filter_after_aggregation_join_reused_by_annotate(self):
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__rating__gt=4)
+            .annotate(min_pages=Min("book__pages"))
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "min_pages"),
+            [("Apress", 447), ("Morgan Kaufmann", 946)],
+        )
+
+    def test_filter_after_aggregation_join_reused_by_combined_query(self):
+        qs = Publisher.objects.annotate(num_books=Count("book"))
+        self.assertSequenceEqual(
+            (
+                qs.filter(book__rating__gt=4) & qs.filter(book__pages__lt=400)
+            ).values_list("name", "book__name"),
+            [("Apress", "Practical Django Projects")],
+        )
+
+    def test_filter_after_aggregation_join_reused_by_combined_query_rhs(self):
+        qs = Publisher.objects.annotate(num_books=Count("book"))
+        lhs = qs.filter(name="Apress").values_list("name", "book__name")
+        rhs = qs.filter(book__rating__gt=4).values_list("name", "book__name")
+        self.assertSequenceEqual(lhs & rhs, [("Apress", self.b1.name)])
+
+    def test_filter_after_aggregation_join_partially_reused(self):
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__authors__age__gt=50)
+            .order_by("name", "book__name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "book__name"),
+            [("Morgan Kaufmann", self.b6.name), ("Prentice Hall", self.b5.name)],
+        )
+
+    def test_filter_after_aggregation_combined_with_itself(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            book__rating__gt=4
+        )
+        self.assertCountEqual(
+            (qs & qs.order_by("book__name")).values_list("name", "book__name"),
+            [("Apress", self.b1.name), ("Morgan Kaufmann", self.b6.name)],
+        )
+
+    def test_filter_after_aggregation_combined_with_unaggregated(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            book__rating__gte=4
+        )
+        combined = Publisher.objects.all() & qs
+        self.assertNotIn(" IN (SELECT", str(combined.query))
+        self.assertEqual(combined.count(), 9)
+
+    def test_filter_after_aggregation_or_combined_rhs(self):
+        qs = Publisher.objects.annotate(num_books=Count("book"))
+        combined = qs.filter(name="Apress") | qs.filter(book__rating__gt=4)
+        self.assertCountEqual(
+            combined.values_list("name", "num_books"),
+            [("Apress", 2), ("Morgan Kaufmann", 1)],
+        )
+
+    def test_filter_after_aggregation_or_combined_join_reused(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            book__rating__gt=4
+        )
+        combined = qs | Publisher.objects.filter(book__rating__gt=4)
+        self.assertCountEqual(
+            combined.values_list("name", "num_books"),
+            [("Apress", 2), ("Morgan Kaufmann", 1)],
+        )
+
+    def test_filter_after_aggregation_xor_combined(self):
+        qs = Publisher.objects.annotate(num_books=Count("book"))
+        self.assertCountEqual(
+            qs.filter(name="Apress") ^ qs.filter(book__rating__gt=4),
+            [self.p1, self.p4],
+        )
+
+    def test_filter_after_aggregation_sticky(self):
+        qs = Author.objects.annotate(num_books=Count("book"))
+        self.assertSequenceEqual(
+            qs.filter(book__rating=5).filter(book__pages=1132), [self.a8]
+        )
+        # Related managers make the next filter() sticky.
+        self.assertSequenceEqual(
+            qs._next_is_sticky().filter(book__rating=5).filter(book__pages=1132), []
+        )
+        self.assertSequenceEqual(
+            qs._next_is_sticky()
+            .filter(book__rating=5)
+            .filter(book__publisher__name="Prentice Hall"),
+            [],
+        )
+
+    def test_filter_after_aggregation_negated(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            Q(book__rating__gte=4) & ~Q(book__pages__lt=400)
+        )
+        self.assertSequenceEqual(qs, [self.p4])
+        self.assertSequenceEqual(qs.order_by("book__pages"), [self.p4])
+
+    def test_filter_after_aggregation_having(self):
+        qs = Publisher.objects.annotate(num_books=Count("book"))
+        combined = qs.filter(num_books__gt=1) | qs.filter(book__rating__gte=4)
+        self.assertEqual(
+            set(combined.values_list("name", flat=True)),
+            {"Apress", "Morgan Kaufmann", "Prentice Hall"},
+        )
+        sql = str(combined.query)
+        self.assertNotIn(">=", sql[sql.index("GROUP BY") : sql.index("HAVING")])
+
+    def test_filter_after_aggregation_aggregate_in_same_filter(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            GreaterThan(Count("book"), 1), book__rating__gte=4
+        )
+        self.assertCountEqual(
+            qs.values_list("name", flat=True), ["Apress", "Prentice Hall"]
+        )
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_filter_after_aggregation_window_in_same_filter(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            Exact(Window(RowNumber(), order_by=F("name")), 1), book__rating__gte=4
+        )
+        self.assertCountEqual(qs.values_list("name", flat=True), ["Apress"])
+        sql = str(qs.query)
+        self.assertNotIn("rating", sql[sql.index("GROUP BY") :])
+
+    def test_filter_after_aggregation_pk_in_subquery(self):
+        publishers = Publisher.objects.annotate(num_books=Count("book")).filter(
+            book__rating__gte=4
+        )
+        self.assertCountEqual(
+            Publisher.objects.filter(pk__in=publishers.values("pk")),
+            [self.p1, self.p3, self.p4],
+        )
+
+    def test_filter_after_aggregation_subquery_annotation(self):
+        num_books = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__rating__gte=4)
+            .filter(pk=OuterRef("publisher"))
+            .values("num_books")
+        )
+        self.assertCountEqual(
+            Book.objects.filter(rating__gte=4)
+            .annotate(num_books=Subquery(num_books))
+            .values_list("pk", "num_books"),
+            [
+                (self.b1.pk, 2),
+                (self.b3.pk, 2),
+                (self.b4.pk, 2),
+                (self.b5.pk, 2),
+                (self.b6.pk, 1),
+            ],
+        )
+
+    def test_filter_after_aggregation_update(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            book__rating__gte=4
+        )
+        self.assertEqual(qs.update(num_awards=F("num_awards") + 1), 3)
+        self.assertSequenceEqual(
+            Publisher.objects.order_by("name").values_list("name", "num_awards"),
+            [
+                ("Apress", 4),
+                ("Jonno's House of Books", 0),
+                ("Morgan Kaufmann", 10),
+                ("Prentice Hall", 8),
+                ("Sams", 1),
+            ],
+        )
+
+    def test_filter_after_aggregation_none(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            book__rating__gte=4
+        )
+        self.assertSequenceEqual(qs.none(), [])
+        self.assertEqual(qs.none().count(), 0)
+        self.assertSequenceEqual(qs[0:0], [])
+
+    def test_filter_after_aggregation_iterator(self):
+        qs = Publisher.objects.annotate(num_books=Count("book")).filter(
+            book__in=(book.pk for book in [self.b1, self.b4])
+        )
+        self.assertCountEqual(qs, [self.p1, self.p3])
+
+    def test_filter_after_aggregation_outer_ref(self):
+        books = Book.objects.annotate(num_authors=Count("authors")).filter(
+            authors__age__gt=50, publisher=OuterRef("pk")
+        )
+        self.assertSequenceEqual(
+            Publisher.objects.filter(Exists(books)).order_by("name"),
+            [self.p4, self.p3],
+        )
+
+    def test_filter_after_aggregation_nested_outer_ref(self):
+        publishers = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(pk=OuterRef("publisher"))
+            .filter(book__in=Book.objects.filter(name=OuterRef(OuterRef("name"))))
+        )
+        self.assertEqual(Book.objects.filter(Exists(publishers)).count(), 6)
+
+    def test_filter_after_aggregation_outer_ref_in_list(self):
+        publishers = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(pk=OuterRef("publisher"))
+            .filter(book__pk__in=[OuterRef("pk")])
+        )
+        self.assertEqual(Book.objects.filter(Exists(publishers)).count(), 6)
+
+    def test_filter_after_aggregation_outer_ref_annotation(self):
+        qs = Publisher.objects.annotate(
+            min_pages=Value(1000), num_books=Count("book")
+        ).filter(book__in=Book.objects.filter(pages__gt=OuterRef("min_pages")))
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_books"), [("Prentice Hall", 2)]
+        )
+
+    def test_filter_after_aggregation_outer_ref_in_combined_query(self):
+        books = Book.objects.filter(pk=-1).values("pk")
+        qs = Publisher.objects.annotate(
+            min_pages=Value(1000), num_books=Count("book")
+        ).filter(
+            book__in=books.union(
+                Book.objects.filter(pages__gt=OuterRef("min_pages")).values("pk")
+            )
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_books"), [("Prentice Hall", 2)]
+        )
+
+    def test_filter_after_aggregation_outer_ref_in_subquery_annotation(self):
+        min_pages = Book.objects.annotate(value=OuterRef("min_pages")).values("value")
+        qs = Publisher.objects.annotate(
+            min_pages=Value(1000), num_books=Count("book")
+        ).filter(book__pages__gt=Subquery(min_pages[:1]))
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_books"), [("Prentice Hall", 2)]
+        )
+
+    def test_filter_after_aggregation_annotation_in_list(self):
+        qs = Publisher.objects.annotate(
+            min_pages=Value(400), num_books=Count("book")
+        ).filter(book__pages__range=(F("min_pages"), 600))
+        self.assertCountEqual(qs.values_list("name", flat=True), ["Apress", "Sams"])
+
+    def test_filter_after_aggregation_annotation_in_list_condition(self):
+        pages = Case(When(min_pages__gt=0, then=Value(300)), default=Value(946))
+        qs = (
+            Publisher.objects.annotate(min_pages=Value(1), num_books=Count("book"))
+            .filter(book__pages__in=[pages])
+            .order_by("name")
+        )
+        self.assertSequenceEqual(qs.values_list("name", "num_books"), [("Apress", 2)])
+
+    def test_filter_after_aggregation_pk_annotation(self):
+        qs = Publisher.objects.annotate(pk=Count("book")).filter(book__rating__gte=4)
+        self.assertCountEqual(
+            qs.values_list("name", flat=True),
+            ["Apress", "Morgan Kaufmann", "Prentice Hall"],
+        )
+
+    def test_filter_after_aggregation_filtered_relation_references_annotation(self):
+        qs = (
+            Publisher.objects.annotate(
+                min_pages=Value(300),
+                long_books=FilteredRelation(
+                    "book", condition=Q(book__pages__gt=F("min_pages"))
+                ),
+                num_books=Count("book"),
+            )
+            .filter(long_books__rating__gte=4)
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", flat=True),
+            ["Apress", "Morgan Kaufmann", "Prentice Hall"],
+        )
+
+    def test_filter_after_aggregation_extra(self):
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__authors__age__gt=50)
+            .extra(where=["aggregation_regress_author.age > 50"])
+            .order_by("name")
+        )
+        self.assertSequenceEqual(qs, [self.p4, self.p3])
+
+    def test_filter_after_aggregation_extra_select(self):
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__authors__age__gt=50)
+            .extra(select={"author_age": "aggregation_regress_author.age"})
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "author_age"),
+            [("Morgan Kaufmann", 57), ("Prentice Hall", 57)],
+        )
+
+    def test_filter_after_aggregation_raw_sql_annotation(self):
+        is_old = Case(
+            When(
+                Q(RawSQL("aggregation_regress_author.age > 50", (), BooleanField())),
+                then=Value(True),
+            ),
+            default=Value(False),
+        )
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__authors__age__gt=50)
+            .annotate(is_old=is_old)
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "is_old"),
+            [("Morgan Kaufmann", True), ("Prentice Hall", True)],
+        )
+
+    def test_filter_after_aggregation_raw_sql_order_by(self):
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__authors__age__gt=50)
+            .order_by(RawSQL("aggregation_regress_author.age", ()), "name")
+        )
+        self.assertSequenceEqual(qs, [self.p4, self.p3])
+
+    def test_filter_after_aggregation_filtered_relation_raw_sql(self):
+        condition = Q(book__pages__gt=RawSQL("aggregation_regress_author.age * 10", ()))
+        qs = (
+            Publisher.objects.annotate(num_books=Count("book"))
+            .filter(book__authors__age__gt=50)
+            .annotate(
+                long_books=FilteredRelation("book", condition=condition),
+                num_long_books=Count("long_books"),
+            )
+            .order_by("name")
+        )
+        self.assertSequenceEqual(
+            qs.values_list("name", "num_long_books"),
+            [("Morgan Kaufmann", 1), ("Prentice Hall", 2)],
+        )
 
     @skipUnlessDBFeature("allows_group_by_selected_pks")
     def test_aggregate_duplicate_columns(self):
