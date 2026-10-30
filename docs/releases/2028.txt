@@ -338,6 +338,9 @@ to remove usage of these features.
 * The ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` transitional setting is removed.
   Signed cookies using the legacy salt derivation are no longer accepted.
 
+* The ``Field.get_placeholder_sql`` shim over the deprecated
+  ``get_placeholder`` method is removed.
+
 See :ref:`deprecated-features-6.2` for details on these changes, including how
 to remove usage of these features.
 
