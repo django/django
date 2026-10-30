@@ -190,72 +190,6 @@ General-purpose aggregation functions
             {'parking': True, 'double_bed': True}
         ]}]>
 
-``StringAgg``
--------------
-
-.. class:: StringAgg(expression, delimiter, distinct=False, filter=None, default=None, order_by=())
-
-    .. deprecated:: 6.0
-
-        The PostgreSQL ``StringAgg`` class is deprecated in favor of the
-        generally available :class:`~django.db.models.StringAgg` class.
-
-    Returns the input values concatenated into a string, separated by
-    the ``delimiter`` string, or ``default`` if there are no values.
-
-    .. attribute:: delimiter
-
-        Required argument. A string, :class:`~django.db.models.Value`, or
-        expression representing the string for separating values. For example,
-        ``Value(",")``.
-
-        .. deprecated:: 6.0
-
-            Support for providing a string is deprecated.
-
-    .. attribute:: distinct
-
-        An optional boolean argument that determines if concatenated values
-        will be distinct. Defaults to ``False``.
-
-    .. attribute:: order_by
-
-        An optional string of a field name (with an optional ``"-"`` prefix
-        which indicates descending order) or an expression (or a tuple or list
-        of strings and/or expressions) that specifies the ordering of the
-        elements in the result string.
-
-        Examples are the same as for :attr:`ArrayAgg.order_by`.
-
-    Usage example::
-
-        class Publication(models.Model):
-            title = models.CharField(max_length=30)
-
-
-        class Article(models.Model):
-            headline = models.CharField(max_length=100)
-            publications = models.ManyToManyField(Publication)
-
-    .. code-block:: pycon
-
-        >>> article = Article.objects.create(headline="NASA uses Python")
-        >>> article.publications.create(title="The Python Journal")
-        <Publication: Publication object (1)>
-        >>> article.publications.create(title="Science News")
-        <Publication: Publication object (2)>
-        >>> from django.contrib.postgres.aggregates import StringAgg
-        >>> Article.objects.annotate(
-        ...     publication_names=StringAgg(
-        ...         "publications__title",
-        ...         delimiter=", ",
-        ...         order_by="publications__title",
-        ...     )
-        ... ).values("headline", "publication_names")
-        <QuerySet [{
-            'headline': 'NASA uses Python', 'publication_names': 'Science News, The Python Journal'
-        }]>
-
 Aggregate functions for statistics
 ==================================
 
@@ -383,8 +317,6 @@ Here's some examples of some of the general-purpose aggregation functions:
 
 .. code-block:: pycon
 
-    >>> TestModel.objects.aggregate(result=StringAgg("field1", delimiter=";"))
-    {'result': 'foo;bar;test'}
     >>> TestModel.objects.aggregate(result=ArrayAgg("field2"))
     {'result': [1, 2, 3]}
     >>> TestModel.objects.aggregate(result=ArrayAgg("field1"))

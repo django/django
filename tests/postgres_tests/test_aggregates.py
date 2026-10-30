@@ -25,9 +25,6 @@ try:
     from django.contrib.postgres.aggregates import BitOr  # RemovedInDjango2028Warning
     from django.contrib.postgres.aggregates import BitXor  # RemovedInDjango2028Warning
     from django.contrib.postgres.aggregates import (
-        StringAgg,  # RemovedInDjango2028Warning.
-    )
-    from django.contrib.postgres.aggregates import (
         ArrayAgg,
         BoolAnd,
         BoolOr,
@@ -562,33 +559,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     results,
                     [([0],), ([1],), ([2],), ([0],)],
                 )
-
-    def test_string_agg_delimiter_deprecation(self):
-        msg = (
-            "delimiter: str will be resolved as a field reference instead "
-            'of a string literal on Django 2028. Pass `delimiter=Value("\'")` '
-            "to preserve the previous behavior."
-        )
-
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx:
-            values = AggregateTestModel.objects.aggregate(
-                stringagg=StringAgg("char_field", delimiter="'")
-            )
-            self.assertEqual(values, {"stringagg": "Foo1'Foo2'Foo4'Foo3"})
-        self.assertEqual(ctx.filename, __file__)
-
-    def test_string_agg_deprecation(self):
-        msg = (
-            "The PostgreSQL specific StringAgg function is deprecated. Use "
-            "django.db.models.aggregates.StringAgg instead."
-        )
-
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx:
-            values = AggregateTestModel.objects.aggregate(
-                stringagg=StringAgg("char_field", delimiter=Value("'"))
-            )
-            self.assertEqual(values, {"stringagg": "Foo1'Foo2'Foo4'Foo3"})
-        self.assertEqual(ctx.filename, __file__)
 
     def test_bit_agg_deprecation(self):
         for BitAggregate in [BitAnd, BitOr, BitXor]:

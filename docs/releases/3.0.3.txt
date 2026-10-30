@@ -9,7 +9,7 @@ Django 3.0.3 fixes a security issue and several bugs in 3.0.2.
 CVE-2020-7471: Potential SQL injection via ``StringAgg(delimiter)``
 ===================================================================
 
-:class:`~django.contrib.postgres.aggregates.StringAgg` aggregation function was
+``StringAgg`` aggregation function was
 subject to SQL injection, using a suitably crafted ``delimiter``.
 
 Bugfixes
@@ -35,7 +35,7 @@ Bugfixes
 
 * Fixed a regression in Django 2.2 that caused a crash of
   :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
-  :class:`~django.contrib.postgres.aggregates.StringAgg` with ``filter``
+  ``StringAgg`` with ``filter``
   argument when used in a ``Subquery`` (:ticket:`31097`).
 
 * Fixed a regression in Django 2.2.7 that caused
