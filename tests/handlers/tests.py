@@ -94,6 +94,15 @@ class HandlerTests(SimpleTestCase):
         # Expect "bad request" response
         self.assertEqual(response.status_code, 400)
 
+    @override_settings(ROOT_URLCONF="handlers.urls")
+    def test_invalid_content_type_returns_bad_request(self):
+        environ = self.request_factory.post("/malformed_post/").environ
+        environ["CONTENT_TYPE"] = "text/plain; charset*=BOGUS''%20"
+        handler = WSGIHandler()
+        response = handler(environ, lambda *a, **k: None)
+        self.addCleanup(response.close)
+        self.assertEqual(response.status_code, 400)
+
 
 @override_settings(ROOT_URLCONF="handlers.urls", MIDDLEWARE=[])
 class TransactionsPerRequestTests(TransactionTestCase):
