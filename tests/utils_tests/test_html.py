@@ -6,8 +6,6 @@ from datetime import datetime
 from django.core.exceptions import SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.functional import lazystr
 from django.utils.html import (
     conditional_escape,
@@ -26,7 +24,6 @@ from django.utils.html import (
 from django.utils.safestring import mark_safe
 
 
-@override_settings(URLIZE_ASSUME_HTTPS=True)
 class TestUtilsHtml(SimpleTestCase):
     def check_output(self, function, value, output=None):
         """
@@ -481,19 +478,6 @@ class TestUtilsHtml(SimpleTestCase):
         for value, output in tests:
             with self.subTest(value=value):
                 self.assertEqual(urlize(value), output)
-
-    @override_settings(URLIZE_ASSUME_HTTPS=False)
-    def test_urlize_http_default_warning(self):
-        msg = (
-            "The default protocol will be changed from HTTP to HTTPS in "
-            "Django 2028. Set the URLIZE_ASSUME_HTTPS transitional setting to "
-            "True to opt into using HTTPS as the new default protocol."
-        )
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            self.assertEqual(
-                urlize("Visit example.com"),
-                'Visit <a href="http://example.com">example.com</a>',
-            )
 
     def test_urlize_unchanged_inputs(self):
         tests = (

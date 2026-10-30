@@ -278,6 +278,11 @@ to remove usage of these features.
 * The ``django.contrib.postgres.aggregates.mixins.OrderableAggMixin`` class is
   removed.
 
+* The default protocol in :tfilter:`urlize` and :tfilter:`urlizetrunc` is
+  changed from HTTP to HTTPS.
+
+* The ``URLIZE_ASSUME_HTTPS`` transitional setting is removed.
+
 See :ref:`deprecated-features-6.1` for details on these changes, including how
 to remove usage of these features.
 

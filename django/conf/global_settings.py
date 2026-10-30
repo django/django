@@ -681,11 +681,6 @@ SECURE_SSL_REDIRECT = False
 SECURE_CSP = {}
 SECURE_CSP_REPORT_ONLY = {}
 
-# RemovedInDjango2028Warning: A transitional setting helpful in early adoption
-# of HTTPS as the default protocol in urlize and urlizetrunc when no protocol
-# is provided. Set to True to assume HTTPS during the Django 6.x release cycle.
-URLIZE_ASSUME_HTTPS = False
-
 #########
 # TASKS #
 #########
