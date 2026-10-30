@@ -254,11 +254,6 @@ allowed with the ``using`` argument.
 The return value will be the number of successfully delivered messages (which
 can be ``0`` or ``1`` since it can only send one message).
 
-.. deprecated:: 6.0
-
-    Passing ``fail_silently`` and later parameters as positional arguments is
-    deprecated.
-
 .. deprecated:: 6.1
 
     The ``fail_silently``, ``auth_user``, ``auth_password``, and ``connection``
@@ -318,11 +313,6 @@ mail server would be opened::
     send_mass_mail((message1, message2))
 
 The return value will be the number of successfully delivered messages.
-
-.. deprecated:: 6.0
-
-    Passing ``fail_silently`` and later parameters as positional arguments is
-    deprecated.
 
 .. deprecated:: 6.1
 
@@ -392,11 +382,6 @@ The keyword argument ``using`` is an optional :setting:`MAILERS` alias to use
 to send the mail. If unspecified, the default mailer configuration will be
 used.
 
-.. deprecated:: 6.0
-
-    Passing ``fail_silently`` and later parameters as positional arguments is
-    deprecated.
-
 .. deprecated:: 6.1
 
     The ``fail_silently`` and ``connection`` arguments are deprecated. In most
@@ -417,11 +402,6 @@ setting.
 The keyword argument ``using`` is an optional :setting:`MAILERS` alias to use
 to send the mail. If unspecified, the default mailer configuration will be
 used.
-
-.. deprecated:: 6.0
-
-    Passing ``fail_silently`` and later parameters as positional arguments is
-    deprecated.
 
 .. deprecated:: 6.1
 
@@ -519,11 +499,6 @@ email backend API :ref:`provides an alternative
         :setting:`MAILERS` configuration with the desired connection options,
         and then call :meth:`EmailMessage.send(using="...") <send>` with that
         configuration's alias. See :ref:`migrating-to-mailers`.
-
-    .. deprecated:: 6.0
-
-        Passing all except the first four parameters as positional arguments is
-        deprecated.
 
     .. versionchanged:: 6.2
 
@@ -1314,10 +1289,6 @@ backends.
       silently ignored.
     * All other keyword arguments are passed directly to the constructor of the
       email backend.
-
-    .. deprecated:: 6.0
-
-        Passing ``fail_silently`` as a positional argument is deprecated.
 
     .. deprecated:: 6.1
 

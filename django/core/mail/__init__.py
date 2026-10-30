@@ -26,7 +26,6 @@ from django.core.mail.message import (
 from django.core.mail.utils import DNS_NAME, CachedDnsName
 from django.utils.deprecation import (
     RemovedInDjango2028Warning,
-    deprecate_posargs,
     warn_about_external_use,
 )
 from django.utils.functional import Promise
@@ -70,7 +69,6 @@ mailers = MailersHandler()
 
 
 # RemovedInDjango2028Warning.
-@deprecate_posargs(RemovedInDjango2028Warning, ["fail_silently"])
 def get_connection(backend=None, *, fail_silently=False, **kwds):
     """Load an email backend and return an instance of it.
 
@@ -83,7 +81,7 @@ def get_connection(backend=None, *, fail_silently=False, **kwds):
         "get_connection() is deprecated. See 'Migrating email to mailers' "
         "in Django's documentation for recommended replacements."
     )
-    warn_about_external_use(msg, RemovedInDjango2028Warning, skip_frames=1)
+    warn_about_external_use(msg, RemovedInDjango2028Warning)
     warn_about_default_mailers_if_needed()
 
     if fail_silently:
@@ -101,16 +99,6 @@ def get_connection(backend=None, *, fail_silently=False, **kwds):
     return klass(**kwds)
 
 
-@deprecate_posargs(
-    RemovedInDjango2028Warning,
-    [
-        "fail_silently",
-        "auth_user",
-        "auth_password",
-        "connection",
-        "html_message",
-    ],
-)
 def send_mail(
     subject,
     message,
@@ -141,17 +129,11 @@ def send_mail(
     #       email.attach_alternative(html_message, "text/html")
     #   return email.send(using=using)
     if fail_silently:
-        warn_about_external_use(
-            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
-        )
+        warn_about_external_use(FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning)
     if auth_user is not None or auth_password is not None:
-        warn_about_external_use(
-            AUTH_ARGS_WARNING, RemovedInDjango2028Warning, skip_frames=1
-        )
+        warn_about_external_use(AUTH_ARGS_WARNING, RemovedInDjango2028Warning)
     if connection is not None:
-        warn_about_external_use(
-            CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
-        )
+        warn_about_external_use(CONNECTION_ARG_WARNING, RemovedInDjango2028Warning)
 
     if using is not None:
         report_using_incompatibility(
@@ -184,15 +166,6 @@ def send_mail(
     return mail.send(using=using)
 
 
-@deprecate_posargs(
-    RemovedInDjango2028Warning,
-    [
-        "fail_silently",
-        "auth_user",
-        "auth_password",
-        "connection",
-    ],
-)
 def send_mass_mail(
     datatuple,
     *,
@@ -216,17 +189,11 @@ def send_mass_mail(
     #   mailer = mailers.default if using is None else mailers[using]
     #   return mailer.send_messages(messages)
     if fail_silently:
-        warn_about_external_use(
-            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
-        )
+        warn_about_external_use(FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning)
     if auth_user is not None or auth_password is not None:
-        warn_about_external_use(
-            AUTH_ARGS_WARNING, RemovedInDjango2028Warning, skip_frames=1
-        )
+        warn_about_external_use(AUTH_ARGS_WARNING, RemovedInDjango2028Warning)
     if connection is not None:
-        warn_about_external_use(
-            CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
-        )
+        warn_about_external_use(CONNECTION_ARG_WARNING, RemovedInDjango2028Warning)
 
     if using is not None:
         report_using_incompatibility(
@@ -270,15 +237,14 @@ def _send_server_message(
     using=None,
 ):
     # RemovedInDjango2028Warning: everything before `recipients =
-    # getattr(...)`. skip_frames=2: this helper's caller + its
-    # @deprecate_posargs decorator.
+    # getattr(...)`. skip_frames=1: this helper's caller.
     if fail_silently:
         warn_about_external_use(
-            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=2
+            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
         )
     if connection is not None:
         warn_about_external_use(
-            CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=2
+            CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
         )
 
     if using is not None:
@@ -315,9 +281,6 @@ def _send_server_message(
 
 
 # RemovedInDjango2028Warning: fail_silently and connection args.
-@deprecate_posargs(
-    RemovedInDjango2028Warning, ["fail_silently", "connection", "html_message"]
-)
 def mail_admins(
     subject,
     message,
@@ -340,9 +303,6 @@ def mail_admins(
 
 
 # RemovedInDjango2028Warning: fail_silently and connection args.
-@deprecate_posargs(
-    RemovedInDjango2028Warning, ["fail_silently", "connection", "html_message"]
-)
 def mail_managers(
     subject,
     message,

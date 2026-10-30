@@ -21,7 +21,6 @@ from django.conf import settings
 from django.core.mail.utils import DNS_NAME
 from django.utils.deprecation import (
     RemovedInDjango2028Warning,
-    deprecate_posargs,
     warn_about_external_use,
 )
 from django.utils.encoding import force_bytes, force_str, punycode
@@ -246,17 +245,6 @@ class EmailMessage:
     # If None, defaults to settings.DEFAULT_CHARSET.
     encoding = None
 
-    @deprecate_posargs(
-        RemovedInDjango2028Warning,
-        [
-            "bcc",
-            "connection",
-            "attachments",
-            "headers",
-            "cc",
-            "reply_to",
-        ],
-    )
     def __init__(
         self,
         subject="",
@@ -315,9 +303,7 @@ class EmailMessage:
         self.extra_headers = headers or {}
         # RemovedInDjango2028Warning.
         if connection is not None:
-            warn_about_external_use(
-                CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
-            )
+            warn_about_external_use(CONNECTION_ARG_WARNING, RemovedInDjango2028Warning)
         self._connection = connection
 
     # RemovedInDjango2028Warning: connection property.
@@ -616,18 +602,6 @@ class EmailMultiAlternatives(EmailMessage):
     made easier.
     """
 
-    @deprecate_posargs(
-        RemovedInDjango2028Warning,
-        [
-            "bcc",
-            "connection",
-            "attachments",
-            "headers",
-            "alternatives",
-            "cc",
-            "reply_to",
-        ],
-    )
     def __init__(
         self,
         subject="",
