@@ -1404,11 +1404,11 @@ values are stored as null.
 
 Inherits all attributes and methods from :class:`FileField`.
 
-:class:`ImageField` doesn't validate that the uploaded object is a valid
-image. This validation is performed by :class:`forms.ImageField
-<django.forms.ImageField>`, which uses Pillow. Consequently, files saved
-directly to the model field without passing through a form aren't validated
-as images.
+Inherits all attributes and methods from :class:`FileField`.
+
+Validation that the uploaded object is a valid image isn't performed at the
+model layer. It should be performed at the form layer or an equivalent
+validation layer.
 
 In addition to the special attributes that are available for
 :class:`FileField`, an :class:`ImageField` also has ``height`` and ``width``
