@@ -1,4 +1,3 @@
-import warnings
 from asyncio import iscoroutinefunction
 from contextlib import ContextDecorator, contextmanager
 from functools import wraps
@@ -10,8 +9,6 @@ from django.db import (
     ProgrammingError,
     connections,
 )
-from django.utils.deprecation import RemovedInDjango2028Warning
-from django.utils.warnings import django_file_prefixes
 
 
 class TransactionManagementError(ProgrammingError):
@@ -48,15 +45,6 @@ def commit(using=None):
 def rollback(using=None):
     """Roll back a transaction."""
     get_connection(using).rollback()
-
-
-def savepoint(using=None):
-    warnings.warn(
-        "savepoint() is deprecated. Use savepoint_create() instead.",
-        category=RemovedInDjango2028Warning,
-        skip_file_prefixes=django_file_prefixes(),
-    )
-    return savepoint_create(using=using)
 
 
 def savepoint_create(using=None):
