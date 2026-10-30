@@ -386,13 +386,6 @@ Conditionally enabling or disabling actions
                         del actions["delete_selected"]
                 return actions
 
-    .. versionchanged:: 6.1
-
-        The keyword argument ``action_location`` was added. The return type was
-        changed to a dictionary where the keys are action names and the values
-        are :class:`Action` objects, previously the values were
-        ``(function, name, description)`` tuples.
-
 .. _admin-action-permissions:
 
 Setting permissions for actions
@@ -461,8 +454,6 @@ itself. For example::
 
 Controlling where actions are available
 ---------------------------------------
-
-.. versionadded:: 6.1
 
 By default, admin actions are available on the change list page only. You can
 control where an action appears using the ``location`` argument of the
@@ -562,15 +553,8 @@ The ``action`` decorator
         :attr:`~django.db.models.Options.verbose_name` and
         :attr:`~django.db.models.Options.verbose_name_plural`.
 
-    .. versionchanged:: 6.1
-
-        The keyword arguments ``description_plural`` and ``location`` were
-        added.
-
 ``ActionLocation``
 ==================
-
-.. versionadded:: 6.1
 
 .. class:: ActionLocation
 
@@ -588,8 +572,6 @@ The ``action`` decorator
 
 ``Action``
 ==========
-
-.. versionadded:: 6.1
 
 .. class:: Action
 

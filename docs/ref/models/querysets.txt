@@ -172,8 +172,6 @@ Here's the formal declaration of a ``QuerySet``:
 
     .. attribute:: totally_ordered
 
-        .. versionadded:: 6.1
-
         Returns ``True`` if the ``QuerySet`` is ordered and the ordering is
         deterministic. This requires that the ordering includes a field
         (or set of fields) that is unique and non-nullable.
@@ -1043,8 +1041,6 @@ See :meth:`union` for some restrictions.
 
 ``fetch_mode()``
 ~~~~~~~~~~~~~~~~
-
-.. versionadded:: 6.1
 
 .. method:: fetch_mode(mode)
 
@@ -2641,11 +2637,6 @@ Example:
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
-.. versionchanged:: 6.1
-
-    Support for chaining ``in_bulk()`` after :meth:`values` or
-    :meth:`values_list` was added.
-
 ``iterator()``
 ~~~~~~~~~~~~~~
 
@@ -2818,12 +2809,6 @@ equivalent to the above example::
         p = Article.objects.order_by("title", "pub_date")[0]
     except IndexError:
         p = None
-
-.. versionchanged:: 6.1
-
-    ``first()`` and :meth:`last` no longer order by the primary key when
-    ordering has been forcibly cleared by calling :meth:`order_by` with no
-    arguments.
 
 ``last()``
 ~~~~~~~~~~
@@ -3128,10 +3113,6 @@ ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
 
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
-
-.. versionchanged:: 6.1
-
-    Support for the ``DB_*`` variants of ``on_delete`` attribute was added.
 
 ``as_manager()``
 ~~~~~~~~~~~~~~~~
@@ -4124,8 +4105,6 @@ by the aggregate.
 
 .. class:: BitAnd(expression, filter=None, default=None, **extra)
 
-    .. versionadded:: 6.1
-
     Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
     ``default`` if all values are null.
 
@@ -4136,8 +4115,6 @@ by the aggregate.
 
 .. class:: BitOr(expression, filter=None, default=None, **extra)
 
-    .. versionadded:: 6.1
-
     Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
     ``default`` if all values are null.
 
@@ -4147,8 +4124,6 @@ by the aggregate.
 ~~~~~~~~~~
 
 .. class:: BitXor(expression, filter=None, default=None, **extra)
-
-    .. versionadded:: 6.1
 
     Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
     ``default`` if all values are null.
@@ -4270,11 +4245,6 @@ by the aggregate.
         each of the values. For example, ``Value(",")``. (On SQLite, the
         literal delimiter ``Value(",")`` is the only delimiter compatible with
         ``distinct=True``.)
-
-        .. versionchanged:: 6.1
-
-            Support for using ``distinct=True`` with a delimiter of
-            ``Value(",")`` on SQLite was added.
 
 Query-related tools
 ===================

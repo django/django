@@ -106,8 +106,6 @@ This tag is used for CSRF protection, as described in the documentation for
 ``csp_nonce_attr``
 ------------------
 
-.. versionadded:: 6.1
-
 When called without arguments, renders a ``nonce="<value>"`` HTML attribute
 when the :func:`~django.template.context_processors.csp` context processor is
 configured, and an empty string otherwise. Use it in ``<script>`` or

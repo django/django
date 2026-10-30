@@ -166,8 +166,6 @@ Django core exception classes are defined in ``django.core.exceptions``.
 ``FieldFetchBlocked``
 ---------------------
 
-.. versionadded:: 6.1
-
 .. exception:: FieldFetchBlocked
 
     Raised when a field would be fetched on-demand and the

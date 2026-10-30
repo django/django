@@ -103,12 +103,6 @@ real email and gives them access to the messages that would have been sent.
 :ref:`topics/email:Configuring email for development` discusses some other
 approaches.
 
-.. versionchanged:: 6.1
-
-    In earlier releases, Django defaulted to sending email through an SMTP
-    server running on localhost, using the now-deprecated
-    :setting:`EMAIL_BACKEND` and related settings.
-
 .. deprecated:: 6.1
 
     Until Django 2028, if the :setting:`MAILERS` setting is not defined then
@@ -274,14 +268,6 @@ can be ``0`` or ``1`` since it can only send one message).
     :ref:`migrating-to-mailers-auth`, and
     :ref:`migrating-to-mailers-get-connection`.
 
-.. versionchanged:: 6.1
-
-    The ``using`` argument was added.
-
-    Older versions ignored ``fail_silently=True``, ``auth_user``,
-    and ``auth_password`` when a ``connection`` was also provided.
-    This now raises a ``TypeError``.
-
 .. versionchanged:: 6.2
 
     The ``from_email`` and ``recipient_list`` arguments now support
@@ -346,14 +332,6 @@ The return value will be the number of successfully delivered messages.
     :ref:`migrating-to-mailers-fail-silently`,
     :ref:`migrating-to-mailers-auth`, and
     :ref:`migrating-to-mailers-get-connection`.
-
-.. versionchanged:: 6.1
-
-    The ``using`` argument was added.
-
-    Older versions ignored ``fail_silently=True``, ``auth_user``,
-    and ``auth_password`` when a ``connection`` was also provided.
-    This now raises a ``TypeError``.
 
 .. versionchanged:: 6.2
 
@@ -427,13 +405,6 @@ used.
     :ref:`migrating-to-mailers-fail-silently` and
     :ref:`migrating-to-mailers-get-connection`.
 
-.. versionchanged:: 6.1
-
-    The ``using`` argument was added.
-
-    Older versions ignored ``fail_silently=True`` when a ``connection``
-    was also provided. This now raises a ``TypeError``.
-
 ``mail_managers()``
 -------------------
 
@@ -459,13 +430,6 @@ used.
     :setting:`MAILERS` configuration. See
     :ref:`migrating-to-mailers-fail-silently` and
     :ref:`migrating-to-mailers-get-connection`.
-
-.. versionchanged:: 6.1
-
-    The ``using`` argument was added.
-
-    Older versions ignored ``fail_silently=True`` when a ``connection``
-    was also provided. This now raises a ``TypeError``.
 
 .. _topic-email-message:
 
@@ -601,13 +565,6 @@ email backend API :ref:`provides an alternative
         certain backend-dependent exceptions while sending the message will be
         ignored. Providing both ``fail_silently`` and ``using`` will raise an
         error.
-
-        .. versionchanged:: 6.1
-
-            The ``using`` argument was added.
-
-            Older versions ignored ``fail_silently=True`` when a ``connection``
-            was also provided. This now raises a ``TypeError``.
 
         .. deprecated:: 6.1
 
@@ -1180,11 +1137,6 @@ The console backend supports these :setting:`OPTIONS <MAILERS-OPTIONS>`:
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
 
-.. versionchanged:: 6.1
-
-    The settings file created by :djadmin:`startproject` now defines
-    :setting:`MAILERS` with the console backend as the default configuration.
-
 .. _topic-email-file-backend:
 
 File backend
@@ -1235,10 +1187,6 @@ Django's test runner :ref:`automatically switches to this backend for testing
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
-
-.. versionchanged:: 6.1
-
-    The ``sent_using`` attribute was added to messages in the outbox.
 
 .. _topic-email-dummy-backend:
 
@@ -1305,8 +1253,6 @@ backends.
 
 .. data:: mailers
 
-    .. versionadded:: 6.1
-
     You can access the mailers configured in the :setting:`MAILERS` setting
     through a dict-like object: ``django.core.mail.mailers``:
 
@@ -1319,8 +1265,6 @@ backends.
     raised. Other configuration problems will raise an ``InvalidMailer`` error.
 
 .. data:: mailers.default
-
-    .. versionadded:: 6.1
 
     As a shortcut, the default mailer can be accessed through
     ``django.core.mail.mailers.default``:

@@ -1087,10 +1087,6 @@ while exact-matching ``JSONNull()`` is used to match JSON ``null``.
     Exact-matching ``None`` in a query to mean JSON ``null`` is deprecated.
     After the deprecation period, it will be interpreted as SQL ``NULL``.
 
-.. versionchanged:: 6.1
-
-    ``JSONNull()`` expression was added.
-
 .. code-block:: pycon
 
     >>> from django.db.models import JSONNull
@@ -1198,10 +1194,6 @@ directly, but you can still use dictionary unpacking to use it in a query:
 .. admonition:: MySQL, MariaDB, and Oracle < 21c
 
     Negative JSON array indices are not supported.
-
-.. versionchanged:: 6.1
-
-    Oracle 21c+ support for negative JSON array indices was added.
 
 .. admonition:: Integer-like object keys
 

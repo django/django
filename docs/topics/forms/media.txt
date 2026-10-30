@@ -129,8 +129,6 @@ HTML:
 ``Stylesheet`` objects
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 6.1
-
 .. class:: Stylesheet(href, **attributes)
 
     Represents a stylesheet link. The ``rel`` attribute is set to

@@ -439,11 +439,6 @@ subclass::
         collapsed, using an expandable widget with a toggle for switching
         their visibility.
 
-        .. versionchanged:: 6.1
-
-            The ``wide`` class has been removed, as it was made obsolete by the
-            new admin layout.
-
     * ``description``
         A string of optional extra text to be displayed at the top of each
         fieldset, under the heading of the fieldset.
@@ -1316,11 +1311,6 @@ subclass::
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
 
-    .. versionchanged:: 6.1
-
-        On earlier versions, search terms invalid for a given field type were
-        not skipped.
-
 .. attribute:: ModelAdmin.search_help_text
 
     Set ``search_help_text`` to specify a descriptive text for the search box
@@ -1415,8 +1405,6 @@ default templates used by the :class:`ModelAdmin` views:
     the :doc:`actions documentation</ref/contrib/admin/actions>`.
 
 .. attribute:: ModelAdmin.delete_confirmation_max_display
-
-    .. versionadded:: 6.1
 
     Set ``delete_confirmation_max_display`` to control how many objects are
     displayed on the delete confirmation pages before truncating the remainder

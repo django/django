@@ -366,10 +366,6 @@ Example::
 
     Zipcode.objects.filter(poly__isempty=True)
 
-.. versionchanged:: 6.1
-
-    SpatiaLite support was added.
-
 .. fieldlookup:: isvalid
 
 ``isvalid``
@@ -419,8 +415,6 @@ SpatiaLite  ``GeometryType(geom)``
 
 ``num_dimensions``
 ------------------
-
-.. versionadded:: 6.1
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_NDims.html>`__,
 SpatiaLite

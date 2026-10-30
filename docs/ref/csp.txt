@@ -261,11 +261,6 @@ To use this nonce in templates, the
 :func:`~django.template.context_processors.csp` context processor needs to be
 enabled. It adds a ``csp_nonce`` variable to the template context.
 
-.. versionchanged:: 6.1
-
-    The :ttag:`csp_nonce_attr` template tag was added, including support for
-    rendering :class:`~django.forms.Media` objects.
-
 For inline ``<script>`` and ``<style>`` elements, include the nonce directly
 using the context variable:
 

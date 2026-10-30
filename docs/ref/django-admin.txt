@@ -1090,8 +1090,6 @@ recipient email arguments.
 
 .. django-admin-option:: --using ALIAS
 
-.. versionadded:: 6.1
-
 Specifies the :setting:`MAILERS` alias to use for sending the test email to
 the recipients given as arguments. Defaults to the ``"default"`` mailer.
 

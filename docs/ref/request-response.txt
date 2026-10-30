@@ -221,8 +221,6 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.multipart_parser_class
 
-    .. versionadded:: 6.1
-
     The class used to parse ``multipart/form-data`` request data. By default,
     this is ``django.http.multipartparser.MultiPartParser``.
 
@@ -1152,10 +1150,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     to ``None`` to disable the length check.
 
     See :class:`HttpResponse` for other optional constructor arguments.
-
-    .. versionchanged:: 6.1
-
-       ``max_length`` was added.
 
     .. attribute:: HttpResponseRedirect.url
 

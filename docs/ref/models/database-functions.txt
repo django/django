@@ -1960,8 +1960,6 @@ UUID functions
 ``UUID4``
 ---------
 
-.. versionadded:: 6.1
-
 .. class:: UUID4()
 
 Generates a :rfc:`version 4 UUID <9562#section-5.4>`, which is random and is
@@ -1974,8 +1972,6 @@ generated using a cryptographically secure method.
 
 ``UUID7``
 ---------
-
-.. versionadded:: 6.1
 
 .. class:: UUID7(shift=None)
 

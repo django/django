@@ -381,10 +381,6 @@ Python logging module <python:logging.handlers>`.
             },
         }
 
-    .. versionchanged:: 6.1
-
-        The ``using`` argument was added.
-
     .. deprecated:: 6.1
 
         The ``email_backend`` argument is deprecated. Use ``using`` instead.
