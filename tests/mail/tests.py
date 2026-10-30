@@ -10,8 +10,6 @@ from email.headerregistry import Address
 from email.message import EmailMessage as PyEmailMessage
 from email.message import Message as PyMessage
 from email.message import MIMEPart
-from email.mime.image import MIMEImage
-from email.mime.text import MIMEText
 from pathlib import Path
 from textwrap import dedent
 from unittest import mock
@@ -1192,33 +1190,6 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(attached_message["Content-Transfer-Encoding"], "8bit")
         self.assertEqual(attached_message.get_content_type(), "text/plain")
 
-    # RemovedInDjango2028Warning.
-    def test_attach_mime_image(self):
-        """
-        EmailMessage.attach() docs: "You can pass it
-        a single argument that is a MIMEBase instance."
-        """
-        msg = (
-            "MIMEBase attachments are deprecated."
-            " Use an email.message.MIMEPart instead."
-        )
-        # This also verifies complex attachments with extra header fields.
-        email = EmailMessage()
-        image = MIMEImage(b"GIF89a...", "gif")
-        image["Content-Disposition"] = "inline"
-        image["Content-ID"] = "<content-id@example.org>"
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            email.attach(image)
-
-        attachments = self.get_raw_attachments(email)
-        self.assertEqual(len(attachments), 1)
-        image_att = attachments[0]
-        self.assertEqual(image_att.get_content_type(), "image/gif")
-        self.assertEqual(image_att.get_content_disposition(), "inline")
-        self.assertEqual(image_att["Content-ID"], "<content-id@example.org>")
-        self.assertEqual(image_att.get_content(), b"GIF89a...")
-        self.assertIsNone(image_att.get_filename())
-
     def test_attach_mime_part(self):
         """
         EmailMessage.attach() docs: "You can pass it
@@ -1244,24 +1215,6 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(image_att["Content-ID"], "<content-id@example.org>")
         self.assertEqual(image_att.get_content(), b"GIF89a...")
         self.assertIsNone(image_att.get_filename())
-
-    # RemovedInDjango2028Warning.
-    def test_attach_mime_image_in_constructor(self):
-        msg = (
-            "MIMEBase attachments are deprecated."
-            " Use an email.message.MIMEPart instead."
-        )
-        image = MIMEImage(b"\x89PNG...", "png")
-        image["Content-Disposition"] = "attachment; filename=test.png"
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            email = EmailMessage(attachments=[image])
-
-        attachments = self.get_raw_attachments(email)
-        self.assertEqual(len(attachments), 1)
-        image_att = attachments[0]
-        self.assertEqual(image_att.get_content_type(), "image/png")
-        self.assertEqual(image_att.get_content(), b"\x89PNG...")
-        self.assertEqual(image_att.get_filename(), "test.png")
 
     def test_attach_mime_part_in_constructor(self):
         image = MIMEPart()
@@ -2818,214 +2771,6 @@ class GetConnectionTests(SimpleTestCase):
             mail.get_connection()
 
 
-# RemovedInDjango2028Warning.
-class DeprecatedInternalsTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    @mock.patch("django.core.mail.message.MIMEText.set_payload")
-    def test_nonascii_as_string_with_ascii_charset(self, mock_set_payload):
-        """Line length check should encode the payload supporting
-        `surrogateescape`.
-
-        Following https://github.com/python/cpython/issues/76511, newer
-        versions of Python (3.12.3 and 3.13+) ensure that a message's
-        payload is encoded with the provided charset and `surrogateescape` is
-        used as the error handling strategy.
-
-        This test is heavily based on the test from the fix for the bug above.
-        Line length checks in SafeMIMEText's set_payload should also use the
-        same error handling strategy to avoid errors such as:
-
-        UnicodeEncodeError: 'utf-8' codec can't encode <...>: surrogates not
-        allowed
-
-        """
-        # This test is specific to Python's legacy MIMEText. This can be safely
-        # removed when EmailMessage.message() uses Python's modern email API.
-        # (Using surrogateescape for non-utf8 is covered in test_encoding().)
-        from django.core.mail import SafeMIMEText
-
-        def simplified_set_payload(instance, payload, charset):
-            instance._payload = payload
-
-        mock_set_payload.side_effect = simplified_set_payload
-
-        text = (
-            "Text heavily based in Python's text for non-ascii messages: Föö bär"
-        ).encode("iso-8859-1")
-        body = text.decode("ascii", errors="surrogateescape")
-        message = SafeMIMEText(body, "plain", "ascii")
-        mock_set_payload.assert_called_once()
-        self.assertEqual(message.get_payload(decode=True), text)
-
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_sanitize_address(self):
-        """Email addresses are properly sanitized."""
-        # Tests the internal sanitize_address() function. Many of these cases
-        # are duplicated in test_address_header_handling(), which verifies
-        # headers in the generated message.
-        from django.core.mail.message import sanitize_address
-
-        for email_address, encoding, expected_result in (
-            # ASCII addresses.
-            ("to@example.com", "ascii", "to@example.com"),
-            ("to@example.com", "utf-8", "to@example.com"),
-            (("A name", "to@example.com"), "ascii", "A name <to@example.com>"),
-            (
-                ("A name", "to@example.com"),
-                "utf-8",
-                "A name <to@example.com>",
-            ),
-            ("localpartonly", "ascii", "localpartonly"),
-            # ASCII addresses with display names.
-            ("A name <to@example.com>", "ascii", "A name <to@example.com>"),
-            ("A name <to@example.com>", "utf-8", "A name <to@example.com>"),
-            ('"A name" <to@example.com>', "ascii", "A name <to@example.com>"),
-            ('"A name" <to@example.com>', "utf-8", "A name <to@example.com>"),
-            # Unicode addresses: IDNA encoded domain supported per RFC-5890.
-            ("to@éxample.com", "utf-8", "to@xn--xample-9ua.com"),
-            # The next three cases should be removed when fixing #35713.
-            # (An 'encoded-word' localpart is prohibited by RFC-2047, and not
-            # supported by any known mail service.)
-            ("tó@example.com", "utf-8", "=?utf-8?b?dMOz?=@example.com"),
-            (
-                ("Tó Example", "tó@example.com"),
-                "utf-8",
-                "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
-            ),
-            (
-                "Tó Example <tó@example.com>",
-                "utf-8",
-                # (Not RFC-2047 compliant.)
-                "=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>",
-            ),
-            # IDNA addresses with display names.
-            (
-                "To Example <to@éxample.com>",
-                "ascii",
-                "To Example <to@xn--xample-9ua.com>",
-            ),
-            (
-                "To Example <to@éxample.com>",
-                "utf-8",
-                "To Example <to@xn--xample-9ua.com>",
-            ),
-            # Addresses with two @ signs.
-            ('"to@other.com"@example.com', "utf-8", r'"to@other.com"@example.com'),
-            (
-                '"to@other.com" <to@example.com>',
-                "utf-8",
-                '"to@other.com" <to@example.com>',
-            ),
-            (
-                ("To Example", "to@other.com@example.com"),
-                "utf-8",
-                'To Example <"to@other.com"@example.com>',
-            ),
-            # Addresses with long unicode display names.
-            (
-                "Tó Example very long" * 4 + " <to@example.com>",
-                "utf-8",
-                "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
-                "=C3=B3_Example_?=\n"
-                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
-                "<to@example.com>",
-            ),
-            (
-                ("Tó Example very long" * 4, "to@example.com"),
-                "utf-8",
-                "=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT"
-                "=C3=B3_Example_?=\n"
-                " =?utf-8?q?very_longT=C3=B3_Example_very_long?= "
-                "<to@example.com>",
-            ),
-            # Address with long display name and unicode domain.
-            (
-                ("To Example very long" * 4, "to@exampl€.com"),
-                "utf-8",
-                "To Example very longTo Example very longTo Example very longT"
-                "o Example very\n"
-                " long <to@xn--exampl-nc1c.com>",
-            ),
-        ):
-            with self.subTest(email_address=email_address, encoding=encoding):
-                self.assertEqual(
-                    sanitize_address(email_address, encoding), expected_result
-                )
-
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_sanitize_address_invalid(self):
-        # Tests the internal sanitize_address() function. Note that Django's
-        # EmailMessage.message() will not catch these cases, as it only calls
-        # sanitize_address() if an address also includes non-ASCII chars.
-        # Django detects these cases in the SMTP EmailBackend during sending.
-        # See SMTPBackendTests.test_avoids_sending_to_invalid_addresses()
-        # below.
-        from django.core.mail.message import sanitize_address
-
-        for email_address in (
-            # Invalid address with two @ signs.
-            "to@other.com@example.com",
-            # Invalid address without the quotes.
-            "to@other.com <to@example.com>",
-            # Other invalid addresses.
-            "@",
-            "to@",
-            "@example.com",
-            ("", ""),
-        ):
-            with self.subTest(email_address=email_address):
-                with self.assertRaisesMessage(ValueError, "Invalid address"):
-                    sanitize_address(email_address, encoding="utf-8")
-
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_sanitize_address_header_injection(self):
-        # Tests the internal sanitize_address() function. These cases are
-        # duplicated in test_address_header_handling(), which verifies headers
-        # in the generated message.
-        from django.core.mail.message import sanitize_address
-
-        msg = "Invalid address; address parts cannot contain newlines."
-        tests = [
-            "Name\nInjection <to@example.com>",
-            ("Name\nInjection", "to@xample.com"),
-            "Name <to\ninjection@example.com>",
-            ("Name", "to\ninjection@example.com"),
-        ]
-        for email_address in tests:
-            with self.subTest(email_address=email_address):
-                with self.assertRaisesMessage(ValueError, msg):
-                    sanitize_address(email_address, encoding="utf-8")
-
-
-# RemovedInDjango2028Warning.
-class PythonGlobalState(SimpleTestCase):
-    """
-    Tests for #12422 -- Django smarts (#2472/#11212) with charset of utf-8 text
-    parts shouldn't pollute global email Python package charset registry when
-    django.mail.message is imported.
-    """
-
-    def test_utf8(self):
-        txt = MIMEText("UTF-8 encoded body", "plain", "utf-8")
-        self.assertIn("Content-Transfer-Encoding: base64", txt.as_string())
-
-    def test_7bit(self):
-        txt = MIMEText("Body with only ASCII characters.", "plain", "utf-8")
-        self.assertIn("Content-Transfer-Encoding: base64", txt.as_string())
-
-    def test_8bit_latin(self):
-        txt = MIMEText("Body with latin characters: àáä.", "plain", "utf-8")
-        self.assertIn("Content-Transfer-Encoding: base64", txt.as_string())
-
-    def test_8bit_non_latin(self):
-        txt = MIMEText(
-            "Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.",
-            "plain",
-            "utf-8",
-        )
-        self.assertIn("Content-Transfer-Encoding: base64", txt.as_string())
-
-
 class LegacyAPINotUsedTests(SimpleTestCase):
     """
     Check django.core.mail does not directly import Python legacy email APIs,
@@ -3055,21 +2800,6 @@ class LegacyAPINotUsedTests(SimpleTestCase):
         django_path = django_core_mail_path.parent.parent.parent
         for abs_path in django_core_mail_path.glob("**/*.py"):
             allowed_exceptions = self.allowed_exceptions.copy()
-            # RemovedInDjango2028Warning.
-            # The following will be removed after the deprecation period.
-            if abs_path.name == "message.py":
-                allowed_exceptions.update(
-                    {
-                        "email.charset",
-                        "email.header.Header",
-                        "email.mime.base.MIMEBase",
-                        "email.mime.message.MIMEMessage",
-                        "email.mime.multipart.MIMEMultipart",
-                        "email.mime.text.MIMEText",
-                        "email.utils.formataddr",
-                        "email.utils.getaddresses",
-                    }
-                )
             path = abs_path.relative_to(django_path)
             with self.subTest(path=str(path)):
                 collector = self.ImportCollector(abs_path.read_text())

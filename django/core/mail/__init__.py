@@ -2,7 +2,6 @@
 Tools for sending email.
 """
 
-import warnings
 from email.headerregistry import Address
 
 from django.conf import settings
@@ -20,7 +19,6 @@ from django.core.mail.message import (
     EmailAttachment,
     EmailMessage,
     EmailMultiAlternatives,
-    forbid_multi_line_headers,
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
@@ -56,12 +54,6 @@ __all__ = [
     "mail_managers",
     "EmailAlternative",
     "EmailAttachment",
-    # RemovedInDjango2028Warning: When the deprecation ends, remove the last
-    # entries.
-    "BadHeaderError",
-    "SafeMIMEText",
-    "SafeMIMEMultipart",
-    "forbid_multi_line_headers",
 ]
 
 
@@ -322,31 +314,3 @@ def mail_managers(
         connection=connection,
         using=using,
     )
-
-
-# RemovedInDjango2028Warning.
-_deprecate_on_import = {
-    "BadHeaderError": "BadHeaderError is deprecated. Replace with ValueError.",
-    "SafeMIMEText": (
-        "SafeMIMEText is deprecated. The return value"
-        " of EmailMessage.message() is an email.message.EmailMessage."
-    ),
-    "SafeMIMEMultipart": (
-        "SafeMIMEMultipart is deprecated. The return value"
-        " of EmailMessage.message() is an email.message.EmailMessage."
-    ),
-}
-
-
-# RemovedInDjango2028Warning.
-def __getattr__(name):
-    try:
-        msg = _deprecate_on_import[name]
-    except KeyError:
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from None
-    else:
-        # Issue deprecation warnings at time of import.
-        from django.core.mail import message
-
-        warnings.warn(msg, category=RemovedInDjango2028Warning)
-        return getattr(message, name)

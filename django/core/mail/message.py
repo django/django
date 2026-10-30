@@ -1,20 +1,10 @@
 import email.message
 import email.policy
 import mimetypes
-import warnings
 from collections import namedtuple
 from datetime import datetime, timezone
-from email import charset as Charset
-from email import generator
-from email.errors import HeaderParseError
-from email.header import Header
-from email.headerregistry import Address, AddressHeader, parser
-from email.mime.base import MIMEBase
-from email.mime.message import MIMEMessage
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.utils import formataddr, getaddresses, make_msgid
-from io import BytesIO, StringIO
+from email.headerregistry import Address, AddressHeader
+from email.utils import make_msgid
 from pathlib import Path
 
 from django.conf import settings
@@ -32,205 +22,9 @@ from .deprecation import (
     report_using_incompatibility,
 )
 
-# RemovedInDjango2028Warning.
-# Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
-# some spam filters.
-utf8_charset = Charset.Charset("utf-8")
-utf8_charset.body_encoding = None  # Python defaults to BASE64
-utf8_charset_qp = Charset.Charset("utf-8")
-utf8_charset_qp.body_encoding = Charset.QP
-
 # Default MIME type to use on attachments (if it is not explicitly given
 # and cannot be guessed).
 DEFAULT_ATTACHMENT_MIME_TYPE = "application/octet-stream"
-
-# RemovedInDjango2028Warning.
-RFC5322_EMAIL_LINE_LENGTH_LIMIT = 998
-
-
-# RemovedInDjango2028Warning.
-# BadHeaderError must be ValueError (not subclass it), so that existing code
-# with `except BadHeaderError` will catch the ValueError that Python's modern
-# email API raises for headers containing CR or NL.
-BadHeaderError = ValueError
-
-# RemovedInDjango2028Warning.
-# Header names that contain structured address data (RFC 5322).
-ADDRESS_HEADERS = {
-    "from",
-    "sender",
-    "reply-to",
-    "to",
-    "cc",
-    "bcc",
-    "resent-from",
-    "resent-sender",
-    "resent-to",
-    "resent-cc",
-    "resent-bcc",
-}
-
-
-# RemovedInDjango2028Warning.
-def forbid_multi_line_headers(name, val, encoding):
-    """Forbid multi-line headers to prevent header injection."""
-    warnings.warn(
-        "The internal API forbid_multi_line_headers() is deprecated."
-        " Python's modern email API (with email.message.EmailMessage or"
-        " email.policy.default) will reject multi-line headers.",
-        RemovedInDjango2028Warning,
-    )
-
-    encoding = encoding or settings.DEFAULT_CHARSET
-    val = str(val)  # val may be lazy
-    if "\n" in val or "\r" in val:
-        raise BadHeaderError(
-            "Header values can't contain newlines (got %r for header %r)" % (val, name)
-        )
-    try:
-        val.encode("ascii")
-    except UnicodeEncodeError:
-        if name.lower() in ADDRESS_HEADERS:
-            val = ", ".join(
-                sanitize_address(addr, encoding) for addr in getaddresses((val,))
-            )
-        else:
-            val = Header(val, encoding).encode()
-    else:
-        if name.lower() == "subject":
-            val = Header(val).encode()
-    return name, val
-
-
-# RemovedInDjango2028Warning.
-def sanitize_address(addr, encoding):
-    """
-    Format a pair of (name, address) or an email address string.
-    """
-    warnings.warn(
-        "The internal API sanitize_address() is deprecated."
-        " Python's modern email API (with email.message.EmailMessage or"
-        " email.policy.default) will handle most required validation and"
-        " encoding. Use Python's email.headerregistry.Address to construct"
-        " formatted addresses from component parts.",
-        RemovedInDjango2028Warning,
-    )
-
-    address = None
-    if not isinstance(addr, tuple):
-        addr = force_str(addr)
-        try:
-            token, rest = parser.get_mailbox(addr)
-        except (HeaderParseError, ValueError, IndexError):
-            raise ValueError('Invalid address "%s"' % addr)
-        else:
-            if rest:
-                # The entire email address must be parsed.
-                raise ValueError(
-                    'Invalid address; only %s could be parsed from "%s"' % (token, addr)
-                )
-            nm = token.display_name or ""
-            localpart = token.local_part
-            domain = token.domain or ""
-    else:
-        nm, address = addr
-        if "@" not in address:
-            raise ValueError(f'Invalid address "{address}"')
-        localpart, domain = address.rsplit("@", 1)
-
-    address_parts = nm + localpart + domain
-    if "\n" in address_parts or "\r" in address_parts:
-        raise ValueError("Invalid address; address parts cannot contain newlines.")
-
-    # Avoid UTF-8 encode, if it's possible.
-    try:
-        nm.encode("ascii")
-        nm = Header(nm).encode()
-    except UnicodeEncodeError:
-        nm = Header(nm, encoding).encode()
-    try:
-        localpart.encode("ascii")
-    except UnicodeEncodeError:
-        localpart = Header(localpart, encoding).encode()
-    domain = punycode(domain)
-
-    parsed_address = Address(username=localpart, domain=domain)
-    return formataddr((nm, parsed_address.addr_spec))
-
-
-# RemovedInDjango2028Warning.
-class MIMEMixin:
-    def as_string(self, unixfrom=False, linesep="\n"):
-        """Return the entire formatted message as a string.
-        Optional `unixfrom' when True, means include the Unix From_ envelope
-        header.
-
-        This overrides the default as_string() implementation to not mangle
-        lines that begin with 'From '. See bug #13433 for details.
-        """
-        fp = StringIO()
-        g = generator.Generator(fp, mangle_from_=False)
-        g.flatten(self, unixfrom=unixfrom, linesep=linesep)
-        return fp.getvalue()
-
-    def as_bytes(self, unixfrom=False, linesep="\n"):
-        """Return the entire formatted message as bytes.
-        Optional `unixfrom' when True, means include the Unix From_ envelope
-        header.
-
-        This overrides the default as_bytes() implementation to not mangle
-        lines that begin with 'From '. See bug #13433 for details.
-        """
-        fp = BytesIO()
-        g = generator.BytesGenerator(fp, mangle_from_=False)
-        g.flatten(self, unixfrom=unixfrom, linesep=linesep)
-        return fp.getvalue()
-
-
-# RemovedInDjango2028Warning.
-class SafeMIMEMessage(MIMEMixin, MIMEMessage):
-    def __setitem__(self, name, val):
-        # Per RFC 2046 Section 5.2.1, message/rfc822 attachment headers must be
-        # ASCII.
-        name, val = forbid_multi_line_headers(name, val, "ascii")
-        MIMEMessage.__setitem__(self, name, val)
-
-
-# RemovedInDjango2028Warning.
-class SafeMIMEText(MIMEMixin, MIMEText):
-    def __init__(self, _text, _subtype="plain", _charset=None):
-        self.encoding = _charset
-        MIMEText.__init__(self, _text, _subtype=_subtype, _charset=_charset)
-
-    def __setitem__(self, name, val):
-        name, val = forbid_multi_line_headers(name, val, self.encoding)
-        MIMEText.__setitem__(self, name, val)
-
-    def set_payload(self, payload, charset=None):
-        if charset == "utf-8" and not isinstance(charset, Charset.Charset):
-            has_long_lines = any(
-                len(line.encode(errors="surrogateescape"))
-                > RFC5322_EMAIL_LINE_LENGTH_LIMIT
-                for line in payload.splitlines()
-            )
-            # Quoted-Printable encoding has the side effect of shortening long
-            # lines, if any (#22561).
-            charset = utf8_charset_qp if has_long_lines else utf8_charset
-        MIMEText.set_payload(self, payload, charset=charset)
-
-
-# RemovedInDjango2028Warning.
-class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
-    def __init__(
-        self, _subtype="mixed", boundary=None, _subparts=None, encoding=None, **_params
-    ):
-        self.encoding = encoding
-        MIMEMultipart.__init__(self, _subtype, boundary, _subparts, **_params)
-
-    def __setitem__(self, name, val):
-        name, val = forbid_multi_line_headers(name, val, self.encoding)
-        MIMEMultipart.__setitem__(self, name, val)
-
 
 EmailAlternative = namedtuple("EmailAlternative", ["content", "mimetype"])
 EmailAttachment = namedtuple("EmailAttachment", ["filename", "content", "mimetype"])
@@ -294,9 +88,6 @@ class EmailMessage:
         if attachments:
             for attachment in attachments:
                 if isinstance(attachment, email.message.MIMEPart):
-                    self.attach(attachment)
-                elif isinstance(attachment, MIMEBase):
-                    # RemovedInDjango2028Warning.
                     self.attach(attachment)
                 else:
                     self.attach(*attachment)
@@ -415,7 +206,7 @@ class EmailMessage:
         Attach a file with the given filename and content. The filename can
         be omitted and the mimetype is guessed, if not provided.
 
-        If the first parameter is a MIMEBase subclass, insert it directly
+        If the first parameter is a MIMEPart instance, insert it directly
         into the resulting message attachments.
 
         For a text/* mimetype (guessed or specified), when a bytes object is
@@ -426,18 +217,6 @@ class EmailMessage:
             if content is not None or mimetype is not None:
                 raise ValueError(
                     "content and mimetype must not be given when a MIMEPart "
-                    "instance is provided."
-                )
-            self.attachments.append(filename)
-        elif isinstance(filename, MIMEBase):
-            warnings.warn(
-                "MIMEBase attachments are deprecated."
-                " Use an email.message.MIMEPart instead.",
-                RemovedInDjango2028Warning,
-            )
-            if content is not None or mimetype is not None:
-                raise ValueError(
-                    "content and mimetype must not be given when a MIMEBase "
                     "instance is provided."
                 )
             self.attachments.append(filename)
@@ -488,18 +267,9 @@ class EmailMessage:
 
     def _add_attachments(self, msg):
         if self.attachments:
-            if hasattr(self, "mixed_subtype"):
-                # RemovedInDjango2028Warning.
-                raise AttributeError(
-                    "EmailMessage no longer supports the"
-                    " undocumented `mixed_subtype` attribute"
-                )
             msg.make_mixed()
             for attachment in self.attachments:
                 if isinstance(attachment, email.message.MIMEPart):
-                    msg.attach(attachment)
-                elif isinstance(attachment, MIMEBase):
-                    # RemovedInDjango2028Warning.
                     msg.attach(attachment)
                 else:
                     self._add_attachment(msg, *attachment)
@@ -647,12 +417,6 @@ class EmailMultiAlternatives(EmailMessage):
         if self.body or not self.alternatives:
             super()._add_bodies(msg)
         if self.alternatives:
-            if hasattr(self, "alternative_subtype"):
-                # RemovedInDjango2028Warning.
-                raise AttributeError(
-                    "EmailMultiAlternatives no longer supports the"
-                    " undocumented `alternative_subtype` attribute"
-                )
             msg.make_alternative()
             encoding = self.encoding or settings.DEFAULT_CHARSET
             for alternative in self.alternatives:

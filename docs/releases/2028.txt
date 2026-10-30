@@ -296,6 +296,18 @@ to remove usage of these features.
 * The :mod:`django.core.mail` APIs no longer accept certain parameters as
   positional arguments. These must be passed as keyword arguments instead.
 
+* Support for passing Python's legacy email ``email.mime.base.MIMEBase``
+  object to ``EmailMessage.attach()`` (or including one in the message's
+  ``attachments`` list) is removed.
+
+* The ``django.core.mail.BadHeaderError`` exception is removed.
+
+* The ``django.core.mail.SafeMIMEText`` and ``SafeMIMEMultipart`` classes are
+  removed.
+
+* The ``django.core.mail.forbid_multi_line_headers()`` and
+  ``django.core.mail.message.sanitize_address()`` functions are removed.
+
 See :ref:`deprecated-features-6.1` for details on these changes, including how
 to remove usage of these features.
 

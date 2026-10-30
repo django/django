@@ -478,12 +478,6 @@ email backend API :ref:`provides an alternative
       :class:`EmailAttachment`, or a tuple with attributes
       ``(filename, content, mimetype)``.
 
-      .. deprecated:: 6.0
-
-          Support for Python's legacy :class:`~email.mime.base.MIMEBase`
-          objects in ``attachments`` is deprecated. Use
-          :class:`~email.message.MIMEPart` instead.
-
     * ``headers``: A dictionary of extra headers to put on the message. The
       keys are the header name, values are the header values. It's up to the
       caller to ensure header names and values are in the correct format for
@@ -630,11 +624,6 @@ email backend API :ref:`provides an alternative
 
           Python's :meth:`email.contentmanager.set_content` documentation
           describes the supported arguments for ``MIMEPart.set_content()``.
-
-          .. deprecated:: 6.0
-
-              Support for :class:`email.mime.base.MIMEBase` attachments is
-              deprecated. Use :class:`~email.message.MIMEPart` instead.
 
     .. method:: attach_file(path, mimetype=None)
 
