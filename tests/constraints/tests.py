@@ -313,6 +313,18 @@ class CheckConstraintTests(TestCase):
         constraint.validate(Product, Product(price=501, discounted_price=5))
         constraint.validate(Product, Product(price=499, discounted_price=5))
 
+        nested_constraint = models.CheckConstraint(
+            condition=models.Q(
+                price__gt=models.expressions.RawSQL(
+                    "price > %s",
+                    (20,),
+                    output_field=models.BooleanField(),
+                )
+            ),
+            name="price_gt_raw_noop",
+        )
+        nested_constraint.validate(Product, Product(price=10))
+
     @skipUnlessDBFeature("supports_comparing_boolean_expr")
     def test_validate_nullable_field_with_none(self):
         # Nullable fields should be considered valid on None values.
@@ -441,6 +453,20 @@ class CheckConstraintTests(TestCase):
                 ModelWithDatabaseDefault,
                 ModelWithDatabaseDefault(field_with_db_default="other value"),
             )
+
+    def test_validate_database_error_non_rawsql(self):
+        """
+        A CheckConstraint with a non-RawSQL expression that triggers a
+        DatabaseError during Q.check() should raise a ValidationError
+        instead of silently passing (#37446).
+        """
+        constraint = models.CheckConstraint(
+            condition=models.Q(unit__regex="["),
+            name="invalid_regex_check",
+        )
+        msg = f"Constraint \u201c{constraint.name}\u201d is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(price=10, unit="test"))
 
 
 class UniqueConstraintTests(TestCase):
