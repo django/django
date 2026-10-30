@@ -525,9 +525,6 @@ class ChangeList:
             return qs
 
     def apply_select_related(self, qs):
-        if self.list_select_related is True:
-            return qs.select_related()
-
         if self.list_select_related is False:
             if fields := self.get_select_related_fields():
                 return qs.select_related(*fields)

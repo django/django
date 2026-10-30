@@ -1,8 +1,6 @@
 from django.core.exceptions import FieldDoesNotExist, FieldError, FieldFetchBlocked
 from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     BigChild,
@@ -147,18 +145,6 @@ class DeferTests(AssertionMixin, TestCase):
         self.assert_delayed(obj.related, 1)
         self.assertEqual(obj.related_id, self.s1.pk)
         self.assertEqual(obj.name, "p1")
-
-    # RemovedInDjango2028Warning: when the deprecation ends, remove this test.
-    def test_defer_foreign_keys_are_deferred_and_not_traversed(self):
-        # select_related() overrides defer().
-        with self.assertNumQueries(1):
-            with ignore_warnings(
-                category=RemovedInDjango2028Warning,
-                message="Calling select_related() with no arguments is deprecated.",
-            ):
-                obj = Primary.objects.defer("related").select_related()[0]
-            self.assert_delayed(obj, 1)
-            self.assertEqual(obj.related.id, self.s1.pk)
 
     def test_saving_object_with_deferred_field(self):
         # Saving models with deferred fields is possible (but inefficient,
@@ -336,14 +322,12 @@ class TestDefer2(AssertionMixin, TestCase):
         """
         related = Secondary.objects.create(first="x1", second="x2")
         ChildProxy.objects.create(name="p1", value="xx", related=related)
-        with ignore_warnings(
-            category=RemovedInDjango2028Warning,
-            message="Calling select_related() with no arguments is deprecated.",
-        ):
-            children = ChildProxy.objects.select_related().only("id", "name")
+        children = ChildProxy.objects.select_related("related").only(
+            "id", "name", "related"
+        )
         self.assertEqual(len(children), 1)
         child = children[0]
-        self.assert_delayed(child, 2)
+        self.assert_delayed(child, 1)
         self.assertEqual(child.name, "p1")
         self.assertEqual(child.value, "xx")
 

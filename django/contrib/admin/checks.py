@@ -1097,14 +1097,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return []
 
     def _check_list_select_related(self, obj):
-        """Check that list_select_related is a boolean, a list or a tuple."""
+        """Check that list_select_related is False, a list, or a tuple."""
 
-        if not isinstance(obj.list_select_related, (bool, list, tuple)):
+        if obj.list_select_related is not False and not isinstance(
+            obj.list_select_related, (list, tuple)
+        ):
             return must_be(
-                # RemovedInDjango2028Warning: replace with:
-                # "a tuple, list, or False",
-                # and also update docs/ref/checks.txt.
-                "a boolean, tuple or list",
+                "a tuple, list, or False",
                 option="list_select_related",
                 obj=obj,
                 id="admin.E117",

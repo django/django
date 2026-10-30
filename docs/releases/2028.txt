@@ -378,6 +378,15 @@ to remove usage of these features.
   ``django.core.signing.base64_hmac()`` is changed from ``"sha1"`` to
   ``"sha256"``.
 
+* Calling :meth:`.QuerySet.select_related` without arguments raises
+  :exc:`TypeError`.
+
+* :class:`.ModelAdmin` raises :exc:`ValueError` if subclassed with its
+  :attr:`.list_select_related` attribute set to ``True``.
+
+* :class:`.ModelAdmin` raises :exc:`ValueError` if its
+  :meth:`.get_list_select_related` method returns ``True``.
+
 See :ref:`deprecated-features-6.2` for details on these changes, including how
 to remove usage of these features.
 

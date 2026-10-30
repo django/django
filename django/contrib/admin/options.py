@@ -4,7 +4,6 @@ import itertools
 import json
 import re
 import sys
-import warnings
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial, update_wrapper
@@ -63,10 +62,6 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import (
-    RemovedInDjango2028Warning,
-    warn_about_implementation,
-)
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -79,7 +74,6 @@ from django.utils.text import (
 )
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
-from django.utils.warnings import django_file_prefixes
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
@@ -703,13 +697,10 @@ class ModelAdmin(BaseModelAdmin):
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
         if cls.__dict__.get("list_select_related") is True:
-            # RemovedInDjango2028Warning: when the deprecation ends, raise a
-            # ValueError.
-            warnings.warn(
-                "Setting ModelAdmin.list_select_related to True is deprecated. "
-                "Use False or a list or tuple of fields to fetch instead.",
-                RemovedInDjango2028Warning,
-                skip_file_prefixes=django_file_prefixes(),
+            raise ValueError(
+                "Setting ModelAdmin.list_select_related to True is not "
+                "supported. Use False or a list or tuple of fields to fetch "
+                "instead."
             )
 
     def __init__(self, model, admin_site):
@@ -898,16 +889,11 @@ class ModelAdmin(BaseModelAdmin):
         ChangeList = self.get_changelist(request)
         list_select_related = self.get_list_select_related(request)
         if list_select_related is True:
-            # RemovedInDjango2028Warning: when the deprecation ends, remove the
-            # below 'if' clause and raise a ValueError here.
-            if self.list_select_related is not True:
-                warn_about_implementation(
-                    "Returning True from ModelAdmin.get_list_select_related() is "
-                    "deprecated. Return False or a list or tuple of fields to "
-                    "fetch instead.",
-                    RemovedInDjango2028Warning,
-                    self.get_list_select_related,
-                )
+            raise ValueError(
+                "Returning True from ModelAdmin.get_list_select_related() is not "
+                "supported. Return False or a list or tuple of fields to fetch "
+                "instead."
+            )
         return ChangeList(
             request,
             self.model,

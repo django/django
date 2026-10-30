@@ -1798,12 +1798,12 @@ object instance are cached. Example:
     >>> print(e.blog)  # Doesn't hit the database; uses cached version.
 
 Note that the :meth:`~django.db.models.query.QuerySet.select_related`
-:class:`~django.db.models.query.QuerySet` method recursively prepopulates the
-cache of all one-to-many relationships ahead of time. Example:
+:class:`~django.db.models.query.QuerySet` method prepopulates the cache of the
+given one-to-many relationships ahead of time. Example:
 
 .. code-block:: pycon
 
-    >>> e = Entry.objects.select_related().get(id=2)
+    >>> e = Entry.objects.select_related("blog").get(id=2)
     >>> print(e.blog)  # Doesn't hit the database; uses cached version.
     >>> print(e.blog)  # Doesn't hit the database; uses cached version.
 

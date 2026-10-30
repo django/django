@@ -1249,9 +1249,7 @@ class ListSelectRelatedCheckTests(CheckTestCase):
         self.assertIsInvalid(
             TestModelAdmin,
             ValidationTestModel,
-            # RemovedInDjango2028Warning: when the deprecation ends, replace:
-            # ... must be a tuple, list, or False.",
-            "The value of 'list_select_related' must be a boolean, tuple or list.",
+            "The value of 'list_select_related' must be a tuple, list, or False.",
             "admin.E117",
         )
 

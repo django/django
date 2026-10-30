@@ -49,7 +49,6 @@ from django.utils import functional, timezone
 from django.utils.deprecation import (
     RemovedInDjango2028Warning,
     RemovedInDjango2029Warning,
-    warn_about_external_use,
 )
 from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
 from django.utils.warnings import django_file_prefixes
@@ -1836,15 +1835,10 @@ class QuerySet(AltersData):
         elif fields:
             obj.query.add_select_related(fields)
         else:
-            # RemovedInDjango2028Warning: when the deprecation ends, raise a
-            # TypeError instead.
-            warn_about_external_use(
-                "Calling select_related() with no arguments is deprecated. "
-                "Specify the fields to fetch instead.",
-                category=RemovedInDjango2028Warning,
-                skip_name_prefixes=("django.db.models",),
+            raise TypeError(
+                "Calling select_related() with no arguments is not supported. "
+                "Specify the fields to fetch instead."
             )
-            obj.query.select_related = True
         return obj
 
     def prefetch_related(self, *lookups):
