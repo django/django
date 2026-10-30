@@ -38,16 +38,13 @@ import base64
 import datetime
 import json
 import time
-import warnings
 import zlib
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.warnings import django_file_prefixes
 
 _SEP_UNSAFE = _lazy_re_compile(r"^[A-z0-9-_=]*$")
 BASE62_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -99,17 +96,7 @@ def b64_decode(s):
     return base64.urlsafe_b64decode(s + pad)
 
 
-# RemovedInDjango2028Warning: algorithm="sha256"
-def base64_hmac(salt, value, key, algorithm=None):
-    if algorithm is None:
-        warnings.warn(
-            "The default argument for algorithm in base64_hmac() will change "
-            "from 'sha1' to 'sha256' in Django 2028. Pass an explicit "
-            "algorithm to silence this warning.",
-            category=RemovedInDjango2028Warning,
-            skip_file_prefixes=django_file_prefixes(),
-        )
-        algorithm = "sha1"
+def base64_hmac(salt, value, key, algorithm="sha256"):
     return b64_encode(
         salted_hmac(salt, value, key, algorithm=algorithm).digest()
     ).decode()
