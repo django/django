@@ -366,6 +366,10 @@ to remove usage of these features.
 * The ``email_backend`` argument of :class:`.log.AdminEmailHandler` is
   removed.
 
+* The ``django.contrib.postgres.aggregates.BitAnd``,
+  ``django.contrib.postgres.aggregates.BitOr``, and
+  ``django.contrib.postgres.aggregates.BitXor`` classes are removed.
+
 See :ref:`deprecated-features-6.2` for details on these changes, including how
 to remove usage of these features.
 

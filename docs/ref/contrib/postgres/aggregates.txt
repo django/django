@@ -54,45 +54,6 @@ General-purpose aggregation functions
             ArrayAgg("a_field", order_by="-some_field")
             ArrayAgg("a_field", order_by=F("some_field").desc())
 
-``BitAnd``
-----------
-
-.. class:: BitAnd(expression, filter=None, default=None, **extra)
-
-    Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
-    ``default`` if all values are null.
-
-    .. deprecated:: 6.1
-
-        This class is deprecated in favor of the generally available
-        :class:`~django.db.models.BitAnd` class.
-
-``BitOr``
----------
-
-.. class:: BitOr(expression, filter=None, default=None, **extra)
-
-    Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
-    ``default`` if all values are null.
-
-    .. deprecated:: 6.1
-
-        This class is deprecated in favor of the generally available
-        :class:`~django.db.models.BitOr` class.
-
-``BitXor``
-----------
-
-.. class:: BitXor(expression, filter=None, default=None, **extra)
-
-    Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
-    ``default`` if all values are null.
-
-    .. deprecated:: 6.1
-
-        This class is deprecated in favor of the generally available
-        :class:`~django.db.models.BitXor` class.
-
 ``BoolAnd``
 -----------
 

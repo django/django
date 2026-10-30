@@ -15,15 +15,11 @@ from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Cast, Concat, LPad, Substr
 from django.test.utils import Approximate
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango2028Warning
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, HotelReservation, Room, StatTestModel
 
 try:
-    from django.contrib.postgres.aggregates import BitAnd  # RemovedInDjango2028Warning
-    from django.contrib.postgres.aggregates import BitOr  # RemovedInDjango2028Warning
-    from django.contrib.postgres.aggregates import BitXor  # RemovedInDjango2028Warning
     from django.contrib.postgres.aggregates import (
         ArrayAgg,
         BoolAnd,
@@ -559,22 +555,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     results,
                     [([0],), ([1],), ([2],), ([0],)],
                 )
-
-    def test_bit_agg_deprecation(self):
-        for BitAggregate in [BitAnd, BitOr, BitXor]:
-            msg = (
-                f"The PostgreSQL-specific {BitAggregate.__name__} function is "
-                f"deprecated. Use django.db.models.aggregates.{BitAggregate.__name__} "
-                "instead."
-            )
-            with (
-                self.subTest(BitAggregate.__name__),
-                self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx,
-            ):
-                AggregateTestModel.objects.aggregate(
-                    bitagg=BitAggregate("integer_field")
-                )
-        self.assertEqual(ctx.filename, __file__)
 
 
 class TestAggregateDistinct(PostgreSQLTestCase):
