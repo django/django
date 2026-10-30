@@ -195,12 +195,12 @@ Backports
 
 Bug fix backports to stable branches are done exclusively by mergers, following
 the :ref:`supported-versions-policy`. A backport consists of cherry-picking a
-commit from ``main`` onto the target ``stable/A.B.x`` branch.
+commit from ``main`` onto the target ``stable/YYYY.x`` branch.
 
 A backport commit must include two things beyond the original commit message:
 
-* A prefix ``[A.B.x]`` on the subject line, where ``A.B.x`` is the name of the
-  ``stable/A.B.x`` branch being targeted.
+* A prefix ``[YYYY.x]`` on the subject line, where ``YYYY.x`` is the name of
+  the ``stable/YYYY.x`` branch being targeted.
 
 * A suffix ``Backport of <sha> from main.`` line in the commit body, pointing
   to the original commit hash.
@@ -253,7 +253,7 @@ the commit message yourself.
 **Option 3: using the** ``prepare-commit-msg`` **git hook**
 
 The ``scripts/prepare_commit_msg.py`` Python script can be installed as a
-``prepare-commit-msg`` git hook. It automatically adds the ``[A.B.x]`` prefix
+``prepare-commit-msg`` git hook. It automatically adds the ``[YYYY.x]`` prefix
 to the subject line, appends ``Backport of <sha> from main.`` to the commit
 body, and ensures the subject line ends with a period, even when the
 cherry-pick produces conflicts. Copy the script from the main branch, and

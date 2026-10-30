@@ -16,8 +16,9 @@ See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
 Django 2028 is the first release of the :ref:`annual release cycle
-<annual-supported-versions>`. Like every feature release from now on, it will
-receive security and data loss fixes for three years after its release.
+<internal-release-cadence>`. Like every feature release from now on, it will
+receive :ref:`security and data loss fixes for three years
+<supported-versions-policy>` after its release.
 
 Python compatibility
 ====================

@@ -218,7 +218,7 @@ this. For a small app like polls, this process isn't too difficult.
        name = "django-polls"
        version = "0.1"
        dependencies = [
-           "django>=X.Y",  # Replace "X.Y" as appropriate
+           "django>=YYYY",  # Replace "YYYY" as appropriate
        ]
        description = "A Django app to conduct web-based polls."
        readme = "README.rst"
@@ -230,7 +230,7 @@ this. For a small app like polls, this process isn't too difficult.
        classifiers = [
            "Environment :: Web Environment",
            "Framework :: Django",
-           "Framework :: Django :: X.Y",  # Replace "X.Y" as appropriate
+           "Framework :: Django :: YYYY",  # Replace "YYYY" as appropriate
            "Intended Audience :: Developers",
            "Operating System :: OS Independent",
            "Programming Language :: Python",
