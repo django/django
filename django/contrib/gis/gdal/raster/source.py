@@ -253,9 +253,8 @@ class GDALRaster(GDALRasterBase):
         - No strings, bytes, or Paths, which might fetch over the virtual
           filesystem.
         """
-        normalized = cls._preprocess_input(ds_input)
-        if isinstance(normalized, (dict, str, bytes)):
-            value_repr, suffix = trim_value(repr(normalized))
+        if isinstance(ds_input, (dict, str, Path, bytes)):
+            value_repr, suffix = trim_value(repr(ds_input))
             msg = (
                 f"Cannot use object {value_repr}{suffix} for a spatial lookup "
                 "parameter. If this is a raster, wrap it with GDALRaster() "
