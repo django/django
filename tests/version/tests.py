@@ -159,10 +159,6 @@ class VersionTupleTests(SimpleTestCase):
 
     def test_django_version_is_a_version_tuple(self):
         self.assertIsInstance(django.VERSION, VersionTuple)
-        # RemovedInDjango2028Warning: remove the rest of this test.
-        msg = "Indexing django.VERSION from its third component"
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            django.VERSION[2]
 
     def test_invalid_version(self):
         cases = [
