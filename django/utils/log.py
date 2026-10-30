@@ -1,15 +1,11 @@
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
-import warnings
 from copy import copy
 
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.module_loading import import_string
-from django.utils.warnings import django_file_prefixes
 
 request_logger = logging.getLogger("django.request")
 
@@ -86,35 +82,9 @@ class AdminEmailHandler(logging.Handler):
     request data will be provided in the email report.
     """
 
-    def __init__(
-        self, include_html=False, email_backend=None, reporter_class=None, using=None
-    ):
+    def __init__(self, include_html=False, *, reporter_class=None, using=None):
         super().__init__()
-
-        # RemovedInDjango2028Warning: email_backend arg and connection error.
-        if email_backend:
-            if using:
-                raise ImproperlyConfigured(
-                    "The 'email_backend' argument is not compatible with 'using'."
-                )
-            if mail.mailers._is_configured:
-                raise ImproperlyConfigured(
-                    "The 'email_backend' argument is not valid when "
-                    "settings.MAILERS is defined."
-                )
-            warnings.warn(
-                "The 'email_backend' argument is deprecated. Use 'using' instead.",
-                RemovedInDjango2028Warning,
-                skip_file_prefixes=django_file_prefixes(),
-            )
-        if hasattr(self, "connection"):
-            raise AttributeError(
-                "The undocumented AdminEmailHandler.connection() method is no longer "
-                "used."
-            )
-
         self.include_html = include_html
-        self.email_backend = email_backend
         self.using = using
         self.reporter_class = import_string(
             reporter_class or settings.DEFAULT_EXCEPTION_REPORTER
@@ -164,14 +134,6 @@ class AdminEmailHandler(logging.Handler):
         self.send_mail(subject, message, html_message=html_message)
 
     def send_mail(self, subject, message, *args, **kwargs):
-        # RemovedInDjango2028Warning.
-        if not mail.mailers._is_configured:
-            connection = mail.get_connection(
-                backend=self.email_backend, fail_silently=True
-            )
-            mail.mail_admins(subject, message, *args, connection=connection, **kwargs)
-            return
-
         try:
             mail.mail_admins(subject, message, *args, using=self.using, **kwargs)
         except mail.MailerDoesNotExist:

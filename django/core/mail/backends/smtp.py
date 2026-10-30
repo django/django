@@ -7,11 +7,9 @@ import threading
 from email.headerregistry import Address, AddressHeader
 from functools import cached_property
 
-from django.conf import settings
 from django.core.mail import InvalidMailer
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.utils import DNS_NAME
-from django.utils.deprecation import RemovedInDjango2028Warning, warn_about_external_use
 from django.utils.encoding import force_str, punycode
 
 
@@ -34,44 +32,11 @@ class EmailBackend(BaseEmailBackend):
         ssl_certfile=None,
         **kwargs,
     ):
-        # RemovedInDjango2028Warning.
-        if "alias" not in kwargs:
-            msg = (
-                "Directly creating EmailBackend instances is deprecated. "
-                "Use mail.mailers instead."
-            )
-            warn_about_external_use(msg, RemovedInDjango2028Warning)
-
         super().__init__(**kwargs)
         self.fail_silently = fail_silently
         self.connection = None
         self._partial_connection = None
         self._lock = threading.RLock()
-
-        # RemovedInDjango2028Warning.
-        if self.alias is None:
-            # Use deprecated settings when MAILERS not enabled.
-            self.host = host or settings.EMAIL_HOST
-            self.port = port or settings.EMAIL_PORT
-            self.username = settings.EMAIL_HOST_USER if username is None else username
-            self.password = (
-                settings.EMAIL_HOST_PASSWORD if password is None else password
-            )
-            self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
-            self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
-            self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
-            self.ssl_keyfile = (
-                settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
-            )
-            self.ssl_certfile = (
-                settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
-            )
-            if self.use_ssl and self.use_tls:
-                raise ValueError(
-                    "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so "
-                    "only set one of those settings to True."
-                )
-            return
 
         self.host = host
         self.port = port

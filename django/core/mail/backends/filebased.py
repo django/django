@@ -3,8 +3,6 @@
 import datetime
 import os
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import InvalidMailer
 from django.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
 
@@ -16,38 +14,6 @@ class EmailBackend(ConsoleEmailBackend):
         # stream to be None, so we don't default to stdout.
         kwargs["stream"] = None
         super().__init__(fail_silently=fail_silently, **kwargs)
-
-        # RemovedInDjango2028Warning.
-        if self.alias is None:
-            # Use deprecated settings when MAILERS not enabled.
-            if file_path is not None:
-                self.file_path = file_path
-            else:
-                self.file_path = getattr(settings, "EMAIL_FILE_PATH", None)
-            if self.file_path is None:
-                raise ImproperlyConfigured(
-                    "The EMAIL_FILE_PATH setting must be set to use the file "
-                    "EmailBackend."
-                )
-            self.file_path = os.path.abspath(self.file_path)
-            try:
-                os.makedirs(self.file_path, exist_ok=True)
-            except FileExistsError:
-                raise ImproperlyConfigured(
-                    "Path for saving email messages exists, but is not a directory: %s"
-                    % self.file_path
-                )
-            except OSError as err:
-                raise ImproperlyConfigured(
-                    "Could not create directory for saving email messages: %s (%s)"
-                    % (self.file_path, err)
-                )
-            # Make sure that self.file_path is writable.
-            if not os.access(self.file_path, os.W_OK):
-                raise ImproperlyConfigured(
-                    "Could not write to directory: %s" % self.file_path
-                )
-            return
 
         if file_path is None:
             raise InvalidMailer("OPTIONS must define 'file_path'.", alias=self.alias)

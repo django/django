@@ -3,7 +3,7 @@ from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.mail import MailerDoesNotExist, mail_managers, mailers
+from django.core.mail import MailerDoesNotExist, mail_managers
 from django.http import HttpResponsePermanentRedirect
 from django.middleware import MiddlewareMixin
 from django.urls import is_valid_path
@@ -155,11 +155,6 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
         return response
 
     def send_mail(self, subject, message, *args, **kwargs):
-        # RemovedInDjango2028Warning.
-        if not mailers._is_configured:
-            mail_managers(subject, message, *args, fail_silently=True, **kwargs)
-            return
-
         try:
             mail_managers(subject, message, *args, using=self.using, **kwargs)
         except MailerDoesNotExist:

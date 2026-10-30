@@ -201,6 +201,7 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
         "STATIC_URL": settings.STATIC_URL,
         "STATIC_ROOT": settings.STATIC_ROOT,
         "MIDDLEWARE": settings.MIDDLEWARE,
+        "MAILERS": settings.MAILERS,
     }
 
     # Redirect some settings for the duration of these tests.
@@ -225,6 +226,11 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     settings.LANGUAGE_CODE = "en"
     settings.SITE_ID = 1
     settings.MIDDLEWARE = ALWAYS_MIDDLEWARE
+    # The test runner swaps every mailer for the memory backend, so this
+    # default mailer never sends real email.
+    settings.MAILERS = {
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+    }
     settings.MIGRATION_MODULES = {
         # This lets us skip creating migrations for the test models as many of
         # them depend on one of the following contrib applications.

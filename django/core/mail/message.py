@@ -9,18 +9,8 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils.deprecation import (
-    RemovedInDjango2028Warning,
-    warn_about_external_use,
-)
 from django.utils.encoding import force_bytes, force_str, punycode
 from django.utils.timezone import get_current_timezone
-
-from .deprecation import (
-    CONNECTION_ARG_WARNING,
-    FAIL_SILENTLY_ARG_WARNING,
-    report_using_incompatibility,
-)
 
 # Default MIME type to use on attachments (if it is not explicitly given
 # and cannot be guessed).
@@ -47,7 +37,6 @@ class EmailMessage:
         to=None,
         *,
         bcc=None,
-        connection=None,
         attachments=None,
         headers=None,
         cc=None,
@@ -92,26 +81,6 @@ class EmailMessage:
                 else:
                     self.attach(*attachment)
         self.extra_headers = headers or {}
-        # RemovedInDjango2028Warning.
-        if connection is not None:
-            warn_about_external_use(CONNECTION_ARG_WARNING, RemovedInDjango2028Warning)
-        self._connection = connection
-
-    # RemovedInDjango2028Warning: connection property.
-    @property
-    def connection(self):
-        msg = "The EmailMessage.connection attribute is deprecated."
-        warn_about_external_use(msg, RemovedInDjango2028Warning)
-        return self._connection
-
-    @connection.setter
-    def connection(self, value):
-        msg = (
-            "The EmailMessage.connection attribute is deprecated. Switch to "
-            "EmailMessage.send(using=...) with a MAILERS alias."
-        )
-        warn_about_external_use(msg, RemovedInDjango2028Warning)
-        self._connection = value
 
     def message(self, *, policy=email.policy.default):
         msg = email.message.EmailMessage(policy=policy)
@@ -161,45 +130,17 @@ class EmailMessage:
         """
         return [email for email in (self.to + self.cc + self.bcc) if email]
 
-    def send(self, fail_silently=False, *, using=None):
+    def send(self, *, using=None):
         """Send the email message."""
         if not self.recipients():
             # Don't bother creating the network connection if there's nobody to
             # send to.
             return 0
 
-        # RemovedInDjango2028Warning: replace the remainder of this method
-        # with:
-        #   from django.core.mail import mailers
-        #   mailer = mailers.default if using is None else mailers[using]
-        #   return mailer.send_messages([self])
+        from django.core.mail import mailers
 
-        from django.core import mail
-
-        if fail_silently:
-            warn_about_external_use(
-                FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning
-            )
-        if hasattr(self, "get_connection"):
-            raise AttributeError(
-                "EmailMessage no longer supports the undocumented "
-                "get_connection() method."
-            )
-
-        if using is not None:
-            report_using_incompatibility(self._connection, fail_silently)
-            connection = mail.mailers[using]
-        elif self._connection:
-            connection = self._connection
-            if fail_silently:
-                raise TypeError(
-                    "fail_silently cannot be used with a connection. "
-                    "Pass fail_silently to get_connection() instead."
-                )
-        else:
-            connection = mail.get_connection(fail_silently=fail_silently)
-
-        return connection.send_messages([self])
+        mailer = mailers.default if using is None else mailers[using]
+        return mailer.send_messages([self])
 
     def attach(self, filename=None, content=None, mimetype=None):
         """
@@ -380,7 +321,6 @@ class EmailMultiAlternatives(EmailMessage):
         to=None,
         *,
         bcc=None,
-        connection=None,
         attachments=None,
         headers=None,
         alternatives=None,
@@ -397,7 +337,6 @@ class EmailMultiAlternatives(EmailMessage):
             from_email,
             to,
             bcc=bcc,
-            connection=connection,
             attachments=attachments,
             headers=headers,
             cc=cc,

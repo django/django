@@ -7,7 +7,7 @@ from email.headerregistry import Address
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail.exceptions import InvalidMailer, MailerDoesNotExist
-from django.core.mail.handler import DEFAULT_MAILER_ALIAS, MailersHandler
+from django.core.mail.handler import MailersHandler
 
 # Imported for backwards compatibility and for the sake
 # of a cleaner namespace. These symbols used to be in
@@ -22,20 +22,7 @@ from django.core.mail.message import (
     make_msgid,
 )
 from django.core.mail.utils import DNS_NAME, CachedDnsName
-from django.utils.deprecation import (
-    RemovedInDjango2028Warning,
-    warn_about_external_use,
-)
 from django.utils.functional import Promise
-from django.utils.module_loading import import_string
-
-from .deprecation import (
-    AUTH_ARGS_WARNING,
-    CONNECTION_ARG_WARNING,
-    FAIL_SILENTLY_ARG_WARNING,
-    report_using_incompatibility,
-    warn_about_default_mailers_if_needed,
-)
 
 __all__ = [
     "InvalidMailer",
@@ -47,7 +34,6 @@ __all__ = [
     "DEFAULT_ATTACHMENT_MIME_TYPE",
     "make_msgid",
     "mailers",
-    "get_connection",
     "send_mail",
     "send_mass_mail",
     "mail_admins",
@@ -60,47 +46,12 @@ __all__ = [
 mailers = MailersHandler()
 
 
-# RemovedInDjango2028Warning.
-def get_connection(backend=None, *, fail_silently=False, **kwds):
-    """Load an email backend and return an instance of it.
-
-    If backend is None (default), use settings.EMAIL_BACKEND.
-
-    Both fail_silently and other keyword arguments are used in the
-    constructor of the backend.
-    """
-    msg = (
-        "get_connection() is deprecated. See 'Migrating email to mailers' "
-        "in Django's documentation for recommended replacements."
-    )
-    warn_about_external_use(msg, RemovedInDjango2028Warning)
-    warn_about_default_mailers_if_needed()
-
-    if fail_silently:
-        kwds["fail_silently"] = fail_silently
-
-    if mailers._is_configured:
-        # Support get_connection(**kwargs) from MAILERS["default"].
-        if backend is not None:
-            raise RuntimeError(
-                "get_connection(backend, ...) is not supported with MAILERS."
-            )
-        return mailers.create_connection(DEFAULT_MAILER_ALIAS, _deprecated_kwargs=kwds)
-
-    klass = import_string(backend or settings.EMAIL_BACKEND)
-    return klass(**kwds)
-
-
 def send_mail(
     subject,
     message,
     from_email,
     recipient_list,
     *,
-    fail_silently=False,
-    auth_user=None,
-    auth_password=None,
-    connection=None,
     html_message=None,
     using=None,
 ):
@@ -113,58 +64,15 @@ def send_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    # RemovedInDjango2028Warning: change entire implementation to:
-    #   email = EmailMultiAlternatives(
-    #       subject, message, from_email, recipient_list
-    #   )
-    #   if html_message:
-    #       email.attach_alternative(html_message, "text/html")
-    #   return email.send(using=using)
-    if fail_silently:
-        warn_about_external_use(FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning)
-    if auth_user is not None or auth_password is not None:
-        warn_about_external_use(AUTH_ARGS_WARNING, RemovedInDjango2028Warning)
-    if connection is not None:
-        warn_about_external_use(CONNECTION_ARG_WARNING, RemovedInDjango2028Warning)
-
-    if using is not None:
-        report_using_incompatibility(
-            connection, fail_silently, auth_user, auth_password
-        )
-    elif connection is None:
-        options = {"fail_silently": fail_silently}
-        if auth_user is not None:
-            options["username"] = auth_user
-        if auth_password is not None:
-            options["password"] = auth_password
-        connection = get_connection(**options)
-    else:
-        if fail_silently:
-            raise TypeError(
-                "fail_silently cannot be used with a connection. "
-                "Pass fail_silently to get_connection() instead."
-            )
-        if auth_user is not None or auth_password is not None:
-            raise TypeError(
-                "auth_user and auth_password cannot be used with a connection. "
-                "Pass auth_user and auth_password to get_connection() instead."
-            )
-    mail = EmailMultiAlternatives(
-        subject, message, from_email, recipient_list, connection=connection
-    )
+    email = EmailMultiAlternatives(subject, message, from_email, recipient_list)
     if html_message:
-        mail.attach_alternative(html_message, "text/html")
-
-    return mail.send(using=using)
+        email.attach_alternative(html_message, "text/html")
+    return email.send(using=using)
 
 
 def send_mass_mail(
     datatuple,
     *,
-    fail_silently=False,
-    auth_user=None,
-    auth_password=None,
-    connection=None,
     using=None,
 ):
     """
@@ -176,78 +84,22 @@ def send_mass_mail(
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    # RemovedInDjango2028Warning: change entire implementation to:
-    #   messages = [...]
-    #   mailer = mailers.default if using is None else mailers[using]
-    #   return mailer.send_messages(messages)
-    if fail_silently:
-        warn_about_external_use(FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning)
-    if auth_user is not None or auth_password is not None:
-        warn_about_external_use(AUTH_ARGS_WARNING, RemovedInDjango2028Warning)
-    if connection is not None:
-        warn_about_external_use(CONNECTION_ARG_WARNING, RemovedInDjango2028Warning)
-
-    if using is not None:
-        report_using_incompatibility(
-            connection, fail_silently, auth_user, auth_password
-        )
-        connection = mailers[using]
-    elif connection is None:
-        options = {"fail_silently": fail_silently}
-        if auth_user is not None:
-            options["username"] = auth_user
-        if auth_password is not None:
-            options["password"] = auth_password
-        connection = get_connection(**options)
-    else:
-        if fail_silently:
-            raise TypeError(
-                "fail_silently cannot be used with a connection. "
-                "Pass fail_silently to get_connection() instead."
-            )
-        if auth_user is not None or auth_password is not None:
-            raise TypeError(
-                "auth_user and auth_password cannot be used with a connection. "
-                "Pass auth_user and auth_password to get_connection() instead."
-            )
     messages = [
-        EmailMessage(subject, message, sender, recipient, connection=connection)
+        EmailMessage(subject, message, sender, recipient)
         for subject, message, sender, recipient in datatuple
     ]
-    return connection.send_messages(messages)
+    mailer = mailers.default if using is None else mailers[using]
+    return mailer.send_messages(messages)
 
 
-# RemovedInDjango2028Warning: fail_silently and connection args.
 def _send_server_message(
     *,
     setting_name,
     subject,
     message,
     html_message=None,
-    fail_silently=False,
-    connection=None,
     using=None,
 ):
-    # RemovedInDjango2028Warning: everything before `recipients =
-    # getattr(...)`. skip_frames=1: this helper's caller.
-    if fail_silently:
-        warn_about_external_use(
-            FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
-        )
-    if connection is not None:
-        warn_about_external_use(
-            CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
-        )
-
-    if using is not None:
-        report_using_incompatibility(connection, fail_silently)
-    elif connection is not None and fail_silently:
-        raise TypeError(
-            "fail_silently cannot be used with a connection. "
-            "Pass fail_silently to get_connection() instead."
-        )
-    # ... end of RemovedInDjango2028Warning.
-
     recipients = getattr(settings, setting_name)
     if not recipients:
         return
@@ -265,20 +117,16 @@ def _send_server_message(
         body=message,
         from_email=settings.SERVER_EMAIL,
         to=recipients,
-        connection=connection,
     )
     if html_message:
         mail.attach_alternative(html_message, "text/html")
-    mail.send(using=using, fail_silently=fail_silently)
+    mail.send(using=using)
 
 
-# RemovedInDjango2028Warning: fail_silently and connection args.
 def mail_admins(
     subject,
     message,
     *,
-    fail_silently=False,
-    connection=None,
     html_message=None,
     using=None,
 ):
@@ -288,19 +136,14 @@ def mail_admins(
         subject=subject,
         message=message,
         html_message=html_message,
-        fail_silently=fail_silently,
-        connection=connection,
         using=using,
     )
 
 
-# RemovedInDjango2028Warning: fail_silently and connection args.
 def mail_managers(
     subject,
     message,
     *,
-    fail_silently=False,
-    connection=None,
     html_message=None,
     using=None,
 ):
@@ -310,7 +153,5 @@ def mail_managers(
         subject=subject,
         message=message,
         html_message=html_message,
-        fail_silently=fail_silently,
-        connection=connection,
         using=using,
     )

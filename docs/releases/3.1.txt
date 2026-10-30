@@ -276,7 +276,7 @@ CSRF
 Email
 ~~~~~
 
-* The :setting:`EMAIL_FILE_PATH` setting, used by the :ref:`file email backend
+* The ``EMAIL_FILE_PATH`` setting, used by the :ref:`file email backend
   <topic-email-file-backend>`, now supports :class:`pathlib.Path`.
 
 Error Reporting

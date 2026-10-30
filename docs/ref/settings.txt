@@ -1400,115 +1400,6 @@ that are not allowed to visit any page, systemwide. Use this for bots/crawlers.
 This is only used if ``CommonMiddleware`` is installed (see
 :doc:`/topics/http/middleware`).
 
-.. setting:: EMAIL_BACKEND
-
-``EMAIL_BACKEND``
------------------
-
-Default: ``'``:ref:`django.core.mail.backends.smtp.EmailBackend
-<topic-email-smtp-backend>`\ ``'``
-
-The backend to use for sending emails. For the list of available backends see
-:ref:`topic-email-backends`.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is :setting:`BACKEND <MAILERS-BACKEND>` in the
-    :setting:`MAILERS` ``"default"`` configuration. See
-    :ref:`migrating-to-mailers`.
-
-.. setting:: EMAIL_FILE_PATH
-
-``EMAIL_FILE_PATH``
--------------------
-
-Default: Not defined
-
-The directory used by the :ref:`file email backend <topic-email-file-backend>`
-to store output files.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"file_path"`` under :setting:`OPTIONS <MAILERS-OPTIONS>`
-    in a :setting:`MAILERS` definition that uses the file email backend. See
-    :ref:`migrating-to-mailers`.
-
-.. setting:: EMAIL_HOST
-
-``EMAIL_HOST``
---------------
-
-Default: ``'localhost'``
-
-The host to use for sending email.
-
-See also :setting:`EMAIL_PORT`.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"host"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in a
-    :setting:`MAILERS` definition that uses the SMTP email backend. See
-    :ref:`migrating-to-mailers`.
-
-.. setting:: EMAIL_HOST_PASSWORD
-
-``EMAIL_HOST_PASSWORD``
------------------------
-
-Default: ``''`` (Empty string)
-
-Password to use for the SMTP server defined in :setting:`EMAIL_HOST`. This
-setting is used in conjunction with :setting:`EMAIL_HOST_USER` when
-authenticating to the SMTP server. If either of these settings is empty,
-Django won't attempt authentication.
-
-See also :setting:`EMAIL_HOST_USER`.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"password"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
-    a :setting:`MAILERS` definition that uses the SMTP email backend. See
-    :ref:`migrating-to-mailers`.
-
-.. setting:: EMAIL_HOST_USER
-
-``EMAIL_HOST_USER``
--------------------
-
-Default: ``''`` (Empty string)
-
-Username to use for the SMTP server defined in :setting:`EMAIL_HOST`.
-If empty, Django won't attempt authentication.
-
-See also :setting:`EMAIL_HOST_PASSWORD`.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"username"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
-    a :setting:`MAILERS` definition that uses the SMTP email backend. See
-    :ref:`migrating-to-mailers`.
-
-.. setting:: EMAIL_PORT
-
-``EMAIL_PORT``
---------------
-
-Default: ``25``
-
-Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"port"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in a
-    :setting:`MAILERS` definition that uses the SMTP email backend. See
-    :ref:`migrating-to-mailers`.
-
 .. setting:: EMAIL_SUBJECT_PREFIX
 
 ``EMAIL_SUBJECT_PREFIX``
@@ -1529,121 +1420,6 @@ Default: ``False``
 
 Whether to send the SMTP ``Date`` header of email messages in the local time
 zone (``True``) or in UTC (``False``).
-
-.. setting:: EMAIL_USE_TLS
-
-``EMAIL_USE_TLS``
------------------
-
-Default: ``False``
-
-Whether to use a TLS (secure) connection when talking to the SMTP server.
-This is used for explicit TLS connections, generally on port 587. If you are
-experiencing hanging connections, see the implicit TLS setting
-:setting:`EMAIL_USE_SSL`.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"use_tls"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
-    a :setting:`MAILERS` definition that uses the SMTP email backend. See
-    :ref:`migrating-to-mailers`.
-
-.. setting:: EMAIL_USE_SSL
-
-``EMAIL_USE_SSL``
------------------
-
-Default: ``False``
-
-Whether to use an implicit TLS (secure) connection when talking to the SMTP
-server. In most email documentation this type of TLS connection is referred
-to as SSL. It is generally used on port 465. If you are experiencing problems,
-see the explicit TLS setting :setting:`EMAIL_USE_TLS`.
-
-Note that :setting:`EMAIL_USE_TLS`/:setting:`EMAIL_USE_SSL` are mutually
-exclusive, so only set one of those settings to ``True``.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"use_ssl"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
-    a :setting:`MAILERS` definition that uses the SMTP email backend. See
-    :ref:`migrating-to-mailers`.
-
-.. setting:: EMAIL_SSL_CERTFILE
-
-``EMAIL_SSL_CERTFILE``
-----------------------
-
-Default: ``None``
-
-If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True`` and the
-secure connection to the SMTP server requires client authentication, use this
-setting to specify the path to a PEM-formatted certificate chain file, which
-must be used in conjunction with :setting:`EMAIL_SSL_KEYFILE`.
-
-``EMAIL_SSL_CERTFILE`` should not be used with a self-signed server certificate
-or a certificate from a private certificate authority (CA). In such cases, the
-server's certificate (or the root certificate of the private CA) should be
-installed into the system's CA bundle. This can be done by following
-platform-specific instructions for installing a root CA certificate,
-or by using OpenSSL's ``SSL_CERT_FILE`` or ``SSL_CERT_DIR`` environment
-variables to specify a custom certificate bundle (if modifying the system
-bundle is not possible or desired).
-
-For more complex scenarios, the :ref:`SMTP EmailBackend
-<topic-email-smtp-backend>` can be subclassed to add root certificates to its
-``ssl_context`` using
-:meth:`python:ssl.SSLContext.load_verify_locations`.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"ssl_certfile"`` under :setting:`OPTIONS
-    <MAILERS-OPTIONS>` in a :setting:`MAILERS` definition that uses the SMTP
-    email backend. See :ref:`migrating-to-mailers`.
-
-.. setting:: EMAIL_SSL_KEYFILE
-
-``EMAIL_SSL_KEYFILE``
----------------------
-
-Default: ``None``
-
-If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
-optionally specify the path to a PEM-formatted private key file for client
-authentication of the SSL connection along with :setting:`EMAIL_SSL_CERTFILE`.
-
-Note that setting :setting:`EMAIL_SSL_CERTFILE` and
-:setting:`EMAIL_SSL_KEYFILE` doesn't result in any certificate checking.
-They're passed to the underlying SSL connection. Please refer to the
-documentation of Python's :meth:`python:ssl.SSLContext.wrap_socket` function
-for details on how the certificate chain file and private key file are handled.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"ssl_keyfile"`` under :setting:`OPTIONS <MAILERS-OPTIONS>`
-    in a :setting:`MAILERS` definition that uses the SMTP email backend. See
-    :ref:`migrating-to-mailers`.
-
-.. setting:: EMAIL_TIMEOUT
-
-``EMAIL_TIMEOUT``
------------------
-
-Default: ``None``
-
-Specifies a timeout in seconds for blocking operations like the connection
-attempt.
-
-.. deprecated:: 6.1
-
-    This setting is deprecated and will be removed in Django 2028. Its
-    replacement is ``"timeout"`` under :setting:`OPTIONS <MAILERS-OPTIONS>` in
-    a :setting:`MAILERS` definition that uses the SMTP email backend. See
-    :ref:`migrating-to-mailers`.
 
 .. setting:: FILE_UPLOAD_HANDLERS
 
@@ -2186,9 +1962,7 @@ configuration process will be skipped.
 ``MAILERS``
 -----------
 
-.. RemovedInDjango2028Warning: Update the default value to be ``{}``.
-
-Default: Not defined
+Default: ``{}`` (Empty dictionary)
 
 A dictionary containing the settings for all email backends to be used with
 Django. It is a nested dictionary that maps backend aliases to dictionaries
@@ -2222,15 +1996,6 @@ Setting ``MAILERS`` to an empty dictionary (``{}``) disables email sending and
 any attempt to send mail will raise ``MailerDoesNotExist``.
 
 See :ref:`topic-email-configuration` for more information.
-
-.. deprecated:: 6.1
-
-    In Django 2028, the default value will change from "Not defined" to ``{}``.
-    Until then, if ``MAILERS`` is not defined in the project's settings, Django
-    will create a ``"default"`` mailer using the :setting:`EMAIL_BACKEND`
-    setting. Projects can opt into the Django 2028 behavior at any time by
-    adding ``MAILERS`` and removing ``EMAIL_BACKEND`` from their settings. See
-    :ref:`migrating-to-mailers-settings`.
 
 .. setting:: MAILERS-BACKEND
 
@@ -3977,19 +3742,8 @@ Email
 * :setting:`ADMINS`
 * :setting:`DEFAULT_CHARSET`
 * :setting:`DEFAULT_FROM_EMAIL`
-* :setting:`EMAIL_BACKEND`
-* :setting:`EMAIL_FILE_PATH`
-* :setting:`EMAIL_HOST`
-* :setting:`EMAIL_HOST_PASSWORD`
-* :setting:`EMAIL_HOST_USER`
-* :setting:`EMAIL_PORT`
-* :setting:`EMAIL_SSL_CERTFILE`
-* :setting:`EMAIL_SSL_KEYFILE`
 * :setting:`EMAIL_SUBJECT_PREFIX`
-* :setting:`EMAIL_TIMEOUT`
 * :setting:`EMAIL_USE_LOCALTIME`
-* :setting:`EMAIL_USE_SSL`
-* :setting:`EMAIL_USE_TLS`
 * :setting:`MAILERS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`

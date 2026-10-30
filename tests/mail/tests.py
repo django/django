@@ -2,7 +2,6 @@ import ast
 import mimetypes
 import pickle
 import re
-import tempfile
 from datetime import datetime, timezone
 from email import message_from_bytes as _message_from_bytes
 from email import policy
@@ -14,7 +13,6 @@ from pathlib import Path
 from textwrap import dedent
 from unittest import mock
 
-from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import (
@@ -23,30 +21,14 @@ from django.core.mail import (
     EmailAttachment,
     EmailMessage,
     EmailMultiAlternatives,
-    MailerDoesNotExist,
     mail_admins,
     mail_managers,
-    mailers,
     send_mail,
     send_mass_mail,
 )
-from django.core.mail.backends import console, dummy, filebased, locmem, smtp
-from django.core.mail.deprecation import (
-    AUTH_ARGS_WARNING,
-    CONNECTION_ARG_WARNING,
-    FAIL_SILENTLY_ARG_WARNING,
-)
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import ignore_warnings, requires_tz_support
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.test.utils import requires_tz_support
 from django.utils.translation import gettext_lazy
-
-from . import (
-    custombackend,
-    ignore_no_default_mailer_warning,
-    override_deprecated_email_settings,
-)
-from .custombackend import OptionsCapturingBackend
 
 # Check whether python/cpython#128110 has been fixed by seeing if space between
 # encoded-words is ignored (as required by RFC 2047 section 6.2).
@@ -245,15 +227,13 @@ class MailTestsMixin:
                 structure.append(self.get_message_structure(subpart, level + 1))
         return "".join(structure)
 
-    # RemovedInDjango2028Warning.
-    def use_email_backend(self, backend):
-        if hasattr(settings, "MAILERS"):
-            return self.settings(MAILERS={"default": {"BACKEND": backend}})
-        else:
-            return override_deprecated_email_settings(EMAIL_BACKEND=backend)
 
-
-@ignore_no_default_mailer_warning()
+@override_settings(
+    MAILERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+        "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+    }
+)
 class EmailMessageTests(MailTestsMixin, SimpleTestCase):
     """Tests for django.core.mail.EmailMessage and EmailMultiAlternative."""
 
@@ -1692,14 +1672,11 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         email = EmailMultiAlternatives()
         self.assertIsInstance(email.message(), PyMessage)  # force serialization.
 
-    # RemovedInDjango2028Warning: connection argument.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_positional_arguments_order(self):
         """
         EmailMessage class docs: "… is initialized with the following
         parameters (in the given order, if positional arguments are used)."
         """
-        connection = mail.get_connection()
         email = EmailMessage(
             # (If you need to insert/remove/reorder any params here,
             # that indicates a breaking change to documented behavior.)
@@ -1709,7 +1686,6 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
             ["to@example.com"],
             # (New options can be added below here as keyword-only args.)
             bcc=["bcc@example.com"],
-            connection=connection,
             attachments=[EmailAttachment("file.txt", "attachment\n", "text/plain")],
             headers={"X-Header": "custom header"},
             cc=["cc@example.com"],
@@ -1731,10 +1707,7 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         self.assertEqual(
             email.recipients(), ["to@example.com", "cc@example.com", "bcc@example.com"]
         )
-        self.assertIs(email.connection, connection)
 
-    # RemovedInDjango2028Warning: connection argument and attribute.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
     def test_all_params_can_be_set_before_send(self):
         """
         EmailMessage class docs: "All parameters … can be set at any time
@@ -1742,15 +1715,12 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         """
         # This is meant to verify EmailMessage.__init__() doesn't apply any
         # special processing that would be missing for properties set later.
-        original_connection = mail.get_connection()
-        new_connection = mail.get_connection()
         email = EmailMessage(
             "original subject",
             "original body\n",
             "original-from@example.com",
             ["original-to@example.com"],
             bcc=["original-bcc@example.com"],
-            connection=original_connection,
             attachments=[
                 EmailAttachment("original.txt", "original attachment\n", "text/plain")
             ],
@@ -1763,7 +1733,6 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
         email.from_email = "new-from@example.com"
         email.to = ["new-to@example.com"]
         email.bcc = ["new-bcc@example.com"]
-        email.connection = new_connection
         image = MIMEPart()
         image.set_content(b"GIF89a...", "image", "gif")
         email.attachments = [
@@ -1795,7 +1764,6 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
             email.recipients(),
             ["new-to@example.com", "new-cc@example.com", "new-bcc@example.com"],
         )
-        self.assertIs(email.connection, new_connection)
         self.assertNotIn("original", message.as_string())
 
     def test_message_is_python_email_message(self):
@@ -1865,78 +1833,11 @@ class EmailMessageTests(MailTestsMixin, SimpleTestCase):
             message.as_string(policy=policy.compat32),
         )
 
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_send_fail_silently_conflict(self):
-        email = EmailMessage(
-            "Subject",
-            "Body",
-            "from@example.com",
-            ["to@example.com"],
-            connection=mail.get_connection(),
-        )
-        msg = (
-            "fail_silently cannot be used with a connection. "
-            "Pass fail_silently to get_connection() instead."
-        )
-        with self.assertRaisesMessage(TypeError, msg):
-            email.send(fail_silently=True)
-
     def test_send(self):
         email = EmailMessage(to=["to@example.com"])
         email.send()
         self.assertEqual(mail.outbox[0].to, ["to@example.com"])
-
-        # RemovedInDjango2028Warning.
-        if not mailers._is_configured:
-            self.assertIsNone(mail.outbox[0].sent_using)
-            return
-
         self.assertEqual(mail.outbox[0].sent_using, "default")
-
-    # RemovedInDjango2028Warning.
-    def test_connection_arg_deprecated(self):
-        connection = object()
-        with self.assertWarnsMessage(
-            RemovedInDjango2028Warning, CONNECTION_ARG_WARNING
-        ):
-            email = EmailMessage(connection=connection)
-        with ignore_warnings(category=RemovedInDjango2028Warning):
-            self.assertIs(email.connection, connection)
-
-    # RemovedInDjango2028Warning.
-    def test_connection_attr_deprecated(self):
-        email = EmailMessage()
-        connection = object()
-        msg_set = (
-            "The EmailMessage.connection attribute is deprecated. Switch to "
-            "EmailMessage.send(using=...) with a MAILERS alias."
-        )
-        msg_get = "The EmailMessage.connection attribute is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg_set):
-            email.connection = connection
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg_get):
-            self.assertIs(email.connection, connection)
-
-    # RemovedInDjango2028Warning.
-    def test_fail_silently_deprecated(self):
-        email = EmailMessage(to=["to@example.com"])
-        with self.assertWarnsMessage(
-            RemovedInDjango2028Warning, FAIL_SILENTLY_ARG_WARNING
-        ):
-            email.send(fail_silently=True)
-
-
-# RemovedInDjango2028Warning: Move override_settings and additional test cases
-# to EmailMessageTests and remove this class.
-@override_settings(
-    MAILERS={
-        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
-        "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
-    }
-)
-class EmailMessageTestsWithMailers(EmailMessageTests):
-    # Repeat all EmailMessageTests with MAILERS defined.
 
     def test_send_using(self):
         email = EmailMessage(to=["to@example.com"])
@@ -1947,42 +1848,18 @@ class EmailMessageTestsWithMailers(EmailMessageTests):
         self.assertEqual(mail.outbox[1].sent_using, "custom")
         self.assertEqual(mail.outbox[2].sent_using, "default")
 
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_send_using_conflicts_with_connection(self):
-        msg = "'connection' is not compatible with 'using'."
-        with self.subTest("in constructor"):
-            email = EmailMessage(to=["to@example.com"], connection=object())
-            with self.assertRaisesMessage(TypeError, msg):
-                email.send(using="test")
 
-        with self.subTest("as attribute"):
-            email = EmailMessage(to=["to@example.com"])
-            email.connection = object()
-            with self.assertRaisesMessage(TypeError, msg):
-                email.send(using="test")
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_send_using_conflicts_with_fail_silently(self):
-        msg = "'fail_silently' is not compatible with 'using'."
-        email = EmailMessage(to=["to@example.com"])
-        with self.assertRaisesMessage(TypeError, msg):
-            email.send(using="test", fail_silently=True)
-
-
-@ignore_no_default_mailer_warning()
+@override_settings(
+    MAILERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+        "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+    }
+)
 class SendMailTests(SimpleTestCase, MailTestsMixin):
     """Tests for django.core.mail.send_mail()."""
 
     def test_sends_using_default_mailer(self):
         send_mail("subject", "body", "from@example.com", ["to@example.com"])
-
-        # RemovedInDjango2028Warning.
-        if not mailers._is_configured:
-            self.assertIsNone(mail.outbox[0].sent_using)
-            return
-
         self.assertEqual(mail.outbox[0].sent_using, "default")
 
     def test_plaintext_send_mail(self):
@@ -2052,162 +1929,6 @@ class SendMailTests(SimpleTestCase, MailTestsMixin):
         self.assertEqual(message.get("from"), "tester")
         self.assertEqual(message.get("to"), "django")
 
-    # RemovedInDjango2028Warning.
-    def test_connection_arg(self):
-        # Send using non-default connection.
-        connection = custombackend.EmailBackend()
-        with self.assertWarnsMessage(
-            RemovedInDjango2028Warning, CONNECTION_ARG_WARNING
-        ):
-            send_mail(
-                "Subject",
-                "Content",
-                "from@example.com",
-                ["to@example.com"],
-                connection=connection,
-            )
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, "Subject")
-
-    # RemovedInDjango2028Warning.
-    def test_auth_passed_to_backend_init(self):
-        self.addCleanup(OptionsCapturingBackend.reset)
-        with (
-            self.use_email_backend("mail.custombackend.OptionsCapturingBackend"),
-            self.assertWarnsMessage(RemovedInDjango2028Warning, AUTH_ARGS_WARNING),
-        ):
-            send_mail(
-                "Subject",
-                "Content",
-                "from@example.com",
-                ["to@example.com"],
-                auth_user="user",
-                auth_password="password",
-            )
-        # "auth_user" and "auth_password" become "username" and "password".
-        init_kwargs = OptionsCapturingBackend.init_kwargs[0]
-        self.assertEqual(init_kwargs["username"], "user")
-        self.assertEqual(init_kwargs["password"], "password")
-
-    # RemovedInDjango2028Warning.
-    def test_fail_silently_passed_to_backend_init(self):
-        self.addCleanup(OptionsCapturingBackend.reset)
-        with (
-            self.use_email_backend("mail.custombackend.OptionsCapturingBackend"),
-            self.assertWarnsMessage(
-                RemovedInDjango2028Warning, FAIL_SILENTLY_ARG_WARNING
-            ),
-        ):
-            send_mail(
-                "Subject",
-                "Content",
-                "from@example.com",
-                ["to@example.com"],
-                fail_silently=True,
-            )
-        init_kwargs = OptionsCapturingBackend.init_kwargs[0]
-        self.assertIs(init_kwargs["fail_silently"], True)
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_fail_silently_conflict(self):
-        msg = (
-            "fail_silently cannot be used with a connection. "
-            "Pass fail_silently to get_connection() instead."
-        )
-        with self.assertRaisesMessage(TypeError, msg):
-            send_mail(
-                "Subject",
-                "Body",
-                "from@example.com",
-                ["to@example.com"],
-                fail_silently=True,
-                connection=mail.get_connection(),
-            )
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_auth_conflict(self):
-        msg = (
-            "auth_user and auth_password cannot be used with a connection. "
-            "Pass auth_user and auth_password to get_connection() instead."
-        )
-        for param in ["auth_user", "auth_password"]:
-            with (
-                self.subTest(param=param),
-                self.assertRaisesMessage(TypeError, msg),
-            ):
-                send_mail(
-                    "subject",
-                    "body",
-                    "from@example.com",
-                    ["to@example.com"],
-                    **{param: "value"},
-                    connection=mail.get_connection(),
-                )
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_using_connection_conflict(self):
-        msg = "'connection' is not compatible with 'using'."
-        with self.assertRaisesMessage(TypeError, msg):
-            send_mail(
-                "subject",
-                "body",
-                "from@example.com",
-                ["to@example.com"],
-                connection=object(),
-                using="default",
-            )
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_using_fail_silently_conflict(self):
-        msg = "'fail_silently' is not compatible with 'using'."
-        with self.assertRaisesMessage(TypeError, msg):
-            send_mail(
-                "subject",
-                "body",
-                "from@example.com",
-                ["to@example.com"],
-                fail_silently=True,
-                using="default",
-            )
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_using_auth_conflict(self):
-        msg = (
-            "'auth_user' and 'auth_password' are not compatible with 'using'. "
-            "Set 'username' and 'password' OPTIONS in MAILERS instead."
-        )
-        for param in ["auth_user", "auth_password"]:
-            with (
-                self.subTest(param=param),
-                self.assertRaisesMessage(TypeError, msg),
-            ):
-                send_mail(
-                    "subject",
-                    "body",
-                    "from@example.com",
-                    ["to@example.com"],
-                    using="default",
-                    **{param: "value"},
-                )
-
-
-# RemovedInDjango2028Warning: Move override_settings and additional test cases
-# to SendMailTests and remove this class.
-@override_settings(
-    MAILERS={
-        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
-        "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
-    }
-)
-class SendMailTestsWithMailers(SendMailTests):
-    # Repeat all SendMailTests with MAILERS defined.
-
     def test_using_arg(self):
         # Send using non-default mailer.
         send_mail(
@@ -2220,7 +1941,12 @@ class SendMailTestsWithMailers(SendMailTests):
         self.assertEqual(mail.outbox[0].sent_using, "custom")
 
 
-@ignore_no_default_mailer_warning()
+@override_settings(
+    MAILERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+        "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+    }
+)
 class SendMassMailTests(MailTestsMixin, SimpleTestCase):
     """Tests for django.core.mail.send_mass_mail()."""
 
@@ -2251,136 +1977,7 @@ class SendMassMailTests(MailTestsMixin, SimpleTestCase):
         send_mass_mail(
             [("Subject1", "Content1", "from1@example.com", ["to1@example.com"])]
         )
-
-        # RemovedInDjango2028Warning.
-        if not mailers._is_configured:
-            self.assertIsNone(mail.outbox[0].sent_using)
-            return
-
         self.assertEqual(mail.outbox[0].sent_using, "default")
-
-    # RemovedInDjango2028Warning.
-    def test_connection_arg(self):
-        # Send using non-default connection.
-        connection = custombackend.EmailBackend()
-        with self.assertWarnsMessage(
-            RemovedInDjango2028Warning, CONNECTION_ARG_WARNING
-        ):
-            send_mass_mail(
-                [
-                    ("Subject1", "Content1", "from1@example.com", ["to1@example.com"]),
-                    ("Subject2", "Content2", "from2@example.com", ["to2@example.com"]),
-                ],
-                connection=connection,
-            )
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 2)
-        self.assertEqual(connection.test_outbox[0].subject, "Subject1")
-        self.assertEqual(connection.test_outbox[1].subject, "Subject2")
-        # Connection is provided to EmailMessage objects (#17811).
-        with ignore_warnings(
-            category=RemovedInDjango2028Warning,
-            message="The EmailMessage.connection attribute is deprecated.",
-        ):
-            self.assertIs(connection.test_outbox[0].connection, connection)
-            self.assertIs(connection.test_outbox[1].connection, connection)
-
-    # RemovedInDjango2028Warning.
-    def test_auth_passed_to_backend_init(self):
-        self.addCleanup(OptionsCapturingBackend.reset)
-        with (
-            self.use_email_backend("mail.custombackend.OptionsCapturingBackend"),
-            self.assertWarnsMessage(RemovedInDjango2028Warning, AUTH_ARGS_WARNING),
-        ):
-            send_mass_mail(
-                [("Subject1", "Content1", "from1@example.com", ["to1@example.com"])],
-                auth_user="user",
-                auth_password="password",
-            )
-        # "auth_user" and "auth_password" become "username" and "password".
-        init_kwargs = OptionsCapturingBackend.init_kwargs[0]
-        self.assertEqual(init_kwargs["username"], "user")
-        self.assertEqual(init_kwargs["password"], "password")
-
-    # RemovedInDjango2028Warning.
-    def test_fail_silently_passed_to_backend_init(self):
-        self.addCleanup(OptionsCapturingBackend.reset)
-        with (
-            self.use_email_backend("mail.custombackend.OptionsCapturingBackend"),
-            self.assertWarnsMessage(
-                RemovedInDjango2028Warning, FAIL_SILENTLY_ARG_WARNING
-            ),
-        ):
-            send_mass_mail(
-                [("Subject1", "Content1", "from1@example.com", ["to1@example.com"])],
-                fail_silently=True,
-            )
-        init_kwargs = OptionsCapturingBackend.init_kwargs[0]
-        self.assertIs(init_kwargs["fail_silently"], True)
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_send_fail_silently_conflict(self):
-        datatuple = (("Subject", "Message", "from@example.com", ["to@example.com"]),)
-        msg = (
-            "fail_silently cannot be used with a connection. "
-            "Pass fail_silently to get_connection() instead."
-        )
-        with self.assertRaisesMessage(TypeError, msg):
-            send_mass_mail(
-                datatuple, fail_silently=True, connection=mail.get_connection()
-            )
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_send_auth_conflict(self):
-        datatuple = (("Subject", "Message", "from@example.com", ["to@example.com"]),)
-        msg = (
-            "auth_user and auth_password cannot be used with a connection. "
-            "Pass auth_user and auth_password to get_connection() instead."
-        )
-        for param in ["auth_user", "auth_password"]:
-            with (
-                self.subTest(param=param),
-                self.assertRaisesMessage(TypeError, msg),
-            ):
-                send_mass_mail(
-                    datatuple, **{param: "value"}, connection=mail.get_connection()
-                )
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_using_connection_conflict(self):
-        msg = "'connection' is not compatible with 'using'."
-        with self.assertRaisesMessage(TypeError, msg):
-            send_mass_mail(
-                [("Subject1", "Content1", "from1@example.com", ["to1@example.com"])],
-                connection=object(),
-                using="default",
-            )
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_using_fail_silently_conflict(self):
-        msg = "'fail_silently' is not compatible with 'using'."
-        with self.assertRaisesMessage(TypeError, msg):
-            send_mass_mail(
-                [("Subject1", "Content1", "from1@example.com", ["to1@example.com"])],
-                fail_silently=True,
-                using="default",
-            )
-
-
-# RemovedInDjango2028Warning: Move override_settings and additional test cases
-# to SendMassMailTests and remove this class.
-@override_settings(
-    MAILERS={
-        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
-        "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
-    }
-)
-class SendMassMailTestsWithMailers(SendMassMailTests):
-    # Repeat all SendMassMailTests with MAILERS defined.
 
     def test_using_arg(self):
         send_mass_mail(
@@ -2390,7 +1987,12 @@ class SendMassMailTestsWithMailers(SendMassMailTests):
         self.assertEqual(mail.outbox[0].sent_using, "custom")
 
 
-@ignore_no_default_mailer_warning()
+@override_settings(
+    MAILERS={
+        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+        "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
+    }
+)
 class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
     """Tests for django.core.mail.mail_admins() and mail_managers()."""
 
@@ -2504,12 +2106,6 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
         for mail_func in [mail_admins, mail_managers]:
             with self.subTest(mail_func.__name__):
                 mail_func("Subject", "Content")
-
-                # RemovedInDjango2028Warning.
-                if not mailers._is_configured:
-                    self.assertIsNone(mail.outbox[0].sent_using)
-                    continue
-
                 self.assertEqual(mail.outbox[0].sent_using, "default")
 
     def test_wrong_admins_managers(self):
@@ -2539,236 +2135,12 @@ class MailAdminsAndManagersTests(SimpleTestCase, MailTestsMixin):
                     with self.assertRaisesMessage(ImproperlyConfigured, msg):
                         mail_func("subject", "content")
 
-    # RemovedInDjango2028Warning.
-    @override_settings(ADMINS=["nobody@example.com"])
-    def test_connection_arg_mail_admins(self):
-        # Send using non-default connection.
-        connection = custombackend.EmailBackend()
-        with self.assertWarnsMessage(
-            RemovedInDjango2028Warning, CONNECTION_ARG_WARNING
-        ):
-            mail_admins("Admin message", "Content", connection=connection)
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, "[Django] Admin message")
-
-    # RemovedInDjango2028Warning.
-    @override_settings(MANAGERS=["nobody@example.com"])
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_connection_arg_mail_managers(self):
-        # Send using non-default connection.
-        connection = custombackend.EmailBackend()
-        with self.assertWarnsMessage(
-            RemovedInDjango2028Warning, CONNECTION_ARG_WARNING
-        ):
-            mail_managers("Manager message", "Content", connection=connection)
-        self.assertEqual(mail.outbox, [])
-        self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, "[Django] Manager message")
-
-    # RemovedInDjango2028Warning.
-    @override_settings(ADMINS=["admin@example.com"], MANAGERS=["manager@example.com"])
-    def test_fail_silently_deprecated(self):
-        for mail_func in [mail_managers, mail_admins]:
-            with (
-                self.subTest(mail_func=mail_func),
-                self.assertWarnsMessage(
-                    RemovedInDjango2028Warning, FAIL_SILENTLY_ARG_WARNING
-                ),
-            ):
-                mail_func("Subject", "Content", fail_silently=True)
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_mail_admins_fail_silently_conflict(self):
-        msg = (
-            "fail_silently cannot be used with a connection. "
-            "Pass fail_silently to get_connection() instead."
-        )
-        with self.assertRaisesMessage(TypeError, msg):
-            mail_admins(
-                "Subject",
-                "Message",
-                fail_silently=True,
-                connection=mail.get_connection(),
-            )
-
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_mail_managers_fail_silently_conflict(self):
-        msg = (
-            "fail_silently cannot be used with a connection. "
-            "Pass fail_silently to get_connection() instead."
-        )
-        with self.assertRaisesMessage(TypeError, msg):
-            mail_managers(
-                "Subject",
-                "Message",
-                fail_silently=True,
-                connection=mail.get_connection(),
-            )
-
-
-# RemovedInDjango2028Warning: Move override_settings and additional test cases
-# to MailAdminsAndManagersTests and remove this class.
-@override_settings(
-    MAILERS={
-        "default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
-        "custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"},
-    }
-)
-class MailAdminsAndManagersTestsWithMailers(MailAdminsAndManagersTests):
-    # Repeat all MailAdminsAndManagersTests with MAILERS defined.
-
     @override_settings(ADMINS=["admin@example.com"], MANAGERS=["manager@example.com"])
     def test_using_arg(self):
         for mail_func in [mail_admins, mail_managers]:
             with self.subTest(mail_func.__name__):
                 mail_func("Subject", "Content", using="custom")
                 self.assertEqual(mail.outbox[0].sent_using, "custom")
-
-
-# RemovedInDjango2028Warning.
-@ignore_warnings(category=RemovedInDjango2028Warning)
-class GetConnectionTests(SimpleTestCase):
-    """Tests for django.core.mail.get_connection()."""
-
-    def test_deprecated(self):
-        msg = (
-            "get_connection() is deprecated. See 'Migrating email to mailers' "
-            "in Django's documentation for recommended replacements."
-        )
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            mail.get_connection()
-
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend")
-    def test_uses_email_backend_setting(self):
-        connection = mail.get_connection()
-        self.assertIsInstance(connection, console.EmailBackend)
-
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
-    def test_backend_specific_kwargs(self):
-        connection = mail.get_connection(host="mail.example.com")
-        self.assertIsInstance(connection, smtp.EmailBackend)
-        self.assertEqual(connection.host, "mail.example.com")
-
-    def test_backend_arg(self):
-        """Test backend argument of mail.get_connection()"""
-        cases = [
-            ("django.core.mail.backends.smtp.EmailBackend", smtp.EmailBackend),
-            ("django.core.mail.backends.locmem.EmailBackend", locmem.EmailBackend),
-            ("django.core.mail.backends.dummy.EmailBackend", dummy.EmailBackend),
-            ("django.core.mail.backends.console.EmailBackend", console.EmailBackend),
-        ]
-        for backend_path, backend_class in cases:
-            with self.subTest(backend_path=backend_path):
-                self.assertIsInstance(
-                    mail.get_connection(backend_path),
-                    backend_class,
-                )
-
-        # The filebased EmailBackend requires a file_path arg.
-        with (
-            self.subTest(
-                backend_path="django.core.mail.backends.filebased.EmailBackend"
-            ),
-            tempfile.TemporaryDirectory() as tmp_dir,
-        ):
-            self.assertIsInstance(
-                mail.get_connection(
-                    "django.core.mail.backends.filebased.EmailBackend",
-                    file_path=tmp_dir,
-                ),
-                filebased.EmailBackend,
-            )
-
-    def test_custom_backend(self):
-        """Test custom backend defined in this suite."""
-        conn = mail.get_connection("mail.custombackend.EmailBackend")
-        self.assertTrue(hasattr(conn, "test_outbox"))
-        email = EmailMessage(to=["to@example.com"])
-        conn.send_messages([email])
-        self.assertEqual(len(conn.test_outbox), 1)
-
-    def test_raises_error_from_backend_init(self):
-        msg = " not object"
-        with self.assertRaisesMessage(TypeError, msg):
-            mail.get_connection(
-                "django.core.mail.backends.filebased.EmailBackend", file_path=object()
-            )
-
-    def test_arbitrary_keyword(self):
-        """
-        Make sure that get_connection() accepts arbitrary keyword that might be
-        used with custom backends.
-        """
-        c = mail.get_connection(fail_silently=True, foo="bar")
-        self.assertIs(c.fail_silently, True)
-
-    @override_settings(
-        MAILERS={
-            "default": {
-                "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
-                "OPTIONS": {"host": "mail.example.com"},
-            },
-            "custom": {
-                "BACKEND": "django.core.mail.backends.locmem.EmailBackend",
-            },
-        }
-    )
-    def test_mailers_compatibility(self):
-        # Returns default mailer when MAILERS defined.
-        with self.subTest("no args"):
-            backend = mail.get_connection()
-            self.assertIsInstance(backend, smtp.EmailBackend)
-            self.assertEqual(backend.host, "mail.example.com")
-            self.assertIs(backend.fail_silently, False)
-
-        with self.subTest("with fail_silently"):
-            backend = mail.get_connection(fail_silently=True)
-            self.assertIsInstance(backend, smtp.EmailBackend)
-            self.assertEqual(backend.host, "mail.example.com")
-            self.assertIs(backend.fail_silently, True)
-            # Original OPTIONS are intact.
-            self.assertEqual(
-                settings.MAILERS["default"]["OPTIONS"],
-                {"host": "mail.example.com"},
-            )
-
-        with self.subTest("with other keyword args"):
-            backend = mail.get_connection(host="example.net")
-            self.assertIsInstance(backend, smtp.EmailBackend)
-            self.assertEqual(backend.host, "example.net")
-            self.assertIs(backend.fail_silently, False)
-            self.assertEqual(
-                settings.MAILERS["default"]["OPTIONS"],
-                {"host": "mail.example.com"},
-            )
-
-        with self.subTest("with fail_silently and other keyword args"):
-            backend = mail.get_connection(host="example.net", fail_silently=True)
-            self.assertIsInstance(backend, smtp.EmailBackend)
-            self.assertEqual(backend.host, "example.net")
-            self.assertIs(backend.fail_silently, True)
-            self.assertEqual(
-                settings.MAILERS["default"]["OPTIONS"],
-                {"host": "mail.example.com"},
-            )
-
-        with self.subTest("with backend"):
-            msg = "get_connection(backend, ...) is not supported with MAILERS."
-            with self.assertRaisesMessage(RuntimeError, msg):
-                mail.get_connection(
-                    backend="django.core.mail.backends.dummy.EmailBackend"
-                )
-
-    @override_settings(
-        MAILERS={"custom": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}}
-    )
-    def test_mailers_compatibility_no_default_mailer(self):
-        msg = "The mailer 'default' is not configured."
-        with self.assertRaisesMessage(MailerDoesNotExist, msg):
-            mail.get_connection()
 
 
 class LegacyAPINotUsedTests(SimpleTestCase):

@@ -343,6 +343,29 @@ to remove usage of these features.
 
 * The ``SQLCompiler.quote_name_unless_alias()`` method is removed.
 
+* The ``EMAIL_BACKEND``, ``EMAIL_FILE_PATH``, ``EMAIL_HOST``,
+  ``EMAIL_HOST_PASSWORD``, ``EMAIL_HOST_USER``, ``EMAIL_PORT``,
+  ``EMAIL_USE_TLS``, ``EMAIL_USE_SSL``, ``EMAIL_SSL_CERTFILE``,
+  ``EMAIL_SSL_KEYFILE``, and ``EMAIL_TIMEOUT`` settings are removed. The
+  default value of :setting:`MAILERS` is now ``{}``.
+
+* The ``django.core.mail.get_connection()`` function is removed.
+
+* The ``connection``, ``fail_silently``, ``auth_user``, and ``auth_password``
+  arguments are removed from :func:`.send_mail`, :func:`.send_mass_mail`,
+  :func:`.mail_admins`, :func:`.mail_managers`, the :class:`.EmailMessage`
+  constructor, and :meth:`.EmailMessage.send`. Support for the
+  ``EmailMessage.connection`` attribute is removed.
+
+* Directly creating instances of the ``smtp.EmailBackend`` class is
+  unsupported, and the class documentation for that backend is removed.
+
+* The ``BaseEmailBackend.__init__()`` method raises errors for unknown keyword
+  arguments and no longer supports ``fail_silently``.
+
+* The ``email_backend`` argument of :class:`.log.AdminEmailHandler` is
+  removed.
+
 See :ref:`deprecated-features-6.2` for details on these changes, including how
 to remove usage of these features.
 
