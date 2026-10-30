@@ -100,6 +100,17 @@ class SampleErrorTest(SimpleTestCase):
         raise AssertionError("SampleErrorTest.dummy_test() was called")
 
 
+class SampleSubtestWithUnpicklableAttribute(SimpleTestCase):
+    def setUp(self):
+        self.mock = mock.MagicMock()
+
+    # This method name doesn't begin with "test" to prevent test discovery
+    # from seeing it.
+    def dummy_test(self):
+        with self.subTest(i=1):
+            self.fail("expected failure")
+
+
 class RemoteTestResultTest(SimpleTestCase):
     def test_was_successful_no_events(self):
         result = RemoteTestResult()
@@ -201,6 +212,22 @@ class RemoteTestResultTest(SimpleTestCase):
         subtest_event = events[1]
         assertion_error = subtest_event[3]
         self.assertEqual(str(assertion_error[1]), "expected failure")
+
+    @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
+    def test_unpicklable_subtest_attribute_after_test_finishes(self):
+        """Subtest events can be pickled after the test finishes."""
+        result = RemoteTestResult()
+        subtest_test = SampleSubtestWithUnpicklableAttribute(methodName="dummy_test")
+        subtest_test.run(result=result)
+
+        pickle.dumps(result.events)
+        (event,) = [e for e in result.events if e[0] == "addSubTest"]
+        self.assertIsInstance(event[2], unittest.case._SubTest)
+        self.assertEqual(
+            str(event[2]),
+            "dummy_test (test_runner.test_parallel."
+            "SampleSubtestWithUnpicklableAttribute.dummy_test) (i=1)",
+        )
 
     @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_add_failing_subtests(self):
