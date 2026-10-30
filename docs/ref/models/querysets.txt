@@ -797,7 +797,7 @@ rather than 1-tuples. An example should make the difference clearer:
     >>> Entry.objects.values_list("id", flat=True).order_by("id")
     <QuerySet [1, 2, 3, ...]>
 
-It is an error to pass in ``flat`` when there is more than one field.
+It is an error to pass in ``flat`` with no fields or with more than one field.
 
 You can pass ``named=True`` to get results as a
 :func:`~python:collections.namedtuple`:

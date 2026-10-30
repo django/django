@@ -1595,19 +1595,9 @@ class QuerySet(AltersData):
                     "field."
                 )
             elif not fields:
-                # RemovedInDjango2028Warning: When the deprecation ends,
-                # replace with:
-                # raise TypeError(
-                #     "'flat' is not valid when values_list is called with no "
-                #     "fields."
-                # )
-                warnings.warn(
-                    "Calling values_list() with no field name and flat=True "
-                    "is deprecated. Pass an explicit field name instead, like "
-                    "'pk'.",
-                    RemovedInDjango2028Warning,
+                raise TypeError(
+                    "'flat' is not valid when values_list is called with no fields."
                 )
-                fields = [self.model._meta.concrete_fields[0].attname]
 
         field_names = {f: False for f in fields if not hasattr(f, "resolve_expression")}
         _fields = []

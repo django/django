@@ -311,7 +311,8 @@ to remove usage of these features.
 See :ref:`deprecated-features-6.1` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
+  raises ``TypeError``.
 
 See :ref:`deprecated-features-6.2` for details on these changes, including how
 to remove usage of these features.
