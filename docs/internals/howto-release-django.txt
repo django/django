@@ -22,6 +22,11 @@ There are three types of releases that you might need to make:
 
 * Pre-releases: e.g. 4.2 alpha, beta, or rc.
 
+Starting with Django 2028, releases use :ref:`calendar versions
+<annual-official-releases>`. Where this document refers to ``A.B`` or
+``A.B.C``, read ``YYYY`` or ``YYYY.N`` instead, e.g. ``stable/2028.x`` or
+2028.1.
+
 The short version of the steps involved is:
 
 #. If this is a security release, pre-notify the security distribution list
@@ -713,7 +718,8 @@ You're almost done! All that's left to do now is:
    ``django/__init__.py`` again, incrementing to whatever the next expected
    release will be. For example, after releasing 4.1.1, update ``VERSION`` to
    ``VERSION = (4, 1, 2, 'alpha', 0)`` (:commit:`example commit
-   <a4d19953d46247ee1992b3427fe652e941524272>`).
+   <a4d19953d46247ee1992b3427fe652e941524272>`). After releasing 2028.1,
+   update ``VERSION`` to ``VERSION = (2028, 2, 'alpha', 0)``.
 
 #. If this was an alpha release:
 
@@ -818,3 +824,21 @@ Some examples:
 * ``(4, 2, 0, "alpha", 0)`` → "4.2 pre-alpha"
 
 * ``(4, 2, 0, "beta", 1)`` → "4.2 beta 1"
+
+Starting with Django 2028, the ``VERSION`` tuple has four elements, as
+calendar versions have no minor version:
+
+#. Year.
+#. Patch number, 0 for the feature release.
+#. Status -- can be one of "alpha", "beta", "rc" or "final".
+#. Series number, as above.
+
+A patch number of 0 is never shown in the version. Some examples:
+
+* ``(2028, 0, "alpha", 0)`` → "2028 pre-alpha"
+
+* ``(2028, 0, "beta", 1)`` → "2028 beta 1"
+
+* ``(2028, 0, "final", 0)`` → "2028"
+
+* ``(2028, 1, "final", 0)`` → "2028.1"
