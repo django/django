@@ -4,6 +4,7 @@ import os
 import sys
 
 from django.apps import apps
+from django.core.exceptions import ValidationError
 from django.core.management.base import OutputWrapper
 from django.db.models import NOT_PROVIDED
 from django.utils import timezone
@@ -54,12 +55,12 @@ class MigrationQuestioner:
                 filenames = os.listdir(list(migrations_module.__path__)[0])
             return not any(x.endswith(".py") for x in filenames if x != "__init__.py")
 
-    def ask_not_null_addition(self, field_name, model_name):
+    def ask_not_null_addition(self, field_name, model_name, field=None):
         """Adding a NOT NULL field to a model."""
         # None means quit
         return None
 
-    def ask_not_null_alteration(self, field_name, model_name):
+    def ask_not_null_alteration(self, field_name, model_name, field=None):
         """Changing a NULL field to NOT NULL."""
         # None means quit
         return None
@@ -76,7 +77,7 @@ class MigrationQuestioner:
         """Should these migrations really be merged?"""
         return self.defaults.get("ask_merge", False)
 
-    def ask_auto_now_add_addition(self, field_name, model_name):
+    def ask_auto_now_add_addition(self, field_name, model_name, field=None):
         """Adding an auto_now_add field to a model."""
         # None means quit
         return None
@@ -125,13 +126,16 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                     return value
             self.prompt_output.write("Please select a valid option: ", ending="")
 
-    def _ask_default(self, default=""):
+    def _ask_default(self, default="", field=None):
         """
         Prompt for a default value.
 
         The ``default`` argument allows providing a custom default value (as a
         string) which will be shown to the user and used as the return value
         if the user doesn't provide any other input.
+
+        If ``field`` is given, the value is checked with ``field.to_python()``
+        and the user is prompted again if it's invalid for the field.
         """
         self.prompt_output.write("Please enter the default value as valid Python.")
         if default:
@@ -165,11 +169,35 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 sys.exit(1)
             else:
                 try:
-                    return eval(code, {}, {"datetime": datetime, "timezone": timezone})
+                    value = eval(code, {}, {"datetime": datetime, "timezone": timezone})
                 except Exception as e:
                     self.prompt_output.write(f"{e.__class__.__name__}: {e}")
+                    continue
+                if error := self._validate_default(value, field):
+                    self.prompt_output.write(
+                        f"{code!r} is not a valid value for this "
+                        f"{field.__class__.__name__}:\n  {error}"
+                    )
+                    continue
+                return value
 
-    def ask_not_null_addition(self, field_name, model_name):
+    def _validate_default(self, value, field):
+        """
+        Return an error message if value isn't a valid default for field.
+        Callables are evaluated when migrating, and relation fields can't
+        be checked before the related model is resolved.
+        """
+        if field is None or callable(value) or field.is_relation:
+            return None
+        try:
+            field.to_python(value)
+        except ValidationError as e:
+            return " ".join(e.messages)
+        except (TypeError, ValueError) as e:
+            return str(e)
+        return None
+
+    def ask_not_null_addition(self, field_name, model_name, field=None):
         """Adding a NOT NULL field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
@@ -189,10 +217,10 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             if choice == 2:
                 sys.exit(3)
             else:
-                return self._ask_default()
+                return self._ask_default(field=field)
         return None
 
-    def ask_not_null_alteration(self, field_name, model_name):
+    def ask_not_null_alteration(self, field_name, model_name, field=None):
         """Changing a NULL field to NOT NULL."""
         if not self.dry_run:
             choice = self._choice_input(
@@ -217,7 +245,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             elif choice == 3:
                 sys.exit(3)
             else:
-                return self._ask_default()
+                return self._ask_default(field=field)
         return None
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
@@ -252,7 +280,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             False,
         )
 
-    def ask_auto_now_add_addition(self, field_name, model_name):
+    def ask_auto_now_add_addition(self, field_name, model_name, field=None):
         """Adding an auto_now_add field to a model."""
         if not self.dry_run:
             choice = self._choice_input(
@@ -269,7 +297,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             if choice == 2:
                 sys.exit(3)
             else:
-                return self._ask_default(default="timezone.now")
+                return self._ask_default(default="timezone.now", field=field)
         return None
 
     def ask_unique_callable_default_addition(self, field_name, model_name):
@@ -318,7 +346,7 @@ class NonInteractiveMigrationQuestioner(MigrationQuestioner):
                 f"{reason}."
             )
 
-    def ask_not_null_addition(self, field_name, model_name):
+    def ask_not_null_addition(self, field_name, model_name, field=None):
         # We can't ask the user, so act like the user aborted.
         self.log_lack_of_migration(
             field_name,
@@ -328,7 +356,7 @@ class NonInteractiveMigrationQuestioner(MigrationQuestioner):
         )
         sys.exit(3)
 
-    def ask_not_null_alteration(self, field_name, model_name):
+    def ask_not_null_alteration(self, field_name, model_name, field=None):
         # We can't ask the user, so set as not provided.
         self.log(
             f"Field '{field_name}' on model '{model_name}' given a default of "
@@ -336,7 +364,7 @@ class NonInteractiveMigrationQuestioner(MigrationQuestioner):
         )
         return NOT_PROVIDED
 
-    def ask_auto_now_add_addition(self, field_name, model_name):
+    def ask_auto_now_add_addition(self, field_name, model_name, field=None):
         # We can't ask the user, so act like the user aborted.
         self.log_lack_of_migration(
             field_name,

@@ -274,7 +274,9 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* In interactive mode, :djadmin:`makemigrations` now validates the one-off
+  default value for a non-nullable field against the field's type, and prompts
+  again if the value is invalid (for example, ``0`` for a ``DateTimeField``).
 
 Models
 ~~~~~~

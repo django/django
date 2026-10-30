@@ -1171,11 +1171,11 @@ class MigrationAutodetector:
             field = field.clone()
             if isinstance(field, time_fields) and field.auto_now_add:
                 field.default = self.questioner.ask_auto_now_add_addition(
-                    field_name, model_name
+                    field_name, model_name, field=field
                 )
             else:
                 field.default = self.questioner.ask_not_null_addition(
-                    field_name, model_name
+                    field_name, model_name, field=field
                 )
         if (
             field.unique
@@ -1346,7 +1346,7 @@ class MigrationAutodetector:
                     ):
                         field = new_field.clone()
                         new_default = self.questioner.ask_not_null_alteration(
-                            field_name, model_name
+                            field_name, model_name, field=new_field
                         )
                         if new_default is not models.NOT_PROVIDED:
                             field.default = new_default
