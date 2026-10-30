@@ -1,5 +1,4 @@
 import copy
-import operator
 import pickle
 from unittest import skipUnless
 
@@ -7,7 +6,6 @@ import django
 import django.utils.version
 from django import get_version
 from django.test import SimpleTestCase
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.version import (
     VersionTuple,
     get_complete_version,
@@ -124,13 +122,8 @@ class VersionTests(SimpleTestCase):
 
 
 class VersionTupleTests(SimpleTestCase):
-
-    # The deprecation only applies to versions in the X.Y[.Z] scheme, whose
-    # tuple loses a component when calendar versions arrive.
     version = VersionTuple(6, 2, 1, "final", 0)
     calendar_version = VersionTuple(2028, 5, "final", 0)
-    # RemovedInDjango2028Warning.
-    hint = "django.VERSION has four components from Django 2028"
 
     def test_attributes(self):
         cases = [
@@ -176,113 +169,6 @@ class VersionTupleTests(SimpleTestCase):
         for version in cases:
             with self.subTest(version=version), self.assertRaises(AssertionError):
                 VersionTuple(*version)
-
-    # RemovedInDjango2028Warning.
-    def test_indexing_from_third_component_deprecated(self):
-        msg = "Indexing django.VERSION from its third component on"
-        indexes = [
-            2,
-            3,
-            4,
-            -1,
-            -2,
-            -3,
-            slice(3),
-            slice(None),
-            slice(1, None),
-            slice(None, None, 2),
-        ]
-        for index in indexes:
-            with self.subTest(index=index):
-                with self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx:
-                    self.version[index]
-                self.assertIn(self.hint, str(ctx.warning))
-
-    # RemovedInDjango2028Warning.
-    def test_indexing_first_two_components_not_deprecated(self):
-        cases = [
-            (0, 6),
-            (1, 2),
-            (-4, 2),
-            (-5, 6),
-            (slice(2), (6, 2)),
-            (slice(1), (6,)),
-            (slice(0, 2), (6, 2)),
-        ]
-        for index, expected in cases:
-            with self.subTest(index=index):
-                self.assertEqual(self.version[index], expected)
-
-    # RemovedInDjango2028Warning.
-    def test_iterating_deprecated(self):
-        msg = "Iterating or unpacking django.VERSION is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            major, minor, micro, status, iteration = self.version
-        self.assertEqual(
-            (major, minor, micro, status, iteration), (6, 2, 1, "final", 0)
-        )
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            self.assertEqual(tuple(self.version), (6, 2, 1, "final", 0))
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            self.assertEqual(list(self.version), [6, 2, 1, "final", 0])
-
-    # RemovedInDjango2028Warning.
-    def test_length_deprecated(self):
-        msg = "Relying on the length of django.VERSION is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            self.assertEqual(len(self.version), 5)
-
-    # RemovedInDjango2028Warning.
-    def test_comparison_with_three_or_more_components_deprecated(self):
-        msg = "Comparing django.VERSION with three or more components is deprecated."
-        operators = [
-            operator.eq,
-            operator.ne,
-            operator.lt,
-            operator.le,
-            operator.gt,
-            operator.ge,
-        ]
-        for other in [(6, 2, 1), (6, 2, 1, "final", 0)]:
-            for op in operators:
-                with self.subTest(other=other, operator=op.__name__):
-                    with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-                        op(self.version, other)
-
-    # RemovedInDjango2028Warning.
-    def test_reflected_comparison_deprecated(self):
-        msg = "Comparing django.VERSION with three or more components is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-            self.assertIs((6, 2, 1, "final", 0) == self.version, True)
-
-    # RemovedInDjango2028Warning.
-    def test_comparison_with_fewer_components_not_deprecated(self):
-        cases = [
-            (operator.ge, (6,), True),
-            (operator.ge, (6, 2), True),
-            (operator.ge, (6, 3), False),
-            (operator.lt, (2028,), True),
-            (operator.eq, (6, 2), False),
-            (operator.ne, (6, 2), True),
-        ]
-        for op, other, expected in cases:
-            with self.subTest(operator=op.__name__, other=other):
-                self.assertIs(op(self.version, other), expected)
-
-    # RemovedInDjango2028Warning.
-    def test_comparison_with_non_tuple_not_deprecated(self):
-        self.assertIs(self.version == "6.2.1", False)
-
-    # RemovedInDjango2028Warning.
-    def test_calendar_versions_not_deprecated(self):
-        # Calendar versions already have their final shape, so nothing about
-        # reading them is deprecated.
-        self.assertEqual(self.calendar_version[1], 5)
-        self.assertEqual(self.calendar_version[2], "final")
-        self.assertEqual(self.calendar_version[:], (2028, 5, "final", 0))
-        self.assertEqual(len(self.calendar_version), 4)
-        self.assertEqual(tuple(self.calendar_version), (2028, 5, "final", 0))
-        self.assertIs(self.calendar_version == (2028, 5, "final", 0), True)
 
     def test_hashing(self):
         self.assertEqual(hash(self.version), hash((6, 2, 1, "final", 0)))

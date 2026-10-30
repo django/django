@@ -396,4 +396,9 @@ to remove usage of these features.
 See :ref:`deprecated-features-6.2` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* ``django.VERSION`` has four components, ``(year, patch, status,
+  iteration)``, as calendar versions have no minor component. The deprecation
+  warnings for indexing it from its third component on, reading it in a way
+  that depends on its length, and comparing it against three or more
+  components are removed. Use the ``.feature``, ``.patch``, ``.status``, and
+  ``.iteration`` attributes instead.
