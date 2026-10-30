@@ -4,7 +4,12 @@ from itertools import chain
 from django.apps import apps
 from django.conf import settings
 from django.contrib.admin.exceptions import NotRegistered
-from django.contrib.admin.utils import NotRelationField, flatten, get_fields_from_path
+from django.contrib.admin.utils import (
+    NotRelationField,
+    flatten,
+    flatten_fieldsets,
+    get_fields_from_path,
+)
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
@@ -182,6 +187,7 @@ class BaseModelAdminChecks:
             *self._check_fields(admin_obj),
             *self._check_fieldsets(admin_obj),
             *self._check_exclude(admin_obj),
+            *self._check_fields_in_exclude(admin_obj),
             *self._check_form(admin_obj),
             *self._check_filter_vertical(admin_obj),
             *self._check_filter_horizontal(admin_obj),
@@ -505,6 +511,46 @@ class BaseModelAdminChecks:
             ]
         else:
             return []
+
+    def _check_fields_in_exclude(self, obj):
+        """
+        Check that no field is in both `exclude` and `fields` or `fieldsets`,
+        since it would be left out of the form but still be rendered.
+        """
+        # Skip if the basic checks of the options involved fail, as their
+        # values can't be relied upon to be sequences of field names.
+        if (
+            self._check_fields(obj)
+            or self._check_fieldsets(obj)
+            or self._check_exclude(obj)
+            or self._check_readonly_fields(obj)
+            or self._check_form(obj)
+        ):
+            return []
+        if not obj.exclude:
+            return []
+        if obj.fields:
+            option, field_names = "fields", flatten(obj.fields)
+        elif obj.fieldsets:
+            option, field_names = "fieldsets", flatten_fieldsets(obj.fieldsets)
+        else:
+            return []
+        # Fields in `readonly_fields` are rendered as text rather than as form
+        # fields, and fields declared on the form are included in it whether
+        # or not they are excluded, so both may safely appear in `exclude`.
+        excluded = set(obj.exclude).difference(
+            obj.readonly_fields, obj.form.declared_fields
+        )
+        return [
+            checks.Error(
+                "The value of '%s' cannot be in both '%s' and 'exclude'."
+                % (field_name, option),
+                obj=obj.__class__,
+                id="admin.E042",
+            )
+            for field_name in field_names
+            if field_name in excluded
+        ]
 
     def _check_form(self, obj):
         """Check that form subclasses BaseModelForm."""

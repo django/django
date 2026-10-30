@@ -117,7 +117,11 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``admin.E042`` system check ensures that a field listed in
+  :attr:`~django.contrib.admin.ModelAdmin.fields` or
+  :attr:`~django.contrib.admin.ModelAdmin.fieldsets` is not also in
+  :attr:`~django.contrib.admin.ModelAdmin.exclude`, which previously crashed
+  the add and change views.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
