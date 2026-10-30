@@ -48,6 +48,9 @@ class Apps:
         # Lock for thread-safe population.
         self._lock = threading.RLock()
         self.loading = False
+        # App configs whose ready() method hasn't run yet, while populate() is
+        # in phase 3 or after it failed in phase 3.
+        self._app_configs_pending_ready = None
 
         # Maps ("app_label", "modelname") tuples to lists of functions to be
         # called when the corresponding model is ready. Used by this class's
@@ -83,45 +86,60 @@ class Apps:
                 raise RuntimeError("populate() isn't reentrant")
             self.loading = True
 
-            # Phase 1: initialize app configs and import app modules.
-            for entry in installed_apps:
-                if isinstance(entry, AppConfig):
-                    app_config = entry
-                else:
-                    app_config = AppConfig.create(entry)
-                if app_config.label in self.app_configs:
+            # Phases 1 and 2 are skipped when retrying after a failure in
+            # phase 3.
+            if self._app_configs_pending_ready is None:
+                # Phase 1: initialize app configs and import app modules.
+                for entry in installed_apps:
+                    if isinstance(entry, AppConfig):
+                        app_config = entry
+                    else:
+                        app_config = AppConfig.create(entry)
+                    if app_config.label in self.app_configs:
+                        raise ImproperlyConfigured(
+                            "Application labels aren't unique, "
+                            "duplicates: %s" % app_config.label
+                        )
+
+                    self.app_configs[app_config.label] = app_config
+                    app_config.apps = self
+
+                # Check for duplicate app names.
+                counts = Counter(
+                    app_config.name for app_config in self.app_configs.values()
+                )
+                duplicates = [name for name, count in counts.most_common() if count > 1]
+                if duplicates:
                     raise ImproperlyConfigured(
-                        "Application labels aren't unique, "
-                        "duplicates: %s" % app_config.label
+                        "Application names aren't unique, "
+                        "duplicates: %s" % ", ".join(duplicates)
                     )
 
-                self.app_configs[app_config.label] = app_config
-                app_config.apps = self
+                self.apps_ready = True
 
-            # Check for duplicate app names.
-            counts = Counter(
-                app_config.name for app_config in self.app_configs.values()
-            )
-            duplicates = [name for name, count in counts.most_common() if count > 1]
-            if duplicates:
-                raise ImproperlyConfigured(
-                    "Application names aren't unique, "
-                    "duplicates: %s" % ", ".join(duplicates)
-                )
+                # Phase 2: import models modules.
+                for app_config in self.app_configs.values():
+                    app_config.import_models()
 
-            self.apps_ready = True
+                self.clear_cache()
 
-            # Phase 2: import models modules.
-            for app_config in self.app_configs.values():
-                app_config.import_models()
+                self.models_ready = True
 
-            self.clear_cache()
+                self._app_configs_pending_ready = list(self.get_app_configs())
 
-            self.models_ready = True
-
-            # Phase 3: run ready() methods of app configs.
-            for app_config in self.get_app_configs():
-                app_config.ready()
+            # Phase 3: run ready() methods of app configs. If one fails,
+            # populate() can be called again, e.g. when a WSGI server imports
+            # the application again, to run the remaining ones. Since no module
+            # is imported again, model classes aren't redefined.
+            pending = self._app_configs_pending_ready
+            while pending:
+                try:
+                    pending[0].ready()
+                except Exception:
+                    self.loading = False
+                    raise
+                del pending[0]
+            self._app_configs_pending_ready = None
 
             self.ready = True
             self.ready_event.set()
@@ -358,6 +376,7 @@ class Apps:
         self.stored_app_configs.append(self.app_configs)
         self.app_configs = {}
         self.apps_ready = self.models_ready = self.loading = self.ready = False
+        self._app_configs_pending_ready = None
         self.clear_cache()
         self.populate(installed)
 
