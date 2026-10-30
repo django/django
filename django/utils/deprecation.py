@@ -9,16 +9,16 @@ from django.utils.inspect import signature
 from django.utils.warnings import django_file_prefixes
 
 
-class RemovedInDjango2028Warning(DeprecationWarning):
+class RemovedInDjango2029Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango2029Warning(PendingDeprecationWarning):
+class RemovedInDjango2030Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango2028Warning
-RemovedAfterNextVersionWarning = RemovedInDjango2029Warning
+RemovedInNextVersionWarning = RemovedInDjango2029Warning
+RemovedAfterNextVersionWarning = RemovedInDjango2030Warning
 
 
 def __getattr__(name):
