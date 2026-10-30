@@ -8,7 +8,6 @@ from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.db.backends.base.creation import TEST_DATABASE_PREFIX, BaseDatabaseCreation
 from django.test import SimpleTestCase, TransactionTestCase
 from django.test.utils import override_settings
-from django.utils.deprecation import RemovedInDjango2028Warning
 
 from ..models import (
     CircularA,
@@ -166,43 +165,6 @@ class TestDbCreationTests(SimpleTestCase):
             with mock.patch.object(creation, "_create_test_db"):
                 creation.create_test_db(verbosity=0, autoclobber=True)
             self.assertIs(mark_expected_failures_and_skips.called, False)
-        finally:
-            with mock.patch.object(creation, "_destroy_test_db"):
-                creation.destroy_test_db(old_database_name, verbosity=0)
-
-    @mock.patch("django.db.migrations.executor.MigrationExecutor.migrate")
-    @mock.patch.object(BaseDatabaseCreation, "serialize_db_to_string")
-    def test_serialize_deprecation(self, serialize_db_to_string, *mocked_objects):
-        test_connection = get_connection_copy()
-        creation = test_connection.creation_class(test_connection)
-        self.patch_close_connection(creation)
-        old_database_name = test_connection.settings_dict["NAME"]
-        msg = (
-            "DatabaseCreation.create_test_db(serialize) is deprecated. Call "
-            "DatabaseCreation.serialize_test_db() once all test databases are set up "
-            "instead if you need fixtures persistence between tests."
-        )
-        try:
-            with (
-                self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx,
-                mock.patch.object(creation, "_create_test_db"),
-            ):
-                creation.create_test_db(verbosity=0, serialize=True)
-            self.assertEqual(ctx.filename, __file__)
-            serialize_db_to_string.assert_called_once_with()
-        finally:
-            with mock.patch.object(creation, "_destroy_test_db"):
-                creation.destroy_test_db(old_database_name, verbosity=0)
-        # Now with `serialize` False.
-        serialize_db_to_string.reset_mock()
-        try:
-            with (
-                self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx,
-                mock.patch.object(creation, "_create_test_db"),
-            ):
-                creation.create_test_db(verbosity=0, serialize=False)
-            self.assertEqual(ctx.filename, __file__)
-            serialize_db_to_string.assert_not_called()
         finally:
             with mock.patch.object(creation, "_destroy_test_db"):
                 creation.destroy_test_db(old_database_name, verbosity=0)
