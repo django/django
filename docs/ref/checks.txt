@@ -776,6 +776,8 @@ with the admin site:
   it's referenced by ``<other_modeladmin>.autocomplete_fields``.
 * **admin.E041**: The value of ``delete_confirmation_max_display`` must be a
   non-negative integer or ``None``.
+* **admin.E042**: The value of ``<field name>`` cannot be in both
+  ``fields``/``fieldsets`` and ``exclude``.
 
 ``ModelAdmin``
 ~~~~~~~~~~~~~~
