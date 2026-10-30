@@ -335,6 +335,9 @@ to remove usage of these features.
 
 * The ``USE_BLANK_CHOICE_DASH`` transitional setting is removed.
 
+* The ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` transitional setting is removed.
+  Signed cookies using the legacy salt derivation are no longer accepted.
+
 See :ref:`deprecated-features-6.2` for details on these changes, including how
 to remove usage of these features.
 

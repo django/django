@@ -125,26 +125,10 @@ def _cookie_signer_salt(cookie_name, salt=""):
     return f"django.http.cookies.v2:{len(salt)}:{salt}{cookie_name}"
 
 
-# RemovedInDjango2028Warning: When the deprecation ends, remove.
-def _cookie_signer_legacy_salt(cookie_name, salt=""):
-    return cookie_name + salt
-
-
 def _unsign_cookie(signed_value, *, cookie_name, salt="", max_age=None):
-    try:
-        # RemovedInDjango2028Warning: When the deprecation ends, replace the
-        # whole function body with this single return statement.
-        return get_cookie_signer(salt=_cookie_signer_salt(cookie_name, salt)).unsign(
-            signed_value, max_age=max_age
-        )
-    except BadSignature as exc:
-        if settings.SIGNED_COOKIE_LEGACY_SALT_FALLBACK and not isinstance(
-            exc, SignatureExpired
-        ):
-            return get_cookie_signer(
-                salt=_cookie_signer_legacy_salt(cookie_name, salt)
-            ).unsign(signed_value, max_age=max_age)
-        raise
+    return get_cookie_signer(salt=_cookie_signer_salt(cookie_name, salt)).unsign(
+        signed_value, max_age=max_age
+    )
 
 
 def get_cookie_signer(salt="django.core.signing.get_cookie_signer"):

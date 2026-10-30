@@ -26,13 +26,6 @@ DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
 
 # RemovedInDjango2028Warning.
-SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG = (
-    "The SIGNED_COOKIE_LEGACY_SALT_FALLBACK transitional setting is "
-    "deprecated. Remove it from your settings once legacy signed cookies "
-    "have expired. They will not be accepted in Django 2028."
-)
-
-# RemovedInDjango2028Warning.
 DEPRECATED_EMAIL_SETTINGS = {
     "EMAIL_BACKEND",
     "EMAIL_FILE_PATH",
@@ -150,12 +143,6 @@ class LazySettings(LazyObject):
             self.__dict__.pop(name, None)
 
         # RemovedInDjango2028Warning.
-        if name == "SIGNED_COOKIE_LEGACY_SALT_FALLBACK":
-            _show_settings_deprecation_warning(
-                SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
-                RemovedInDjango2028Warning,
-            )
-        # RemovedInDjango2028Warning.
         if name == "MAILERS":
             # When MAILERS is set, clear any cached values of
             # deprecated settings so that __getattr__() runs again for them.
@@ -270,13 +257,6 @@ class Settings:
                 self._explicit_settings.add(setting)
 
         # RemovedInDjango2028Warning.
-        if "SIGNED_COOKIE_LEGACY_SALT_FALLBACK" in self._explicit_settings:
-            warnings.warn(
-                SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
-                RemovedInDjango2028Warning,
-                skip_file_prefixes=django_file_prefixes(),
-            )
-        # RemovedInDjango2028Warning.
         _check_email_settings_conflicts(self._explicit_settings)
         for name in DEPRECATED_EMAIL_SETTINGS.intersection(self._explicit_settings):
             warnings.warn(
@@ -327,12 +307,6 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        # RemovedInDjango2028Warning.
-        if name == "SIGNED_COOKIE_LEGACY_SALT_FALLBACK":
-            _show_settings_deprecation_warning(
-                SIGNED_COOKIE_LEGACY_SALT_DEPRECATED_MSG,
-                RemovedInDjango2028Warning,
-            )
         # RemovedInDjango2028Warning.
         if name in DEPRECATED_EMAIL_SETTINGS:
             _show_settings_deprecation_warning(

@@ -422,10 +422,6 @@ Methods
     be checked against the signed timestamp attached to the cookie value to
     ensure the cookie is not older than ``max_age`` seconds.
 
-    Cookies signed by older Django versions are accepted by default for
-    backwards compatibility. Set :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK`
-    to ``False`` to reject them.
-
     For example:
 
     .. code-block:: pycon
