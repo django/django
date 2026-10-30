@@ -172,7 +172,7 @@ class DatabaseCache(BaseDatabaseCache):
                             )
 
                     exp = connection.ops.adapt_datetimefield_value(exp)
-                    if result and mode == "touch":
+                    if result and mode == "touch" and current_expires >= tz_now():
                         cursor.execute(
                             "UPDATE %s SET %s = %%s WHERE %s = %%s"
                             % (table, quote_name("expires"), quote_name("cache_key")),
