@@ -29,13 +29,15 @@ except ImportError:  # pragma: no cover
     HAS_GEOIP2 = False
 else:
     HAS_GEOIP2 = True
-    __all__ += ["GeoIP2", "GeoIP2Exception"]
+    __all__ += ["GeoIP2", "GeoIP2Exception", "SUPPORTED_DATABASE_TYPES"]
 
 
 # These are the values stored in the `database_type` field of the metadata.
 # See https://maxmind.github.io/MaxMind-DB/#database_type for details.
 SUPPORTED_DATABASE_TYPES = {
+    "DBIP-City",
     "DBIP-City-Lite",
+    "DBIP-Country",
     "DBIP-Country-Lite",
     "GeoIP2-City",
     "GeoIP2-Country",
@@ -67,7 +69,14 @@ class GeoIP2:
     _path = None
     _reader = None
 
-    def __init__(self, path=None, cache=0, country=None, city=None):
+    def __init__(
+        self,
+        path=None,
+        cache=0,
+        country=None,
+        city=None,
+        supported_types=None,
+    ):
         """
         Initialize the GeoIP object. No parameters are required to use default
         settings. Keyword arguments may be passed in to customize the locations
@@ -89,6 +98,9 @@ class GeoIP2:
 
         * city: The name of the GeoIP city data file. Defaults to
             'GeoLite2-City.mmdb'; overrides the GEOIP_CITY setting.
+
+        * supported_types: An iterable of allowed database edition strings.
+            Defaults to SUPPORTED_DATABASE_TYPES.
         """
         if cache not in self.cache_options:
             raise GeoIP2Exception("Invalid GeoIP caching option: %s" % cache)
@@ -115,8 +127,14 @@ class GeoIP2:
                 "Path must be a valid database or directory containing databases."
             )
 
+        self.supported_types = (
+            set(supported_types)
+            if supported_types is not None
+            else SUPPORTED_DATABASE_TYPES
+        )
+
         database_type = self._metadata.database_type
-        if database_type not in SUPPORTED_DATABASE_TYPES:
+        if database_type not in self.supported_types:
             raise GeoIP2Exception(f"Unable to handle database edition: {database_type}")
 
     def __del__(self):
