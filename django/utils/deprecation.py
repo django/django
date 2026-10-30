@@ -37,13 +37,6 @@ def __getattr__(name):
         from django.middleware import MiddlewareMixin
 
         return MiddlewareMixin
-    if name == "RemovedInDjango70Warning":
-        warnings.warn(
-            "RemovedInDjango2028Warning should be used instead of "
-            "RemovedInDjango70Warning.",
-            stacklevel=2,
-        )
-        return RemovedInDjango2028Warning
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
