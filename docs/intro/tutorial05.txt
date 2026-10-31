@@ -681,12 +681,12 @@ achieve some very clever things.
 
 For example, while our tests here have covered some of the internal logic of a
 model and the way our views publish information, you can use an "in-browser"
-framework such as Selenium_ to test the way your HTML actually renders in a
+framework such as Playwright_ to test the way your HTML actually renders in a
 browser. These tools allow you to check not just the behavior of your Django
 code, but also, for example, of your JavaScript. It's quite something to see
 the tests launch a browser, and start interacting with your site, as if a human
 being were driving it! Django includes :class:`~django.test.LiveServerTestCase`
-to facilitate integration with tools like Selenium.
+to facilitate integration with tools like Playwright.
 
 If you have a complex application, you may want to run tests automatically
 with every commit for the purposes of `continuous integration`_, so that
@@ -701,7 +701,7 @@ Coverage will help to identify dead code. See
 :doc:`Testing in Django </topics/testing/index>` has comprehensive
 information about testing.
 
-.. _Selenium: https://www.selenium.dev/
+.. _Playwright: https://playwright.dev/
 .. _continuous integration: https://en.wikipedia.org/wiki/Continuous_integration
 
 What's next?
