@@ -41,6 +41,8 @@ class ChoiceWidgetTest(WidgetTest):
         self.assertIsNot(widget.choices, obj.choices)
         self.assertEqual(widget.attrs, obj.attrs)
         self.assertIsNot(widget.attrs, obj.attrs)
+        self.assertEqual(widget.option_attrs, obj.option_attrs)
+        self.assertIsNot(widget.option_attrs, obj.option_attrs)
 
     def test_options(self):
         options = list(
