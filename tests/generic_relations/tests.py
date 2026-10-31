@@ -627,6 +627,17 @@ class GenericRelationsTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             tagged_item.save()
 
+    def test_unsaved_generic_foreign_key_save(self):
+        quartz = Mineral(name="Quartz", hardness=7)
+        tagged_item = TaggedItem(tag="shiny", content_object=quartz)
+        quartz.save()
+        tagged_item.save()
+        self.assertEqual(tagged_item.object_id, quartz.pk)
+        self.assertEqual(tagged_item.content_object, quartz)
+        tagged_item.refresh_from_db()
+        self.assertEqual(tagged_item.object_id, quartz.pk)
+        self.assertEqual(tagged_item.content_object, quartz)
+
     @skipUnlessDBFeature("has_bulk_insert")
     def test_unsaved_generic_foreign_key_parent_bulk_create(self):
         quartz = Mineral(name="Quartz", hardness=7)
