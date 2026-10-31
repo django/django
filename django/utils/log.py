@@ -246,7 +246,9 @@ class ServerFormatter(logging.Formatter):
         return super().format(record)
 
     def uses_server_time(self):
-        return self._fmt.find("{server_time}") >= 0
+        return self._style.__class__(
+            self._fmt.replace("server_time", "asctime")
+        ).usesTime()
 
 
 def log_message(
