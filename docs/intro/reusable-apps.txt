@@ -223,7 +223,7 @@ this. For a small app like polls, this process isn't too difficult.
        description = "A Django app to conduct web-based polls."
        readme = "README.rst"
        license = "BSD-3-Clause"
-       requires-python = ">= 3.12"
+       requires-python = ">= 3.14"
        authors = [
            {name = "Your Name", email = "yourname@example.com"},
        ]
@@ -236,8 +236,6 @@ this. For a small app like polls, this process isn't too difficult.
            "Programming Language :: Python",
            "Programming Language :: Python :: 3",
            "Programming Language :: Python :: 3 :: Only",
-           "Programming Language :: Python :: 3.12",
-           "Programming Language :: Python :: 3.13",
            "Programming Language :: Python :: 3.14",
            "Programming Language :: Python :: 3.15",
            "Topic :: Internet :: WWW/HTTP",

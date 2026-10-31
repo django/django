@@ -1,5 +1,4 @@
 import sys
-import unittest
 from typing import TYPE_CHECKING
 
 from django.template import Context, Engine, TemplateDoesNotExist, TemplateSyntaxError
@@ -7,7 +6,6 @@ from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
 from django.urls import NoReverseMatch
 from django.utils import translation
-from django.utils.version import PY314
 
 if TYPE_CHECKING:
     type AnnotatedKwarg = str
@@ -227,7 +225,6 @@ class TemplateTestMixin:
         template = self._engine().from_string("{{ description.count }}")
         self.assertEqual(template.render(Context({"description": "test"})), "")
 
-    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     def test_callable_uses_deferred_annotations(self):
         """
         Missing required arguments are gracefully handled when a signature uses

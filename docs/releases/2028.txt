@@ -26,6 +26,8 @@ Python compatibility
 Django 2028 supports Python 3.14 and 3.15. We **highly recommend** and only
 officially support the latest release of each series.
 
+The Django 6.2.x series is the last to support Python 3.12 and 3.13.
+
 .. _whats-new-2028:
 
 What's new in Django 2028

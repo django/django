@@ -1981,7 +1981,7 @@ time-based component.
 .. admonition:: Availability
 
     Available on PostgreSQL version 18 or later, MariaDB version 11.7 or later,
-    and SQLite on Python version 3.14 or later.
+    and SQLite.
 
 .. admonition:: ``shift``
 

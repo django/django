@@ -28,7 +28,7 @@ from math import (
     tan,
 )
 from re import search as re_search
-from uuid import uuid4
+from uuid import uuid4, uuid7
 
 from django.db.backends.utils import (
     split_tzname_delta,
@@ -37,10 +37,6 @@ from django.db.backends.utils import (
 )
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
-from django.utils.version import PY314
-
-if PY314:
-    from uuid import uuid7
 
 
 def register(connection):
@@ -91,8 +87,7 @@ def register(connection):
     connection.create_aggregate("BIT_OR", 1, BitOr)
     connection.create_aggregate("BIT_XOR", 1, BitXor)
     connection.create_function("UUIDV4", 0, _sqlite_uuid4)
-    if PY314:
-        connection.create_function("UUIDV7", 0, _sqlite_uuid7)
+    connection.create_function("UUIDV7", 0, _sqlite_uuid7)
     # Some math functions are enabled by default in SQLite 3.35+.
     sql = "select sqlite_compileoption_used('ENABLE_MATH_FUNCTIONS')"
     if not connection.execute(sql).fetchone()[0]:

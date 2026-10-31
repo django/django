@@ -28,7 +28,6 @@ from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
 from django.test import SimpleTestCase
-from django.utils.version import PY312
 
 from ..test_data import TestDataMixin
 
@@ -40,13 +39,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
     )
 
     def assertArgumentTypeError(self, i, bad_type):
-        if PY312:
-            msg = (
-                f"argument {i}: TypeError: '{bad_type}' object cannot be interpreted "
-                "as an integer"
-            )
-        else:
-            msg = f"argument {i}: TypeError: wrong type"
+        msg = (
+            f"argument {i}: TypeError: '{bad_type}' object cannot be interpreted "
+            "as an integer"
+        )
         return self.assertRaisesMessage(ctypes.ArgumentError, msg)
 
     def test_wkt(self):

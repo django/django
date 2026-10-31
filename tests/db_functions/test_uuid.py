@@ -85,8 +85,6 @@ class TestUUID(TestCase):
                 msg = "UUID7 is not supported on MySQL."
         elif connection.vendor == "postgresql":
             msg = "UUID7 requires PostgreSQL version 18 or later."
-        elif connection.vendor == "sqlite":
-            msg = "UUID7 on SQLite requires Python version 3.14 or later."
         else:
             msg = "UUID7 is not supported on this database backend."
 
