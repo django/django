@@ -621,6 +621,29 @@ class ExecutorTests(MigrationTestBase):
             ]
         )
 
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.delayed_reload_a",
+            "migrations.migrations_test_apps.delayed_reload_b",
+        ]
+    )
+    def test_unapply_run_python_after_unrelated_delayed_reload(self):
+        """
+        RunPython's reverse_code receives consistent related models when an
+        applied migration that isn't unapplied reloads a model with
+        delay=True between two unapplied migrations.
+        """
+        executor = MigrationExecutor(connection)
+        executor.migrate([("delayed_reload_b", "0003_run_python")])
+        executor.loader.build_graph()
+        try:
+            # delayed_reload_b.0002 stays applied but its AlterModelOptions
+            # re-renders A (related to C through Hub) and not B.
+            executor.migrate([("delayed_reload_a", None)])
+        finally:
+            executor.loader.build_graph()
+            executor.migrate([("delayed_reload_b", None)])
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_process_callback(self):
         """
