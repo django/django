@@ -115,7 +115,7 @@ You can select a mailer with the new ``using`` argument to :ref:`email sending
 
 :setting:`MAILERS` is not yet enabled by default in existing projects. It will
 replace :setting:`EMAIL_BACKEND` and related ``EMAIL_*`` settings in Django
-7.0. Until then, the older settings will continue to work but will issue
+2028. Until then, the older settings will continue to work but will issue
 deprecation warnings: see the list of :ref:`email deprecations
 <mailers-deprecations>` below.
 
