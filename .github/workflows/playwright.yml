@@ -41,8 +41,16 @@ jobs:
         run: python -m playwright install --with-deps chromium
       - name: Run Playwright tests
         working-directory: ./tests/
-        run: |
-          python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --settings=test_sqlite --parallel 1
+        run: python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --video=retain-on-failure --tracing=retain-on-failure --settings=test_sqlite --parallel 1
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: $/.github/actions/playwright-artifacts
+        with:
+          browser: chromium
+          sha: ${{ github.event.pull_request.head.sha }}
+          path: /tmp/playwright-sqlite
+          artifact-name: playwright-sqlite-${{ github.event.pull_request.head.sha }}
 
   playwright-postgresql:
     if: contains(github.event.pull_request.labels.*.name, 'playwright')
@@ -87,5 +95,13 @@ jobs:
         run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py
       - name: Run Playwright tests
         working-directory: ./tests/
-        run: |
-          python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --settings=test_postgres --parallel 1
+        run: python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --video=retain-on-failure --tracing=retain-on-failure --settings=test_postgres --parallel 1
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: $/.github/actions/playwright-artifacts
+        with:
+          browser: chromium
+          sha: ${{ github.event.pull_request.head.sha }}
+          path: /tmp/playwright-postgresql
+          artifact-name: playwright-postgresql-${{ github.event.pull_request.head.sha }}

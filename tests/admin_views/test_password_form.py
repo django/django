@@ -10,6 +10,7 @@ class PlaywrightAuthTests(AdminPlaywrightTestCase):
     available_apps = AdminPlaywrightTestCase.available_apps
 
     def setUp(self):
+        super().setUp()
         self.superuser = User.objects.create_superuser(
             username="super",
             password="secret",
