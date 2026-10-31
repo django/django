@@ -723,6 +723,22 @@ added a dependency that specifies the last migration of ``app2``::
             migrations.RunPython(move_m1),
         ]
 
+When a data migration requires data created by another migration, add a
+dependency on the migration that creates that data. This ensures that the
+required data migration runs first.
+
+.. note::
+
+    Migration dependencies do not ensure that data created by
+    :data:`~django.db.models.signals.post_migrate` handlers is available.
+    This signal is sent after the :djadmin:`migrate` command finishes
+    running migrations, rather than after each individual migration.
+
+    For example, :mod:`django.contrib.auth` creates model permissions in a
+    ``post_migrate`` handler. A data migration cannot assume that these
+    permissions already exist, particularly when migrating a new database,
+    even if it depends on the migrations of the ``auth`` app.
+
 More advanced migrations
 ------------------------
 
