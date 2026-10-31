@@ -188,7 +188,7 @@ class BlockTranslateNode(Node):
         context.pop()
         try:
             result %= data
-        except (KeyError, ValueError):
+        except KeyError, ValueError:
             if nested:
                 # Either string is malformed, or it's a bug
                 raise TemplateSyntaxError(

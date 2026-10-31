@@ -53,7 +53,7 @@ Source = "https://github.com/django/django"
 Tracker = "https://code.djangoproject.com/"
 
 [tool.black]
-target-version = ["py312"]
+target-version = ["py314"]
 force-exclude = "tests/test_runner_apps/tagged/tests_syntax_error.py"
 
 [tool.isort]

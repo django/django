@@ -208,7 +208,7 @@ class Engine:
         extra_data = getattr(template, "extra_data", {})
         try:
             partial = extra_data["partials"][partial_name]
-        except (KeyError, TypeError):
+        except KeyError, TypeError:
             raise TemplateDoesNotExist(partial_name, tried=[template_name])
         partial.engine = self
 

@@ -122,7 +122,7 @@ class EmailBackend(BaseEmailBackend):
     def _close_connection(self, connection):
         try:
             connection.quit()
-        except (ssl.SSLError, smtplib.SMTPServerDisconnected):
+        except ssl.SSLError, smtplib.SMTPServerDisconnected:
             # This happens when calling quit() on a TLS connection
             # sometimes, or when the connection was already disconnected
             # by the server.

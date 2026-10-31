@@ -105,7 +105,7 @@ def symlinks_supported():
         try:
             os.symlink(original_path, symlink_path)
             supported = True
-        except (OSError, NotImplementedError):
+        except OSError, NotImplementedError:
             supported = False
         return supported
 

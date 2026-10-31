@@ -28,7 +28,7 @@ def ordinal(value):
     """
     try:
         value = int(value)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return value
     if value < 0:
         return str(value)
@@ -80,7 +80,7 @@ def intcomma(value, use_l10n=True):
         try:
             if not isinstance(value, (float, Decimal)):
                 value = Decimal(value)
-        except (TypeError, ValueError, InvalidOperation):
+        except TypeError, ValueError, InvalidOperation:
             return intcomma(value, False)
         else:
             return number_format(value, use_l10n=True, force_grouping=True)
@@ -136,7 +136,7 @@ def intword(value):
     """
     try:
         value = int(value)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return value
 
     abs_value = abs(value)
@@ -162,7 +162,7 @@ def apnumber(value):
     """
     try:
         value = int(value)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return value
     if not 0 < value < 10:
         return value

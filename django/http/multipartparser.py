@@ -94,7 +94,7 @@ class MultiPartParser:
         # to receive.
         try:
             content_length = int(META.get("CONTENT_LENGTH", 0))
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             content_length = 0
 
         if content_length < 0:
@@ -211,7 +211,7 @@ class MultiPartParser:
                 try:
                     disposition = meta_data["content-disposition"][1]
                     field_name = disposition["name"].strip()
-                except (KeyError, IndexError, AttributeError):
+                except KeyError, IndexError, AttributeError:
                     continue
 
                 transfer_encoding = meta_data.get("content-transfer-encoding")
@@ -280,7 +280,7 @@ class MultiPartParser:
 
                     try:
                         content_length = int(meta_data.get("content-length")[0])
-                    except (IndexError, TypeError, ValueError):
+                    except IndexError, TypeError, ValueError:
                         content_length = None
 
                     counters = [0] * len(handlers)
@@ -731,7 +731,7 @@ def parse_boundary_stream(stream, max_header_size):
             name = header_name.lower().rstrip(" ")
             value, params = parse_header_parameters(value_and_params.lstrip(" "))
             params = {k: v.encode() for k, v in params.items()}
-        except (ValueError, LookupError):  # Invalid header.
+        except ValueError, LookupError:  # Invalid header.
             continue
 
         if name == "content-disposition":

@@ -128,7 +128,7 @@ class BasePaginator:
             if isinstance(number, float) and not number.is_integer():
                 raise ValueError
             number = int(number)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             raise PageNotAnInteger(self.error_messages["invalid_page"])
         if number < 1:
             raise EmptyPage(self.error_messages["min_page"])

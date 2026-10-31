@@ -2359,7 +2359,7 @@ class Model(AltersData, metaclass=ModelBase):
                         _cls = fld.path_infos[-1].to_opts.model
                     else:
                         _cls = None
-                except (FieldDoesNotExist, AttributeError):
+                except FieldDoesNotExist, AttributeError:
                     if fld is None or (
                         fld.get_transform(part) is None and fld.get_lookup(part) is None
                     ):

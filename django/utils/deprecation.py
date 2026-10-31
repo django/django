@@ -154,7 +154,7 @@ def warn_about_implementation(message, category, target):
     try:
         filename = inspect.getsourcefile(function)
         _, lineno = inspect.getsourcelines(function)
-    except (AttributeError, OSError, TypeError):
+    except AttributeError, OSError, TypeError:
         # Can't identify the source. Issue the warning generically.
         warnings.warn(message, category, skip_file_prefixes=django_file_prefixes())
         return
@@ -163,7 +163,7 @@ def warn_about_implementation(message, category, target):
     module = function.__module__
     try:
         registry = sys.modules[module].__dict__.setdefault("__warningregistry__", {})
-    except (AttributeError, KeyError):
+    except AttributeError, KeyError:
         registry = None
 
     warnings.warn_explicit(

@@ -116,7 +116,7 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
         return None
     try:
         dt = typecast_timestamp(dt)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return None
     if conn_tzname:
         dt = dt.replace(tzinfo=zoneinfo.ZoneInfo(conn_tzname))
@@ -159,7 +159,7 @@ def _sqlite_time_trunc(lookup_type, dt, tzname, conn_tzname):
     if dt_parsed is None:
         try:
             dt = typecast_time(dt)
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return None
     else:
         dt = dt_parsed
@@ -240,7 +240,7 @@ def _sqlite_time_extract(lookup_type, dt):
         return None
     try:
         dt = typecast_time(dt)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return None
     return getattr(dt, lookup_type)
 
@@ -267,7 +267,7 @@ def _sqlite_format_dtdelta(connector, lhs, rhs):
     try:
         real_lhs = _sqlite_prepare_dtdelta_param(connector, lhs)
         real_rhs = _sqlite_prepare_dtdelta_param(connector, rhs)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return None
     if connector == "+":
         # typecast_timestamp() returns a date or a datetime without timezone.

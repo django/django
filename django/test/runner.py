@@ -795,7 +795,7 @@ class DiscoverRunner:
         if not faulthandler.is_enabled() and enable_faulthandler:
             try:
                 faulthandler.enable(file=sys.stderr.fileno())
-            except (AttributeError, io.UnsupportedOperation):
+            except AttributeError, io.UnsupportedOperation:
                 faulthandler.enable(file=sys.__stderr__.fileno())
         self.pdb = pdb
         if self.pdb and self.parallel > 1:
@@ -1207,7 +1207,7 @@ def try_importing(label):
     """
     try:
         mod = import_module(label)
-    except (ImportError, TypeError):
+    except ImportError, TypeError:
         return (False, False)
 
     return (True, hasattr(mod, "__path__"))

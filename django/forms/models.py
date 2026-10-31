@@ -1680,7 +1680,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
             self.validate_no_null_characters(pk)
             try:
                 self.queryset.filter(**{key: pk})
-            except (ValueError, TypeError, ValidationError):
+            except ValueError, TypeError, ValidationError:
                 raise ValidationError(
                     self.error_messages["invalid_pk_value"],
                     code="invalid_pk_value",

@@ -335,7 +335,7 @@ class Field(RegisterLookupMixin):
         for choices_group in self.choices:
             try:
                 group_name, group_choices = choices_group
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 # Containing non-pairs
                 break
             try:
@@ -355,7 +355,7 @@ class Field(RegisterLookupMixin):
                             ),
                         ]
                     )
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 # No groups, choices in the form [value, display]
                 value, human_name = group_name, group_choices
                 if not self._choices_is_value(value) or not self._choices_is_value(
@@ -1865,7 +1865,7 @@ class DecimalField(Field):
                 decimal_value = self.context.create_decimal_from_float(value)
             else:
                 decimal_value = decimal.Decimal(value)
-        except (decimal.InvalidOperation, TypeError, ValueError):
+        except decimal.InvalidOperation, TypeError, ValueError:
             raise exceptions.ValidationError(
                 self.error_messages["invalid"],
                 code="invalid",
@@ -2089,7 +2089,7 @@ class FloatField(Field):
             return value
         try:
             return float(value)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             raise exceptions.ValidationError(
                 self.error_messages["invalid"],
                 code="invalid",
@@ -2189,7 +2189,7 @@ class IntegerField(Field):
             return value
         try:
             return int(value)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             raise exceptions.ValidationError(
                 self.error_messages["invalid"],
                 code="invalid",
@@ -2766,7 +2766,7 @@ class BinaryField(Field):
         if isinstance(value, str):
             try:
                 return memoryview(b64decode(value.encode("ascii"), validate=True))
-            except (UnicodeEncodeError, binascii.Error):
+            except UnicodeEncodeError, binascii.Error:
                 raise exceptions.ValidationError(
                     self.error_messages["invalid"],
                     code="invalid",
@@ -2814,7 +2814,7 @@ class UUIDField(Field):
             input_form = "int" if isinstance(value, int) else "hex"
             try:
                 return uuid.UUID(**{input_form: value})
-            except (AttributeError, ValueError):
+            except AttributeError, ValueError:
                 raise exceptions.ValidationError(
                     self.error_messages["invalid"],
                     code="invalid",

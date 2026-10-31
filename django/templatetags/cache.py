@@ -23,7 +23,7 @@ class CacheNode(Node):
         if expire_time is not None:
             try:
                 expire_time = int(expire_time)
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 raise TemplateSyntaxError(
                     '"cache" tag got a non-integer timeout value: %r' % expire_time
                 )

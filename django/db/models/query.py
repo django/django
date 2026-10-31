@@ -659,7 +659,7 @@ class QuerySet(AltersData):
             # attribute.
             try:
                 arg.default_alias
-            except (AttributeError, TypeError):
+            except AttributeError, TypeError:
                 raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
@@ -1858,7 +1858,7 @@ class QuerySet(AltersData):
                         "The named annotation '%s' conflicts with the "
                         "default name for another annotation." % arg.default_alias
                     )
-            except (TypeError, AttributeError):
+            except TypeError, AttributeError:
                 raise TypeError("Complex annotations require an alias")
             annotations[arg.default_alias] = arg
         annotations.update(kwargs)
@@ -2680,7 +2680,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 if not hasattr(obj, "_prefetched_objects_cache"):
                     try:
                         obj._prefetched_objects_cache = {}
-                    except (AttributeError, TypeError):
+                    except AttributeError, TypeError:
                         # Must be an immutable object from
                         # values_list(flat=True), for example (TypeError) or
                         # a QuerySet subclass that isn't returning Model

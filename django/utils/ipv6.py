@@ -59,6 +59,6 @@ def is_valid_ipv6_address(ip_addr):
         return True
     try:
         _ipv6_address_from_str(ip_addr)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return False
     return True

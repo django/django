@@ -660,13 +660,13 @@ def create_generic_related_manager(superclass, rel):
         def _remove_prefetched_objects(self):
             try:
                 self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
-            except (AttributeError, KeyError):
+            except AttributeError, KeyError:
                 pass  # nothing to clear from cache
 
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
-            except (AttributeError, KeyError):
+            except AttributeError, KeyError:
                 queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
 

@@ -211,7 +211,7 @@ class MemoryFileUploadHandler(FileUploadHandler):
         stream = getattr(input_data, "_stream", input_data)
         try:
             content_length = stream.seek(0, os.SEEK_END)
-        except (UnsupportedOperation, AttributeError):
+        except UnsupportedOperation, AttributeError:
             # Cannot seek; fall back to the Content-Length parameter.
             # On WSGI the stream enforces this value so it is trustworthy.
             pass

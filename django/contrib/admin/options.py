@@ -925,7 +925,7 @@ class ModelAdmin(BaseModelAdmin):
         try:
             object_id = field.to_python(object_id)
             return queryset.get(**{field.name: object_id})
-        except (model.DoesNotExist, ValidationError, ValueError):
+        except model.DoesNotExist, ValidationError, ValueError:
             return None
 
     def get_changelist_form(self, request, **kwargs):
@@ -1519,7 +1519,7 @@ class ModelAdmin(BaseModelAdmin):
                 try:
                     app_label, model_name = source_model_name.split(".", 1)
                     source_model = apps.get_model(app_label, model_name)
-                except (LookupError, ValueError):
+                except LookupError, ValueError:
                     msg = _('The app "%s" could not be found.') % source_model_name
                     self.message_user(request, msg, messages.ERROR)
                 else:

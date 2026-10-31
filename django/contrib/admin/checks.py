@@ -961,7 +961,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             except AttributeError:
                 try:
                     field = get_fields_from_path(obj.model, item)[-1]
-                except (FieldDoesNotExist, NotRelationField):
+                except FieldDoesNotExist, NotRelationField:
                     return [
                         checks.Error(
                             f"The value of '{label}' refers to '{item}', which is not "
@@ -1084,7 +1084,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             # Validate the field string
             try:
                 get_fields_from_path(obj.model, field)
-            except (NotRelationField, FieldDoesNotExist):
+            except NotRelationField, FieldDoesNotExist:
                 return [
                     checks.Error(
                         "The value of '%s' refers to '%s', which does not refer to a "
@@ -1221,7 +1221,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         else:
             try:
                 field = get_fields_from_path(obj.model, obj.date_hierarchy)[-1]
-            except (NotRelationField, FieldDoesNotExist):
+            except NotRelationField, FieldDoesNotExist:
                 return [
                     checks.Error(
                         "The value of 'date_hierarchy' refers to '%s', which "

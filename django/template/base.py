@@ -289,7 +289,7 @@ class Template:
         # string.
         try:
             message = str(exception.args[0])
-        except (IndexError, UnicodeDecodeError):
+        except IndexError, UnicodeDecodeError:
             message = "(Could not get exception message)"
 
         return {
@@ -1091,7 +1091,7 @@ class Variable:
                     current = current[bit]
                     # ValueError/IndexError are for numpy.array lookup on
                     # numpy < 1.9 and 1.9+ respectively
-                except (TypeError, AttributeError, KeyError, ValueError, IndexError):
+                except TypeError, AttributeError, KeyError, ValueError, IndexError:
                     try:  # attribute lookup
                         # Don't return class attributes if the class is the
                         # context:
@@ -1100,7 +1100,7 @@ class Variable:
                         ):
                             raise AttributeError
                         current = getattr(current, bit)
-                    except (TypeError, AttributeError):
+                    except TypeError, AttributeError:
                         # Reraise if the exception was raised by a @property
                         if not isinstance(current, BaseContext) and bit in dir(current):
                             raise
