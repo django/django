@@ -40,11 +40,6 @@ The ``task`` decorator
         def my_task():
             pass
 
-    .. versionchanged:: 6.1
-
-        Support for passing arbitrary ``**kwargs`` to the ``@task`` decorator
-        is added.
-
     If the defined ``Task`` is not valid according to the backend,
     :exc:`~django.tasks.exceptions.InvalidTask` is raised.
 

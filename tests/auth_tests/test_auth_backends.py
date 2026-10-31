@@ -32,7 +32,6 @@ from django.test import (
     override_settings,
 )
 from django.urls import reverse
-from django.utils.version import PY314
 from django.views.debug import ExceptionReporter, technical_500_response
 from django.views.decorators.debug import sensitive_variables
 
@@ -1344,7 +1343,6 @@ class AuthenticateTests(TestCase):
     def test_skips_backends_with_decorated_method(self):
         self.assertEqual(authenticate(username="test", password="test"), self.user1)
 
-    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     @override_settings(
         AUTHENTICATION_BACKENDS=[
             "auth_tests.test_auth_backends.AnnotatedBackend",

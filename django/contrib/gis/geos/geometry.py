@@ -158,7 +158,7 @@ class GEOSGeometryBase(GEOSBase):
         if isinstance(other, str):
             try:
                 other = GEOSGeometry.from_ewkt(other)
-            except (ValueError, GEOSException):
+            except ValueError, GEOSException:
                 return False
         return (
             isinstance(other, GEOSGeometry)
@@ -484,7 +484,7 @@ class GEOSGeometryBase(GEOSBase):
         if self.srid:
             try:
                 return gdal.SpatialReference(self.srid)
-            except (gdal.GDALException, gdal.SRSException):
+            except gdal.GDALException, gdal.SRSException:
                 pass
         return None
 

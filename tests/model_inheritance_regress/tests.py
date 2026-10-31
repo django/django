@@ -9,8 +9,6 @@ from unittest import expectedFailure
 from django import forms
 from django.db.models import FETCH_PEERS
 from django.test import TestCase
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     ArticleWithAuthor,
@@ -40,7 +38,6 @@ from .models import (
     Supplier,
     TrainStation,
     User,
-    Wholesaler,
 )
 
 
@@ -249,19 +246,6 @@ class ModelInheritanceTest(TestCase):
         r.save()
         self.assertEqual(r.id, orig_id)
         self.assertEqual(r.id, r.place_ptr_id)
-
-    def test_issue_11764(self):
-        """
-        Regression test for #11764
-        """
-        # RemovedInDjango2028Warning: when the deprecation ends, this test can
-        # be removed.
-        with ignore_warnings(
-            category=RemovedInDjango2028Warning,
-            message="Calling select_related() with no arguments is deprecated.",
-        ):
-            wholesalers = list(Wholesaler.objects.select_related())
-        self.assertEqual(wholesalers, [])
 
     def test_issue_7853(self):
         """

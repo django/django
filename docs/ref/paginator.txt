@@ -49,12 +49,7 @@ For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
     there will be two pages; the first page with 10 items and the second
     (and last) page with 13 items. ``orphans`` defaults to zero, which means
     pages are never combined and the last page may have one item. ``orphans``
-    should be less than the :attr:`~Paginator.per_page` value.
-
-    .. deprecated:: 6.0
-
-        Support for the ``orphans`` argument being larger than or equal to the
-        ``per_page`` argument is deprecated.
+    must be less than the :attr:`~Paginator.per_page` value.
 
 .. attribute:: Paginator.allow_empty_first_page
 

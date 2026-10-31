@@ -256,7 +256,7 @@ class MigrationWriter:
             missing_dirs.insert(0, existing_dirs.pop(-1))
             try:
                 base_module = import_module(".".join(existing_dirs))
-            except (ImportError, ValueError):
+            except ImportError, ValueError:
                 continue
             else:
                 try:

@@ -450,7 +450,7 @@ class Deserializer(base.Deserializer):
             )
         try:
             return apps.get_model(model_identifier)
-        except (LookupError, TypeError):
+        except LookupError, TypeError:
             raise base.DeserializationError(
                 "<%s> node has invalid model identifier: '%s'"
                 % (node.nodeName, model_identifier)

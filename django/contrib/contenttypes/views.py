@@ -19,7 +19,7 @@ def shortcut(request, content_type_id, object_id):
                 % {"ct_id": content_type_id}
             )
         obj = content_type.get_object_for_this_type(pk=object_id)
-    except (ObjectDoesNotExist, ValueError, ValidationError):
+    except ObjectDoesNotExist, ValueError, ValidationError:
         raise Http404(
             _("Content type %(ct_id)s object %(obj_id)s doesn’t exist")
             % {"ct_id": content_type_id, "obj_id": object_id}

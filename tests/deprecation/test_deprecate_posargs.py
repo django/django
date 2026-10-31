@@ -1,10 +1,8 @@
 import inspect
-import unittest
 from typing import TYPE_CHECKING
 
 from django.test import SimpleTestCase
 from django.utils.deprecation import RemovedAfterNextVersionWarning, deprecate_posargs
-from django.utils.version import PY314
 
 if TYPE_CHECKING:
     type AnnotatedKwarg = int
@@ -361,7 +359,6 @@ class DeprecatePosargsTests(SimpleTestCase):
             def func(*args, b=1):
                 return args, b
 
-    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     def test_decorator_rejects_var_positional_param_with_deferred_annotation(self):
         with self.assertRaisesMessage(
             TypeError,

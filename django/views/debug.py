@@ -609,12 +609,12 @@ def technical_404_response(request, exception):
     """Create a technical 404 error response. `exception` is the Http404."""
     try:
         error_url = exception.args[0]["path"]
-    except (IndexError, TypeError, KeyError):
+    except IndexError, TypeError, KeyError:
         error_url = request.path_info[1:]  # Trim leading slash
 
     try:
         tried = exception.args[0]["tried"]
-    except (IndexError, TypeError, KeyError):
+    except IndexError, TypeError, KeyError:
         resolved = True
         tried = request.resolver_match.tried if request.resolver_match else None
     else:

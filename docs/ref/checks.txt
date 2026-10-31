@@ -811,8 +811,8 @@ with the admin site:
   ``FieldListFilter``.
 * **admin.E116**: The value of ``list_filter[n]`` refers to ``<label>``,
   which does not refer to a Field.
-* **admin.E117**: The value of ``list_select_related`` must be a boolean,
-  tuple or list.
+* **admin.E117**: The value of ``list_select_related`` must be a tuple, list,
+  or ``False``.
 * **admin.E118**: The value of ``list_per_page`` must be an integer.
 * **admin.E119**: The value of ``list_max_show_all`` must be an integer.
 * **admin.E120**: The value of ``list_editable`` must be a list or tuple.

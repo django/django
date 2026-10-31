@@ -108,7 +108,7 @@ def normalize_choices(value, *, depth=0):
     try:
         # Recursive call to convert any nested values to a list of 2-tuples.
         return [(k, normalize_choices(v, depth=depth + 1)) for k, v in value]
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         # Return original value for the system check to raise if it has items
         # that are not iterable or not 2-tuples:
         # - TypeError: cannot unpack non-iterable <type> object

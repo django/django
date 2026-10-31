@@ -205,7 +205,7 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``distinct`` argument for
-  :class:`~django.contrib.postgres.aggregates.StringAgg` determines if
+  ``StringAgg`` determines if
   concatenated values will be distinct.
 
 * The new :class:`~django.contrib.postgres.indexes.GinIndex` and

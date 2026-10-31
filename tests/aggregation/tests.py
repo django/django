@@ -2298,8 +2298,8 @@ class AggregateTestCase(TestCase):
 
     def test_alias_sql_injection(self):
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, "
-            "control characters, quotation marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, control "
+            "characters, quotation marks, semicolons, percent signs, or SQL comments."
         )
         for crafted_alias in [
             """injected_name" from "aggregation_author"; --""",

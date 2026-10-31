@@ -1207,8 +1207,3 @@ class CamelCaseRelatedModel(models.Model):
     fk2 = models.ForeignKey(
         CamelCaseModel, on_delete=models.CASCADE, related_name="fk2"
     )
-
-
-# RemovedInDjango2028Warning: When the deprecation ends, remove.
-class ModelAction(models.Model):
-    pass

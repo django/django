@@ -50,7 +50,7 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
     # Resolver404 dictionary)
     try:
         message = exception.args[0]
-    except (AttributeError, IndexError):
+    except AttributeError, IndexError:
         pass
     else:
         if isinstance(message, str):

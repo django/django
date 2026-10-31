@@ -56,7 +56,7 @@ class GeometryField(forms.Field):
                     value = GEOSGeometry(
                         value, max_geom_collections=self.max_geom_collections
                     )
-                except (GEOSException, ValueError, TypeError):
+                except GEOSException, ValueError, TypeError:
                     value = None
             if value is None:
                 raise ValidationError(

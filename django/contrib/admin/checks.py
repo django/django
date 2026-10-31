@@ -961,7 +961,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             except AttributeError:
                 try:
                     field = get_fields_from_path(obj.model, item)[-1]
-                except (FieldDoesNotExist, NotRelationField):
+                except FieldDoesNotExist, NotRelationField:
                     return [
                         checks.Error(
                             f"The value of '{label}' refers to '{item}', which is not "
@@ -1084,7 +1084,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             # Validate the field string
             try:
                 get_fields_from_path(obj.model, field)
-            except (NotRelationField, FieldDoesNotExist):
+            except NotRelationField, FieldDoesNotExist:
                 return [
                     checks.Error(
                         "The value of '%s' refers to '%s', which does not refer to a "
@@ -1097,14 +1097,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return []
 
     def _check_list_select_related(self, obj):
-        """Check that list_select_related is a boolean, a list or a tuple."""
+        """Check that list_select_related is False, a list, or a tuple."""
 
-        if not isinstance(obj.list_select_related, (bool, list, tuple)):
+        if obj.list_select_related is not False and not isinstance(
+            obj.list_select_related, (list, tuple)
+        ):
             return must_be(
-                # RemovedInDjango2028Warning: replace with:
-                # "a tuple, list, or False",
-                # and also update docs/ref/checks.txt.
-                "a boolean, tuple or list",
+                "a tuple, list, or False",
                 option="list_select_related",
                 obj=obj,
                 id="admin.E117",
@@ -1222,7 +1221,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         else:
             try:
                 field = get_fields_from_path(obj.model, obj.date_hierarchy)[-1]
-            except (NotRelationField, FieldDoesNotExist):
+            except NotRelationField, FieldDoesNotExist:
                 return [
                     checks.Error(
                         "The value of 'date_hierarchy' refers to '%s', which "

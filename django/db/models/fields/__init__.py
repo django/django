@@ -32,18 +32,14 @@ from django.utils.dateparse import (
     parse_duration,
     parse_time,
 )
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.duration import duration_string
 from django.utils.functional import Promise
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
-from django.utils.warnings import django_file_prefixes
 
 __all__ = [
     "AutoField",
-    # RemovedInDjango2028Warning
-    "BLANK_CHOICE_DASH",
     "BLANK_CHOICE_LABEL",
     "BigAutoField",
     "BigIntegerField",
@@ -86,12 +82,8 @@ class NOT_PROVIDED:
     pass
 
 
-# RemovedInDjango2028Warning: From Django 6.1, the values to use for "blank"
-# in SelectFields will be defined by the below BLANK_CHOICE_LABEL constant.
-# Will be appended to the start of most "choices" lists.
-# BLANK_CHOICE_DASH is still available as a constant in Django 6.1.
-BLANK_CHOICE_DASH = [("", "---------")]
-# This allows any app's ready() method to overwrite BLANK_CHOICE_LABEL.
+# The label of the "blank" choice prepended to most "choices" lists. Any app's
+# ready() method can overwrite BLANK_CHOICE_LABEL.
 BLANK_CHOICE_LABEL = _("- Select an option -")
 
 
@@ -190,32 +182,6 @@ class Field(RegisterLookupMixin):
         }
 
     description = property(_description)
-
-    def __init_subclass__(cls, **kwargs):
-        # RemovedInDjango2028Warning: When the deprecation ends, remove
-        # completely.
-        # Allow for both `get_placeholder` and `get_placeholder_sql` to
-        # be declared to ease the deprecation process for third-party apps.
-        if (
-            get_placeholder := cls.__dict__.get("get_placeholder")
-        ) is not None and "get_placeholder_sql" not in cls.__dict__:
-            warnings.warn(
-                "Field.get_placeholder is deprecated in favor of get_placeholder_sql. "
-                f"Define {cls.__module__}.{cls.__qualname__}.get_placeholder_sql "
-                "to return both SQL and parameters instead.",
-                category=RemovedInDjango2028Warning,
-                skip_file_prefixes=django_file_prefixes(),
-            )
-
-            def get_placeholder_sql(self, value, compiler, connection):
-                placeholder = get_placeholder(self, value, compiler, connection)
-                if hasattr(value, "as_sql"):
-                    sql, params = compiler.compile(value)
-                    return placeholder % sql, params
-                return placeholder, (value,)
-
-            setattr(cls, "get_placeholder_sql", get_placeholder_sql)
-        return super().__init_subclass__(**kwargs)
 
     def __init__(
         self,
@@ -369,7 +335,7 @@ class Field(RegisterLookupMixin):
         for choices_group in self.choices:
             try:
                 group_name, group_choices = choices_group
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 # Containing non-pairs
                 break
             try:
@@ -389,7 +355,7 @@ class Field(RegisterLookupMixin):
                             ),
                         ]
                     )
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 # No groups, choices in the form [value, display]
                 value, human_name = group_name, group_choices
                 if not self._choices_is_value(value) or not self._choices_is_value(
@@ -1899,7 +1865,7 @@ class DecimalField(Field):
                 decimal_value = self.context.create_decimal_from_float(value)
             else:
                 decimal_value = decimal.Decimal(value)
-        except (decimal.InvalidOperation, TypeError, ValueError):
+        except decimal.InvalidOperation, TypeError, ValueError:
             raise exceptions.ValidationError(
                 self.error_messages["invalid"],
                 code="invalid",
@@ -2123,7 +2089,7 @@ class FloatField(Field):
             return value
         try:
             return float(value)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             raise exceptions.ValidationError(
                 self.error_messages["invalid"],
                 code="invalid",
@@ -2223,7 +2189,7 @@ class IntegerField(Field):
             return value
         try:
             return int(value)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             raise exceptions.ValidationError(
                 self.error_messages["invalid"],
                 code="invalid",
@@ -2800,7 +2766,7 @@ class BinaryField(Field):
         if isinstance(value, str):
             try:
                 return memoryview(b64decode(value.encode("ascii"), validate=True))
-            except (UnicodeEncodeError, binascii.Error):
+            except UnicodeEncodeError, binascii.Error:
                 raise exceptions.ValidationError(
                     self.error_messages["invalid"],
                     code="invalid",
@@ -2848,7 +2814,7 @@ class UUIDField(Field):
             input_form = "int" if isinstance(value, int) else "hex"
             try:
                 return uuid.UUID(**{input_form: value})
-            except (AttributeError, ValueError):
+            except AttributeError, ValueError:
                 raise exceptions.ValidationError(
                     self.error_messages["invalid"],
                     code="invalid",

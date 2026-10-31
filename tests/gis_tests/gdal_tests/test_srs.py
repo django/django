@@ -225,7 +225,7 @@ class SpatialRefTest(SimpleTestCase):
             try:
                 srs = SpatialReference(bad)
                 srs.validate()
-            except (SRSException, GDALException):
+            except SRSException, GDALException:
                 pass
             else:
                 self.fail('Should not have initialized on bad WKT "%s"!')

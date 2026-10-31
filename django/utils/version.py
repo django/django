@@ -56,7 +56,6 @@ class VersionTuple(tuple):
 
     @property
     def _components(self):
-        # The components as a plain tuple, without deprecation warnings.
         return tuple.__getitem__(self, slice(None))
 
     # Indexed from the end, where the two schemes agree.
@@ -75,90 +74,6 @@ class VersionTuple(tuple):
     @property
     def iteration(self):
         return tuple.__getitem__(self, -1)
-
-    # RemovedInDjango2028Warning: everything from here to the end of the class
-    # only warns about the coming shape change. Remove it all when the
-    # deprecation ends. The attributes above stay.
-    def _warn(self, message):
-        if len(self._components) == 4:
-            # Calendar versions already have their final shape.
-            return
-        # Imported here to avoid a circular import: django.utils.deprecation
-        # imports django.utils.inspect, which imports this module.
-        from django.utils.deprecation import (
-            RemovedInDjango2028Warning,
-            warn_about_external_use,
-        )
-
-        warn_about_external_use(
-            f"{message} django.VERSION has four components from Django 2028, "
-            "(year, patch, status, iteration), as calendar versions have no "
-            "minor component. Use `.feature`, `.patch`, `.status`, and "
-            "`.iteration` attributes instead.",
-            RemovedInDjango2028Warning,
-            # Report the caller of the tuple operation, not the operation, and
-            # stay quiet when Django reads its own version.
-            skip_name_prefixes="django.utils.version.VersionTuple",
-        )
-
-    def _warn_comparison(self, other):
-        # A comparison against three or more components can reach the ones
-        # which move down an index, so its result can change from Django 2028.
-        if isinstance(other, tuple) and tuple.__len__(other) > 2:
-            self._warn(
-                "Comparing django.VERSION with three or more components is "
-                "deprecated."
-            )
-
-    def __getitem__(self, index):
-        # Losing the minor component moves every later component down one
-        # index: VERSION[2] is the micro version now, but the status from
-        # Django 2028. Indexing any of them is therefore deprecated.
-        length = tuple.__len__(self)
-        if isinstance(index, slice):
-            deprecated = any(i >= 2 for i in range(*index.indices(length)))
-        else:
-            position = index + length if index < 0 else index
-            deprecated = 2 <= position < length
-        if deprecated:
-            self._warn(
-                "Indexing django.VERSION from its third component on is deprecated."
-            )
-        return tuple.__getitem__(self, index)
-
-    def __iter__(self):
-        self._warn("Iterating or unpacking django.VERSION is deprecated.")
-        return tuple.__iter__(self)
-
-    def __len__(self):
-        self._warn("Relying on the length of django.VERSION is deprecated.")
-        return tuple.__len__(self)
-
-    def __eq__(self, other):
-        self._warn_comparison(other)
-        return tuple.__eq__(self, other)
-
-    def __ne__(self, other):
-        self._warn_comparison(other)
-        return tuple.__ne__(self, other)
-
-    def __lt__(self, other):
-        self._warn_comparison(other)
-        return tuple.__lt__(self, other)
-
-    def __le__(self, other):
-        self._warn_comparison(other)
-        return tuple.__le__(self, other)
-
-    def __gt__(self, other):
-        self._warn_comparison(other)
-        return tuple.__gt__(self, other)
-
-    def __ge__(self, other):
-        self._warn_comparison(other)
-        return tuple.__ge__(self, other)
-
-    __hash__ = tuple.__hash__
 
 
 def get_version(version=None):

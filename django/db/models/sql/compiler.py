@@ -1,7 +1,6 @@
 import collections
 import json
 import re
-import warnings
 from functools import cached_property, partial
 from itertools import chain
 
@@ -24,10 +23,8 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.warnings import django_file_prefixes
 
 
 class PositionRef(Ref):
@@ -183,7 +180,7 @@ class SQLCompiler:
         for expr in expressions:
             try:
                 sql, params = self.compile(expr)
-            except (EmptyResultSet, FullResultSet):
+            except EmptyResultSet, FullResultSet:
                 continue
             if (
                 allows_group_by_select_index
@@ -576,18 +573,6 @@ class SQLCompiler:
         quoted = self.connection.ops.quote_name(name)
         self.quote_cache[name] = quoted
         return quoted
-
-    # RemovedInDjango2028Warning: When the deprecation ends, remove.
-    def quote_name_unless_alias(self, name):
-        warnings.warn(
-            (
-                "SQLCompiler.quote_name_unless_alias() is deprecated. "
-                "Use .quote_name() instead."
-            ),
-            category=RemovedInDjango2028Warning,
-            skip_file_prefixes=django_file_prefixes(),
-        )
-        return self.quote_name(name)
 
     def compile(self, node):
         vendor_impl = getattr(node, "as_" + self.connection.vendor, None)

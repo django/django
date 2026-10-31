@@ -112,7 +112,7 @@ def clear_site_cache(sender, **kwargs):
         pass
     try:
         del SITE_CACHE[Site.objects.using(using).get(pk=instance.pk).domain]
-    except (KeyError, Site.DoesNotExist):
+    except KeyError, Site.DoesNotExist:
         pass
 
 

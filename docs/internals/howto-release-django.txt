@@ -15,17 +15,12 @@ There are three types of releases that you might need to make:
 
 * Security releases: disclosing and fixing a vulnerability. This'll
   generally involve two or three simultaneous releases -- e.g.
-  3.2.x, 4.0.x, and, depending on timing, perhaps a 4.1.x.
+  ``YYYY.x``, ``YYYY-1.x``, and, depending on timing, perhaps a ``YYYY-2.x``.
 
-* Regular version releases: either a final release (e.g. 4.1) or a
-  bugfix update (e.g. 4.1.1).
+* Regular version releases: either a final release (e.g. 2028) or a
+  bugfix update (e.g. 2028.1).
 
-* Pre-releases: e.g. 4.2 alpha, beta, or rc.
-
-Starting with Django 2028, releases use :ref:`calendar versions
-<annual-official-releases>`. Where this document refers to ``A.B`` or
-``A.B.C``, read ``YYYY`` or ``YYYY.N`` instead, e.g. ``stable/2028.x`` or
-2028.1.
+* Pre-releases: e.g. 2028 alpha, beta, or rc.
 
 The short version of the steps involved is:
 
@@ -205,10 +200,10 @@ A week before a security release
 
    .. code-block:: text
 
-    Notice of upcoming Django security releases (3.2.24, 4.2.10 and 5.0.2)
+    Notice of upcoming Django security releases (YYYY.N, YYYY-1.N and YYYY-2.N)
 
-    Django versions 5.0.2, 4.2.10, and 3.2.24 will be released on Tuesday,
-    February 6th, 2024 around 1500 UTC. They will fix one security defect
+    Django versions YYYY.N, YYYY-1.N, and YYYY-2.N will be released on
+    <<DATE>> around 1500 UTC. They will fix one security defect
     with severity "moderate".
 
     For details of severity levels, see:
@@ -279,7 +274,7 @@ A few days before any release
 
    .. code-block:: shell
 
-        $ git diff --name-only stable/5.0.x | grep "\.po"  | xargs sed -ri "s/PO-Revision-Date: [0-9\-]+ /PO-Revision-Date: $(date -I) /g"
+        $ git diff --name-only stable/2028.x | grep "\.po"  | xargs sed -ri "s/PO-Revision-Date: [0-9\-]+ /PO-Revision-Date: $(date -I) /g"
 
    Lastly, commit the changed/added files (both ``.po`` and ``.mo``) and create
    a new PR targeting the stable branch of the corresponding release (example
@@ -300,15 +295,15 @@ A few days before any release
 
    and then commit the changed man page.
 
-#. If this is the "dot zero" release of a new series, create a new branch from
-   the current stable branch in the `django-docs-translations
+#. If this is a feature release, create a new branch from the current stable
+   branch in the `django-docs-translations
    <https://github.com/django/django-docs-translations>`__ repository. For
-   example, when releasing Django 4.2:
+   example, when releasing Django ``YYYY``:
 
    .. code-block:: shell
 
-    $ git checkout -b stable/4.2.x origin/stable/4.1.x
-    $ git push origin stable/4.2.x:stable/4.2.x
+    $ git checkout -b stable/YYYY.x origin/stable/YYYY-1.x
+    $ git push origin stable/YYYY.x:stable/YYYY.x
 
 #. Write the announcement blog post for the release. You can enter it into the
    admin at any time and mark it as inactive. Here are a few examples: `example
@@ -323,7 +318,7 @@ A few days before a feature freeze
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In preparation for the alpha release, the directory
-``/home/www/www/media/releases/A.B`` must be created on the djangoproject
+``/home/www/www/media/releases/YYYY`` must be created on the djangoproject
 server.
 
 Before the feature freeze, a branch targeting ``main`` must be created to
@@ -342,7 +337,7 @@ cut. The following items should be addressed in this branch:
 
 #. Remove ``.. versionadded::`` and ``.. versionchanged::`` annotations in the
    documentation from two releases ago, as well as any remaining older
-   annotations. For example, in Django 5.1, notes for 4.2 will be removed
+   annotations. For example, in Django YYYY, notes for YYYY-2 will be removed
    (:commit:`example commit <9edb7833b89e811eefd94974fb987f4605b0c0d7>`).
 
 #. Remove features that have reached the end of their deprecation cycle,
@@ -379,29 +374,30 @@ Feature freeze tasks
    <435bdab93889dae01e71c79598edab10627cc1f9>`).
 
 #. Create a new stable branch from ``main``. Be sure to fetch and update
-   ``upstream`` to latest. For example, when feature freezing Django 5.2:
+   ``upstream`` to latest. For example, when feature freezing Django 2028:
 
    .. code-block:: shell
 
     $ git fetch upstream
-    $ git checkout -b stable/5.2.x upstream/main
-    $ git push upstream -u stable/5.2.x:stable/5.2.x
+    $ git checkout -b stable/2028.x upstream/main
+    $ git push upstream -u stable/2028.x:stable/2028.x
 
    At the same time, update the ``django_next_version`` variable in
    ``docs/conf.py`` on the stable release branch to point to the new
-   development version. For example, when creating ``stable/5.2.x``, set
-   ``django_next_version`` to ``'6.0'`` on the new stable branch
+   development version. For example, when creating ``stable/2028.x``, set
+   ``django_next_version`` to ``'2029'`` on the new stable branch
    (:commit:`example commit <1eb62e5b622ef7fd6e0123d8bbf6662d893d5d08>`).
 
 #. Create ``Release`` entries for the next version in the `admin`__ on
    ``djangoproject.com``. Add one for each milestone (alpha, beta, rc, and
    final), leaving *is active* unset to mark them as unreleased. Set target
-   dates per the agreed schedule, and set the LTS flag if applicable. The
-   ``X.Y`` roadmap page will be available at ``/download/X.Y/roadmap/``.
+   dates per the agreed schedule. The LTS flag is set automatically for
+   calendar versions. The ``YYYY`` roadmap page will be available at
+   ``/download/YYYY/roadmap/``.
 
-   For example, when creating ``stable/5.2.x``, add ``Release`` entries for
-   ``6.0a1``, ``6.0b1``, ``6.0rc1``, and ``6.0``. The ``6.0`` roadmap can be
-   then reviewed at https://www.djangoproject.com/download/6.0/roadmap/.
+   For example, when creating ``stable/2028.x``, add ``Release`` entries for
+   ``2029a1``, ``2029b1``, ``2029rc1``, and ``2029``. The ``2029`` roadmap can
+   be then reviewed at https://www.djangoproject.com/download/2029/roadmap/.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 
@@ -413,14 +409,14 @@ Feature freeze tasks
 
 #. Add the new branch to `Read the Docs
    <https://readthedocs.org/projects/django/>`__. Since the automatically
-   generated version names ("stable-A.B.x") differ from the version names used
-   in Read the Docs ("A.B.x"), update the Read the Docs config for the version
-   to point to the slug ``A.B.x`` and set it as active. `See more details
-   <https://github.com/readthedocs/readthedocs.org/issues/12483>`__.
+   generated version names (``stable-YYYY.x``) differ from the version names
+   used in Read the Docs (``YYYY.x``), update the Read the Docs config for the
+   version to point to the slug ``YYYY.x`` and set it as active. `See more
+   details <https://github.com/readthedocs/readthedocs.org/issues/12483>`__.
 
 #. `Create a PR on PyPI proposing the new Trove classifier
    <https://github.com/pypa/trove-classifiers/pulls?q=is%3Apr+django+trove+classifier>`__.
-   For example ``Framework :: Django :: 5.2``.
+   For example ``Framework :: Django :: 2028``.
 
 #. Update the current branch under active development and add pre-release
    branch in the `Django release process
@@ -469,7 +465,7 @@ issuing **multiple releases**, repeat these steps for each release.
 
    .. code-block:: shell
 
-        $ git checkout stable/4.1.x
+        $ git checkout stable/2028.x
         $ git pull
 
 #. If this is a security release, merge the appropriate patches from
@@ -479,19 +475,20 @@ issuing **multiple releases**, repeat these steps for each release.
 
    .. code-block:: shell
 
-        $ git checkout stable/4.1.x
-        $ git merge --ff-only security/4.1.x
+        $ git checkout stable/2028.x
+        $ git merge --ff-only security/2028.x
 
-   (This assumes ``security/4.1.x`` is a branch in the ``django-security`` repo
-   containing the necessary security patches for the next release in the 4.1
-   series.)
+   (This assumes ``security/2028.x`` is a branch in the ``django-security``
+   repo containing the necessary security patches for the next release in the
+   2028 series.)
 
    If git refuses to merge with ``--ff-only``, switch to the security-patch
    branch and rebase it on the branch you are about to merge it into (``git
-   checkout security/4.1.x; git rebase stable/4.1.x``) and then switch back and
-   do the merge. Make sure the commit message for each security fix explains
-   that the commit is a security fix and that an announcement will follow
-   (:commit:`example security commit <bf39978a53f117ca02e9a0c78b76664a41a54745>`).
+   checkout security/2028.x; git rebase stable/2028.x``) and then switch back
+   and do the merge. Make sure the commit message for each security fix
+   explains that the commit is a security fix and that an announcement will
+   follow (:commit:`example security commit
+   <bf39978a53f117ca02e9a0c78b76664a41a54745>`).
 
 #. Update the version number in ``django/__init__.py`` for the release.
    Please see `notes on setting the VERSION tuple`_ below for details
@@ -526,13 +523,13 @@ Building the artifacts
 
     .. code-block:: shell
 
-        $ VERSION=5.2.1 scripts/verify_release.sh
+        $ VERSION=2028.1 scripts/verify_release.sh
 
 #. Tag the release using ``git tag``. For example:
 
    .. code-block:: shell
 
-        $ git tag --sign --message="Tag 4.1.1" 4.1.1
+        $ git tag --sign --message="Tag 2028.1" 2028.1
 
    You can check your work running ``git tag --verify <tag>``.
 
@@ -618,14 +615,15 @@ Now you're ready to actually put the release out there. To do this:
 
    Version
      Must match the version number as defined in the tarball
-     (``django-<version>.tar.gz``). For example: "5.2", "4.1.1", or "4.2rc1".
+     (``django-<version>.tar.gz``). For example: "2028", "2028.1", or
+     "2028rc1".
 
    Is active
      Set to False until the release is fully published (last step).
 
    LTS
      Enable if the release is part of an :abbr:`LTS (Long Term Support)`
-     branch.
+     branch, such as 6.2.x. It's set automatically for calendar versions.
 
    Dates
      Set the release date to today. This release will not be published until
@@ -643,8 +641,8 @@ Now you're ready to actually put the release out there. To do this:
    https://code.djangoproject.com/wiki/ReleaseTestNewVersion.
 
 #. Run the `confirm-release`__ build on Jenkins to verify the checksum file(s)
-   (e.g. use ``4.2rc1`` for
-   https://media.djangoproject.com/pgp/Django-4.2rc1.checksum.txt).
+   (e.g. use ``2028rc1`` for
+   https://media.djangoproject.com/pgp/Django-2028rc1.checksum.txt).
 
    __ https://djangoci.com/job/confirm-release/
 
@@ -671,7 +669,7 @@ Now you're ready to actually put the release out there. To do this:
 
 #. Make the blog post announcing the release live.
 
-#. For a new version release (e.g. 4.1, 4.2), update the default stable version
+#. For a feature release (e.g. 2028), update the default stable version
    of the docs by flipping the ``is_default`` flag to ``True`` on the
    appropriate ``DocumentRelease`` object in the ``docs.djangoproject.com``
    database (this will automatically flip it to ``False`` for all
@@ -682,11 +680,11 @@ Now you're ready to actually put the release out there. To do this:
    file by copying the result generated from running the command
    ``manage_translations.py robots_txt`` in the current stable branch from the
    `django-docs-translations repository`__. For example, when releasing Django
-   4.2:
+   2028:
 
    .. code-block:: shell
 
-        $ git checkout stable/4.2.x
+        $ git checkout stable/2028.x
         $ git pull
         $ python manage_translations.py robots_txt
 
@@ -716,10 +714,8 @@ You're almost done! All that's left to do now is:
 
 #. If this is not a pre-release, update the ``VERSION`` tuple in
    ``django/__init__.py`` again, incrementing to whatever the next expected
-   release will be. For example, after releasing 4.1.1, update ``VERSION`` to
-   ``VERSION = (4, 1, 2, 'alpha', 0)`` (:commit:`example commit
-   <a4d19953d46247ee1992b3427fe652e941524272>`). After releasing 2028.1,
-   update ``VERSION`` to ``VERSION = (2028, 2, 'alpha', 0)``.
+   release will be. For example, after releasing 2028.1, update ``VERSION`` to
+   ``VERSION = VersionTuple(2028, 2, "alpha", 0)``.
 
 #. If this was an alpha release:
 
@@ -727,14 +723,14 @@ You're almost done! All that's left to do now is:
       <https://code.djangoproject.com/admin/ticket/versions>`__.
 
    #. Create a new security branch from the freshly cut stable branch. Be sure
-      to fetch and update ``upstream`` to latest. For example, after the 5.2
+      to fetch and update ``upstream`` to latest. For example, after the 2028
       alpha release:
 
       .. code-block:: shell
 
         $ git fetch upstream
-        $ git checkout -b security/5.2.x upstream/stable/5.2.x
-        $ git push origin -u security/5.2.x:security/5.2.x
+        $ git checkout -b security/2028.x upstream/stable/2028.x
+        $ git push origin -u security/2028.x:security/2028.x
 
 #. If this was a final release:
 
@@ -768,8 +764,8 @@ You're almost done! All that's left to do now is:
 
       .. code-block:: shell
 
-         $ git checkout stable/A.B.x
-         $ git checkout -b update-translations-catalog-A.B.x
+         $ git checkout stable/YYYY.x
+         $ git checkout -b update-translations-catalog-YYYY.x
 
    #. Ensure that the release's dedicated virtual environment is enabled and
       run the following:
@@ -803,37 +799,20 @@ Notes on setting the VERSION tuple
 ==================================
 
 Django's version reporting is controlled by the ``VERSION`` tuple in
-``django/__init__.py``. This is a five-element tuple, whose elements
-are:
+``django/__init__.py``. This is a four-element tuple, whose elements are:
 
-#. Major version.
-#. Minor version.
-#. Micro version.
+#. Year.
+#. Patch number, 0 for the feature release.
 #. Status -- can be one of "alpha", "beta", "rc" or "final".
 #. Series number, for alpha/beta/RC packages which run in sequence
    (allowing, for example, "beta 1", "beta 2", etc.).
 
 For a final release, the status is always "final" and the series
 number is always 0. A series number of 0 with an "alpha" status will
-be reported as "pre-alpha".
+be reported as "pre-alpha". A patch number of 0 is never shown in the
+version.
 
 Some examples:
-
-* ``(4, 1, 1, "final", 0)`` → "4.1.1"
-
-* ``(4, 2, 0, "alpha", 0)`` → "4.2 pre-alpha"
-
-* ``(4, 2, 0, "beta", 1)`` → "4.2 beta 1"
-
-Starting with Django 2028, the ``VERSION`` tuple has four elements, as
-calendar versions have no minor version:
-
-#. Year.
-#. Patch number, 0 for the feature release.
-#. Status -- can be one of "alpha", "beta", "rc" or "final".
-#. Series number, as above.
-
-A patch number of 0 is never shown in the version. Some examples:
 
 * ``(2028, 0, "alpha", 0)`` → "2028 pre-alpha"
 

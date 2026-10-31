@@ -4,7 +4,6 @@ import itertools
 import json
 import re
 import sys
-import warnings
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial, update_wrapper
@@ -63,13 +62,8 @@ from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import (
-    RemovedInDjango2028Warning,
-    warn_about_implementation,
-)
 from django.utils.html import format_html
 from django.utils.http import urlencode
-from django.utils.inspect import get_func_args
 from django.utils.safestring import mark_safe
 from django.utils.text import (
     capfirst,
@@ -80,7 +74,6 @@ from django.utils.text import (
 )
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
-from django.utils.warnings import django_file_prefixes
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
@@ -109,29 +102,6 @@ class Action:
     description: str
     plural_description: str
     locations: list
-
-    # RemovedInDjango2028Warning.
-    def _as_tuple(self):
-        return (self.func, self.name, self.description)
-
-    # RemovedInDjango2028Warning.
-    def __iter__(self):
-        warnings.warn(
-            "Unpacking an action tuple is deprecated. Use Action attributes instead.",
-            RemovedInDjango2028Warning,
-            skip_file_prefixes=django_file_prefixes(),
-        )
-        return iter(self._as_tuple())
-
-    # RemovedInDjango2028Warning.
-    def __getitem__(self, index):
-        warnings.warn(
-            "Using indexes on an action tuple is deprecated. "
-            "Use Action attributes instead.",
-            RemovedInDjango2028Warning,
-            skip_file_prefixes=django_file_prefixes(),
-        )
-        return self._as_tuple()[index]
 
 
 HORIZONTAL, VERTICAL = 1, 2
@@ -727,13 +697,10 @@ class ModelAdmin(BaseModelAdmin):
     def __init_subclass__(cls, **kwargs) -> None:
         super().__init_subclass__(**kwargs)
         if cls.__dict__.get("list_select_related") is True:
-            # RemovedInDjango2028Warning: when the deprecation ends, raise a
-            # ValueError.
-            warnings.warn(
-                "Setting ModelAdmin.list_select_related to True is deprecated. "
-                "Use False or a list or tuple of fields to fetch instead.",
-                RemovedInDjango2028Warning,
-                skip_file_prefixes=django_file_prefixes(),
+            raise ValueError(
+                "Setting ModelAdmin.list_select_related to True is not "
+                "supported. Use False or a list or tuple of fields to fetch "
+                "instead."
             )
 
     def __init__(self, model, admin_site):
@@ -916,28 +883,17 @@ class ModelAdmin(BaseModelAdmin):
         list_display = self.get_list_display(request)
         list_display_links = self.get_list_display_links(request, list_display)
         # Add the action checkboxes if any actions are available.
-        # RemovedInDjango2028Warning: When the deprecation ends, replace with:
-        # if self.get_actions(
-        #     request, action_location=ActionLocation.CHANGE_LIST
-        # ):
-        if self._get_actions_with_action_location(
-            request, action_location=ActionLocation.CHANGE_LIST
-        ):
+        if self.get_actions(request, action_location=ActionLocation.CHANGE_LIST):
             list_display = ["action_checkbox", *list_display]
         sortable_by = self.get_sortable_by(request)
         ChangeList = self.get_changelist(request)
         list_select_related = self.get_list_select_related(request)
         if list_select_related is True:
-            # RemovedInDjango2028Warning: when the deprecation ends, remove the
-            # below 'if' clause and raise a ValueError here.
-            if self.list_select_related is not True:
-                warn_about_implementation(
-                    "Returning True from ModelAdmin.get_list_select_related() is "
-                    "deprecated. Return False or a list or tuple of fields to "
-                    "fetch instead.",
-                    RemovedInDjango2028Warning,
-                    self.get_list_select_related,
-                )
+            raise ValueError(
+                "Returning True from ModelAdmin.get_list_select_related() is not "
+                "supported. Return False or a list or tuple of fields to fetch "
+                "instead."
+            )
         return ChangeList(
             request,
             self.model,
@@ -969,7 +925,7 @@ class ModelAdmin(BaseModelAdmin):
         try:
             object_id = field.to_python(object_id)
             return queryset.get(**{field.name: object_id})
-        except (model.DoesNotExist, ValidationError, ValueError):
+        except model.DoesNotExist, ValidationError, ValueError:
             return None
 
     def get_changelist_form(self, request, **kwargs):
@@ -1129,30 +1085,10 @@ class ModelAdmin(BaseModelAdmin):
                 filtered_actions.append(action)
         return filtered_actions
 
-    # RemovedInDjango2028Warning: When the deprecation ends, remove.
-    def _get_actions_with_action_location(
-        self, request, action_location=ActionLocation.CHANGE_LIST
-    ):
-        if "action_location" in get_func_args(self.get_actions):
-            return self.get_actions(request, action_location=action_location)
-        else:
-            warn_about_implementation(
-                "Overriding get_actions() without the 'action_location' parameter is "
-                "deprecated. Update the signature to get_actions(self, request, "
-                "action_location=ActionLocation.CHANGE_LIST).",
-                RemovedInDjango2028Warning,
-                self.get_actions,
-            )
-            if action_location == ActionLocation.CHANGE_FORM:
-                # Disable adding actions on change form when get_actions is
-                # overridden with old signature.
-                return {}
-            return self.get_actions(request)
-
     def get_actions(self, request, action_location=ActionLocation.CHANGE_LIST):
         """
         Return a dictionary mapping the names of all actions for this
-        ModelAdmin to a tuple of (callable, name, description) for each action.
+        ModelAdmin to an Action for each action.
         """
         # If self.actions is set to None that means actions are disabled on
         # this page.
@@ -1161,30 +1097,6 @@ class ModelAdmin(BaseModelAdmin):
         base_actions = self._get_base_actions(action_location=action_location)
         actions = self._filter_actions_by_permissions(request, base_actions)
         return {action.name: action for action in actions}
-
-    # RemovedInDjango2028Warning: When the deprecation ends, remove.
-    def _get_action_choices_with_action_location(
-        self,
-        request,
-        default_choices=None,
-        action_location=ActionLocation.CHANGE_LIST,
-    ):
-        if "action_location" in get_func_args(self.get_action_choices):
-            return self.get_action_choices(
-                request,
-                default_choices=default_choices,
-                action_location=action_location,
-            )
-        else:
-            warn_about_implementation(
-                "Overriding get_action_choices() without the 'action_location' "
-                "parameter is deprecated. Update the signature to "
-                "get_action_choices(self, request, default_choices=None, "
-                "action_location=ActionLocation.CHANGE_LIST).",
-                RemovedInDjango2028Warning,
-                self.get_action_choices,
-            )
-            return self.get_action_choices(request, default_choices=default_choices)
 
     def _get_choice_description(self, action, action_location):
         if action_location == ActionLocation.CHANGE_LIST:
@@ -1204,27 +1116,17 @@ class ModelAdmin(BaseModelAdmin):
         if default_choices is None:
             default_choices = [("", get_blank_choice_label())]
         choices = [*default_choices]
-        # RemovedInDjango2028Warning: When the deprecation ends, replace with:
-        # actions = self.get_actions(request, action_location=action_location)
-        actions = self._get_actions_with_action_location(
-            request, action_location=action_location
-        )
+        actions = self.get_actions(request, action_location=action_location)
         for action in actions.values():
-            if isinstance(action, tuple):
-                choice = (action[1], action[2] % model_format_dict(self.opts))
-            else:
-                choice = (
-                    action.name,
-                    self._get_choice_description(action, action_location),
-                )
-            choices.append(choice)
+            choices.append(
+                (action.name, self._get_choice_description(action, action_location))
+            )
         return choices
 
     def get_action(self, action, action_location=ActionLocation.CHANGE_LIST):
         """
         Return a given action from a parameter, which can either be a callable,
-        or the name of a method on the ModelAdmin. Return is a tuple of
-        (callable, name, description).
+        or the name of a method on the ModelAdmin. Return an Action.
         """
         # If the action is a callable, just use it.
         if callable(action):
@@ -1617,7 +1519,7 @@ class ModelAdmin(BaseModelAdmin):
                 try:
                     app_label, model_name = source_model_name.split(".", 1)
                     source_model = apps.get_model(app_label, model_name)
-                except (LookupError, ValueError):
+                except LookupError, ValueError:
                     msg = _('The app "%s" could not be found.') % source_model_name
                     self.message_user(request, msg, messages.ERROR)
                 else:
@@ -1861,14 +1763,8 @@ class ModelAdmin(BaseModelAdmin):
             else ""
         )
         action_form = self.action_form(data, auto_id=None, prefix=prefix)
-        # RemovedInDjango2028Warning: When the deprecation ends, replace with:
-        # action_form.fields["action"].choices = self.get_action_choices(
-        #     request, action_location=action_location
-        # )
-        action_form.fields["action"].choices = (
-            self._get_action_choices_with_action_location(
-                request, action_location=action_location
-            )
+        action_form.fields["action"].choices = self.get_action_choices(
+            request, action_location=action_location
         )
 
         # If the form's valid we can handle the action.
@@ -1877,17 +1773,8 @@ class ModelAdmin(BaseModelAdmin):
             select_across = action_form.cleaned_data["select_across"]
             if action_location == ActionLocation.CHANGE_FORM:
                 select_across = False
-            # RemovedInDjango2028Warning: When the deprecation ends, replace:
-            # actions = self.get_actions(
-            #     request, action_location=action_location
-            # )
-            actions = self._get_actions_with_action_location(
-                request, action_location=action_location
-            )
-            if isinstance(actions[action], tuple):
-                func = actions[action][0]
-            else:
-                func = actions[action].func
+            actions = self.get_actions(request, action_location=action_location)
+            func = actions[action].func
 
             # Get the list of selected PKs. If nothing's selected, we can't
             # perform an action on it, so bail. Except we want to perform
@@ -2093,24 +1980,12 @@ class ModelAdmin(BaseModelAdmin):
                 )
 
         action_form = None
-        # RemovedInDjango2028Warning: When the deprecation ends, replace with:
-        # actions = self.get_actions(
-        #     request, action_location=ActionLocation.CHANGE_FORM
-        # )
-        actions = self._get_actions_with_action_location(
-            request, action_location=ActionLocation.CHANGE_FORM
-        )
+        actions = self.get_actions(request, action_location=ActionLocation.CHANGE_FORM)
         if actions and not add:
             action_location = ActionLocation.CHANGE_FORM
             action_form = self.action_form(auto_id=None, prefix=action_location.value)
-            # RemovedInDjango2028Warning: When the deprecation ends, replace:
-            # action_form.fields["action"].choices = self.get_action_choices(
-            #     request, action_location=action_location
-            # )
-            action_form.fields["action"].choices = (
-                self._get_action_choices_with_action_location(
-                    request, action_location=action_location
-                )
+            action_form.fields["action"].choices = self.get_action_choices(
+                request, action_location=action_location
             )
         fieldsets = self.get_fieldsets(request, obj)
         ModelForm = self.get_form(
@@ -2354,13 +2229,7 @@ class ModelAdmin(BaseModelAdmin):
         action_failed = False
         selected = request.POST.getlist(helpers.ACTION_CHECKBOX_NAME)
 
-        # RemovedInDjango2028Warning: When the deprecation ends, replace with:
-        # actions = self.get_actions(
-        #     request, action_location=ActionLocation.CHANGE_LIST
-        # )
-        actions = self._get_actions_with_action_location(
-            request, action_location=ActionLocation.CHANGE_LIST
-        )
+        actions = self.get_actions(request, action_location=ActionLocation.CHANGE_LIST)
         # Actions with no confirmation
         if (
             actions
@@ -2442,14 +2311,8 @@ class ModelAdmin(BaseModelAdmin):
         # Build the action form and populate it with available actions.
         if actions:
             action_form = self.action_form(auto_id=None)
-            # RemovedInDjango2028Warning: When the deprecation ends, replace:
-            # action_form.fields["action"].choices = self.get_action_choices(
-            #     request, action_location=ActionLocation.CHANGE_LIST
-            # )
-            action_form.fields["action"].choices = (
-                self._get_action_choices_with_action_location(
-                    request, action_location=ActionLocation.CHANGE_LIST
-                )
+            action_form.fields["action"].choices = self.get_action_choices(
+                request, action_location=ActionLocation.CHANGE_LIST
             )
             media += action_form.media
         else:

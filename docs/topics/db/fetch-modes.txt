@@ -2,8 +2,6 @@
 Fetch modes
 ===========
 
-.. versionadded:: 6.1
-
 .. module:: django.db.models.fetch_modes
 
 .. currentmodule:: django.db.models

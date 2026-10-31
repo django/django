@@ -188,36 +188,10 @@ DATABASES = {}
 DATABASE_ROUTERS = []
 
 # Mailer configurations. No mailers are defined by default.
-# RemovedInDjango2028Warning: uncomment the next line.
-# MAILERS = {}
-
-# RemovedInDjango2028Warning.
-# The email backend to use. For possible shortcuts see django.core.mail.
-# The default is to use the SMTP backend.
-# Third-party backends can be specified by providing a Python path
-# to a module that defines an EmailBackend class.
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-# RemovedInDjango2028Warning.
-# Host for sending email.
-EMAIL_HOST = "localhost"
-
-# RemovedInDjango2028Warning.
-# Port for sending email.
-EMAIL_PORT = 25
+MAILERS = {}
 
 # Whether to send SMTP 'Date' header in the local time zone or in UTC.
 EMAIL_USE_LOCALTIME = False
-
-# RemovedInDjango2028Warning.
-# Optional SMTP authentication information for EMAIL_HOST.
-EMAIL_HOST_USER = ""
-EMAIL_HOST_PASSWORD = ""
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = False
-EMAIL_SSL_CERTFILE = None
-EMAIL_SSL_KEYFILE = None
-EMAIL_TIMEOUT = None
 
 # List of strings representing installed apps.
 INSTALLED_APPS = []
@@ -226,9 +200,6 @@ TEMPLATES = []
 
 # Default form rendering class.
 FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
-# RemovedInDjango2028Warning: This setting allows to revert back to the old
-# blank choice label in Django 6.1.
-USE_BLANK_CHOICE_DASH = False
 
 # Default email address to use for various automated correspondence from
 # the site managers.
@@ -561,7 +532,6 @@ AUTH_PASSWORD_VALIDATORS = []
 # SIGNING #
 ###########
 
-SIGNED_COOKIE_LEGACY_SALT_FALLBACK = False
 SIGNING_BACKEND = "django.core.signing.TimestampSigner"
 
 ########
@@ -680,11 +650,6 @@ SECURE_SSL_REDIRECT = False
 ##################
 SECURE_CSP = {}
 SECURE_CSP_REPORT_ONLY = {}
-
-# RemovedInDjango2028Warning: A transitional setting helpful in early adoption
-# of HTTPS as the default protocol in urlize and urlizetrunc when no protocol
-# is provided. Set to True to assume HTTPS during the Django 6.x release cycle.
-URLIZE_ASSUME_HTTPS = False
 
 #########
 # TASKS #

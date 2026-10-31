@@ -13,8 +13,7 @@ from django.db.models.functions import ExtractYear, Length, LTrim
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.test.utils import CaptureQueriesContext, register_lookup
 
 from .models import (
     FK1,
@@ -1979,8 +1978,8 @@ class Queries5Tests(TestCase):
 
     def test_extra_select_alias_sql_injection(self):
         msg = (
-            "Column aliases cannot contain whitespace characters, hashes, "
-            "control characters, quotation marks, semicolons, or SQL comments."
+            "Column aliases cannot contain whitespace characters, hashes, control "
+            "characters, quotation marks, semicolons, percent signs, or SQL comments."
         )
         for crafted_alias in [
             """injected_name" from "queries_note"; --""",
@@ -2014,13 +2013,6 @@ class SelectRelatedTests(TestCase):
         # infinitely if you forgot to specify "depth". Now we set an arbitrary
         # default upper bound.
         self.assertSequenceEqual(X.objects.all(), [])
-        # RemovedInDjango2028Warning: when the deprecation ends, remove this
-        # test case.
-        with ignore_warnings(
-            category=RemovedInDjango2028Warning,
-            message="Calling select_related() with no arguments is deprecated.",
-        ):
-            self.assertSequenceEqual(X.objects.select_related(), [])
 
 
 class SubclassFKTests(TestCase):

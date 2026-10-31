@@ -667,7 +667,7 @@ Miscellaneous
 
 * The :class:`~django.contrib.postgres.aggregates.ArrayAgg`,
   :class:`~django.contrib.postgres.aggregates.JSONBAgg`, and
-  :class:`~django.contrib.postgres.aggregates.StringAgg` aggregates will return
+  ``StringAgg`` aggregates will return
   ``None`` when there are no rows instead of ``[]``, ``[]``, and ``''``
   respectively in Django 5.0. If you need the previous behavior, explicitly set
   ``default`` to ``Value([])``, ``Value('[]')``, or ``Value('')``.

@@ -356,7 +356,7 @@ class _WKBReader(IOBase):
         elif isinstance(wkb, (bytes, str)):
             try:
                 wkb = binascii.unhexlify(wkb)
-            except (binascii.Error, ValueError):
+            except binascii.Error, ValueError:
                 raise GEOSException(_INVALID_WKB_MESSAGE) from None
         else:
             raise TypeError(

@@ -69,7 +69,7 @@ Minor features
 
 * The new ``ordering`` argument for
   :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
-  :class:`~django.contrib.postgres.aggregates.StringAgg` determines the
+  ``StringAgg`` determines the
   ordering of the aggregated elements.
 
 * The new :class:`~django.contrib.postgres.indexes.BTreeIndex`,

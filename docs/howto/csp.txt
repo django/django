@@ -103,11 +103,6 @@ To use nonces in your CSP policy, beside the basic config, you need to:
 
       {% csp_nonce_attr form.media %}
 
-   .. versionchanged:: 6.1
-
-       The :ttag:`csp_nonce_attr` template tag was added, including support for
-       rendering :class:`~django.forms.Media` objects.
-
 .. admonition:: Caching and Nonce Reuse
 
    The :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware`

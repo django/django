@@ -453,7 +453,7 @@ class AdminSite:
 
         try:
             content_type = ContentType.objects.get_for_id(int(content_type_id))
-        except (ContentType.DoesNotExist, ValueError):
+        except ContentType.DoesNotExist, ValueError:
             pass
         else:
             model_class = content_type.model_class()
