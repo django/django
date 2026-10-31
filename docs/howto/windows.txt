@@ -77,7 +77,7 @@ and set up the virtual environment. To activate the environment, run:
 
 .. code-block:: doscon
 
-    ...\> project-name\Scripts\activate.bat
+    ...\> project-name\Scripts\activate
 
 The virtual environment will be activated and you'll see "(project-name)" next
 to the command prompt to designate that. Each time you start a new command
