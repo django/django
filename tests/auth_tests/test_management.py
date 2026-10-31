@@ -1594,6 +1594,45 @@ class CreatePermissionsTests(TestCase):
             ).exists()
         )
 
+    def test_verbose_name_change(self):
+        auth_tests_config = apps.get_app_config("auth_tests")
+        org_content_type = ContentType.objects.get_by_natural_key(
+            "auth_tests", "organization"
+        )
+        original_verbose_name = Organization._meta.verbose_name
+        original_verbose_name_raw = Organization._meta.verbose_name_raw
+        try:
+            Organization._meta.verbose_name = "test org"
+            Organization._meta.verbose_name_raw = "test org"
+            create_permissions(auth_tests_config, verbosity=0)
+
+            self.assertTrue(
+                Permission.objects.filter(
+                    content_type=org_content_type,
+                    name="Can add test org",
+                ).exists()
+            )
+
+            Organization._meta.verbose_name = "new test org"
+            Organization._meta.verbose_name_raw = "new test org"
+            create_permissions(auth_tests_config, verbosity=0)
+
+            self.assertTrue(
+                Permission.objects.filter(
+                    content_type=org_content_type,
+                    name="Can add new test org",
+                ).exists()
+            )
+            self.assertFalse(
+                Permission.objects.filter(
+                    content_type=org_content_type,
+                    name="Can add test org",
+                ).exists()
+            )
+        finally:
+            Organization._meta.verbose_name = original_verbose_name
+            Organization._meta.verbose_name_raw = original_verbose_name_raw
+
 
 @override_settings(
     MIGRATION_MODULES=dict(
