@@ -307,7 +307,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
         obj.widget = copy.deepcopy(self.widget, memo)
-        obj.attrs = self.widget.attrs
+        obj.attrs = obj.widget.attrs
         memo[id(self)] = obj
         return obj
 
