@@ -26,6 +26,7 @@ from django.core.cache import (
     caches,
 )
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
+from django.core.cache.backends.db import DatabaseCache
 from django.core.cache.backends.redis import RedisCacheClient
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
@@ -51,6 +52,7 @@ from django.test import (
     TestCase,
     TransactionTestCase,
     override_settings,
+    skipUnlessDBFeature,
 )
 from django.test.signals import setting_changed
 from django.test.utils import CaptureQueriesContext
@@ -1287,6 +1289,117 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         time.sleep(0.02)
         with self.assertNumQueries(2):
             self.assertEqual(cache.get_many(["a", "b", "expired"]), {"a": 1, "b": 2})
+
+    @skipUnlessDBFeature("test_db_allows_multiple_connections")
+    def test_incr_is_atomic(self):
+        cache.set("counter", 0)
+        barrier = threading.Barrier(2, timeout=10)
+        errors = []
+        results = []
+        original_get = DatabaseCache.get
+
+        def synchronized_get(cache_instance, *args, **kwargs):
+            value = original_get(cache_instance, *args, **kwargs)
+            barrier.wait()
+            return value
+
+        def increment():
+            try:
+                results.append(caches["default"].incr("counter"))
+            except Exception as error:
+                errors.append(error)
+            finally:
+                connections.close_all()
+
+        threads = [threading.Thread(target=increment) for _ in range(2)]
+        with mock.patch.object(DatabaseCache, "get", synchronized_get):
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+
+        self.assertEqual(errors, [])
+        self.assertCountEqual(results, [1, 2])
+        self.assertEqual(cache.get("counter"), 2)
+
+    def test_incr_locks_row(self):
+        cache.set("counter", 1)
+        with CaptureQueriesContext(connection) as captured_queries:
+            cache.incr("counter")
+        queries = "\n".join(query["sql"] for query in captured_queries)
+
+        if connection.features.has_select_for_update:
+            self.assertIn(connection.ops.for_update_sql(), queries)
+        else:
+            quote_name = connection.ops.quote_name
+            table, value_column, expires_column, cache_key_column = map(
+                quote_name, ("test cache table", "value", "expires", "cache_key")
+            )
+            write_lock_sql = "UPDATE %s SET %s = %s WHERE %s =" % (
+                table,
+                value_column,
+                value_column,
+                cache_key_column,
+            )
+            select_sql = "SELECT %s, %s FROM %s WHERE %s =" % (
+                value_column,
+                expires_column,
+                table,
+                cache_key_column,
+            )
+            self.assertIn(write_lock_sql, queries)
+            self.assertIn(select_sql, queries)
+            self.assertLess(queries.index(write_lock_sql), queries.index(select_sql))
+
+    def test_incr_preserves_expiry(self):
+        cache.set("counter", 1, timeout=60)
+        cache_key = cache.make_key("counter")
+        table = connection.ops.quote_name("test cache table")
+        cache_key_column = connection.ops.quote_name("cache_key")
+        expires_column = connection.ops.quote_name("expires")
+
+        def get_expiry():
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT %s FROM %s WHERE %s = %%s"
+                    % (expires_column, table, cache_key_column),
+                    [cache_key],
+                )
+                return cursor.fetchone()[0]
+
+        expiry = get_expiry()
+        self.assertEqual(cache.incr("counter"), 2)
+        self.assertEqual(get_expiry(), expiry)
+
+    def test_incr_expired_key(self):
+        cache.set("counter", 1, timeout=0)
+        with self.assertRaisesMessage(ValueError, "Key 'counter' not found"):
+            cache.incr("counter")
+        cache_key = cache.make_key("counter")
+        table = connection.ops.quote_name("test cache table")
+        cache_key_column = connection.ops.quote_name("cache_key")
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT 1 FROM %s WHERE %s = %%s" % (table, cache_key_column),
+                [cache_key],
+            )
+            self.assertIsNone(cursor.fetchone())
+
+    def test_incr_uses_write_database(self):
+        cache.set("counter", 1)
+        with (
+            mock.patch(
+                "django.core.cache.backends.db.router.db_for_write",
+                return_value="default",
+            ) as db_for_write,
+            mock.patch(
+                "django.core.cache.backends.db.router.db_for_read",
+                return_value="default",
+            ) as db_for_read,
+        ):
+            self.assertEqual(cache.incr("counter"), 2)
+        db_for_write.assert_called_once_with(cache.cache_model_class)
+        db_for_read.assert_not_called()
 
     def test_delete_many_num_queries(self):
         cache.set_many({"a": 1, "b": 2, "c": 3})
