@@ -3813,6 +3813,12 @@ If you're using file-based session storage, this sets the directory in
 which Django will store session data. When the default value (``None``) is
 used, Django will use the standard temporary directory for the system.
 
+.. warning::
+
+    Restrict access to this directory to the web server's user. Session file
+    names include the session key, so other local users who can list the
+    directory could hijack sessions. See :ref:`file-based sessions
+    <topics-session-file>` for details.
 
 .. setting:: SESSION_SAVE_EVERY_REQUEST
 
