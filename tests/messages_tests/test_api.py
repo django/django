@@ -40,6 +40,24 @@ class ApiTests(SimpleTestCase):
         )
         self.assertEqual(self.storage.store, [])
 
+    def test_clear_messages(self):
+        self.request._messages = self.storage
+        messages.add_message(self.request, messages.DEBUG, "some message")
+        self.assertEqual(len(self.storage.store), 1)
+        res = messages.clear_messages(self.request)
+        self.assertTrue(res)
+        self.assertEqual(self.storage.store, [])
+
+    def test_clear_messages_request_is_none(self):
+        msg = "clear_messages() argument must be an HttpRequest object, not 'NoneType'."
+        self.request._messages = self.storage
+        with self.assertRaisesMessage(TypeError, msg):
+            messages.clear_messages(None)
+
+    def test_clear_messages_middleware_missing(self):
+        res = messages.clear_messages(self.request)
+        self.assertFalse(res)
+
 
 class CustomRequest:
     def __init__(self, request):
