@@ -342,20 +342,30 @@ body never uses it.
     CSP nonces are now generated before headers are added to streaming
     responses, even if the response body never uses the nonce.
 
+.. _csp-nonce-caching:
+
 Nonce and caching
 -----------------
 
-Because nonces must be unique per request, extra care is needed when using
-full-page caching (e.g., Django's cache middleware, CDN caching). Serving
-cached responses with previously generated nonces may result in reuse across
-users and requests. Although such responses may still appear to work (since the
-nonce in the CSP header and HTML content match), reuse defeats the purpose of
-the nonce and weakens security.
+Nonces must be unique per request. Serving cached responses containing a nonce
+reuses that nonce across requests and potentially across users. Although the
+response may still work because the nonce in the CSP header matches the HTML,
+reuse weakens the protection provided by the nonce.
 
-To ensure nonce-based policies remain effective:
+When :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` includes a
+generated nonce in an enforced or report-only CSP header, it adds
+``Cache-Control: private`` to prevent shared caches from storing the response.
+Private caches, such as browser caches, may still store it.
 
-* Avoid caching full responses that include ``{{ csp_nonce }}`` or
-  :ttag:`csp_nonce_attr`.
-* If caching is necessary, use a strategy that injects a fresh nonce on each
-  request, or consider refactoring your application to avoid inline scripts and
-  styles altogether.
+If you implement a caching strategy that injects a fresh nonce into both the
+response body and the CSP header for each request, you can subclass the
+middleware and set
+:attr:`~django.middleware.csp.ContentSecurityPolicyMiddleware.nonce_caching_allowed`
+to ``True``. This disables the automatic addition of
+``Cache-Control: private``.
+
+.. versionchanged:: 6.2
+
+    :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` now adds
+    ``Cache-Control: private`` when it includes a generated nonce in a CSP
+    header.
