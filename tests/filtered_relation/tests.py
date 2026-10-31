@@ -29,6 +29,7 @@ from .models import (
     Currency,
     Editor,
     ExchangeRate,
+    Library,
     RentalSession,
     Reservation,
     Seller,
@@ -748,6 +749,34 @@ class FilteredRelationTests(TestCase):
                     condition=Q(book__editor__name__icontains="b"),
                 ),
             )
+
+    def test_condition_inherited_field_relation_name(self):
+        msg = (
+            "FilteredRelation's condition doesn't support nested relations "
+            "deeper than the relation_name (got 'libraries__small' for "
+            "'libraries')."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Editor.objects.annotate(
+                small_libraries=FilteredRelation(
+                    "libraries",
+                    condition=Q(libraries__small=True),
+                ),
+            )
+
+    def test_condition_inherited_field_parent_link(self):
+        library = Library.objects.create(small=True)
+        library.editors.add(self.editor_a)
+        Library.objects.create(small=False).editors.add(self.editor_b)
+        self.assertSequenceEqual(
+            Editor.objects.annotate(
+                small_libraries=FilteredRelation(
+                    "libraries__location_ptr",
+                    condition=Q(libraries__location_ptr__small=True),
+                ),
+            ).filter(small_libraries__isnull=False),
+            [self.editor_a],
+        )
 
     def test_condition_deeper_relation_name_implicit_exact(self):
         msg = (
