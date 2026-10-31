@@ -99,3 +99,7 @@ class Bookmark(models.Model):
 
     def __str__(self):
         return self.url
+
+
+class BookBinaryInfo(models.Model):
+    datas = models.BinaryField(max_length=100)
