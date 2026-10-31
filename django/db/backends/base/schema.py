@@ -32,6 +32,8 @@ def _is_relevant_relation(relation, altered_field):
     if field.many_to_many:
         # M2M reverse field
         return False
+    if not relation.related_model._meta.managed:
+        return False
     if altered_field.primary_key and field.to_fields == [None]:
         # Foreign key constraint on the primary key, which is being altered.
         return True
