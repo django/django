@@ -12,7 +12,7 @@ from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.serializer import Serializer, serializer_factory
 from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
-from django.utils.timezone import now
+from django.utils.timezone import now, template_localtime
 
 
 class OperationWriter:
@@ -203,7 +203,7 @@ class MigrationWriter:
         if self.include_header:
             items["migration_header"] = MIGRATION_HEADER_TEMPLATE % {
                 "version": get_version(),
-                "timestamp": now().strftime("%Y-%m-%d %H:%M"),
+                "timestamp": template_localtime(now()).strftime("%Y-%m-%d %H:%M"),
             }
         else:
             items["migration_header"] = ""

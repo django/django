@@ -1,8 +1,8 @@
-import datetime
 import re
 from collections import namedtuple
 
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
+from django.utils.timezone import now, template_localtime
 
 FieldReference = namedtuple("FieldReference", "to through")
 
@@ -21,7 +21,7 @@ class RegexObject:
 
 
 def get_migration_name_timestamp():
-    return datetime.datetime.now().strftime("%Y%m%d_%H%M")
+    return template_localtime(now()).strftime("%Y%m%d_%H%M")
 
 
 def resolve_relation(model, app_label=None, model_name=None):
