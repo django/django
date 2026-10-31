@@ -30,10 +30,18 @@
 
     --tab-focus-outline: 2px solid #0066cc;
     --tab-focus-outline-offset: 2px;
+}
 
-    display: flex;
-    flex-wrap: wrap;
+/* Move tabs to right side of row. */
+tab-container.console-block::part(tablist-wrapper),
+div.console-block {
     justify-content: flex-end;
+}
+
+/* Align tabs to bottom of row and set gap between them. */
+tab-container.console-block::part(tablist-tab-wrapper),
+div.console-block {
+    display: flex;
     align-items: flex-end;
     column-gap: var(--tab-gap);
     @media (forced-colors: active) {
@@ -41,21 +49,11 @@
          * ring. Provide some additional visual separation. */
         column-gap: var(--tab-gap-forced-colors);
     }
+}
 
-    > input[type="radio"] {
-        /* Hide the radio button visually but not from keyboard navigation.
-         * From https://v1.tailwindcss.com/docs/screen-readers sr-only. */
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border-width: 0;
-    }
-
+/* Shared styling for CSS-only tabs and tab-container-element tabs. */
+.console-block {
+    [role="tab"],
     > label {
         &:last-of-type {
             margin-inline-end: var(--tab-row-end-margin);
@@ -86,6 +84,7 @@
         z-index: 1;
     }
 
+    [role="tab"][aria-selected="true"],
     > input[type="radio"]:checked + label {
         color: var(--tab-active-label-color, #555);
         background-color: var(--tab-active-background-color);
@@ -101,15 +100,60 @@
         );
     }
 
+    [role="tab"]:focus-visible,
     > input[type="radio"]:focus-visible + label {
         outline: var(--tab-focus-outline);
         outline-offset: var(--tab-focus-outline-offset);
     }
 
+    /* Constrain tab panel width so theme's code overflow policy (wrapping,
+     * horizontal scrolling, or whatever) applies. */
     > section {
         box-sizing: border-box;
         max-width: 100%;
         overflow-x: auto;
+    }
+
+    /* Remove vertical space between tabs row and Pygments content in panel. */
+    pre {
+        margin-block-start: 0;
+    }
+}
+
+tab-container.console-block {
+    display: block;
+}
+
+/* Remove browser button styling from tab-container tabs. (This rule must use
+ * lower specificity than the shared styling applied above.) */
+:where(tab-container.console-block) > button[role="tab"] {
+    all: unset;
+}
+
+/* Ensure hidden tab panels are really hidden. */
+tab-container.console-block > section[hidden] {
+    display: none;
+}
+
+/* CSS-only tabs using hidden radio buttons when JS not available. */
+div.console-block {
+    flex-wrap: wrap;
+
+    > input[type="radio"] {
+        /* Hide the radio button visually but not from keyboard navigation.
+         * From https://v1.tailwindcss.com/docs/screen-readers sr-only. */
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+
+    > section {
         /* Place the panel on its own row and hide it until active. */
         flex-basis: 100%;
         display: none;
@@ -118,9 +162,5 @@
     > .c-tab-unix:checked ~ section.c-content-unix,
     > .c-tab-win:checked ~ section.c-content-win {
         display: block;
-    }
-
-    pre {
-        margin-block-start: 0;
     }
 }
