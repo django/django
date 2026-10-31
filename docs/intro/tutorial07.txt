@@ -182,8 +182,9 @@ related objects are displayed in a more compact, table-based format:
 .. image:: _images/admin11t.png
    :alt: Add question page now has more compact choices
 
-Note that there is an extra "Delete?" column that allows removing rows added
-using the "Add another Choice" button and rows that have already been saved.
+After adding and saving some rows, note that there will be an extra "Delete?"
+column that allows removing rows added using the "Add another Choice" button
+and rows that have already been saved.
 
 Customize the admin change list
 ===============================
