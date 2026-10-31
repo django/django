@@ -21,7 +21,6 @@ from django.contrib.admin.utils import (
     get_fields_from_path,
     lookup_spawns_duplicates,
     prepare_lookup_value,
-    quote,
 )
 from django.core.exceptions import (
     FieldDoesNotExist,
@@ -32,7 +31,6 @@ from django.core.paginator import InvalidPage
 from django.db.models import F, Field, ManyToOneRel, OrderBy
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Combinable
-from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext
@@ -84,6 +82,7 @@ class ChangeList:
         sortable_by,
         search_help_text,
     ):
+        self.request = request
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -554,8 +553,4 @@ class ChangeList:
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
-        return reverse(
-            "admin:%s_%s_change" % (self.opts.app_label, self.opts.model_name),
-            args=(quote(pk),),
-            current_app=self.model_admin.admin_site.name,
-        )
+        return self.model_admin.get_change_url(pk, request=self.request)
