@@ -117,7 +117,11 @@ class Fieldset:
 
     @property
     def media(self):
-        return forms.Media()
+        media = forms.Media()
+        for fieldline in self:
+            for field in fieldline:
+                media += field.media
+        return media
 
     @cached_property
     def is_collapsible(self):
@@ -198,6 +202,10 @@ class AdminField:
 
     def errors(self):
         return mark_safe(self.field.errors.as_ul())
+
+    @property
+    def media(self):
+        return forms.Media()
 
 
 class AdminReadonlyField:
@@ -299,6 +307,22 @@ class AdminReadonlyField:
                     result_repr = display_for_field(value, f, self.empty_value_display)
                 result_repr = linebreaksbr(result_repr)
         return conditional_escape(result_repr)
+
+    @property
+    def media(self):
+        field, obj, model_admin = (
+            self.field["field"],
+            self.form.instance,
+            self.model_admin,
+        )
+        try:
+            f, _attr, _value = lookup_field(field, obj, model_admin)
+        except (AttributeError, ValueError, ObjectDoesNotExist):
+            return forms.Media()
+        if not f or not hasattr(f, "formfield"):
+            return forms.Media()
+        Media = getattr(f.formfield().widget, "Media", None)
+        return forms.Media(Media)
 
 
 class InlineAdminFormSet:
