@@ -1,6 +1,7 @@
 import dataclasses
 import pickle
-from datetime import datetime
+import queue
+from datetime import datetime, timedelta
 
 from django.tasks import (
     DEFAULT_TASK_QUEUE_NAME,
@@ -343,3 +344,84 @@ class TaskTestCase(SimpleTestCase):
         msg = "run_after cannot be defined statically with the @task decorator."
         with self.assertRaisesMessage(TypeError, msg):
             task(run_after=timezone.now())(test_tasks.calculate_meaning_of_life.func)
+
+    def test_task_result_comparability_in_priority_queue(self):
+        now = timezone.now()
+        later = now + timedelta(hours=1)
+
+        task_high_immediate = test_tasks.noop_task.using(priority=1, run_after=None)
+        task_high_early = test_tasks.noop_task.using(priority=1, run_after=now)
+        task_high_late = test_tasks.noop_task.using(priority=1, run_after=later)
+        task_low = test_tasks.noop_task.using(priority=5, run_after=now)
+
+        tr_high_immediate = task_high_immediate.enqueue()
+        tr_high_early = task_high_early.enqueue()
+        tr_high_late = task_high_late.enqueue()
+        tr_low = task_low.enqueue()
+
+        pq = queue.PriorityQueue()
+        pq.put(tr_low)
+        pq.put(tr_high_late)
+        pq.put(tr_high_immediate)
+        pq.put(tr_high_early)
+
+        self.assertEqual(pq.get(), tr_high_immediate)
+        self.assertEqual(pq.get(), tr_high_early)
+        self.assertEqual(pq.get(), tr_high_late)
+        self.assertEqual(pq.get(), tr_low)
+
+    def test_task_result_equality(self):
+        result_1 = test_tasks.noop_task.enqueue()
+
+        result_same = dataclasses.replace(result_1, backend="different_backend")
+        self.assertEqual(result_1, result_same)
+
+        result_diff_status = dataclasses.replace(
+            result_1, status=TaskResultStatus.SUCCESSFUL
+        )
+        self.assertNotEqual(result_1, result_diff_status)
+
+        later = timezone.now() + timedelta(minutes=5)
+        result_diff_time = dataclasses.replace(result_1, last_attempted_at=later)
+        self.assertNotEqual(result_1, result_diff_time)
+
+        result_diff_id = dataclasses.replace(result_1, id="completely-different-id")
+        self.assertNotEqual(result_1, result_diff_id)
+
+    def test_task_result_equality_not_implemented(self):
+        result = test_tasks.noop_task.enqueue()
+        self.assertNotEqual(result, "not a task result")
+        self.assertNotEqual(result, 6.2)
+        self.assertNotEqual(result, None)
+
+    def test_task_result_hash_equal_objects(self):
+        result_1 = test_tasks.noop_task.enqueue()
+        result_2 = dataclasses.replace(result_1, backend="different_backend")
+
+        self.assertEqual(result_1, result_2)
+        self.assertEqual(hash(result_1), hash(result_2))
+
+    def test_task_result_hash_usable_in_set(self):
+        result = test_tasks.noop_task.enqueue()
+        result_dup = dataclasses.replace(result, args=[1, 2, 3])
+
+        self.assertEqual(len({result, result_dup}), 1)
+
+    def test_task_result_hash_usable_as_dict_key(self):
+        result = test_tasks.noop_task.enqueue()
+        mapping = {result: "value"}
+
+        result_lookup = dataclasses.replace(result, kwargs={"a": 1})
+        self.assertEqual(mapping[result_lookup], "value")
+
+    def test_task_result_lt_not_implemented(self):
+        result = test_tasks.noop_task.enqueue()
+        with self.assertRaises(TypeError):
+            result < "not a task result"
+
+    def test_task_result_lt_stability(self):
+        result_1 = test_tasks.noop_task.enqueue()
+        result_2 = dataclasses.replace(result_1)
+
+        self.assertFalse(result_1 < result_2)
+        self.assertFalse(result_2 < result_1)
