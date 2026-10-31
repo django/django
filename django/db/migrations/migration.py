@@ -3,7 +3,7 @@ import re
 from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.transaction import atomic
 
-from .exceptions import IrreversibleError
+from .exceptions import IrreversibleError, MigrationOperationError
 
 
 class Migration:
@@ -88,7 +88,13 @@ class Migration:
             new_state = project_state.clone()
 
         for operation in self.operations:
-            operation.state_forwards(self.app_label, new_state)
+            try:
+                operation.state_forwards(self.app_label, new_state)
+            except Exception as e:
+                raise MigrationOperationError(
+                    "Error applying migration '%s' at operation '%s'"
+                    % (str(self), operation.describe())
+                ) from e
         return new_state
 
     def apply(self, project_state, schema_editor, collect_sql=False):
@@ -115,23 +121,29 @@ class Migration:
                 collected_sql_before = len(schema_editor.collected_sql)
             # Save the state before the operation has run
             old_state = project_state.clone()
-            operation.state_forwards(self.app_label, project_state)
-            # Run the operation
-            atomic_operation = operation.atomic or (
-                self.atomic and operation.atomic is not False
-            )
-            if not schema_editor.atomic_migration and atomic_operation:
-                # Force a transaction on a non-transactional-DDL backend or an
-                # atomic operation inside a non-atomic migration.
-                with atomic(schema_editor.connection.alias):
+            try:
+                operation.state_forwards(self.app_label, project_state)
+                # Run the operation
+                atomic_operation = operation.atomic or (
+                    self.atomic and operation.atomic is not False
+                )
+                if not schema_editor.atomic_migration and atomic_operation:
+                    # Force a transaction on a non-transactional-DDL backend
+                    # or an atomic operation inside a non-atomic migration.
+                    with atomic(schema_editor.connection.alias):
+                        operation.database_forwards(
+                            self.app_label, schema_editor, old_state, project_state
+                        )
+                else:
+                    # Normal behavior
                     operation.database_forwards(
                         self.app_label, schema_editor, old_state, project_state
                     )
-            else:
-                # Normal behavior
-                operation.database_forwards(
-                    self.app_label, schema_editor, old_state, project_state
-                )
+            except Exception as e:
+                raise MigrationOperationError(
+                    "Error applying migration '%s' at operation '%s'"
+                    % (str(self), operation.describe())
+                ) from e
             if collect_sql and collected_sql_before == len(schema_editor.collected_sql):
                 schema_editor.collected_sql.append("-- (no-op)")
         return project_state
@@ -163,7 +175,13 @@ class Migration:
             # over all operations
             new_state = new_state.clone()
             old_state = new_state.clone()
-            operation.state_forwards(self.app_label, new_state)
+            try:
+                operation.state_forwards(self.app_label, new_state)
+            except Exception as e:
+                raise MigrationOperationError(
+                    "Error reversing migration '%s' at operation '%s'"
+                    % (str(self), operation.describe())
+                ) from e
             to_run.insert(0, (operation, old_state, new_state))
 
         # Phase 2
@@ -178,21 +196,27 @@ class Migration:
                     )
                     continue
                 collected_sql_before = len(schema_editor.collected_sql)
-            atomic_operation = operation.atomic or (
-                self.atomic and operation.atomic is not False
-            )
-            if not schema_editor.atomic_migration and atomic_operation:
-                # Force a transaction on a non-transactional-DDL backend or an
-                # atomic operation inside a non-atomic migration.
-                with atomic(schema_editor.connection.alias):
+            try:
+                atomic_operation = operation.atomic or (
+                    self.atomic and operation.atomic is not False
+                )
+                if not schema_editor.atomic_migration and atomic_operation:
+                    # Force a transaction on a non-transactional-DDL backend
+                    # or an atomic operation inside a non-atomic migration.
+                    with atomic(schema_editor.connection.alias):
+                        operation.database_backwards(
+                            self.app_label, schema_editor, from_state, to_state
+                        )
+                else:
+                    # Normal behavior
                     operation.database_backwards(
                         self.app_label, schema_editor, from_state, to_state
                     )
-            else:
-                # Normal behavior
-                operation.database_backwards(
-                    self.app_label, schema_editor, from_state, to_state
-                )
+            except Exception as e:
+                raise MigrationOperationError(
+                    "Error reversing migration '%s' at operation '%s'"
+                    % (str(self), operation.describe())
+                ) from e
             if collect_sql and collected_sql_before == len(schema_editor.collected_sql):
                 schema_editor.collected_sql.append("-- (no-op)")
         return project_state
