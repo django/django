@@ -1,6 +1,7 @@
 from django.contrib.messages import Message, constants, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
+from django.contrib.messages.restrictions import AmountRestriction
 from django.contrib.messages.storage import default_storage
 from django.http import HttpRequest, HttpResponse
 from django.test import modify_settings, override_settings
@@ -158,7 +159,10 @@ class BaseTests:
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
             self.assertIn("messages", response.context)
-            messages = [Message(self.levels[level], msg) for msg in data["messages"]]
+            messages = [
+                Message(self.levels[level], msg, restrictions=[AmountRestriction(0)])
+                for msg in data["messages"]
+            ]
             self.assertEqual(list(response.context["messages"]), messages)
             for msg in data["messages"]:
                 self.assertContains(response, msg)
@@ -201,7 +205,8 @@ class BaseTests:
         messages = []
         for level in ("debug", "info", "success", "warning", "error"):
             messages.extend(
-                Message(self.levels[level], msg) for msg in data["messages"]
+                Message(self.levels[level], msg, restrictions=[AmountRestriction(0)])
+                for msg in data["messages"]
             )
             add_url = reverse("add_message", args=(level,))
             self.client.post(add_url, data)
