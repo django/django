@@ -1,6 +1,8 @@
+import io
 import os
 import stat
 import sys
+import tarfile
 import tempfile
 import unittest
 import zipfile
@@ -79,6 +81,29 @@ class TestArchive(unittest.TestCase):
 
 
 class TestArchiveInvalid(SimpleTestCase):
+    def test_extract_function_special_files(self):
+        tests = [
+            ("fifo", tarfile.FIFOTYPE),
+            ("chr", tarfile.CHRTYPE),
+            ("blk", tarfile.BLKTYPE),
+        ]
+        msg = "Archive contains special file: '%s'"
+        for name, member_type in tests:
+            with self.subTest(name), tempfile.TemporaryDirectory() as tmpdir:
+                tar_path = os.path.join(tmpdir, "special_file.tar")
+                with tarfile.open(tar_path, "w") as tar:
+                    member = tarfile.TarInfo(name)
+                    member.type = member_type
+                    tar.addfile(member)
+                    member = tarfile.TarInfo("regular")
+                    member.size = 1
+                    tar.addfile(member, io.BytesIO(b"x"))
+                extract_dir = os.path.join(tmpdir, "extracted")
+                os.mkdir(extract_dir)
+                with self.assertRaisesMessage(SuspiciousOperation, msg % name):
+                    archive.extract(tar_path, extract_dir)
+                self.assertEqual(os.listdir(extract_dir), [])
+
     def test_extract_function_traversal(self):
         archives_dir = os.path.join(os.path.dirname(__file__), "traversal_archives")
         tests = [
