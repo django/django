@@ -75,12 +75,25 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
+        return self._get_table_list(cursor)
+
+    def get_table_list_for_names(self, cursor, table_names):
+        if len(table_names) > self.connection.features.max_query_params:
+            return super().get_table_list_for_names(cursor, table_names)
+        return self._get_table_list(cursor, table_names)
+
+    def _get_table_list(self, cursor, table_names=None):
         # Skip the sqlite_sequence system table used for autoincrement key
         # generation.
-        cursor.execute("""
+        sql = """
             SELECT name, type FROM sqlite_master
-            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
-            ORDER BY name""")
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'"""
+        params = None
+        if table_names is not None:
+            placeholders = ", ".join(["%s"] * len(table_names))
+            sql += f" AND name IN ({placeholders})"
+            params = sorted(table_names)
+        cursor.execute(f"{sql} ORDER BY name", params)
         return [TableInfo(row[0], row[1][0]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
