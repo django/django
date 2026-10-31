@@ -69,7 +69,7 @@ Configuring email
 
 New Django projects are not configured to send email by default. Instead, email
 is printed to the console as a development aid (for projects created with
-:djadmin:`startproject`) or results in a ``MailerDoesNotExist`` error (when the
+:cli:`startproject`) or results in a ``MailerDoesNotExist`` error (when the
 :setting:`MAILERS` setting isn't defined).
 
 Use the :setting:`MAILERS` setting to tell Django how to send email. For
@@ -1182,7 +1182,7 @@ convenience that can be used during development.
 
 .. versionchanged:: 6.1
 
-    The settings file created by :djadmin:`startproject` now defines
+    The settings file created by :cli:`startproject` now defines
     :setting:`MAILERS` with the console backend as the default configuration.
 
 .. _topic-email-file-backend:

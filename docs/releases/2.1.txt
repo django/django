@@ -33,7 +33,7 @@ Model "view" permission
 
 A "view" permission is added to the model :attr:`Meta.default_permissions
 <django.db.models.Options.default_permissions>`. The new permissions will be
-created automatically when running :djadmin:`migrate`.
+created automatically when running :cli:`migrate`.
 
 This allows giving users read-only access to models in the admin.
 :meth:`.ModelAdmin.has_view_permission` is new. The implementation is backwards
@@ -91,7 +91,7 @@ Minor features
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* :djadmin:`createsuperuser` now gives a prompt to allow bypassing the
+* :cli:`createsuperuser` now gives a prompt to allow bypassing the
   :setting:`AUTH_PASSWORD_VALIDATORS` checks.
 
 :mod:`django.contrib.gis`

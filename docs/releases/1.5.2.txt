@@ -47,7 +47,7 @@ Bugfixes
 * Some Python 3 compatibility fixes including #20212 and #20025.
 * Fixed some rare cases where :meth:`~django.db.models.query.QuerySet.get`
   exceptions recursed infinitely (#20278).
-* :djadmin:`makemessages` no longer crashes with ``UnicodeDecodeError``
+* :cli:`makemessages` no longer crashes with ``UnicodeDecodeError``
   (#20354).
 * Fixed ``geojson`` detection with SpatiaLite.
 * :meth:`~django.test.SimpleTestCase.assertContains` once again works with

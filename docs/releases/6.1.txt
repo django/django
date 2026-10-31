@@ -208,7 +208,7 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* :djadmin:`inspectdb` now introspects
+* :cli:`inspectdb` now introspects
   :class:`~django.contrib.postgres.fields.HStoreField` when ``psycopg`` 3.2+ is
   installed and ``django.contrib.postgres`` is in :setting:`INSTALLED_APPS`.
 
@@ -284,11 +284,11 @@ Management Commands
   ``suggest_on_error`` argument to ``True`` by default on Python 3.14, enabling
   suggestions for incorrectly typed subcommand names and argument choices.
 
-* The :djadmin:`loaddata` command now calls
+* The :cli:`loaddata` command now calls
   :data:`~django.db.models.signals.m2m_changed` signals with ``raw=True`` when
   loading fixtures.
 
-* The :djadmin:`sendtestemail` command now supports a :option:`--using
+* The :cli:`sendtestemail` command now supports a :option:`--using
   <sendtestemail --using>` option to specify the :setting:`MAILERS` alias.
 
 Models
@@ -529,7 +529,7 @@ Models
 System checks
 -------------
 
-* The :djadmin:`check` management command now supplies all ``databases`` if not
+* The :cli:`check` management command now supplies all ``databases`` if not
   specified. Callers should be prepared for databases to be accessed.
 
 Dropped support for PostgreSQL 14

@@ -163,7 +163,7 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * When stale content types are detected in the
-  :djadmin:`remove_stale_contenttypes` command, there's now a list of related
+  :cli:`remove_stale_contenttypes` command, there's now a list of related
   objects such as ``auth.Permission``\s that will also be deleted. Previously,
   only the content types were listed (and this prompt was after ``migrate``
   rather than in a separate command).
@@ -521,7 +521,7 @@ backends.
   dictionaries with a list of ``'ASC'`` and/or ``'DESC'`` values corresponding
   to the ordering of each column in the index.
 
-* :djadmin:`inspectdb` no longer calls ``DatabaseIntrospection.get_indexes()``
+* :cli:`inspectdb` no longer calls ``DatabaseIntrospection.get_indexes()``
   which is deprecated. Custom database backends should ensure all types of
   indexes are returned by ``DatabaseIntrospection.get_constraints()``.
 
@@ -722,7 +722,7 @@ Miscellaneous
   thread safe <template_tag_thread_safety>`.
 
 * The prompt for stale content type deletion no longer occurs after running the
-  ``migrate`` command. Use the new :djadmin:`remove_stale_contenttypes` command
+  ``migrate`` command. Use the new :cli:`remove_stale_contenttypes` command
   instead.
 
 * The admin's widget for ``IntegerField`` uses ``type="number"`` rather than

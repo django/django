@@ -206,7 +206,7 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* The :djadmin:`clearsessions` management command now removes file-based
+* The :cli:`clearsessions` management command now removes file-based
   sessions.
 
 :mod:`django.contrib.sites`
@@ -333,7 +333,7 @@ Management Commands
 * The new :option:`makemigrations --check` option makes the command exit
   with a non-zero status when model changes without migrations are detected.
 
-* :djadmin:`makemigrations` now displays the path to the migration files that
+* :cli:`makemigrations` now displays the path to the migration files that
   it generates.
 
 * The :option:`shell --interface` option now accepts ``python`` to force use of
@@ -342,22 +342,22 @@ Management Commands
 * The new :option:`shell --command` option lets you run a command as Django and
   exit, instead of opening the interactive shell.
 
-* Added a warning to :djadmin:`dumpdata` if a proxy model is specified (which
+* Added a warning to :cli:`dumpdata` if a proxy model is specified (which
   results in no output) without its concrete parent.
 
 * The new :attr:`BaseCommand.requires_migrations_checks
   <django.core.management.BaseCommand.requires_migrations_checks>` attribute
   may be set to ``True`` if you want your command to print a warning, like
-  :djadmin:`runserver` does, if the set of migrations on disk don't match the
+  :cli:`runserver` does, if the set of migrations on disk don't match the
   migrations in the database.
 
 * To assist with testing, :func:`~django.core.management.call_command` now
   accepts a command object as the first argument.
 
-* The :djadmin:`shell` command supports tab completion on systems using
+* The :cli:`shell` command supports tab completion on systems using
   ``libedit``, e.g. macOS.
 
-* The :djadmin:`inspectdb` command lets you choose what tables should be
+* The :cli:`inspectdb` command lets you choose what tables should be
   inspected by specifying their names as arguments.
 
 Migrations
@@ -803,7 +803,7 @@ Miscellaneous
 * Support for ``skip_validation`` in ``BaseCommand.execute(**options)`` is
   removed. Use ``skip_checks`` (added in Django 1.7) instead.
 
-* :djadmin:`loaddata` now raises a ``CommandError`` instead of showing a
+* :cli:`loaddata` now raises a ``CommandError`` instead of showing a
   warning when the specified fixture file is not found.
 
 * Instead of directly accessing the ``LogEntry.change_message`` attribute, it's

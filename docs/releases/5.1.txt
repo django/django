@@ -235,7 +235,7 @@ Forms
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* The :djadmin:`makemigrations` command now displays meaningful symbols for
+* The :cli:`makemigrations` command now displays meaningful symbols for
   each operation to highlight :class:`operation categories
   <django.db.migrations.operations.base.OperationCategory>`.
 
@@ -245,7 +245,7 @@ Migrations
 * The new ``Operation.category`` attribute allows specifying an
   :class:`operation category
   <django.db.migrations.operations.base.OperationCategory>` used by the
-  :djadmin:`makemigrations` to display a meaningful symbol for the operation.
+  :cli:`makemigrations` to display a meaningful symbol for the operation.
 
 Models
 ~~~~~~

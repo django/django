@@ -165,7 +165,7 @@ Minor features
   operation installs the ``btree_gist`` extension to add support for operator
   classes that aren't built-in.
 
-* :djadmin:`inspectdb` can now introspect ``JSONField`` and various
+* :cli:`inspectdb` can now introspect ``JSONField`` and various
   ``RangeField``\s (``django.contrib.postgres`` must be in ``INSTALLED_APPS``).
 
 :mod:`django.contrib.sitemaps`
@@ -208,21 +208,21 @@ Generic Views
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* :djadmin:`inspectdb` now translates MySQL's unsigned integer columns to
+* :cli:`inspectdb` now translates MySQL's unsigned integer columns to
   ``PositiveIntegerField`` or ``PositiveSmallIntegerField``.
 
 * The new :option:`makemessages --add-location` option controls the comment
   format in ``.po`` files.
 
-* :djadmin:`loaddata` can now :ref:`read from stdin <loading-fixtures-stdin>`.
+* :cli:`loaddata` can now :ref:`read from stdin <loading-fixtures-stdin>`.
 
 * The new :option:`diffsettings --output` option allows formatting the output
   in a unified diff format.
 
-* On Oracle, :djadmin:`inspectdb` can now introspect ``AutoField`` if the
+* On Oracle, :cli:`inspectdb` can now introspect ``AutoField`` if the
   column is created as an identity column.
 
-* On MySQL, :djadmin:`dbshell` now supports client-side TLS certificates.
+* On MySQL, :cli:`dbshell` now supports client-side TLS certificates.
 
 Migrations
 ~~~~~~~~~~
@@ -305,7 +305,7 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* The :djadmin:`runserver` web server supports HTTP 1.1.
+* The :cli:`runserver` web server supports HTTP 1.1.
 
 Templates
 ~~~~~~~~~

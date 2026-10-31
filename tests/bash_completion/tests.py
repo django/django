@@ -18,6 +18,8 @@ class BashCompletionTests(unittest.TestCase):
     from bash.
     """
 
+    command = "django"
+
     def setUp(self):
         self.old_DJANGO_AUTO_COMPLETE = os.environ.get("DJANGO_AUTO_COMPLETE")
         os.environ["DJANGO_AUTO_COMPLETE"] = "1"
@@ -38,9 +40,9 @@ class BashCompletionTests(unittest.TestCase):
         case a word is completed and the cursor is placed after a whitespace,
         $COMP_CWORD must be incremented by 1:
 
-          * 'django-admin start' -> COMP_CWORD=1
-          * 'django-admin startproject' -> COMP_CWORD=1
-          * 'django-admin startproject ' -> COMP_CWORD=2
+          * 'django start' -> COMP_CWORD=1
+          * 'django startproject' -> COMP_CWORD=1
+          * 'django startproject ' -> COMP_CWORD=2
         """
         os.environ["COMP_WORDS"] = input_str
         idx = len(input_str.split(" ")) - 1  # Index of the last word
@@ -57,9 +59,9 @@ class BashCompletionTests(unittest.TestCase):
                 pass
         return stdout.getvalue().strip().split("\n")
 
-    def test_django_admin_py(self):
-        "django_admin.py will autocomplete option flags"
-        self._user_input("django-admin sqlmigrate --verb")
+    def test_option_flags(self):
+        "The Django CLI will autocomplete option flags"
+        self._user_input(f"{self.command} sqlmigrate --verb")
         output = self._run_autocomplete()
         self.assertEqual(output, ["--verbosity="])
 
@@ -71,32 +73,32 @@ class BashCompletionTests(unittest.TestCase):
 
     def test_custom_command(self):
         "A custom command can autocomplete option flags"
-        self._user_input("django-admin test_command --l")
+        self._user_input(f"{self.command} test_command --l")
         output = self._run_autocomplete()
         self.assertEqual(output, ["--list"])
 
     def test_subcommands(self):
         "Subcommands can be autocompleted"
-        self._user_input("django-admin sql")
+        self._user_input(f"{self.command} sql")
         output = self._run_autocomplete()
         self.assertEqual(output, ["sqlflush sqlmigrate sqlsequencereset"])
 
     def test_completed_subcommand(self):
         "Show option flags in case a subcommand is completed"
-        self._user_input("django-admin startproject ")  # Trailing whitespace
+        self._user_input(f"{self.command} startproject ")  # Trailing whitespace
         output = self._run_autocomplete()
         for item in output:
             self.assertTrue(item.startswith("--"))
 
     def test_help(self):
         "No errors, just an empty list if there are no autocomplete options"
-        self._user_input("django-admin help --")
+        self._user_input(f"{self.command} help --")
         output = self._run_autocomplete()
         self.assertEqual(output, [""])
 
     def test_app_completion(self):
         "Application names will be autocompleted for an AppCommand"
-        self._user_input("django-admin sqlmigrate a")
+        self._user_input(f"{self.command} sqlmigrate a")
         output = self._run_autocomplete()
         a_labels = sorted(
             app_config.label
@@ -104,3 +106,7 @@ class BashCompletionTests(unittest.TestCase):
             if app_config.label.startswith("a")
         )
         self.assertEqual(output, a_labels)
+
+
+class DjangoAdminBashCompletionTests(BashCompletionTests):
+    command = "django-admin"

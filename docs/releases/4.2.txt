@@ -258,7 +258,7 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* :djadmin:`makemessages` command now supports locales with private sub-tags
+* :cli:`makemessages` command now supports locales with private sub-tags
   such as ``nl_NL-x-informal``.
 
 * The new :option:`makemigrations --update` option merges model changes into
@@ -377,7 +377,7 @@ backends.
   should be enabled if your backend supports functional dependency detection in
   ``GROUP BY`` clauses as specified by the ``SQL:1999`` standard.
 
-* :djadmin:`inspectdb` now uses ``display_size`` from
+* :cli:`inspectdb` now uses ``display_size`` from
   ``DatabaseIntrospection.get_table_description()`` rather than
   ``internal_size`` for ``CharField``.
 
@@ -510,7 +510,7 @@ Should become::
         class Meta:
             indexes = [models.Index(fields=["rank", "name"])]
 
-Running the :djadmin:`makemigrations` command will generate a migration
+Running the :cli:`makemigrations` command will generate a migration
 containing a :class:`~django.db.migrations.operations.RenameIndex` operation
 which will rename the existing index. Next, consider squashing migrations to
 remove ``index_together`` from historical migrations.

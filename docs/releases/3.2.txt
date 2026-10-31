@@ -347,13 +347,13 @@ Generic Views
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* :djadmin:`loaddata` now supports fixtures stored in XZ archives (``.xz``) and
+* :cli:`loaddata` now supports fixtures stored in XZ archives (``.xz``) and
   LZMA archives (``.lzma``).
 
-* :djadmin:`dumpdata` now can compress data in the ``bz2``, ``gz``, ``lzma``,
+* :cli:`dumpdata` now can compress data in the ``bz2``, ``gz``, ``lzma``,
   or ``xz`` formats.
 
-* :djadmin:`makemigrations` can now be called without an active database
+* :cli:`makemigrations` can now be called without an active database
   connection. In that case, check for a consistent migration history is
   skipped.
 
@@ -495,7 +495,7 @@ Serialization
 ~~~~~~~~~~~~~
 
 * The new :ref:`JSONL <serialization-formats-jsonl>` serializer allows using
-  the JSON Lines format with :djadmin:`dumpdata` and :djadmin:`loaddata`. This
+  the JSON Lines format with :cli:`dumpdata` and :cli:`loaddata`. This
   can be useful for populating large databases because data is loaded line by
   line into memory, rather than being loaded all at once.
 
@@ -527,7 +527,7 @@ Tests
   :option:`test --no-faulthandler` option.
 
 * :class:`~django.test.runner.DiscoverRunner` and the
-  :djadmin:`test` management command can now track timings, including database
+  :cli:`test` management command can now track timings, including database
   setup and total run time. This can be enabled by using the :option:`test
   --timing` option.
 
@@ -723,7 +723,7 @@ Miscellaneous
 * The password reset mechanism now invalidates tokens when the user email is
   changed.
 
-* :djadmin:`makemessages` command no longer processes invalid locales specified
+* :cli:`makemessages` command no longer processes invalid locales specified
   using :option:`makemessages --locale` option, when they contain hyphens
   (``'-'``).
 

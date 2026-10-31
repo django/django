@@ -79,4 +79,4 @@ Bugfixes
 
 * Fixed a bug in Django 5.2 that caused a redundant ``unique_together``
   constraint to be generated for composite primary keys when using
-  :djadmin:`inspectdb` (:ticket:`36357`).
+  :cli:`inspectdb` (:ticket:`36357`).

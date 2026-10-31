@@ -35,7 +35,7 @@ What's new in Django 5.2
 Automatic models import in the ``shell``
 ----------------------------------------
 
-The :djadmin:`shell` management command now automatically imports models from
+The :cli:`shell` management command now automatically imports models from
 all installed apps. You can view further details of the imported objects by
 setting the ``--verbosity`` flag to 2 or more:
 
@@ -275,12 +275,12 @@ Forms
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* A new warning is displayed when running :djadmin:`runserver`, indicating that
+* A new warning is displayed when running :cli:`runserver`, indicating that
   it is unsuitable for production. This warning can be suppressed by setting
   the :envvar:`DJANGO_RUNSERVER_HIDE_WARNING` environment variable to
   ``"true"``.
 
-* The :djadmin:`makemigrations` and :djadmin:`migrate` commands  have a new
+* The :cli:`makemigrations` and :cli:`migrate` commands  have a new
   ``Command.autodetector`` attribute for subclasses to override in order to use
   a custom autodetector class.
 

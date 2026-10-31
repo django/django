@@ -27,7 +27,7 @@ Bugfixes
 
 * Made the ``Concat`` database function idempotent on SQLite (:ticket:`25517`).
 
-* Avoided a confusing stack trace when starting :djadmin:`runserver` with an
+* Avoided a confusing stack trace when starting :cli:`runserver` with an
   invalid :setting:`INSTALLED_APPS` setting (:ticket:`25510`). This regression
   appeared in 1.8.5 as a side effect of fixing :ticket:`24704`.
 
