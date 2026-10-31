@@ -37,6 +37,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         "SET CONSTRAINTS %(name)s IMMEDIATE; "
         "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
     )
+    sql_alter_fk = "SET CONSTRAINTS %(name)s IMMEDIATE"
     sql_delete_procedure = "DROP FUNCTION %(procedure)s(%(param_types)s)"
 
     def execute(self, sql, params=()):
