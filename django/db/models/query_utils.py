@@ -286,6 +286,12 @@ class DeferredAttribute:
                     )
 
                 instance._state.fetch_mode.fetch(self, instance)
+                if field_name not in data:
+                    # FETCH_PEERS may not load the field if the instance's row
+                    # was deleted after the queryset was evaluated.
+                    raise instance._meta.model.DoesNotExist(
+                        f"{instance._meta.object_name} matching query does not exist."
+                    )
             else:
                 data[field_name] = val
         return data[field_name]
@@ -308,13 +314,17 @@ class DeferredAttribute:
     def fetch_many(self, instances):
         attname = self.field.attname
         db = instances[0]._state.db
-        value_by_pk = (
-            self.field.model._base_manager.using(db)
-            .values_list(attname, flat=True)
-            .in_bulk({i.pk for i in instances})
-        )
-        for instance in instances:
-            setattr(instance, attname, value_by_pk[instance.pk])
+        if to_fetch := [
+            i for i in instances if attname not in i.__dict__ and i._is_pk_set()
+        ]:
+            value_by_pk = (
+                self.field.model._base_manager.using(db)
+                .values_list(attname, flat=True)
+                .in_bulk([i.pk for i in to_fetch])
+            )
+            for instance in to_fetch:
+                if instance.pk in value_by_pk:
+                    setattr(instance, attname, value_by_pk[instance.pk])
 
 
 class class_or_instance_method:

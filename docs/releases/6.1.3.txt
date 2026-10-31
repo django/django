@@ -31,3 +31,8 @@ Bugfixes
 * Fixed a crash in :djadmin:`makemessages` on Windows when processing files
   with non-ASCII names on Python 3.15+, or with :ref:`UTF-8 mode
   <python:utf8-mode>` enabled on older Python versions (:ticket:`37447`).
+
+* Fixed a bug in Django 6.1 where accessing a deferred field with the
+  :attr:`~django.db.models.FETCH_PEERS` fetch mode overwrote values that
+  peer instances had already loaded from the database or modified locally,
+  and raised ``KeyError`` when a peer's row had been deleted (:ticket:`37436`).

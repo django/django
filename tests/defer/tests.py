@@ -260,6 +260,64 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertIsNone(cm.exception.__cause__)
         self.assertTrue(cm.exception.__suppress_context__)
 
+    def test_fetch_peers_preserves_local_modification(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value")
+        # Modify the deferred field on one peer without saving.
+        p1.value = "local modification"
+        # Trigger the peer fetch by accessing the field on another peer.
+        with self.assertNumQueries(1):
+            _ = p2.value
+        # The local modification should be preserved.
+        self.assertEqual(p1.value, "local modification")
+        # The other peer should receive its database value.
+        self.assertEqual(p2.value, "yy")
+
+    def test_fetch_peers_deleted_peer_does_not_cause_keyerror(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk")
+        # Delete one peer's database row after queryset evaluation.
+        Primary.objects.filter(pk=p1.pk).delete()
+        # Accessing another peer's deferred field should not raise KeyError.
+        with self.assertNumQueries(1):
+            _ = p2.value
+        # The surviving peer should receive the correct value.
+        self.assertEqual(p2.value, "yy")
+
+    def test_fetch_peers_accessed_instance_deleted(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk")
+        Primary.objects.filter(pk=p1.pk).delete()
+        with self.assertNumQueries(1):
+            with self.assertRaises(Primary.DoesNotExist):
+                p1.value
+        # The surviving peer was loaded by the same query.
+        with self.assertNumQueries(0):
+            self.assertEqual(p2.value, "yy")
+
+    def test_fetch_peers_batching_preserved(self):
+        # Create a third Primary instance inside this test.
+        Primary.objects.create(name="p3", value="zz", related=self.s1)
+        p1, p2, p3 = list(
+            Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk")
+        )
+        with self.assertNumQueries(1):
+            _ = p1.value
+        with self.assertNumQueries(0):
+            _ = p2.value
+        with self.assertNumQueries(0):
+            _ = p3.value
+        self.assertEqual(p1.value, "xx")
+        self.assertEqual(p2.value, "yy")
+        self.assertEqual(p3.value, "zz")
+
+    def test_fetch_peers_skips_peer_without_pk(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk")
+        p1.pk = None
+        with self.assertNumQueries(1):
+            self.assertEqual(p2.value, "yy")
+        self.assertNotIn("value", p1.__dict__)
+        # Consistent with DeferredAttribute.__get__() for unsaved instances.
+        with self.assertRaises(AttributeError):
+            p1.value
+
 
 class DeferOtherDatabaseTests(TestCase):
     databases = {"other"}
