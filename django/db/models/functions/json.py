@@ -9,25 +9,49 @@ class JSONArray(Func):
     function = "JSON_ARRAY"
     output_field = JSONField()
 
+    def __init__(self, *expressions, absent_on_null=False):
+        self.absent_on_null = absent_on_null
+        super().__init__(*expressions)
+
     def as_sql(self, compiler, connection, **extra_context):
         if not connection.features.supports_json_field:
             raise NotSupportedError(
                 "JSONFields are not supported on this database backend."
             )
+        if self.absent_on_null and not connection.features.supports_json_absent_on_null:
+            raise NotSupportedError(
+                "ABSENT ON NULL is not supported by this database backend."
+            )
         return super().as_sql(compiler, connection, **extra_context)
 
+    def as_sqlite(self, compiler, connection, **extra_context):
+        if not self.absent_on_null:
+            return self.as_sql(compiler, connection, **extra_context)
+        # SQLite's JSON_ARRAY() doesn't support ABSENT ON NULL, so the array
+        # is built normally and null values are stripped from it afterwards.
+        return self.as_sql(
+            compiler,
+            connection,
+            template="%(function)s(JSON_ARRAY(%(expressions)s))",
+            function="django_json_array_remove_nulls",
+            **extra_context,
+        )
+
     def as_native(self, compiler, connection, *, returning, **extra_context):
-        # PostgreSQL 16+ and Oracle remove SQL NULL values from the array by
-        # default. Adds the NULL ON NULL clause to keep NULL values in the
-        # array, mapping them to JSON null values, which matches the behavior
-        # of SQLite.
-        null_on_null = "NULL ON NULL" if len(self.get_source_expressions()) > 0 else ""
+        # Providing the ON NULL clause when no source expressions are
+        # provided is a syntax error on some backends.
+        if len(self.get_source_expressions()) == 0:
+            on_null_clause = ""
+        elif self.absent_on_null:
+            on_null_clause = "ABSENT ON NULL"
+        else:
+            on_null_clause = "NULL ON NULL"
 
         return self.as_sql(
             compiler,
             connection,
             template=(
-                f"%(function)s(%(expressions)s {null_on_null} RETURNING {returning})"
+                f"%(function)s(%(expressions)s {on_null_clause} RETURNING {returning})"
             ),
             **extra_context,
         )
