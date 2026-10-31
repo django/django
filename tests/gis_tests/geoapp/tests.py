@@ -4,7 +4,13 @@ from pathlib import Path
 from unittest import mock, skipIf
 
 from django.contrib.gis import gdal
-from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
+from django.contrib.gis.db.models import (
+    Collect,
+    Extent,
+    MakeLine,
+    Union,
+    functions,
+)
 from django.contrib.gis.gdal.raster.source import DisallowedRasterLookup
 from django.contrib.gis.geos import (
     GeometryCollection,
@@ -22,7 +28,12 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import F, OuterRef, Subquery
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase,
+    TestCase,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 from django.test.utils import CaptureQueriesContext
 
 from ..data.rasters.textrasters import JSON_RASTER
@@ -893,6 +904,36 @@ class GeoQuerySetTest(TestCase):
             self.assertAlmostEqual(point_x, ref_city.x, 5)
             self.assertAlmostEqual(point_y, ref_city.y, 5)
 
+    @skipUnlessDBFeature("supports_make_line_aggr_order_by")
+    def test_make_line_order_by(self):
+        line = City.objects.aggregate(line=MakeLine("point", order_by="name"))["line"]
+        ref_points = City.objects.order_by("name").values_list("point", flat=True)
+        self.assertEqual(len(line), len(ref_points))
+        for (x, y), ref_point in zip(line, ref_points):
+            self.assertAlmostEqual(x, ref_point.x, 5)
+            self.assertAlmostEqual(y, ref_point.y, 5)
+
+    @skipUnlessDBFeature("supports_make_line_aggr")
+    @skipIfDBFeature("supports_make_line_aggr_order_by")
+    def test_make_line_order_by_not_supported(self):
+        with self.assertRaises(NotSupportedError):
+            City.objects.aggregate(line=MakeLine("point", order_by="name"))
+
+    @skipUnlessDBFeature("supports_collect_aggr_order_by")
+    def test_collect_order_by(self):
+        coll = City.objects.aggregate(coll=Collect("point", order_by="-name"))["coll"]
+        ref_points = City.objects.order_by("-name").values_list("point", flat=True)
+        self.assertEqual(len(coll), len(ref_points))
+        for point, ref_point in zip(coll, ref_points):
+            self.assertAlmostEqual(point.x, ref_point.x, 5)
+            self.assertAlmostEqual(point.y, ref_point.y, 5)
+
+    @skipUnlessDBFeature("supports_collect_aggr")
+    @skipIfDBFeature("supports_collect_aggr_order_by")
+    def test_collect_order_by_not_supported(self):
+        with self.assertRaises(NotSupportedError):
+            City.objects.aggregate(coll=Collect("point", order_by="name"))
+
     @skipUnlessDBFeature("supports_union_aggr")
     def test_unionagg(self):
         """
@@ -914,6 +955,33 @@ class GeoQuerySetTest(TestCase):
         self.assertTrue(union.equals(u2))
         qs = City.objects.filter(name="NotACity")
         self.assertIsNone(qs.aggregate(Union("point"))["point__union"])
+
+    @skipUnlessDBFeature("supports_union_aggr_order_by")
+    def test_unionagg_order_by(self):
+        Track.objects.bulk_create(
+            [
+                Track(name="a", line=LineString((0, 4), (1, 4))),
+                Track(name="b", line=LineString((0, 2), (1, 2))),
+                Track(name="c", line=LineString((0, 0), (1, 0))),
+            ]
+        )
+        multiline = GEOSGeometry(
+            "MULTILINESTRING((0 4,1 4),(0 2,1 2),(0 0,1 0))", srid=4326
+        )
+        union = Track.objects.filter(name__in=["a", "b", "c"]).aggregate(
+            union=Union("line", order_by="name")
+        )["union"]
+        self.assertIs(union.equals_exact(multiline), True)
+        union = Track.objects.filter(name__in=["a", "b", "c"]).aggregate(
+            union=Union("line", order_by="-name")
+        )["union"]
+        self.assertIs(union.equals_exact(multiline), False)
+
+    @skipUnlessDBFeature("supports_union_aggr")
+    @skipIfDBFeature("supports_union_aggr_order_by")
+    def test_unionagg_order_by_not_supported(self):
+        with self.assertRaises(NotSupportedError):
+            City.objects.aggregate(union=Union("point", order_by="name"))
 
     @skipUnlessDBFeature("supports_union_aggr")
     def test_geoagg_subquery(self):
