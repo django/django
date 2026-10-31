@@ -35,7 +35,7 @@ from .models import (
 
 
 class DistanceTest(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["distapp_initial"]
 
     def setUp(self):
         # A point we are testing distances with -- using a WGS84
@@ -400,7 +400,7 @@ Perimeter(geom1)                                |    OK              |      :-( 
 
 
 class DistanceFunctionsTests(FuncTestMixin, TestCase):
-    fixtures = ["initial"]
+    fixtures = ["distapp_initial"]
 
     @skipUnlessDBFeature("has_Area_function")
     def test_area(self):

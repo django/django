@@ -12,7 +12,7 @@ from .models import Article, Author, Book, City, DirectoryEntry, Event, Location
 
 
 class RelatedGeoModelTest(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["relatedapp_initial"]
 
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
