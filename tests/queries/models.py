@@ -789,3 +789,7 @@ class JSONFieldNullable(models.Model):
 
     class Meta:
         required_db_features = {"supports_json_field"}
+
+
+class PercentColumn(models.Model):
+    value = models.IntegerField(db_column="per%cent")
