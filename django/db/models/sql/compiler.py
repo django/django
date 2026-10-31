@@ -8,7 +8,7 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import Col, ColPairs, F, OrderBy, RawSQL, Ref, Value
 from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
@@ -23,6 +23,7 @@ from django.db.models.sql.constants import (
     SINGLE,
 )
 from django.db.models.sql.query import Query, get_order_dir
+from django.db.models.sql.where import AND, WhereNode
 from django.db.transaction import TransactionManagementError
 from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.hashable import make_hashable
@@ -806,8 +807,9 @@ class SQLCompiler:
                 order_by = None
             else:
                 distinct_fields, distinct_params = self.get_distinct()
-                # This must come after 'select', 'ordering', and 'distinct'
+                # These must come after 'select', 'ordering', and 'distinct'
                 # (see docstring of get_from_clause() for details).
+                self._use_subqueries_for_unshared_joins()
                 from_, f_params = self.get_from_clause()
                 try:
                     where, w_params = (
@@ -1160,6 +1162,60 @@ class SQLCompiler:
         )
         alias = joins[-1]
         return field, targets, alias, joins, path, opts, transform_function
+
+    def _use_subqueries_for_unshared_joins(self):
+        """
+        Replace JoinOrSubquery filters whose joins aren't referenced elsewhere
+        in the query with their subquery, restricted by the WHERE clause's base
+        table lookups, and release those joins. as_sql() restores the refcounts
+        afterward.
+        """
+        if self.where is None or self.query.group_by is None:
+            return
+        filters = {
+            id(expr): expr
+            for expr in self.where.join_or_subquery_leaves()
+            if all(
+                self.query.alias_refcount[alias] == count
+                for alias, count in expr.refcounts.items()
+            )
+        }
+        if not filters or self.query._has_raw_sql():
+            return
+        for expr in filters.values():
+            for alias, count in expr.refcounts.items():
+                self.query.unref_alias(alias, count)
+        base_alias = self.query.base_table
+        lookups = self._base_table_value_lookups(base_alias)
+        self.where = self.where.replace_join_or_subquery(
+            {
+                key: expr.restricted_subquery_condition(lookups, base_alias)
+                for key, expr in filters.items()
+            }
+        )
+
+    def _base_table_value_lookups(self, alias, node=None):
+        """
+        Return the lookups of the WHERE clause that must hold for every row and
+        compare a column of the base table alias with a single value.
+        """
+        if node is None:
+            node = self.where
+        if node.connector != AND or node.negated:
+            return []
+        lookups = []
+        for child in node.children:
+            if isinstance(child, WhereNode):
+                lookups.extend(self._base_table_value_lookups(alias, child))
+            elif (
+                isinstance(child, Lookup)
+                and isinstance(child.lhs, Col)
+                and child.lhs.alias == alias
+                and not hasattr(child.rhs, "resolve_expression")
+                and not isinstance(child.rhs, (list, tuple, set))
+            ):
+                lookups.append(child)
+        return lookups
 
     def get_from_clause(self):
         """

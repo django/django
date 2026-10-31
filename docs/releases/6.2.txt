@@ -446,6 +446,17 @@ Models
   ``ValidationError`` instead of being silently accepted, and surrounding
   whitespace is stripped.
 
+* :meth:`.QuerySet.filter` calls that span a multi-valued relationship after
+  an aggregation, such as
+  ``Publisher.objects.annotate(Count("book")).filter(book__rating__gt=3)``,
+  now use a subquery instead of an additional join. The join duplicated the
+  aggregated rows, inflating the results of aggregates such as
+  :class:`~django.db.models.Count` and :class:`~django.db.models.Sum`, so
+  querysets that filter or order by such an aggregate may now return different
+  rows. The join is still used if a later part of the query, such as
+  :meth:`~.QuerySet.values` or :meth:`~.QuerySet.order_by`, refers to the same
+  relationship.
+
 Requests and responses
 ----------------------
 
