@@ -24,7 +24,7 @@ from django.core.signals import request_started, setting_changed
 from django.db import DEFAULT_DB_ALIAS, connections, reset_queries
 from django.db.models.options import Options
 from django.template import PartialTemplate, Template
-from django.test.signals import template_rendered
+from django.test.signals import pre_capture_queries, template_rendered
 from django.urls import get_script_prefix, set_script_prefix
 from django.utils.translation import deactivate
 from django.utils.version import PYPY
@@ -721,8 +721,9 @@ class CaptureQueriesContext:
     Context manager that captures queries executed by the specified connection.
     """
 
-    def __init__(self, connection):
+    def __init__(self, connection, clear_caches=False):
         self.connection = connection
+        self.clear_caches = clear_caches
 
     def __iter__(self):
         return iter(self.captured_queries)
@@ -743,6 +744,14 @@ class CaptureQueriesContext:
         # Run any initialization queries if needed so that they won't be
         # included as part of the count.
         self.connection.ensure_connection()
+        if self.clear_caches:
+            if callable(self.clear_caches):
+                self.clear_caches()
+            elif isinstance(self.clear_caches, (list, tuple, set)):
+                for callback in self.clear_caches:
+                    if callable(callback):
+                        callback()
+            pre_capture_queries.send(sender=self.__class__, connection=self.connection)
         self.initial_queries = len(self.connection.queries_log)
         self.final_queries = None
         self.reset_queries_disconnected = request_started.disconnect(reset_queries)
