@@ -1,6 +1,7 @@
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.db import connection
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.views.generic.base import View
@@ -51,12 +52,14 @@ class DetailViewTest(TestCase):
         self.assertTemplateUsed(res, "generic_views/author_detail.html")
 
     def test_detail_missing_object(self):
-        res = self.client.get("/detail/author/500/")
+        id_ = connection.ops.get_nonexistent_pk(500)
+        res = self.client.get(f"/detail/author/{id_}/")
         self.assertEqual(res.status_code, 404)
 
     def test_detail_object_does_not_exist(self):
+        id_ = connection.ops.get_nonexistent_pk(500)
         with self.assertRaises(ObjectDoesNotExist):
-            self.client.get("/detail/doesnotexist/1/")
+            self.client.get(f"/detail/doesnotexist/{id_}/")
 
     def test_detail_by_custom_pk(self):
         res = self.client.get("/detail/author/bycustompk/%s/" % self.author1.pk)
