@@ -22,7 +22,9 @@ class ContextDict(dict):
         return self
 
     def __exit__(self, *args, **kwargs):
-        self.context.pop()
+        # Remove this layer and any layers added inside the context manager.
+        while self.context.pop() is not self:
+            pass
 
 
 class BaseContext:

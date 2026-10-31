@@ -467,6 +467,14 @@ Requests and responses
   scripts or styles without a matching nonce may be blocked or trigger
   violation reports. See :ref:`csp-nonce-generation` for details.
 
+Templates
+---------
+
+* The :meth:`.Context.push` and :meth:`.Context.update` context managers now
+  remove their own context layer and any layers pushed above it when exiting
+  the block. Previously, only the topmost layer was removed, which could leak
+  context variables from an included template into its parent.
+
 Tests
 -----
 
