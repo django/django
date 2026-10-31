@@ -49,18 +49,23 @@ html[data-theme="dark"] {
 
     --body-fg: #eeeeee;
     --body-bg: #121212;
-    --body-quiet-color: #d0d0d0;
-    --body-medium-color: #e0e0e0;
-    --body-loud-color: #ffffff;
+    --body-quiet-fg: #d0d0d0;
+    --body-quiet-color: var(--body-quiet-fg);
+    --body-medium-fg: #e0e0e0;
+    --body-medium-color: var(--body-medium-fg);
+    --body-loud-fg: #ffffff;
+    --body-loud-color: var(--body-loud-fg);
 
     --breadcrumbs-link-fg: #e0e0e0;
     --breadcrumbs-bg: var(--primary);
 
     --link-fg: #81d4fa;
-    --link-hover-color: #4ac1f7;
+    --link-hover-fg: #4ac1f7;
+    --link-hover-color: var(--link-hover-fg);
     --link-selected-fg: #6f94c6;
 
-    --hairline-color: #272727;
+    --hairline-border: #272727;
+    --hairline-color: var(--hairline-border);
     --border-color: #353535;
 
     --error-fg: #e35f5f;
@@ -78,7 +83,8 @@ html[data-theme="dark"] {
 
     --darkened-bg: #212121;
     --selected-bg: #1b1b1b;
-    --selected-row: #00363a;
+    --selected-row-bg: #00363a;
+    --selected-row: var(--selected-row-bg);
 
     --close-button-bg: #333333;
     --close-button-hover-bg: #666666;
@@ -128,7 +134,7 @@ html[data-theme="light"] .theme-toggle .theme-label-when-light {
 .theme-toggle svg.theme-icon-when-auto,
 .theme-toggle svg.theme-icon-when-dark,
 .theme-toggle svg.theme-icon-when-light {
-    fill: var(--header-link-color);
+    fill: var(--header-link-fg);
     color: var(--header-bg);
 }
 
