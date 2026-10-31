@@ -3714,6 +3714,23 @@ class AutodetectorTests(BaseAutodetectorTests):
             unique_together={("title", "newfield")},
         )
 
+    def test_add_field_and_alter_unique_together(self):
+        """
+        Fields added while updating unique_together are created before the
+        AlterUniqueTogether that references them (#37281).
+        """
+        changes = self.get_changes(
+            [self.author_empty, self.book_unique_together_4],
+            [self.author_empty, self.book_unique_together_3],
+        )
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["AddField", "AlterUniqueTogether", "RemoveField"],
+        )
+
     def test_create_model_and_unique_together(self):
         author = ModelState(
             "otherapp",
