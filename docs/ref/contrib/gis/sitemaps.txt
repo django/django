@@ -2,6 +2,9 @@
 Geographic Sitemaps
 ===================
 
+.. module:: django.contrib.gis.sitemaps
+    :synopsis: Sitemaps for geographic data.
+
 KML is an XML language focused on geographic visualization [#]_. ``KMLSitemap``
 and its compressed counterpart ``KMZSitemap`` allow you to present geolocated
 data in a machine-readable format.
@@ -9,14 +12,97 @@ data in a machine-readable format.
 Example
 =======
 
+Follow the installation instructions for the
+:doc:`sitemap framework </ref/contrib/sitemaps>` and add
+``'django.contrib.gis'`` to
+:setting:`INSTALLED_APPS`. The Django template backend must have
+:setting:`APP_DIRS <TEMPLATES-APP_DIRS>` set to ``True`` so that it can load
+the geographic templates.
+
+For example, suppose the ``places`` application contains this model:
+
+.. code-block:: python
+    :caption: ``places/models.py``
+
+    from django.contrib.gis.db import models
+
+
+    class Place(models.Model):
+        name = models.CharField(max_length=100)
+        point = models.PointField()
+
+        def __str__(self):
+            return self.name
+
+Create a sitemap for each format and configure the views in your URLconf:
+
+.. code-block:: python
+    :caption: ``urls.py``
+
+    from django.contrib.gis.sitemaps import KMLSitemap, KMZSitemap
+    from django.contrib.gis.sitemaps import views as gis_sitemap_views
+    from django.contrib.sitemaps import views as sitemap_views
+    from django.urls import path
+
+    from places.models import Place
+
+    sitemaps = {
+        "kml": KMLSitemap([Place]),
+        "kmz": KMZSitemap([Place]),
+    }
+
+    urlpatterns = [
+        path("sitemap.xml", sitemap_views.sitemap, {"sitemaps": sitemaps}),
+        path(
+            "kml/<str:label>/<str:model>/<str:field_name>.kml",
+            gis_sitemap_views.kml,
+            name="django.contrib.gis.sitemaps.views.kml",
+        ),
+        path(
+            "kmz/<str:label>/<str:model>/<str:field_name>.kmz",
+            gis_sitemap_views.kmz,
+            name="django.contrib.gis.sitemaps.views.kmz",
+        ),
+    ]
+
+The URL names for the ``kml`` and ``kmz`` views must match those shown above:
+:class:`KMLSitemap` and :class:`KMZSitemap` use them to reverse the URLs.
+
+In this example, ``/sitemap.xml`` lists URLs for
+``/kml/places/place/point.kml`` and ``/kmz/places/place/point.kmz``. Each of
+these documents contains the ``point`` geometries of the ``Place`` objects
+returned by the model's default manager. The sitemap has one entry per
+geometry field and format, rather than one entry per model instance.
+
 Reference
 =========
 
 ``KMLSitemap``
 --------------
 
+.. class:: KMLSitemap(locations=None)
+
+    A :class:`~django.contrib.sitemaps.Sitemap` subclass that generates links
+    to KML documents for geometry fields.
+
+    ``locations`` is an iterable of model classes or three-item tuples of
+    ``(app_label, model_name, field_name)``. A model class includes all of its
+    :class:`~django.contrib.gis.db.models.GeometryField` fields. Use a tuple
+    to select a particular field, for example::
+
+        KMLSitemap([("places", "place", "point")])
+
+    If ``locations`` is ``None``, geometry fields from all models in installed
+    applications are included. An empty iterable produces an empty sitemap.
+
 ``KMZSitemap``
 --------------
+
+.. class:: KMZSitemap(locations=None)
+
+    Like :class:`KMLSitemap`, but generates links to KMZ documents, which are
+    ZIP archives containing a KML document named ``doc.kml``. The ``locations``
+    argument accepts the same values as :class:`KMLSitemap`.
 
 .. rubric:: Footnotes
 .. [#] https://www.ogc.org/standard/kml/
