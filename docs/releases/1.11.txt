@@ -486,7 +486,7 @@ Backwards incompatible changes in 1.11
   references ``'bar.css'`` which itself references ``'foo.css'``) or if the
   chain of files referencing other files is too deep to resolve in several
   passes. In the latter case, increase the number of passes using
-  :attr:`.ManifestStaticFilesStorage.max_post_process_passes`.
+  ``ManifestStaticFilesStorage.max_post_process_passes``.
 
 * When using ``ManifestStaticFilesStorage``, static files not found in the
   manifest at runtime now raise a ``ValueError`` instead of returning an
