@@ -7,6 +7,9 @@ from .base import WidgetTest
 class TextareaTest(WidgetTest):
     widget = Textarea()
 
+    def test_input_type(self):
+        self.assertEqual(self.widget.input_type, "textarea")
+
     def test_render(self):
         self.check_html(
             self.widget,
@@ -61,6 +64,17 @@ class TextareaTest(WidgetTest):
                 '<textarea rows="10" cols="40" name="msg">pre &quot;quoted&quot; value'
                 "</textarea>"
             ),
+        )
+
+    def test_render_hidden(self):
+        class HiddenTextarea(Textarea):
+            input_type = "hidden"
+
+        self.check_html(
+            HiddenTextarea(),
+            "msg",
+            "value",
+            html='<textarea rows="10" cols="40" name="msg" hidden>value</textarea>',
         )
 
     def test_fieldset(self):
