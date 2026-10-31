@@ -1010,6 +1010,84 @@ class BasicExpressionsTests(TestCase):
         ).get(pk=self.gmbh.pk)
         self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332)
 
+    def test_lookup_filter_on_annotation_with_outerref(self):
+        annotated_queryset = Company.objects.annotate(
+            salary_raise=OuterRef("num_employees"),
+            company_name=OuterRef("name"),
+        )
+        with register_lookup(CharField, Lower):
+            gmbh_salary = Company.objects.annotate(
+                true_filter=Exists(
+                    Subquery(annotated_queryset.filter(salary_raise__gt=1))
+                ),
+                false_filter=Exists(
+                    Subquery(annotated_queryset.filter(salary_raise__lt=1))
+                ),
+                transformed_filter=Exists(
+                    Subquery(
+                        annotated_queryset.filter(
+                            company_name__lower__startswith="test"
+                        )
+                    )
+                ),
+                null_filter=Exists(
+                    Subquery(annotated_queryset.filter(salary_raise__exact=None))
+                ),
+                not_null_filter=Exists(
+                    Subquery(annotated_queryset.filter(salary_raise__isnull=False))
+                ),
+            ).get(pk=self.gmbh.pk)
+        self.assertTrue(gmbh_salary.true_filter)
+        self.assertFalse(gmbh_salary.false_filter)
+        self.assertTrue(gmbh_salary.transformed_filter)
+        self.assertFalse(gmbh_salary.null_filter)
+        self.assertTrue(gmbh_salary.not_null_filter)
+
+    def test_lookup_filter_on_annotation_with_nested_outerref(self):
+        inner = Company.objects.annotate(
+            outer_name=OuterRef(OuterRef("name")),
+        ).filter(outer_name__startswith=F("name"))
+        middle = Company.objects.filter(Exists(inner))
+        self.assertTrue(
+            Company.objects.filter(name="Test GmbH").filter(Exists(middle)).exists()
+        )
+
+    def test_deferred_outerref_lookup_identity_includes_lookups(self):
+        from django.db.models.sql.query import DeferredOuterRefLookup
+
+        gt_lookup = DeferredOuterRefLookup(["gt"], OuterRef("num_employees"), 1)
+        lt_lookup = DeferredOuterRefLookup(["lt"], OuterRef("num_employees"), 1)
+        self.assertNotEqual(gt_lookup, lt_lookup)
+        resolved = gt_lookup.resolve_expression()
+        self.assertIsInstance(resolved, DeferredOuterRefLookup)
+        self.assertEqual(resolved.lookups, ["gt"])
+
+    def test_lookup_filter_on_annotation_with_outerref_after_clone(self):
+        annotated_queryset = Company.objects.annotate(
+            salary_raise=OuterRef("num_employees"),
+            company_name=OuterRef("name"),
+        )
+        filtered = annotated_queryset.filter(salary_raise__gt=1)
+        # Clone and rewrite the queryset before SQL compilation.
+        cloned = filtered.all().alias(tmp=F("name"))
+        with register_lookup(CharField, Lower):
+            gmbh_salary = Company.objects.annotate(
+                true_filter=Exists(Subquery(cloned)),
+                transformed_filter=Exists(
+                    Subquery(
+                        annotated_queryset.filter(
+                            company_name__lower__startswith="test"
+                        ).alias(y=F("name"))
+                    )
+                ),
+                reused_filter=Exists(
+                    Subquery(filtered.filter(salary_raise__isnull=False))
+                ),
+            ).get(pk=self.gmbh.pk)
+        self.assertTrue(gmbh_salary.true_filter)
+        self.assertTrue(gmbh_salary.transformed_filter)
+        self.assertTrue(gmbh_salary.reused_filter)
+
     def test_annotation_with_outerref_and_output_field(self):
         gmbh_salary = Company.objects.annotate(
             max_ceo_salary_raise=Subquery(
