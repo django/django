@@ -442,6 +442,7 @@ class NullableJSONModel(models.Model):
         decoder=CustomJSONDecoder,
         null=True,
     )
+    num = models.IntegerField(blank=True, null=True)
 
     class Meta:
         required_db_features = {"supports_json_field"}
