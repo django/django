@@ -1,7 +1,9 @@
 import ipaddress
 import math
 import re
+import sys
 import warnings
+from decimal import Decimal
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -506,6 +508,53 @@ class MinValueValidator(BaseValidator):
         return a < b
 
 
+def _decimal_significand(value):
+    """
+    Return a (digits, exponent) pair such that ``value`` is equal to
+    ``sign * digits * 10 ** exponent``, or None when the value isn't finite or
+    has too many digits to build an int from its string of digits.
+    """
+    if isinstance(value, int):
+        return abs(value), 0
+    if not value.is_finite():
+        return None
+    _, digits, exponent = value.as_tuple()
+    if len(digits) > sys.get_int_max_str_digits():
+        return None
+    return int("".join(map(str, digits))), exponent
+
+
+def _is_exact_multiple(value, step):
+    """
+    Return whether ``value`` is an integer multiple of ``step``, comparing int
+    and Decimal operands without converting them to float, or None when they
+    can't be compared this way. Only the significands and the exponents are
+    used, so large exponents don't build large numbers.
+    """
+    value_significand = _decimal_significand(value)
+    step_significand = _decimal_significand(step)
+    if value_significand is None or step_significand is None:
+        return None
+    value_digits, value_exponent = value_significand
+    step_digits, step_exponent = step_significand
+    if step_digits == 0:
+        return value_digits == 0
+    if value_digits == 0:
+        return True
+    if value_exponent >= step_exponent:
+        # value / step == value_digits * 10 ** shift / step_digits, so only the
+        # remainder of the division by step_digits matters.
+        shift = value_exponent - step_exponent
+        return (value_digits * pow(10, shift, step_digits)) % step_digits == 0
+    # value / step == value_digits / (step_digits * 10 ** shift). Shifting the
+    # divisor makes it at least as large as the dividend once the shift reaches
+    # the dividend's bit length, and then it can't divide it.
+    shift = step_exponent - value_exponent
+    if shift >= value_digits.bit_length():
+        return False
+    return value_digits % (step_digits * 10**shift) == 0
+
+
 @deconstructible
 class StepValueValidator(BaseValidator):
     message = _("Ensure this value is a multiple of step size %(limit_value)s.")
@@ -541,6 +590,19 @@ class StepValueValidator(BaseValidator):
 
     def compare(self, a, b):
         offset = 0 if self.offset is None else self.offset
+        if (
+            isinstance(a, (int, Decimal))
+            and isinstance(b, (int, Decimal))
+            and isinstance(offset, (int, Decimal))
+        ):
+            # Compare without converting to float, which loses precision for
+            # large ints and Decimals and can't represent them at all. Skip the
+            # subtraction when there's no offset because Decimal arithmetic
+            # raises OverflowError for exponents beyond the context limits.
+            value = a if not offset else a - offset
+            is_multiple = _is_exact_multiple(value, b)
+            if is_multiple is not None:
+                return not is_multiple
         return not math.isclose(math.remainder(a - offset, b), 0, abs_tol=1e-9)
 
 
