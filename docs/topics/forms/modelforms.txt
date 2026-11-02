@@ -438,9 +438,11 @@ Selecting the fields to use
 
 It is strongly recommended that you explicitly set all fields that should be
 edited in the form using the ``fields`` attribute. Failure to do so can easily
-lead to security problems when a form unexpectedly allows a user to set certain
-fields, especially when new fields are added to a model. Depending on how the
-form is rendered, the problem may not even be visible on the web page.
+lead to security problems, such as unintentionally exposing newly added model
+fields or allowing users to change which object is updated when an editable
+:attr:`primary key field <django.db.models.Field.primary_key>` is included in
+the form. Depending on how the form is rendered, the problem may not even be
+visible on the web page.
 
 The alternative approach would be to include all fields automatically, or
 remove only some. This fundamental approach is known to be much less secure and
