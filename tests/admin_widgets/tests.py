@@ -1781,6 +1781,25 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
             school.alumni.all().order_by("name"), [self.lisa, self.peter]
         )
 
+    def test_selector_chooser_background_color(self):
+        """
+        Ensure the selector chooser uses the --selected-bg color in both
+        filter_vertical (stacked) and filter_horizontal widgets.
+        """
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.page.goto(
+            self.live_server_url
+            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
+        )
+        self.page.evaluate(
+            "document.documentElement.style.setProperty("
+            "'--selected-bg', 'rgb(1, 2, 3)')"
+        )
+        for selector in [".selector.stacked", ".selector:not(.stacked)"]:
+            with self.subTest(selector=selector):
+                chooser = self.page.locator(f"{selector} ul.selector-chooser")
+                self.expect(chooser).to_have_css("background-color", "rgb(1, 2, 3)")
+
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_vertical_arrow_buttons_layout(self):
         self.admin_login(username="super", password="secret", login_url="/")
