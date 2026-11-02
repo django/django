@@ -79,6 +79,8 @@ continued here.{% endcomment %}
 {% blocktranslate count 2 context "Special blocktranslate context #2" %}Translatable literal #8b-singular{% plural %}Translatable literal #8b-plural{% endblocktranslate %}
 {% blocktranslate context "Special blocktranslate context #3" count 2 %}Translatable literal #8c-singular{% plural %}Translatable literal #8c-plural{% endblocktranslate %}
 {% blocktranslate with a=1 context "Special blocktranslate context #4" %}Translatable literal #8d {{ a }}{% endblocktranslate %}
+{% blocktranslate force_escape context "Special blocktranslate context #5" %}Translatable literal #8e{% endblocktranslate %}
+{% translate "Translatable literal #7.2a" force_escape context "context #7.2a" %}
 
 {% translate "Translatable literal with context wrapped in single quotes" context 'Context wrapped in single quotes' as var %}
 {% translate "Translatable literal with context wrapped in double quotes" context "Context wrapped in double quotes" as var %}

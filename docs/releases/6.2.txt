@@ -255,7 +255,10 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``force_escape`` option of the :ttag:`translate` and
+  :ttag:`blocktranslate` template tags HTML-escapes the translated string. The
+  admin uses it wherever a translation is rendered inside an HTML attribute, so
+  a translation containing a quote can no longer break the markup.
 
 Logging
 ~~~~~~~

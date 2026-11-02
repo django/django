@@ -136,6 +136,46 @@ class I18nTransTagTests(SimpleTestCase):
             output = self.engine.render_to_string("i18n36")
         self.assertEqual(output, "Page not found")
 
+    @setup(
+        {
+            "template": (
+                '{% load i18n %}<input value="'
+                '{% translate \'Say "hi" & go\' force_escape %}">'
+            )
+        }
+    )
+    def test_force_escape(self):
+        output = self.engine.render_to_string("template")
+        self.assertEqual(output, '<input value="Say &quot;hi&quot; &amp; go">')
+
+    @setup({"template": "{% load i18n %}{% translate 'Say \"hi\" & go' %}"})
+    def test_no_force_escape(self):
+        output = self.engine.render_to_string("template")
+        self.assertEqual(output, 'Say "hi" & go')
+
+    @setup({"template": "{% load i18n %}{% translate andrew force_escape %}"})
+    def test_force_escape_safe_variable(self):
+        output = self.engine.render_to_string(
+            "template", {"andrew": mark_safe("a & b")}
+        )
+        self.assertEqual(output, "a &amp; b")
+
+    @setup(
+        {
+            "template": (
+                "{% load i18n %}{% translate '<b>' force_escape as var %}{{ var }}"
+            )
+        }
+    )
+    def test_force_escape_asvar(self):
+        output = self.engine.render_to_string("template")
+        self.assertEqual(output, "&lt;b&gt;")
+
+    @setup({"template": "{% load i18n %}{% translate '100% \"sure\"' force_escape %}"})
+    def test_force_escape_percent(self):
+        output = self.engine.render_to_string("template")
+        self.assertEqual(output, "100% &quot;sure&quot;")
+
     @setup({"template": "{% load i18n %}{% translate %}A}"})
     def test_syntax_error_no_arguments(self, tag_name):
         msg = "'{}' takes at least one argument".format(tag_name)
@@ -176,6 +216,15 @@ class I18nTransTagTests(SimpleTestCase):
         msg = (
             f"Invalid argument 'noop' provided to the '{tag_name}' tag for the context "
             f"option"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string("template")
+
+    @setup({"template": '{% load i18n %}{% translate "Yes" context force_escape %}'})
+    def test_syntax_error_context_force_escape(self, tag_name):
+        msg = (
+            f"Invalid argument 'force_escape' provided to the '{tag_name}' tag for "
+            f"the context option"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string("template")

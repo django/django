@@ -72,7 +72,7 @@
     {% endblock %}
     <!-- END Header -->
     {% block nav-breadcrumbs %}
-      <nav aria-label="{% translate 'Breadcrumbs' %}">
+      <nav aria-label="{% translate 'Breadcrumbs' force_escape %}">
         {% block breadcrumbs %}
           <ol class="breadcrumbs">
             <li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
