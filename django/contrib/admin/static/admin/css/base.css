@@ -45,6 +45,9 @@ html[data-theme="light"],
     --message-error-bg: #ffefef;
     --message-error-icon: url(../img/icon-no.svg);
 
+    --selector-icons: url(../img/selector-icons.svg);
+    --selector-chooser-bg: var(--selected-bg);
+
     --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
     --selected-bg: #e4e4e4; /* E.g. selected table cells */
     --selected-row: #ffc;
