@@ -252,8 +252,9 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             return "raster"
 
         # Type-based geometries.
-        # TODO: Support 'M' extension.
-        if f.dim == 3:
+        if f.dim == 4:
+            geom_type = f.geom_type + "ZM"
+        elif f.dim == 3:
             geom_type = f.geom_type + "Z"
         else:
             geom_type = f.geom_type
