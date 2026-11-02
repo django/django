@@ -1782,6 +1782,18 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
         )
 
     @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
+    def test_horizontal_arrow_buttons_layout(self):
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.page.goto(
+            self.live_server_url
+            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
+        )
+        self.page.locator(".field-alumni").scroll_into_view_if_needed()
+        buttons = self.page.locator("div.selector:not(.stacked) ul.selector-chooser")
+        self.expect(buttons).to_be_visible()
+        self.take_screenshot("arrow_buttons_horizontal")
+
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark", "high_contrast"])
     def test_vertical_arrow_buttons_layout(self):
         self.admin_login(username="super", password="secret", login_url="/")
         self.page.goto(
@@ -1791,7 +1803,7 @@ class HorizontalVerticalFilterPlaywrightTests(AdminWidgetPlaywrightTestCase):
         self.page.locator(".field-students").scroll_into_view_if_needed()
         buttons = self.page.locator("div.selector.stacked ul.selector-chooser")
         self.expect(buttons).to_be_visible()
-        self.take_screenshot("arrow_buttons")
+        self.take_screenshot("arrow_buttons_vertical")
 
 
 class AdminRawIdWidgetPlaywrightTests(AdminWidgetPlaywrightTestCase):
