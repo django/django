@@ -552,9 +552,9 @@ or globally in the :setting:`DEFAULT_AUTO_FIELD` setting. For more, see
 :class:`CompositePrimaryKey` instead of setting this flag to ``True`` for all
 fields to maintain this invariant.
 
-The primary key field is read-only. If you change the value of the primary
-key on an existing object and then save it, a new object will be created
-alongside the old one.
+Changing an object's primary key and saving it does not change the original
+object in the database. If another object already has the new primary key, that
+object is updated. Otherwise, a new object is created.
 
 The primary key field is set to ``None`` when calling a model instance’s
 :meth:`~django.db.models.Model.delete` method.
