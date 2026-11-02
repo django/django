@@ -172,6 +172,21 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.clean(2), decimal.Decimal(2))
         self.assertEqual(f.step_size, decimal.Decimal("0.3"))
 
+    def test_decimalfield_step_size_large_values(self):
+        f = DecimalField(step_size=decimal.Decimal("0.01"))
+        msg = "'Ensure this value is a multiple of step size 0.01.'"
+        self.assertEqual(
+            f.clean("12345678901234567.01"),
+            decimal.Decimal("12345678901234567.01"),
+        )
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean("12345678901234567.015")
+        # Too large to be converted to a float.
+        self.assertEqual(f.clean("1e400"), decimal.Decimal("1e400"))
+        # Too large to be checked.
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean("1e1000000000")
+
     def test_decimalfield_scientific(self):
         f = DecimalField(max_digits=4, decimal_places=2)
         with self.assertRaisesMessage(ValidationError, "Ensure that there are no more"):

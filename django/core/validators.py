@@ -2,6 +2,7 @@ import ipaddress
 import math
 import re
 import warnings
+from decimal import MAX_EMAX, MIN_EMIN, Decimal, localcontext
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -506,6 +507,12 @@ class MinValueValidator(BaseValidator):
         return a < b
 
 
+# StepValueValidator doesn't check integers and decimals that need more digits.
+_STEP_MAX_DIGITS = 10_000
+# Remainders this close to zero are accepted, as with floats.
+_STEP_TOLERANCE = Decimal("1e-9")
+
+
 @deconstructible
 class StepValueValidator(BaseValidator):
     message = _("Ensure this value is a multiple of step size %(limit_value)s.")
@@ -541,7 +548,33 @@ class StepValueValidator(BaseValidator):
 
     def compare(self, a, b):
         offset = 0 if self.offset is None else self.offset
+        if all(isinstance(value, int | Decimal) for value in (a, b, offset)):
+            return not self._is_multiple(Decimal(a), Decimal(b), Decimal(offset))
         return not math.isclose(math.remainder(a - offset, b), 0, abs_tol=1e-9)
+
+    def _is_multiple(self, a, b, offset):
+        """
+        Check integers and decimals without converting them to floats, which
+        would lose precision or overflow for large values.
+        """
+        values = [value for value in (a, b, offset) if value]
+        if not all(value.is_finite() for value in values):
+            return False
+        # Use enough digits to subtract and divide the values exactly.
+        digits = (
+            max((value.adjusted() for value in values), default=0)
+            - min((value.as_tuple().exponent for value in values), default=0)
+            + 1
+        )
+        # Don't spend time on values with extreme exponents.
+        if digits > _STEP_MAX_DIGITS:
+            return False
+        with localcontext() as context:
+            context.prec = digits + 2
+            context.Emax = MAX_EMAX
+            context.Emin = MIN_EMIN
+            remainder = (a - offset).remainder_near(b)
+        return abs(remainder) <= _STEP_TOLERANCE
 
 
 @deconstructible

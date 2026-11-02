@@ -126,6 +126,17 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(12, f.clean("12"))
         self.assertEqual(f.step_size, 3)
 
+    def test_integerfield_step_size_large_values(self):
+        f = IntegerField(step_size=2)
+        msg = "'Ensure this value is a multiple of step size 2.'"
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean("9007199254740993")
+        self.assertEqual(f.clean("9007199254740994"), 9007199254740994)
+        # Too large to be converted to a float.
+        self.assertEqual(f.clean("1" + "0" * 400), 10**400)
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean("1" + "0" * 399 + "1")
+
     def test_integerfield_step_size_min_value(self):
         f = IntegerField(step_size=3, min_value=-1)
         self.assertWidgetRendersTo(
