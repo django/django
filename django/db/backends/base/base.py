@@ -753,20 +753,28 @@ class BaseDatabaseWrapper:
         self.validate_no_atomic_block()
         current_run_on_commit = self.run_on_commit
         self.run_on_commit = []
-        while current_run_on_commit:
-            _, func, robust = current_run_on_commit.pop(0)
-            if robust:
-                try:
+        # The transaction has ended. Callbacks may bridge to other tasks and
+        # start new transactions. Their ownership is independent of the block
+        # still exiting. Restore its stack afterward to finish unwinding.
+        async_atomic_tasks = self._async_atomic_tasks
+        self._async_atomic_tasks = []
+        try:
+            while current_run_on_commit:
+                _, func, robust = current_run_on_commit.pop(0)
+                if robust:
+                    try:
+                        func()
+                    except Exception as e:
+                        name = getattr(func, "__qualname__", func)
+                        logger.exception(
+                            "Error calling %s in on_commit() during transaction (%s).",
+                            name,
+                            e,
+                        )
+                else:
                     func()
-                except Exception as e:
-                    name = getattr(func, "__qualname__", func)
-                    logger.exception(
-                        "Error calling %s in on_commit() during transaction (%s).",
-                        name,
-                        e,
-                    )
-            else:
-                func()
+        finally:
+            self._async_atomic_tasks = async_atomic_tasks
 
     @contextmanager
     def execute_wrapper(self, wrapper):

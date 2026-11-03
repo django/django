@@ -158,6 +158,269 @@ class AsyncAtomicTests(TransactionTestCase):
                 raise ValueError("Undo parent")
         self.assertEqual(await Reporter.objects.acount(), 0)
 
+    async def test_child_sync_atomic_cannot_enter_parent_savepoint(self):
+        """A sync helper cannot bypass ownership of an async transaction."""
+        get_state = sync_to_async(current_transaction_state)
+        release = asyncio.Event()
+
+        def create(**options):
+            with transaction.atomic(**options):
+                Reporter.objects.create(first_name="Haddock")
+
+        async def child():
+            await release.wait()
+            for options in ({}, {"savepoint": False}, {"durable": True}):
+                with self.subTest(options=options):
+                    with self.assertRaises(transaction.TransactionManagementError):
+                        await sync_to_async(create)(**options)
+
+        async with asyncio.timeout(10), transaction.atomic():
+            await Reporter.objects.acreate(first_name="Tintin")
+            # The child inherits the outer block, before the parent creates
+            # the savepoint that would otherwise capture the child's write.
+            async with asyncio.TaskGroup() as tasks:
+                task = tasks.create_task(child())
+                with self.assertRaisesMessage(ValueError, "Undo savepoint"):
+                    async with transaction.atomic():
+                        before = await get_state()
+                        release.set()
+                        await task
+                        self.assertEqual(await get_state(), before)
+                        self.assertEqual(await Reporter.objects.acount(), 1)
+                        raise ValueError("Undo savepoint")
+            # The owning task can still use the very same synchronous helper.
+            await sync_to_async(create)()
+        self.assertEqual(await Reporter.objects.acount(), 2)
+
+    async def test_async_bridge_cannot_enter_sync_atomic(self):
+        @transaction.atomic
+        def create():
+            Reporter.objects.create(first_name="Haddock")
+
+        async def callback():
+            await sync_to_async(create)()
+
+        async with asyncio.timeout(10), transaction.atomic():
+            before = await sync_to_async(current_transaction_state)()
+            with self.assertRaises(transaction.TransactionManagementError):
+                await sync_to_async(async_to_sync(callback))()
+            self.assertEqual(await sync_to_async(current_transaction_state)(), before)
+            await sync_to_async(create)()
+        self.assertEqual(await Reporter.objects.acount(), 1)
+
+    async def test_owner_can_use_orm_atomic_blocks(self):
+        """ORM operations can still open sync atomic blocks for the owner."""
+        with self.assertRaisesMessage(ValueError, "Undo parent"):
+            async with transaction.atomic():
+                await Reporter.objects.abulk_create(
+                    [Reporter(first_name="Tintin"), Reporter(first_name="Calculus")],
+                    batch_size=1,
+                )
+                reporter, created = await Reporter.objects.aupdate_or_create(
+                    first_name="Haddock", defaults={"last_name": "Captain"}
+                )
+                self.assertIs(created, True)
+                self.assertEqual(await Reporter.objects.acount(), 3)
+                await reporter.adelete()
+                self.assertEqual(await Reporter.objects.acount(), 2)
+                raise ValueError("Undo parent")
+        self.assertEqual(await Reporter.objects.acount(), 0)
+
+    async def test_child_cannot_exit_sync_atomic(self):
+        get_state = sync_to_async(current_transaction_state)
+        atomic = transaction.atomic()
+        async with transaction.atomic():
+            await sync_to_async(atomic.__enter__)()
+            try:
+                before = await get_state()
+                with self.assertRaises(transaction.TransactionManagementError):
+                    await asyncio.create_task(
+                        sync_to_async(atomic.__exit__)(None, None, None)
+                    )
+                self.assertEqual(await get_state(), before)
+                await Reporter.objects.acreate(first_name="Tintin")
+            finally:
+                await sync_to_async(atomic.__exit__)(None, None, None)
+        self.assertEqual(await Reporter.objects.acount(), 1)
+
+    async def test_child_orm_atomic_is_rejected(self):
+        async with transaction.atomic():
+            before = await sync_to_async(current_transaction_state)()
+            with self.assertRaises(transaction.TransactionManagementError):
+                await asyncio.create_task(
+                    # Multiple batches require an internal atomic block.
+                    Reporter.objects.abulk_create(
+                        [
+                            Reporter(first_name="Haddock"),
+                            Reporter(first_name="Calculus"),
+                        ],
+                        batch_size=1,
+                    )
+                )
+            self.assertEqual(await sync_to_async(current_transaction_state)(), before)
+        self.assertEqual(await Reporter.objects.acount(), 0)
+
+    async def test_on_commit_can_open_sync_atomic(self):
+        @transaction.atomic
+        def create():
+            Reporter.objects.create(first_name="Haddock")
+
+        async with transaction.atomic():
+            await sync_to_async(transaction.on_commit)(create)
+            self.assertEqual(await Reporter.objects.acount(), 0)
+        self.assertEqual(await Reporter.objects.acount(), 1)
+
+    async def test_on_commit_bridge_can_open_sync_atomic(self):
+        for robust in (False, True):
+            with self.subTest(robust=robust):
+                callbacks = []
+
+                def create():
+                    self.assertFalse(connection.in_atomic_block)
+                    self.assertTrue(connection.get_autocommit())
+                    with transaction.atomic():
+                        Reporter.objects.create(first_name="Haddock")
+                        transaction.on_commit(lambda: callbacks.append("nested"))
+
+                async def callback():
+                    await sync_to_async(create)()
+
+                with self.assertNoLogs("django.db.backends.base", level="ERROR"):
+                    async with transaction.atomic():
+                        await Reporter.objects.acreate(first_name="Tintin")
+                        await sync_to_async(transaction.on_commit)(
+                            async_to_sync(callback), robust=robust
+                        )
+                        await sync_to_async(transaction.on_commit)(
+                            lambda: callbacks.append("later")
+                        )
+                self.assertEqual(callbacks, ["nested", "later"])
+                self.assertEqual(await Reporter.objects.acount(), 2)
+                await Reporter.objects.all().adelete()
+
+    async def test_on_commit_bridge_error_releases_ownership(self):
+        for error, robust in (
+            (ValueError, False),
+            (ValueError, True),
+            (asyncio.CancelledError, False),
+            (asyncio.CancelledError, True),
+        ):
+            with self.subTest(error=error, robust=robust):
+                callbacks = []
+                workers = []
+
+                def create_and_fail():
+                    with transaction.atomic():
+                        Reporter.objects.create(first_name="Haddock")
+                        raise error("Undo callback")
+
+                async def callback():
+                    await sync_to_async(create_and_fail)()
+
+                async def run():
+                    async with transaction.atomic():
+                        workers.append(
+                            await sync_to_async(transaction.get_connection)()
+                        )
+                        await Reporter.objects.acreate(first_name="Tintin")
+                        await sync_to_async(transaction.on_commit)(
+                            async_to_sync(callback), robust=robust
+                        )
+                        await sync_to_async(transaction.on_commit)(
+                            lambda: callbacks.append("later")
+                        )
+
+                if robust and error is ValueError:
+                    with self.assertLogs(
+                        "django.db.backends.base", level="ERROR"
+                    ) as cm:
+                        await run()
+                    self.assertEqual(len(cm.records), 1)
+                    self.assertIsInstance(cm.records[0].exc_info[1], ValueError)
+                    self.assertEqual(callbacks, ["later"])
+                else:
+                    with self.assertRaisesMessage(error, "Undo callback"):
+                        await run()
+                    self.assertEqual(callbacks, [])
+                # The original write committed; only the callback rolled back.
+                self.assertEqual(
+                    [r.first_name async for r in Reporter.objects.all()], ["Tintin"]
+                )
+                self.assertEqual(workers[0]._async_atomic_tasks, [])
+                # A failed callback must not leave task ownership behind.
+                async with transaction.atomic():
+                    await Reporter.objects.acreate(first_name="Calculus")
+                self.assertEqual(await Reporter.objects.acount(), 2)
+                await Reporter.objects.all().adelete()
+
+    async def test_on_commit_bridge_preserves_new_transaction_ownership(self):
+        def create():
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Haddock")
+
+        async def owned_transaction():
+            async with transaction.atomic():
+                await sync_to_async(create)()
+                with self.assertRaises(transaction.TransactionManagementError):
+                    await asyncio.create_task(sync_to_async(create)())
+
+        def sync_parent():
+            with transaction.atomic():
+                async_to_sync(owned_transaction)()
+
+        for reuse_connection in (False, True):
+            with self.subTest(reuse_connection=reuse_connection):
+
+                async def callback():
+                    if reuse_connection:
+                        # Claim the callback connection's new ownership stack.
+                        await sync_to_async(sync_parent)()
+                    else:
+                        await owned_transaction()
+
+                async with transaction.atomic():
+                    await sync_to_async(transaction.on_commit)(async_to_sync(callback))
+                self.assertEqual(await Reporter.objects.acount(), 1)
+                await Reporter.objects.all().adelete()
+
+    async def test_ownership_is_enforced_during_commit_and_rollback(self):
+        for method in ("_commit", "_rollback"):
+            with self.subTest(method=method):
+
+                def create():
+                    with transaction.atomic():
+                        Reporter.objects.create(first_name="Haddock")
+
+                async def callback():
+                    with self.assertRaises(transaction.TransactionManagementError):
+                        await sync_to_async(create)()
+
+                atomic = transaction.atomic()
+                await atomic.__aenter__()
+                worker = await sync_to_async(transaction.get_connection)()
+                original = getattr(worker, method)
+
+                def finish():
+                    # Avoid recursion if the guard fails and the callback
+                    # attempts to commit its own transaction.
+                    with mock.patch.object(worker, method, original):
+                        async_to_sync(callback)()
+                    return original()
+
+                await Reporter.objects.acreate(first_name="Tintin")
+                with mock.patch.object(
+                    worker, method, side_effect=finish
+                ) as finish_mock:
+                    if method == "_commit":
+                        await atomic.__aexit__(None, None, None)
+                    else:
+                        await atomic.__aexit__(ValueError, ValueError("Undo"), None)
+                    finish_mock.assert_called_once()
+                self.assertEqual(
+                    await Reporter.objects.acount(), 1 if method == "_commit" else 0
+                )
+                await Reporter.objects.all().adelete()
+
     async def test_outermost_block_uses_own_thread_and_connection(self):
         get = sync_to_async(current_thread_and_connection)
         outer_thread, outer_connection = await get()
@@ -486,7 +749,7 @@ class AsyncAtomicTests(TransactionTestCase):
         )
         self.assertEqual(
             rejection_message,
-            "Cannot enter an async atomic block while another task is using "
+            "Cannot use an atomic block while another task is using "
             "this connection's transaction.",
         )
 
@@ -842,3 +1105,38 @@ class AsyncAtomicInsideTestCaseTests(TestCase):
         async with transaction.atomic(durable=True):
             await Reporter.objects.acreate(first_name="Haddock")
         self.assertEqual(await Reporter.objects.acount(), 2)
+
+    async def test_sibling_sync_atomic_cannot_join_owned_transaction(self):
+        """Protect siblings that don't inherit the owner's async blocks."""
+        entered = asyncio.Event()
+        attempted = asyncio.Event()
+
+        def create():
+            with transaction.atomic():
+                Reporter.objects.create(first_name="Haddock")
+
+        async def owner():
+            async with transaction.atomic():
+                before = await sync_to_async(current_transaction_state)()
+                entered.set()
+                await attempted.wait()
+                self.assertEqual(
+                    await sync_to_async(current_transaction_state)(), before
+                )
+                await sync_to_async(create)()
+
+        async def sibling():
+            await entered.wait()
+            try:
+                with self.assertRaises(transaction.TransactionManagementError):
+                    await sync_to_async(create)()
+            finally:
+                attempted.set()
+
+        async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+            tasks.create_task(owner())
+            tasks.create_task(sibling())
+        self.assertEqual(await Reporter.objects.acount(), 2)
+        # The TestCase transaction is still usable after the async owner exits.
+        await sync_to_async(create)()
+        self.assertEqual(await Reporter.objects.acount(), 3)

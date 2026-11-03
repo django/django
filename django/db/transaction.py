@@ -5,7 +5,7 @@ from contextlib import ContextDecorator, contextmanager
 from contextvars import ContextVar
 from functools import wraps
 
-from asgiref.sync import ThreadSensitiveContext, sync_to_async
+from asgiref.sync import ThreadSensitiveContext, get_current_task, sync_to_async
 
 from django.db import (
     DEFAULT_DB_ALIAS,
@@ -205,6 +205,7 @@ class Atomic(ContextDecorator):
 
     def __enter__(self):
         connection = get_connection(self.using)
+        self._validate_async_task(connection)
 
         if (
             self.durable
@@ -247,6 +248,7 @@ class Atomic(ContextDecorator):
 
     def __exit__(self, exc_type, exc_value, traceback):
         connection = get_connection(self.using)
+        self._validate_async_task(connection)
 
         if connection.in_atomic_block:
             connection.atomic_blocks.pop()
@@ -336,6 +338,26 @@ class Atomic(ContextDecorator):
                 else:
                     connection.in_atomic_block = False
 
+    def _validate_async_task(self, connection):
+        blocks = _async_atomic_blocks.get()
+        tasks = connection._async_atomic_tasks
+        if not blocks and not tasks:
+            return
+        # The context is inherited by child tasks, so it cannot identify the
+        # caller of a synchronous helper. Read the task carried by the bridge.
+        task = get_current_task()
+        if blocks and blocks[-1][0] is not task:
+            raise TransactionManagementError(
+                "Cannot use an atomic block in another task's async atomic context."
+            )
+        # Siblings sharing a sync transaction (including TestCase) need not
+        # inherit any async blocks. Check the connection's owner as well.
+        if tasks and tasks[-1] is not task:
+            raise TransactionManagementError(
+                "Cannot use an atomic block while another task is using "
+                "this connection's transaction."
+            )
+
     async def __aenter__(self):
         blocks = _async_atomic_blocks.get()
         task = asyncio.current_task()
@@ -380,17 +402,10 @@ class Atomic(ContextDecorator):
 
     def _enter_async(self, task):
         connection = get_connection(self.using)
-        # A sync parent has no async owner for sibling tasks to inherit.
-        # Check ownership and enter on the worker in one call, so two tasks
-        # cannot both see an unclaimed connection before creating a savepoint.
-        tasks = connection._async_atomic_tasks
-        if tasks and tasks[-1] is not task:
-            raise TransactionManagementError(
-                "Cannot enter an async atomic block while another task is using "
-                "this connection's transaction."
-            )
+        # Validate ownership, enter, and claim the connection on its worker
+        # in one call, before another task can attempt to enter.
         self.__enter__()
-        tasks.append(task)
+        connection._async_atomic_tasks.append(task)
 
     def _exit_async(self, exc_type, exc_value, traceback):
         connection = get_connection(self.using)

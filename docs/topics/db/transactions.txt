@@ -271,6 +271,13 @@ immediately awaits the child. It includes tasks created by
 ``asyncio.create_task()`` or ``asyncio.gather()``, and tasks created by an
 ``async_to_sync()`` bridge inside an async atomic context.
 
+The same ownership rule applies to synchronous ``atomic`` blocks and
+decorators reached through ``sync_to_async()``. The owning task can call
+these helpers, but a child task cannot use them to enter or exit an atomic
+block. This also applies to ORM methods that open atomic blocks internally,
+such as ``abulk_create()`` and ``aupdate_or_create()``. Await these operations
+in the owning task instead of scheduling them in child tasks.
+
 Prefer to keep database work in the owning task. If you create child tasks,
 ensure they all finish before the atomic block exits, for example by using
 ``asyncio.TaskGroup`` inside the block. Their ORM calls can still share the
@@ -285,8 +292,9 @@ If there is no inherited async atomic context, an async block reached
 through ``async_to_sync()`` can still join an existing synchronous
 transaction, including the transaction wrapping a
 :class:`~django.test.TestCase`. Only one task at a time may have async atomic
-blocks open on that shared transaction. Overlapping entry by another task
-raises :exc:`~django.db.transaction.TransactionManagementError` before
+blocks open on that shared transaction. Overlapping atomic entry by another task,
+including through a synchronous helper, raises
+:exc:`~django.db.transaction.TransactionManagementError` before
 creating a savepoint. Run these blocks in sequence to keep using the shared
 transaction.
 
