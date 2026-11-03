@@ -445,7 +445,7 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
             dialogue__search=(
                 SearchQuery("nostrils", config="simple")
                 & SearchQuery("bowels", config="simple")
-            ),
+            )
         )
         self.assertSequenceEqual(searched, [self.verse2])
 
@@ -884,6 +884,9 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
             with self.subTest(lexeme=lexeme):
                 self.assertEqual(quote_lexeme(lexeme), quoted)
 
+    def test_quote_lexeme_escaped_only(self):
+        self.assertEqual(quote_lexeme("&"), "")
+
     def test_prefix_searching(self):
         searched = Line.objects.annotate(
             search=SearchVector("scene__setting", "dialogue"),
@@ -950,6 +953,7 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
                 "scene__setting", "dialogue", config=F("dialogue_config")
             ),
         ).filter(search=SearchQuery(Lexeme("cadeaux"), config=F("dialogue_config")))
+
         self.assertSequenceEqual(searched, [self.french])
 
     def test_config_from_field_implicit(self):
@@ -958,6 +962,7 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
                 "scene__setting", "dialogue", config=F("dialogue_config")
             ),
         ).filter(search=Lexeme("cadeaux"))
+
         self.assertSequenceEqual(searched, [self.french])
 
     def test_invalid_combinations(self):
