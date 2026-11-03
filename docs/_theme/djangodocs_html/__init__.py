@@ -2,6 +2,8 @@
 # the djangodocs Sphinx extension in _ext/djangodocs.py.) This theme must also
 # be listed in conf.py extensions so that Sphinx calls the setup() function.
 
+import os
+
 
 def patch_suppress_sidebar_toctree(
     app, pagename, templatename, context, doctree
@@ -31,6 +33,10 @@ def setup(app):
         # This must be connected at a late (high number) priority so it runs
         # after pydata-sphinx-theme's context generation.
         app.connect("html-page-context", patch_suppress_sidebar_toctree, priority=900)
+
+        if os.environ.get("READTHEDOCS_VERSION_TYPE") == "external":
+            # Adjust layout for Read the Docs PR preview builds.
+            app.add_css_file("pr-preview.css")
 
     return {
         "version": "0.1",
