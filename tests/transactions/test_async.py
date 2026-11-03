@@ -2,11 +2,11 @@ import asyncio
 import gc
 import threading
 from concurrent.futures import ThreadPoolExecutor
-from unittest import mock
+from unittest import mock, skipUnless
 
 from asgiref.sync import async_to_sync, sync_to_async
 
-from django.db import connection, connections, transaction
+from django.db import DatabaseError, connection, connections, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.utils import ignore_warnings
 
@@ -750,7 +750,9 @@ class AsyncAtomicTests(TransactionTestCase):
         self.assertEqual(
             rejection_message,
             "Cannot use an atomic block while another task is using "
-            "this connection's transaction.",
+            "this connection's transaction. Run atomic blocks sequentially "
+            "when sharing a transaction. In tests, use TransactionTestCase "
+            "for independent concurrent transactions.",
         )
 
     async def test_synchronous_parent_reusable_after_async_errors(self):
@@ -984,6 +986,56 @@ class AsyncAtomicTests(TransactionTestCase):
 class AsyncAtomicIsolationTests(TransactionTestCase):
     available_apps = ["transactions"]
 
+    async def test_plain_sibling_does_not_see_uncommitted_write(self):
+        entered = asyncio.Event()
+        checked = asyncio.Event()
+
+        async def owner():
+            async with transaction.atomic():
+                await Reporter.objects.acreate(first_name="Tintin")
+                entered.set()
+                await checked.wait()
+
+        async def sibling():
+            await entered.wait()
+            try:
+                self.assertEqual(await Reporter.objects.acount(), 0)
+            finally:
+                checked.set()
+
+        async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+            tasks.create_task(owner())
+            tasks.create_task(sibling())
+        self.assertEqual(await Reporter.objects.acount(), 1)
+
+    @skipUnless(connection.vendor == "postgresql", "PostgreSQL-specific behavior")
+    async def test_plain_sibling_database_error_does_not_abort_atomic(self):
+        entered = asyncio.Event()
+        attempted = asyncio.Event()
+
+        def invalid_query():
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1 / 0")
+
+        async def owner():
+            async with transaction.atomic():
+                await Reporter.objects.acreate(first_name="Tintin")
+                entered.set()
+                await attempted.wait()
+
+        async def sibling():
+            await entered.wait()
+            try:
+                with self.assertRaises(DatabaseError):
+                    await sync_to_async(invalid_query)()
+            finally:
+                attempted.set()
+
+        async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+            tasks.create_task(owner())
+            tasks.create_task(sibling())
+        self.assertEqual(await Reporter.objects.acount(), 1)
+
     async def test_connection_closed_on_exit(self):
         get = sync_to_async(current_thread_and_connection)
         for max_age in (0, None):
@@ -1106,6 +1158,103 @@ class AsyncAtomicInsideTestCaseTests(TestCase):
             await Reporter.objects.acreate(first_name="Haddock")
         self.assertEqual(await Reporter.objects.acount(), 2)
 
+    async def test_sibling_async_atomic_blocks_can_run_sequentially(self):
+        async def create(name):
+            async with transaction.atomic():
+                await Reporter.objects.acreate(first_name=name)
+
+        await asyncio.create_task(create("Haddock"))
+        await asyncio.create_task(create("Calculus"))
+        self.assertEqual(await Reporter.objects.acount(), 3)
+
+    async def test_sibling_async_atomic_cannot_join_owned_transaction(self):
+        entered = asyncio.Event()
+        attempted = asyncio.Event()
+
+        async def owner():
+            async with transaction.atomic():
+                before = await sync_to_async(current_transaction_state)()
+                entered.set()
+                await attempted.wait()
+                self.assertEqual(
+                    await sync_to_async(current_transaction_state)(), before
+                )
+                await Reporter.objects.acreate(first_name="Haddock")
+
+        async def sibling():
+            await entered.wait()
+            try:
+                with self.assertRaisesMessage(
+                    transaction.TransactionManagementError,
+                    "In tests, use TransactionTestCase for independent concurrent "
+                    "transactions.",
+                ):
+                    async with transaction.atomic():
+                        self.fail("Overlapping atomic entry should be rejected.")
+            finally:
+                attempted.set()
+
+        async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+            tasks.create_task(owner())
+            tasks.create_task(sibling())
+        self.assertEqual(await Reporter.objects.acount(), 2)
+
+    async def test_plain_sibling_sees_uncommitted_write(self):
+        entered = asyncio.Event()
+        checked = asyncio.Event()
+
+        async def owner():
+            with self.assertRaisesMessage(ValueError, "Undo write"):
+                async with transaction.atomic():
+                    await Reporter.objects.acreate(first_name="Haddock")
+                    entered.set()
+                    await checked.wait()
+                    raise ValueError("Undo write")
+
+        async def sibling():
+            await entered.wait()
+            try:
+                self.assertEqual(await Reporter.objects.acount(), 2)
+            finally:
+                checked.set()
+
+        async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+            tasks.create_task(owner())
+            tasks.create_task(sibling())
+        self.assertEqual(await Reporter.objects.acount(), 1)
+
+    @skipUnless(connection.vendor == "postgresql", "PostgreSQL-specific behavior")
+    async def test_plain_sibling_database_error_aborts_atomic(self):
+        entered = asyncio.Event()
+        attempted = asyncio.Event()
+
+        def invalid_query():
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1 / 0")
+
+        async def owner():
+            # Catching the error in the sibling doesn't repair the transaction.
+            # Releasing this block's savepoint fails and rolls its write back.
+            with self.assertRaises(DatabaseError):
+                async with transaction.atomic():
+                    await Reporter.objects.acreate(first_name="Haddock")
+                    entered.set()
+                    await attempted.wait()
+
+        async def sibling():
+            await entered.wait()
+            try:
+                with self.assertRaises(DatabaseError):
+                    await sync_to_async(invalid_query)()
+            finally:
+                attempted.set()
+
+        async with asyncio.timeout(10), asyncio.TaskGroup() as tasks:
+            tasks.create_task(owner())
+            tasks.create_task(sibling())
+        # Rolling back the savepoint leaves the test transaction usable.
+        self.assertEqual(await Reporter.objects.acount(), 1)
+
     async def test_sibling_sync_atomic_cannot_join_owned_transaction(self):
         """Protect siblings that don't inherit the owner's async blocks."""
         entered = asyncio.Event()
@@ -1128,7 +1277,11 @@ class AsyncAtomicInsideTestCaseTests(TestCase):
         async def sibling():
             await entered.wait()
             try:
-                with self.assertRaises(transaction.TransactionManagementError):
+                with self.assertRaisesMessage(
+                    transaction.TransactionManagementError,
+                    "In tests, use TransactionTestCase for independent concurrent "
+                    "transactions.",
+                ):
                     await sync_to_async(create)()
             finally:
                 attempted.set()

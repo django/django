@@ -355,7 +355,9 @@ class Atomic(ContextDecorator):
         if tasks and tasks[-1] is not task:
             raise TransactionManagementError(
                 "Cannot use an atomic block while another task is using "
-                "this connection's transaction."
+                "this connection's transaction. Run atomic blocks sequentially "
+                "when sharing a transaction. In tests, use TransactionTestCase "
+                "for independent concurrent transactions."
             )
 
     async def __aenter__(self):

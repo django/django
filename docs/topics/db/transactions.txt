@@ -298,6 +298,27 @@ including through a synchronous helper, raises
 creating a savepoint. Run these blocks in sequence to keep using the shared
 transaction.
 
+.. admonition:: Testing concurrent transactions
+
+    Use :class:`~django.test.TransactionTestCase` to test independent concurrent
+    transactions. :class:`~django.test.TestCase` supports sequential async atomic
+    blocks, but its wrapping transaction means that sibling tasks share a
+    connection. This differs from tasks entering independent outermost async
+    atomic blocks outside a transaction:
+
+    * Overlapping atomic blocks on the shared connection are rejected.
+    * Queries that don't enter an atomic block can see another task's uncommitted
+      writes on that connection.
+    * On PostgreSQL, a database error in one task can abort the shared
+      transaction and cause another task's atomic block to fail, even if the
+      first task catches the error.
+
+    The ownership checks reject overlapping atomic blocks, but don't prevent
+    plain queries from sharing the transaction. A passing ``TestCase`` therefore
+    doesn't establish that concurrent transactions are isolated. Use
+    ``TransactionTestCase`` when testing commit, rollback, or visibility across
+    independent transactions; its database cleanup is slower than ``TestCase``.
+
 An async atomic block must be exited in the task that entered it. If
 you use the async context manager form, this will be automatic.
 The ``atomic`` decorator will not work if called directly from an async
