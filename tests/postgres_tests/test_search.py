@@ -879,6 +879,7 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
             ("backslash\\", "'backslash'"),
             ("exclamation!", "'exclamation'"),
             ("ampers&nd", "'ampers nd'"),
+            ("&", "NULL"),
         )
         for lexeme, quoted in tests:
             with self.subTest(lexeme=lexeme):
