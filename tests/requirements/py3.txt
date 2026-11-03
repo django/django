@@ -1,5 +1,5 @@
 aiosmtpd >= 1.4.5
-asgiref @ git+https://github.com/django/asgiref.git@refs/pull/596/head
+asgiref >= 3.13.0
 argon2-cffi >= 23.1.0
 bcrypt >= 4.1.1
 black >= 26.5.1
