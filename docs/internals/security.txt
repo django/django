@@ -56,6 +56,8 @@ What to include
 Your initial report should give the security team enough to make a triage
 decision, no more. It should include:
 
+* A single vulnerability, as opposed to multiple separate issues.
+
 * A brief description of the issue and where in Django it occurs.
 
 * A minimal, working proof of concept (code snippet or reproduction steps).
@@ -258,6 +260,7 @@ result on your initial report before submitting further ones. Exceptions can be
 made for issues that are clearly and directly related to an already reported
 finding. Feedback on an initial report is often relevant to subsequent ones,
 and taking the time to read and incorporate it leads to better reports overall.
+Do not include multiple reports in a single submission.
 
 The security team is not able to process large volumes of reports submitted in
 a short period of time, and reports submitted in bulk may be put on hold.
