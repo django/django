@@ -81,9 +81,9 @@ class CompositePKOrderByTests(TestCase):
         for combinator in ("union", "intersection", "difference"):
             with self.subTest(combinator=combinator):
                 qs = getattr(
-                    Comment.objects.filter(pk__in=[(1, 1), (1, 3), (1, 5), (2, 4)]),
+                    Comment.objects.filter(id__in=[1, 3, 4, 5]),
                     combinator,
-                )(Comment.objects.filter(pk__in=[(1, 3), (1, 5), (2, 4)]))
+                )(Comment.objects.filter(id__in=[3, 4, 5]))
                 expected = {
                     "union": [
                         self.comment_1,
@@ -112,11 +112,21 @@ class CompositePKOrderByTests(TestCase):
         )
         self.assertSequenceEqual(
             qs.values_list("pk", flat=True).order_by("pk"),
-            [(1, 1), (1, 2), (1, 5), (2, 4)],
+            [
+                self.comment_1.pk,
+                self.comment_2.pk,
+                self.comment_5.pk,
+                self.comment_4.pk,
+            ],
         )
         self.assertSequenceEqual(
             qs.values_list("pk", "id").order_by("-pk"),
-            [((2, 4), 4), ((1, 5), 5), ((1, 2), 2), ((1, 1), 1)],
+            [
+                (self.comment_4.pk, 4),
+                (self.comment_5.pk, 5),
+                (self.comment_2.pk, 2),
+                (self.comment_1.pk, 1),
+            ],
         )
 
     def test_order_combined_comments_by_pk_and_field(self):
