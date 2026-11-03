@@ -36,6 +36,72 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+November 3, 2026 - :cve:`2026-108147`
+-------------------------------------
+
+Potential memory exhaustion in ``MultiPartParser`` via base64-encoded file
+upload.
+`Full description
+<https://www.djangoproject.com/weblog/2026/nov/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <8b435411f11d69a0dd41a8837654323502e6058e>`
+* Django 6.0 :commit:`(patch) <a29ee4a55acedbe7ba0cb4d2db28c4e4d2848e02>`
+* Django 5.2 :commit:`(patch) <4bd1f59a80adafddbd47527c66d92d6a224244d8>`
+
+November 3, 2026 - :cve:`2026-111211`
+-------------------------------------
+
+Potential log injection via unescaped geometry form values.
+`Full description
+<https://www.djangoproject.com/weblog/2026/nov/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <b336d9a4e8a919d2e5f979b663de2b27e245b793>`
+* Django 6.0 :commit:`(patch) <1b747694d6a68a6b5d48cbe81c71053092a5d374>`
+* Django 5.2 :commit:`(patch) <b83bf870ee0006ab0dd84a01d1f3b0391320a51a>`
+
+November 3, 2026 - :cve:`2026-111362`
+-------------------------------------
+
+Server-side request forgery via crs member of GeoJSON geometries.
+`Full description
+<https://www.djangoproject.com/weblog/2026/nov/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <649fb7985f67d5936dfb8caae6a54c0870dc8eec>`
+* Django 6.0 :commit:`(patch) <e938f676fcca72f41247b0e96d4f0805e1722913>`
+* Django 5.2 :commit:`(patch) <31bef742da017bc71fdce9298c30984aad844102>`
+
+November 3, 2026 - :cve:`2026-113593`
+-------------------------------------
+
+Potential exposure of private data via empty and missing ``Vary`` headers.
+`Full description
+<https://www.djangoproject.com/weblog/2026/nov/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <55e2e009b4f3996e5c55af7b22a8c41eb826e892>`
+* Django 6.0 :commit:`(patch) <2006a2b068766bf332f1afcc32b7614d8e5759a2>`
+* Django 5.2 :commit:`(patch) <9007fecd3633cfd90b093ebe106af564347c8aee>`
+
+November 3, 2026 - :cve:`2026-113733`
+-------------------------------------
+
+Password hash disclosure to "view only" admin users with custom user models.
+`Full description
+<https://www.djangoproject.com/weblog/2026/nov/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <7d875c0a49d2a59335c65f6bf57970a5bac03be2>`
+* Django 6.0 :commit:`(patch) <67cce9dcd23ddeec41ccf0abfe3431e3cd724365>`
+
+November 3, 2026 - :cve:`2026-114582`
+-------------------------------------
+
+Server-side request forgery via ``SpatialReference`` string input.
+`Full description
+<https://www.djangoproject.com/weblog/2026/nov/03/security-releases/>`__
+
+* Django 6.1 :commit:`(patch) <a658355eb51feccbe90b5ca2e3b7f3543cd99e01>`
+* Django 6.0 :commit:`(patch) <1c980729e53ef119d43a01d32ead30116c46cd36>`
+* Django 5.2 :commit:`(patch) <8bda4d0db15f28828d8db000287562efae5ce063>`
+
 October 6, 2026 - :cve:`2026-77050`
 -----------------------------------
 
