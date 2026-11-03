@@ -972,6 +972,33 @@ class AsyncAtomicTests(TransactionTestCase):
             self.assertEqual(callbacks, [])
         self.assertEqual(callbacks, [1])
 
+    async def test_on_commit_discarded_on_rollback(self):
+        callbacks = []
+        with self.assertRaisesMessage(ValueError, "Undo transaction"):
+            async with transaction.atomic():
+                await sync_to_async(transaction.on_commit)(lambda: callbacks.append(1))
+                self.assertEqual(callbacks, [])
+                raise ValueError("Undo transaction")
+        self.assertEqual(callbacks, [])
+        # A later successful transaction must not run the discarded callback.
+        async with transaction.atomic():
+            await sync_to_async(transaction.on_commit)(lambda: callbacks.append(2))
+        self.assertEqual(callbacks, [2])
+
+    async def test_on_commit_discarded_on_savepoint_rollback(self):
+        callbacks = []
+        async with transaction.atomic():
+            await sync_to_async(transaction.on_commit)(lambda: callbacks.append(1))
+            with self.assertRaisesMessage(ValueError, "Undo savepoint"):
+                async with transaction.atomic():
+                    await sync_to_async(transaction.on_commit)(
+                        lambda: callbacks.append(2)
+                    )
+                    raise ValueError("Undo savepoint")
+            await sync_to_async(transaction.on_commit)(lambda: callbacks.append(3))
+            self.assertEqual(callbacks, [])
+        self.assertEqual(callbacks, [1, 3])
+
     async def test_outer_connection_not_in_transaction(self):
         async with transaction.atomic():
             self.assertIs(

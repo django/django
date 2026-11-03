@@ -326,6 +326,43 @@ context, and ``SynchronousOnlyOperation`` will be raised. But the
 ``atomic`` decorator will work as normal on sync code inside
 ``sync_to_async``.
 
+To register an :func:`on_commit` callback from asynchronous code, wrap the
+registration in ``sync_to_async()``::
+
+    from asgiref.sync import sync_to_async
+    from django.db import transaction
+
+
+    async def create_reporter():
+        async with transaction.atomic():
+            reporter = await Reporter.objects.acreate(first_name="Tintin")
+            await sync_to_async(transaction.on_commit)(
+                lambda: send_notification(reporter.pk)
+            )
+
+The body of an async atomic block still runs on the main event-loop thread.
+Django performs its transaction operations and asynchronous ORM calls on a synchronous
+background worker thread. The `on_commit` needs to be scheduled on that same
+background worker thread. Database connections are local to each thread, and ``on_commit()``
+looks up the connection in the thread where it is called. Calling it directly
+from the block's body therefore doesn't register the callback on the worker's
+transaction; it normally raises
+:exc:`~django.core.exceptions.SynchronousOnlyOperation` when accessing the
+event-loop thread's connection.
+
+``sync_to_async()`` runs the registration on the same worker thread
+that is set up by `transaction.atomic`. Keep its default
+``thread_sensitive=True`` so it uses the worker holding the transaction's
+connection. If you specify a database with ``atomic(using=...)``, pass the same
+``using`` alias to ``on_commit()``.
+
+After a successful commit, Django invokes each callback synchronously on the
+worker thread, without awaiting its return value. Passing an ``async def``
+function directly would only create an unawaited coroutine; its body wouldn't
+run. To use an asynchronous callback, adapt it with ``async_to_sync()`` before
+registering it. The ``sync_to_async()`` wrapper above moves the registration to
+the worker thread; it doesn't adapt the callback itself.
+
 .. admonition:: Performance considerations
 
     Open transactions have a performance cost for your database server. To
@@ -398,6 +435,9 @@ Pass a function, or any callable, to :func:`on_commit`::
 
 
     transaction.on_commit(send_welcome_email)
+
+From asynchronous code, wrap registration in ``sync_to_async()`` as shown in
+:ref:`async-atomic`.
 
 Callbacks will not be passed any arguments, but you can bind them with
 :func:`functools.partial`::
