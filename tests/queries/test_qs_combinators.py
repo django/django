@@ -394,6 +394,15 @@ class QuerySetSetOperationTests(TestCase):
             operator.itemgetter("num"),
         )
 
+    def test_order_by_unselected_field_cloned_values(self):
+        numbers = Number.objects.filter(num__in=[1, 2])
+        qs = numbers.union(numbers).values("num").order_by("other_num")
+        clone = qs.all()
+        expected = [{"num": 2}, {"num": 1}]
+
+        self.assertQuerySetEqual(qs, expected)
+        self.assertQuerySetEqual(clone, expected)
+
     def test_order_by_annotation_transform(self):
         class Mod2(Mod, Transform):
             def __init__(self, expr):
