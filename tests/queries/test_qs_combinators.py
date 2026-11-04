@@ -1,6 +1,7 @@
 import operator
 from datetime import datetime
 
+from django.core.paginator import Paginator
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
     DateTimeField,
@@ -392,6 +393,37 @@ class QuerySetSetOperationTests(TestCase):
             [6, 7, 8, 9, 0, 1, 2, 3, 4, 5],
             operator.itemgetter("num"),
         )
+
+    def test_union_with_values_and_order_by_non_selected_column_clones(self):
+        def get_qs():
+            return (
+                Number.objects.filter(num__lt=3)
+                .union(Number.objects.filter(num__lt=3))
+                .values("num")
+                .order_by("other_num")
+            )
+
+        expected = [{"num": 2}, {"num": 1}, {"num": 0}]
+        qs = get_qs()
+        qs_clone = qs.all()
+        self.assertEqual(list(qs), expected)
+        self.assertEqual(list(qs_clone), expected)
+        qs = get_qs()
+        qs_clone = qs.all()
+        self.assertEqual(list(qs_clone), expected)
+        self.assertEqual(list(qs), expected)
+        qs = get_qs()
+        self.assertEqual(list(qs[:1]), expected[:1])
+        self.assertEqual(list(qs), expected)
+        qs = get_qs()
+        self.assertEqual(list(qs.all()), expected)
+        self.assertEqual(list(qs.all()), expected)
+        qs = get_qs()
+        self.assertEqual(qs.first(), expected[0])
+        self.assertEqual(list(qs), expected)
+        paginator = Paginator(get_qs(), 2)
+        self.assertEqual(list(paginator.page(1)), expected[:2])
+        self.assertEqual(list(paginator.page(2)), expected[2:])
 
     def test_order_by_annotation_transform(self):
         class Mod2(Mod, Transform):

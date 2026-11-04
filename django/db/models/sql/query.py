@@ -402,6 +402,8 @@ class Query(BaseExpression):
         obj.annotations = self.annotations.copy()
         if self.annotation_select_mask is not None:
             obj.annotation_select_mask = self.annotation_select_mask.copy()
+        if self.selected is not None:
+            obj.selected = self.selected.copy()
         if self.combined_queries:
             obj.combined_queries = tuple(
                 [query.clone() for query in self.combined_queries]
