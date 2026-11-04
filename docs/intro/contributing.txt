@@ -158,7 +158,7 @@ terminal window.
 
     .. code-block:: doscon
 
-        ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
+        ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate
 
 The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
