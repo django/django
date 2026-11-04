@@ -25,3 +25,7 @@ Bugfixes
   :exc:`~django.core.exceptions.ValidationError` by the
   :class:`~django.contrib.gis.forms.GeometryField` form field
   (:ticket:`37491`).
+
+* Fixed a regression in Django 5.2 that caused a crash when evaluating a
+  combined query using ``values()`` and ordered by a non-selected field after
+  evaluating a clone of the same queryset (:ticket:`37474`).
