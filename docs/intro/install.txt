@@ -58,11 +58,14 @@ You've got three options to install Django:
 .. admonition:: Always refer to the documentation that corresponds to the
     version of Django you're using!
 
-    If you do either of the first two steps, keep an eye out for parts of the
-    documentation marked **new in development version**. That phrase flags
-    features that are only available in development versions of Django, and
-    they likely won't work with an official release.
+    The main documentation site at `docs.djangoproject.com`_ shows the latest
+    stable release by default. If you've installed a different Django version,
+    be sure to switch to the correct documentation using the version picker at
+    the bottom. Keep an eye out for "added/changed/deprecated in version ..."
+    notes which flag features that may be different from the version you're
+    using.
 
+.. _docs.djangoproject.com: https://docs.djangoproject.com/
 
 Verifying
 =========
