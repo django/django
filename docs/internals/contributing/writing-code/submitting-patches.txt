@@ -46,13 +46,13 @@ and time availability), claim it by following these steps:
   the :ref:`process for suggesting new features <requesting-features>`.
 
 * If a ticket for this issue already exists and has been accepted, make sure
-  nobody else has claimed it. To do this, look at the "Owned by" section of
-  the ticket. If it's assigned to "nobody," then it's available to be claimed.
-  Otherwise, somebody else may be working on this ticket. Either find another
-  bug/feature to work on, or contact the developer working on the ticket to
-  offer your help. If a ticket has been assigned for weeks or months without
-  any activity, it's probably safe to reassign it to yourself. If a ticket
-  hasn't been approved yet, join the conversation.
+  the reporter has declined to offer a patch and nobody else has claimed it
+  either. To do this, read the discussion, and look at the "Owned by" section
+  of the ticket. If the reporter has declined, and it's still assigned to no
+  one, then it's available to be claimed. Otherwise, find another bug/feature
+  to work on, or contact the developer working on the ticket to offer your
+  help. If a ticket has been assigned for months without any activity, it's
+  probably safe to reassign it to yourself.
 
 * Log into your account, if you haven't already, by clicking "GitHub Login"
   or "DjangoProject Login" in the upper left of the ticket page. Once logged
@@ -101,9 +101,6 @@ Going through the steps of claiming tickets is overkill in some cases.
 In the case of small changes, such as typos in the documentation or small bugs
 that will only take a few minutes to fix, you don't need to jump through the
 hoops of claiming tickets. Submit your changes directly and you're done!
-
-It is *always* acceptable, regardless of whether someone has claimed it or not,
-to link proposals to a ticket if you happen to have the changes ready.
 
 .. _patch-style:
 
