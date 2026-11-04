@@ -85,26 +85,34 @@ Please read and follow our `Code of Conduct
 Installing Git
 ==============
 
-For this tutorial, you'll need Git installed to download the current
-development version of Django and to generate a branch for the changes you
-make.
+You'll need Git installed to download Django's current development version
+and to create a branch for the changes you make.
 
-To check whether or not you have Git installed, enter ``git`` into the command
-line. If you get messages saying that this command could not be found, you'll
-have to download and install it, see `Git's download page`__.
+To check whether Git is already installed, run:
 
-If you're not that familiar with Git, you can always find out more about its
-commands (once it's installed) by typing ``git help`` into the command line.
+.. console::
 
-__ https://git-scm.com/download
+    $ git --version
+
+If the command isn't recognized, you'll need to download and install Git —
+see `Git's download page <https://git-scm.com/download>`__.
+
+New to Git? You can explore its commands anytime (once installed) by running
+``git help``.
 
 Getting a copy of Django's development version
 ==============================================
 
-The first step to contributing to Django is to get a copy of the source code.
-First, `fork Django on GitHub <https://github.com/django/django/fork>`__. Then,
-from the command line, use the ``cd`` command to navigate to the directory
-where you'll want your local copy of Django to live.
+The first step is to get a copy of the source code:
+
+1. `Fork Django on GitHub <https://github.com/django/django/fork>`__.
+2. Open your terminal (macOS/Linux) or Command Prompt (Windows).
+3. Use ``cd`` to navigate to the folder where you want your local copy of
+   Django to live, for example:
+
+   .. code-block:: console
+
+       $ cd ~/projects
 
 Download the Django source code repository using the following command:
 
@@ -143,22 +151,23 @@ The final step in setting up your virtual environment is to activate it:
 
     $ source ~/.virtualenvs/djangodev/bin/activate
 
-If the ``source`` command is not available, you can try using a dot instead:
-
-.. code-block:: console
-
-    $ . ~/.virtualenvs/djangodev/bin/activate
-
-You have to activate the virtual environment whenever you open a new
-terminal window.
-
 .. admonition:: For Windows users
 
     To activate your virtual environment on Windows, run:
 
     .. code-block:: doscon
 
-        ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
+        ...\>%HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
+
+You'll need to activate the virtual environment every time you open a new
+terminal window.
+
+If your shell doesn't support the ``source`` command, you can use a dot
+(``.``) instead — it works the same way. For example:
+
+.. code-block:: console
+
+    $ . ~/.virtualenvs/djangodev/bin/activate
 
 The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
@@ -186,6 +195,11 @@ haven't broken other parts of Django. If you've never run Django's test suite
 before, it's a good idea to run it once beforehand to get familiar with its
 output.
 
+.. admonition:: What is a test suite?
+
+    A test suite is a collection of automated tests that check whether the
+    code actually works correctly.
+
 Before running the test suite, enter the Django ``tests/`` directory using the
 ``cd tests`` command, and install test dependencies by running:
 
@@ -198,7 +212,7 @@ a dependency for one or more of the Python packages. Consult the failing
 package's documentation or search the web with the error message that you
 encounter.
 
-Now we are ready to run the test suite:
+Now you're ready to run the test suite:
 
 .. console::
 
@@ -208,12 +222,15 @@ Now sit back and relax. Django's entire test suite has thousands of tests, and
 it takes at least a few minutes to run, depending on the speed of your
 computer.
 
-While Django's test suite is running, you'll see a stream of characters
-representing the status of each test as it completes. ``E`` indicates that an
-error was raised during a test, and ``F`` indicates that a test's assertions
-failed. Both of these are considered to be test failures. Meanwhile, ``x`` and
-``s`` indicate expected failures and skipped tests, respectively. Dots indicate
-passing tests.
+While it runs, you'll see a stream of characters showing each test's status
+as it finishes:
+
+* A dot (``.``) means the test passed.
+* ``E`` means a test raised an error.
+* ``F`` means a test's assertions failed.
+* ``x`` and ``s`` mean expected failures and skipped tests.
+
+``E`` and ``F`` both count as test failures.
 
 Skipped tests are typically due to missing external libraries required to run
 the test; see :ref:`running-unit-tests-dependencies` for a list of dependencies
@@ -249,6 +266,14 @@ __ https://djangoci.com
 Working on an approved new feature
 ==================================
 
+Django tracks bugs, feature requests, and other work through *tickets* on
+its ticket tracker (Trac), at https://code.djangoproject.com/. For this
+tutorial, we'll work on a "fake accepted ticket" as a case study. Here are
+the imaginary details:
+
+You can view, search, and create tickets on Django's ticket tracker (Trac)
+at https://code.djangoproject.com/.
+
 For this tutorial, we'll work on a "fake accepted ticket" as a case study. Here
 are the imaginary details:
 
@@ -275,14 +300,15 @@ won't affect the main copy of the code that we cloned earlier.
 Writing some tests for your ticket
 ==================================
 
-In most cases, for a contribution to be accepted into Django it has to include
-tests. For bug fix contributions, this means writing a regression test to
-ensure that the bug is never reintroduced into Django later on. A regression
-test should be written in such a way that it will fail while the bug still
-exists and pass once the bug has been fixed. For contributions containing new
-features, you'll need to include tests which ensure that the new features are
-working correctly. They too should fail when the new feature is not present,
-and then pass once it has been implemented.
+Most contributions need tests to be accepted into Django.
+
+* **Bug fixes** need a regression test — one that fails while the bug still
+  exists, and passes once you've fixed it.
+* **New features** need tests that fail before the feature exists, and pass
+  once you've implemented it.
+
+This proves your change actually works, and helps catch the same bug or
+missing feature if it's ever accidentally reintroduced later.
 
 A good way to do this is to write your new tests first, before making any
 changes to the code. This style of development is called
