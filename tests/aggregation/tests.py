@@ -1651,6 +1651,14 @@ class AggregateTestCase(TestCase):
                 )
                 self.assertEqual(list(books_qs), expected_result)
 
+    def test_aggregation_values_only_aggregate_annotation(self):
+        qs = Author.objects.annotate(num_books=Count("book")).values("num_books")
+        self.assertEqual(qs.count(), Author.objects.count())
+        self.assertEqual(
+            qs.values_list("num_books", flat=True).count(), Author.objects.count()
+        )
+        self.assertEqual(qs.aggregate(max_age=Max("age")), {"max_age": 57})
+
     @skipUnlessDBFeature("supports_subqueries_in_group_by")
     def test_group_by_subquery_annotation(self):
         """

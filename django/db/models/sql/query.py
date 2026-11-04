@@ -603,6 +603,7 @@ class Query(BaseExpression):
                 inner_query.select = (
                     self.model._meta.pk.get_col(inner_query.get_initial_alias()),
                 )
+                inner_query.selected = None
         else:
             outer_query = self
             self.select = ()
@@ -1245,7 +1246,7 @@ class Query(BaseExpression):
         else:
             self.set_annotation_mask(set(self.annotation_select).difference({alias}))
         self.annotations[alias] = annotation
-        if select and self.selected:
+        if select and self.selected is not None:
             self.selected[alias] = alias
 
     @property
@@ -2565,7 +2566,7 @@ class Query(BaseExpression):
             self.annotation_select_mask = None
         else:
             self.annotation_select_mask = set(names)
-            if self.selected:
+            if self.selected is not None:
                 # Prune the masked annotations.
                 self.selected = {
                     key: value
