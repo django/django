@@ -344,7 +344,7 @@ class LoremNode(Node):
     def render(self, context):
         try:
             count = int(self.count.resolve(context))
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             count = 1
         if self.method == "w":
             return words(count, common=self.common)
@@ -546,7 +546,7 @@ class WidthRatioNode(Node):
             max_width = int(self.max_width.resolve(context))
         except VariableDoesNotExist:
             return ""
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             raise TemplateSyntaxError("widthratio final argument must be a number")
         try:
             value = float(value)
@@ -555,7 +555,7 @@ class WidthRatioNode(Node):
             result = str(round(ratio))
         except ZeroDivisionError:
             result = "0"
-        except (ValueError, TypeError, OverflowError):
+        except ValueError, TypeError, OverflowError:
             result = ""
 
         if self.asvar:
@@ -1441,7 +1441,7 @@ def resetcycle(parser, token):
         name = args[1]
         try:
             return ResetCycleNode(parser._named_cycle_nodes[name])
-        except (AttributeError, KeyError):
+        except AttributeError, KeyError:
             raise TemplateSyntaxError("Named cycle '%s' does not exist." % name)
     try:
         return ResetCycleNode(parser._last_cycle_node)

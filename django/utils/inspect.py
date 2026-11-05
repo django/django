@@ -1,19 +1,17 @@
+import annotationlib
 import functools
 import inspect
 import threading
 from contextlib import contextmanager
 
-from django.utils.version import PY314, PY315
+from django.utils.version import PY315
 
-if PY314:
-    import annotationlib
-
-    if not PY315:
-        lock = threading.Lock()
-        safe_signature_from_callable = functools.partial(
-            inspect._signature_from_callable,
-            annotation_format=annotationlib.Format.FORWARDREF,
-        )
+if not PY315:
+    lock = threading.Lock()
+    safe_signature_from_callable = functools.partial(
+        inspect._signature_from_callable,
+        annotation_format=annotationlib.Format.FORWARDREF,
+    )
 
 
 @functools.lru_cache(maxsize=512)
@@ -123,7 +121,7 @@ def lazy_annotations():
 
     This context manager is not reentrant.
     """
-    if PY315 or not PY314:
+    if PY315:
         yield
         return
     with lock:
@@ -144,10 +142,7 @@ def getfullargspec(*args, annotation_format=None, **kwargs):
         return inspect.getfullargspec(
             *args, **kwargs, annotation_format=annotationlib.Format.FORWARDREF
         )
-    if PY314:
-        with lazy_annotations():
-            return inspect.getfullargspec(*args, **kwargs)
-    else:
+    with lazy_annotations():
         return inspect.getfullargspec(*args, **kwargs)
 
 
@@ -156,7 +151,4 @@ def signature(obj):
     A wrapper around inspect.signature that leaves deferred annotations
     unevaluated on Python 3.14+, since they are not used in our case.
     """
-    if PY314:
-        return inspect.signature(obj, annotation_format=annotationlib.Format.FORWARDREF)
-    else:
-        return inspect.signature(obj)
+    return inspect.signature(obj, annotation_format=annotationlib.Format.FORWARDREF)

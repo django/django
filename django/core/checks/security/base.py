@@ -250,7 +250,7 @@ def _check_secret_key(secret_key):
 def check_secret_key(app_configs, **kwargs):
     try:
         secret_key = settings.SECRET_KEY
-    except (ImproperlyConfigured, AttributeError):
+    except ImproperlyConfigured, AttributeError:
         passed_check = False
     else:
         passed_check = _check_secret_key(secret_key)
@@ -262,7 +262,7 @@ def check_secret_key_fallbacks(app_configs, **kwargs):
     warnings = []
     try:
         fallbacks = settings.SECRET_KEY_FALLBACKS
-    except (ImproperlyConfigured, AttributeError):
+    except ImproperlyConfigured, AttributeError:
         warnings.append(Warning(W025.msg % "SECRET_KEY_FALLBACKS", id=W025.id))
     else:
         for index, key in enumerate(fallbacks):

@@ -292,7 +292,7 @@ def lookup_field(name, obj, model_admin=None):
     opts = obj._meta
     try:
         f = _get_non_gfk_field(opts, name)
-    except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
+    except FieldDoesNotExist, FieldIsAForeignKeyColumnName:
         # For non-regular field values, the value is either a method,
         # property, related field, or returned via a callable.
         f = None
@@ -385,7 +385,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
             else:
                 try:
                     attr = get_fields_from_path(model, name)[-1]
-                except (FieldDoesNotExist, NotRelationField):
+                except FieldDoesNotExist, NotRelationField:
                     message = f"Unable to lookup '{name}' on {model._meta.object_name}"
                     if model_admin:
                         message += f" or {model_admin.__class__.__name__}"
@@ -422,7 +422,7 @@ def help_text_for_field(name, model):
     help_text = ""
     try:
         field = _get_non_gfk_field(model._meta, name)
-    except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
+    except FieldDoesNotExist, FieldIsAForeignKeyColumnName:
         pass
     else:
         if hasattr(field, "help_text"):

@@ -315,7 +315,7 @@ Handlers
 Django provides one log handler in addition to :mod:`those provided by the
 Python logging module <python:logging.handlers>`.
 
-.. class:: AdminEmailHandler(include_html=False, email_backend=None, reporter_class=None, using=None)
+.. class:: AdminEmailHandler(include_html=False, *, reporter_class=None, using=None)
 
     This handler sends an email to the site :setting:`ADMINS` for each log
     message it receives.
@@ -361,12 +361,6 @@ Python logging module <python:logging.handlers>`.
     If the specified mailer is not configured in the :setting:`MAILERS`
     setting, no email will be sent and no additional error will be raised.
 
-    By setting the deprecated ``email_backend`` argument of
-    ``AdminEmailHandler``, the :ref:`email backend <topic-email-backends>` that
-    is being used by the handler can be overridden. ``email_backend`` is not
-    supported when :setting:`MAILERS` is defined or when the ``using``
-    argument is provided.
-
     The ``reporter_class`` argument of ``AdminEmailHandler`` allows providing
     an ``django.views.debug.ExceptionReporter`` subclass to customize the
     traceback text sent in the email body. You provide a string import path to
@@ -380,14 +374,6 @@ Python logging module <python:logging.handlers>`.
                 "reporter_class": "somepackage.error_reporter.CustomErrorReporter",
             },
         }
-
-    .. versionchanged:: 6.1
-
-        The ``using`` argument was added.
-
-    .. deprecated:: 6.1
-
-        The ``email_backend`` argument is deprecated. Use ``using`` instead.
 
     .. method:: send_mail(subject, message, *args, **kwargs)
 

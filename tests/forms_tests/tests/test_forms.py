@@ -1,14 +1,11 @@
 import copy
 import datetime
 import json
-import textwrap
 import uuid
 
-from django.conf import USE_BLANK_CHOICE_DASH_DEPRECATED_MSG
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import MaxValueValidator, RegexValidator
-from django.db.models.utils import get_blank_choice_label
 from django.forms import (
     BooleanField,
     BoundField,
@@ -45,10 +42,9 @@ from django.forms.renderers import DjangoTemplates, get_default_renderer
 from django.forms.utils import ErrorDict, ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.safestring import mark_safe
 
 from . import jinja2_tests
@@ -799,37 +795,6 @@ aria-describedby="id_birthday_error">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""",
-        )
-
-    # RemovedInDjango2028Warning
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    @override_settings(USE_BLANK_CHOICE_DASH=True)
-    def test_blank_choice_dash(self):
-        class SomeForm(Form):
-            somechoices = ChoiceField(
-                choices=(
-                    ("0", get_blank_choice_label()),
-                    ("1", "Test 1"),
-                    ("2", "Test 2"),
-                )
-            )
-
-        f = SomeForm()
-
-        self.assertHTMLEqual(
-            f.as_p(),
-            textwrap.dedent("""
-            <p>
-                <label for="id_somechoices">Somechoices:</label>
-                <select name="somechoices" id="id_somechoices">
-                <option value="0">---------</option>
-                <option value="1">Test 1</option>
-                <option value="2">Test 2</option></select>
-            </p>"""),
-        )
-
-        self.assertWarnsMessage(
-            RemovedInDjango2028Warning, USE_BLANK_CHOICE_DASH_DEPRECATED_MSG
         )
 
     def test_forms_with_radio(self):

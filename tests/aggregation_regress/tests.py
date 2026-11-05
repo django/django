@@ -26,8 +26,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast, Concat
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate, ignore_warnings
-from django.utils.deprecation import RemovedInDjango2028Warning
+from django.test.utils import Approximate
 
 from .models import (
     Alfa,
@@ -880,41 +879,6 @@ class AggregationTests(TestCase):
                 "Sams Teach Yourself Django in 24 Hours",
             ],
             lambda b: b.name,
-        )
-
-    def test_annotate_select_related(self):
-        # Regression for #10127 - Empty select_related() works with annotate
-        # RemovedInDjango2028Warning: when the deprecation ends, the below
-        # queryset and assertion can be removed.
-        with ignore_warnings(
-            category=RemovedInDjango2028Warning,
-            message="Calling select_related() with no arguments is deprecated.",
-        ):
-            qs = (
-                Book.objects.filter(rating__lt=4.5)
-                .select_related()
-                .annotate(Avg("authors__age"))
-                .order_by("name")
-            )
-        self.assertQuerySetEqual(
-            qs,
-            [
-                (
-                    "Artificial Intelligence: A Modern Approach",
-                    51.5,
-                    "Prentice Hall",
-                    "Peter Norvig",
-                ),
-                ("Practical Django Projects", 29.0, "Apress", "James Bennett"),
-                (
-                    "Python Web Development with Django",
-                    Approximate(30.333, places=2),
-                    "Prentice Hall",
-                    "Jeffrey Forcier",
-                ),
-                ("Sams Teach Yourself Django in 24 Hours", 45.0, "Sams", "Brad Dayley"),
-            ],
-            lambda b: (b.name, b.authors__age__avg, b.publisher.name, b.contact.name),
         )
 
     def test_values_extra_grouping(self):

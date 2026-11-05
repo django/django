@@ -115,7 +115,7 @@ def get_max_age(response):
     )
     try:
         return int(cc["max-age"])
-    except (ValueError, TypeError, KeyError):
+    except ValueError, TypeError, KeyError:
         pass
 
 

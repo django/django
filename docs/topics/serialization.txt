@@ -238,11 +238,6 @@ This example links the given user with the permission models with PKs 46 and
     XHTML, XML and Control Codes
     <https://www.w3.org/International/questions/qa-controls>`_.
 
-.. versionchanged:: 6.1
-
-    :exc:`~django.core.exceptions.SuspiciousOperation` is raised when
-    unexpected nested tags are found.
-
 .. _serialization-formats-json:
 
 JSON
@@ -647,11 +642,6 @@ command line flags to generate natural keys.
 Subclasses can opt out of natural key serialization by returning an empty tuple
 (``()``) from ``natural_key()``. This tells the serializer to fall back to
 the standard primary key.
-
-.. versionchanged:: 6.1
-
-   Support for opting out of natural key serialization by returning an empty
-   tuple was added.
 
 .. _natural-keys-and-forward-references:
 

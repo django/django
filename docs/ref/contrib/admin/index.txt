@@ -439,11 +439,6 @@ subclass::
         collapsed, using an expandable widget with a toggle for switching
         their visibility.
 
-        .. versionchanged:: 6.1
-
-            The ``wide`` class has been removed, as it was made obsolete by the
-            new admin layout.
-
     * ``description``
         A string of optional extra text to be displayed at the top of each
         fieldset, under the heading of the fieldset.
@@ -950,12 +945,11 @@ subclass::
     the list of objects on the admin change list page. This can save you a
     bunch of database queries.
 
-    The value should be either a boolean, a list or a tuple. Default is
+    The value should be either ``False``, a list, or a tuple. Default is
     ``False``.
 
-    When value is ``True``, ``select_related()`` will always be called. When
-    value is set to ``False``, Django will look at ``list_display`` and call
-    ``select_related()`` if any ``ForeignKey`` is present.
+    When value is set to ``False``, Django will look at ``list_display`` and
+    call ``select_related()`` if any ``ForeignKey`` is present.
 
     If you need more fine-grained control, use a tuple (or list) as value for
     ``list_select_related``. Empty tuple will prevent Django from calling
@@ -969,11 +963,6 @@ subclass::
 
     If you need to specify a dynamic value based on the request, you can
     implement a :meth:`~ModelAdmin.get_list_select_related` method.
-
-    .. deprecated:: 6.1
-
-        Using ``True`` for ``list_select_related`` is deprecated. Use a list or
-        tuple of field names instead.
 
     .. note::
 
@@ -1316,11 +1305,6 @@ subclass::
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
 
-    .. versionchanged:: 6.1
-
-        On earlier versions, search terms invalid for a given field type were
-        not skipped.
-
 .. attribute:: ModelAdmin.search_help_text
 
     Set ``search_help_text`` to specify a descriptive text for the search box
@@ -1415,8 +1399,6 @@ default templates used by the :class:`ModelAdmin` views:
     the :doc:`actions documentation</ref/contrib/admin/actions>`.
 
 .. attribute:: ModelAdmin.delete_confirmation_max_display
-
-    .. versionadded:: 6.1
 
     Set ``delete_confirmation_max_display`` to control how many objects are
     displayed on the delete confirmation pages before truncating the remainder
@@ -1657,13 +1639,8 @@ default templates used by the :class:`ModelAdmin` views:
 .. method:: ModelAdmin.get_list_select_related(request)
 
     The ``get_list_select_related`` method is given the ``HttpRequest`` and
-    should return a boolean or list as :attr:`ModelAdmin.list_select_related`
-    does.
-
-    .. deprecated:: 6.1
-
-        Returning ``True`` is deprecated. Return a list or tuple of field names
-        instead.
+    should return ``False``, a list, or a tuple as
+    :attr:`ModelAdmin.list_select_related` does.
 
 .. method:: ModelAdmin.get_search_fields(request)
 

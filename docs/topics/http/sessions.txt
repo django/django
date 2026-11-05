@@ -198,8 +198,6 @@ You can edit it multiple times.
 
     .. method:: __bool__()
 
-      .. versionadded:: 6.1
-
       Returns the inverse of :meth:`is_empty`. This allows checking if a
       session has data::
 

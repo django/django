@@ -6,7 +6,7 @@ import copy
 import operator
 import warnings
 from contextlib import aclosing, nullcontext
-from functools import cached_property, partial, reduce
+from functools import cached_property, reduce
 from itertools import chain, islice
 from weakref import ref as weak_ref
 
@@ -46,12 +46,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import functional, timezone
-from django.utils.deprecation import (
-    RemovedInDjango2028Warning,
-    RemovedInDjango2029Warning,
-    warn_about_external_use,
-)
-from django.utils.inspect import func_accepts_kwargs, func_supports_parameter
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.warnings import django_file_prefixes
 
 # The maximum number of results to fetch in a get() query.
@@ -61,34 +56,6 @@ MAX_GET_RESULTS = 21
 REPR_OUTPUT_SIZE = 20
 
 DEFAULT_FETCH_MODE = FETCH_ONE
-
-
-# RemovedInDjango2028Warning: When the deprecation ends, remove this function
-# and restore direct model_cls.from_db(..., fetch_mode=fetch_mode) calls at
-# its call sites.
-def _get_from_db(model_cls, fetch_mode):
-    """
-    Return a callable equivalent to model_cls.from_db with fetch_mode already
-    bound, accommodating deprecated from_db() overrides that don't accept the
-    fetch_mode keyword argument.
-    """
-    from django.db.models import Model
-
-    from_db = model_cls.from_db
-    if (
-        from_db.__func__ is Model.from_db.__func__
-        or func_supports_parameter(from_db, "fetch_mode")
-        or func_accepts_kwargs(from_db)
-    ):
-        return partial(from_db, fetch_mode=fetch_mode)
-    warnings.warn(
-        f"{model_cls.__qualname__}.from_db() must accept a fetch_mode keyword "
-        "argument. Support for from_db() methods that do not accept it is "
-        "deprecated.",
-        RemovedInDjango2028Warning,
-        skip_file_prefixes=django_file_prefixes(),
-    )
-    return from_db
 
 
 class BaseIterable:
@@ -151,10 +118,6 @@ class ModelIterable(BaseIterable):
         init_list = [
             f[0].target.attname for f in select[model_fields_start:model_fields_end]
         ]
-        # RemovedInDjango2028Warning: When the deprecation ends, remove this
-        # assignment and call model_cls.from_db(..., fetch_mode=fetch_mode)
-        # directly in the loop below.
-        from_db = _get_from_db(model_cls, fetch_mode)
         related_populators = get_related_populators(klass_info, select, db, fetch_mode)
         known_related_objects = [
             (
@@ -174,10 +137,11 @@ class ModelIterable(BaseIterable):
         ]
         peers = []
         for row in compiler.results_iter(results):
-            obj = from_db(
+            obj = model_cls.from_db(
                 db,
                 init_list,
                 row[model_fields_start:model_fields_end],
+                fetch_mode=fetch_mode,
             )
             if fetch_mode.track_peers:
                 peers.append(weak_ref(obj))
@@ -244,16 +208,13 @@ class RawModelIterable(BaseIterable):
                     query_iterator, cols
                 )
             fetch_mode = self.queryset._fetch_mode
-            # RemovedInDjango2028Warning: When the deprecation ends, remove
-            # this assignment and call
-            # model_cls.from_db(..., fetch_mode=fetch_mode) directly in the
-            # loop below.
-            from_db = _get_from_db(model_cls, fetch_mode)
             peers = []
             for values in query_iterator:
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
-                instance = from_db(db, model_init_names, model_init_values)
+                instance = model_cls.from_db(
+                    db, model_init_names, model_init_values, fetch_mode=fetch_mode
+                )
                 if fetch_mode.track_peers:
                     peers.append(weak_ref(instance))
                     instance._state.peers = peers
@@ -698,7 +659,7 @@ class QuerySet(AltersData):
             # attribute.
             try:
                 arg.default_alias
-            except (AttributeError, TypeError):
+            except AttributeError, TypeError:
                 raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
@@ -1574,12 +1535,7 @@ class QuerySet(AltersData):
     def _values(self, *fields, **expressions):
         clone = self._chain()
         if expressions:
-            # RemovedInDjango2028Warning: When the deprecation ends, deindent:
-            # clone = clone.annotate(**expressions)
-            with warnings.catch_warnings(
-                action="ignore", category=RemovedInDjango2028Warning
-            ):
-                clone = clone.annotate(**expressions)
+            clone = clone.annotate(**expressions)
         clone._fields = fields
         clone.query.set_values(fields)
         return clone
@@ -1600,19 +1556,9 @@ class QuerySet(AltersData):
                     "field."
                 )
             elif not fields:
-                # RemovedInDjango2028Warning: When the deprecation ends,
-                # replace with:
-                # raise TypeError(
-                #     "'flat' is not valid when values_list is called with no "
-                #     "fields."
-                # )
-                warnings.warn(
-                    "Calling values_list() with no field name and flat=True "
-                    "is deprecated. Pass an explicit field name instead, like "
-                    "'pk'.",
-                    RemovedInDjango2028Warning,
+                raise TypeError(
+                    "'flat' is not valid when values_list is called with no fields."
                 )
-                fields = [self.model._meta.concrete_fields[0].attname]
 
         field_names = {f: False for f in fields if not hasattr(f, "resolve_expression")}
         _fields = []
@@ -1851,15 +1797,10 @@ class QuerySet(AltersData):
         elif fields:
             obj.query.add_select_related(fields)
         else:
-            # RemovedInDjango2028Warning: when the deprecation ends, raise a
-            # TypeError instead.
-            warn_about_external_use(
-                "Calling select_related() with no arguments is deprecated. "
-                "Specify the fields to fetch instead.",
-                category=RemovedInDjango2028Warning,
-                skip_name_prefixes=("django.db.models",),
+            raise TypeError(
+                "Calling select_related() with no arguments is not supported. "
+                "Specify the fields to fetch instead."
             )
-            obj.query.select_related = True
         return obj
 
     def prefetch_related(self, *lookups):
@@ -1917,7 +1858,7 @@ class QuerySet(AltersData):
                         "The named annotation '%s' conflicts with the "
                         "default name for another annotation." % arg.default_alias
                     )
-            except (TypeError, AttributeError):
+            except TypeError, AttributeError:
                 raise TypeError("Complex annotations require an alias")
             annotations[arg.default_alias] = arg
         annotations.update(kwargs)
@@ -2739,7 +2680,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 if not hasattr(obj, "_prefetched_objects_cache"):
                     try:
                         obj._prefetched_objects_cache = {}
-                    except (AttributeError, TypeError):
+                    except AttributeError, TypeError:
                         # Must be an immutable object from
                         # values_list(flat=True), for example (TypeError) or
                         # a QuerySet subclass that isn't returning Model
@@ -3094,11 +3035,6 @@ class RelatedPopulator:
             )
 
         self.model_cls = klass_info["model"]
-        # RemovedInDjango2028Warning: When the deprecation ends, remove this
-        # assignment and call
-        # self.model_cls.from_db(..., fetch_mode=fetch_mode) directly in
-        # populate().
-        self.from_db = _get_from_db(self.model_cls, fetch_mode)
         # A primary key must have all of its constituents not-NULL as
         # NULL != NULL and thus NULL cannot be referenced through a foreign
         # relationship. Therefore checking for a single member of the primary
@@ -3119,10 +3055,11 @@ class RelatedPopulator:
         if obj_data[self.pk_idx] is None:
             obj = None
         else:
-            obj = self.from_db(
+            obj = self.model_cls.from_db(
                 self.db,
                 self.init_list,
                 obj_data,
+                fetch_mode=self.fetch_mode,
             )
             if self.fetch_mode.track_peers:
                 self.peers.append(weak_ref(obj))

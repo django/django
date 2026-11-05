@@ -114,18 +114,16 @@ You can select a mailer with the new ``using`` argument to :ref:`email sending
 :doc:`/topics/email` for more details.
 
 :setting:`MAILERS` is not yet enabled by default in existing projects. It will
-replace :setting:`EMAIL_BACKEND` and related ``EMAIL_*`` settings in Django
-2028. Until then, the older settings will continue to work but will issue
-deprecation warnings: see the list of :ref:`email deprecations
-<mailers-deprecations>` below.
+replace ``EMAIL_BACKEND`` and related ``EMAIL_*`` settings in Django 2028.
+Until then, the older settings will continue to work but will issue deprecation
+warnings: see the list of :ref:`email deprecations <mailers-deprecations>`
+below.
 
-You can opt into the new feature at any time before Django 2028; see
-:ref:`migrating-to-mailers`. To ease the transition,
-:data:`mail.mailers["default"] <django.core.mail.mailers.default>` works with
-either :setting:`MAILERS` or the deprecated :setting:`EMAIL_BACKEND` setting
-defined. The deprecated :func:`~django.core.mail.get_connection` function will
-also return an instance of the default mailer when :setting:`MAILERS` is
-defined.
+You can opt into the new feature at any time before Django 2028. To ease the
+transition, :data:`mail.mailers["default"] <django.core.mail.mailers.default>`
+works with either :setting:`MAILERS` or the deprecated ``EMAIL_BACKEND``
+setting defined. The deprecated ``get_connection()`` function will also return
+an instance of the default mailer when :setting:`MAILERS` is defined.
 
 Minor features
 --------------
@@ -261,8 +259,8 @@ Forms
 * The new constant ``django.db.models.fields.BLANK_CHOICE_LABEL`` defines a
   more accessible and translatable default label for the blank choice in
   forms, which is appended to most ``choices`` lists. The transitional setting
-  :setting:`USE_BLANK_CHOICE_DASH` allows you to revert back to the old
-  default label.
+  ``USE_BLANK_CHOICE_DASH`` allows you to revert back to the old default
+  label.
 
 * :class:`~django.forms.FilePathField` now provides a
   :meth:`~django.forms.FilePathField.set_choices` method to scan the
@@ -354,8 +352,8 @@ Security
 ~~~~~~~~
 
 * Signed cookies now use an unambiguous salt derivation by default. Set
-  :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` to ``True`` to continue
-  accepting legacy signed cookies.
+  ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` to ``True`` to continue accepting
+  legacy signed cookies.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -556,7 +554,7 @@ Miscellaneous
 * The minimum supported version of SQLite is increased from 3.31.0 to 3.37.0.
 
 * The default value of the transitional setting
-  :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` is now ``False``.
+  ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` is now ``False``.
 
 * In cases where cached pages or template fragments varied on arguments, e.g.
   :ref:`vary headers <using-vary-headers>` for
@@ -584,8 +582,6 @@ Miscellaneous
 * The undocumented ``connection()`` method of :class:`.log.AdminEmailHandler`
   has been removed and is no longer called. Subclasses overriding
   :meth:`.AdminEmailHandler.send_mail` should avoid calling ``connection()``.
-  See :ref:`migrating-to-mailers-get-connection` if specific connection
-  configuration is needed.
 
 * The internal implementation of :class:`.BrokenLinkEmailsMiddleware` has been
   updated for mailers. If you have subclassed it to customize email sending
@@ -618,17 +614,13 @@ Features deprecated in 6.1
 Email
 -----
 
-* The :setting:`EMAIL_BACKEND`, :setting:`EMAIL_FILE_PATH`,
-  :setting:`EMAIL_HOST`, :setting:`EMAIL_HOST_PASSWORD`,
-  :setting:`EMAIL_HOST_USER`, :setting:`EMAIL_PORT`,
-  :setting:`EMAIL_USE_TLS`, :setting:`EMAIL_USE_SSL`,
-  :setting:`EMAIL_SSL_CERTFILE`, :setting:`EMAIL_SSL_KEYFILE`, and
-  :setting:`EMAIL_TIMEOUT` settings are deprecated. Replace them with a
-  :setting:`MAILERS` configuration dictionary as described in
-  :ref:`migrating-to-mailers`.
+* The ``EMAIL_BACKEND``, ``EMAIL_FILE_PATH``, ``EMAIL_HOST``,
+  ``EMAIL_HOST_PASSWORD``, ``EMAIL_HOST_USER``, ``EMAIL_PORT``,
+  ``EMAIL_USE_TLS``, ``EMAIL_USE_SSL``, ``EMAIL_SSL_CERTFILE``,
+  ``EMAIL_SSL_KEYFILE``, and ``EMAIL_TIMEOUT`` settings are deprecated.
+  Replace them with a :setting:`MAILERS` configuration dictionary.
 
-* :func:`.mail.get_connection` is deprecated. See
-  :ref:`migrating-to-mailers-get-connection` for replacement options.
+* ``mail.get_connection()`` is deprecated.
 
 * The ``connection`` argument to :func:`.send_mail`, :func:`.send_mass_mail`,
   :func:`.mail_admins`, :func:`.mail_managers`, and :class:`.EmailMessage` is
@@ -637,13 +629,11 @@ Email
 
 * The ``fail_silently`` argument to :func:`.send_mail`,
   :func:`.send_mass_mail`, :func:`.mail_admins`, :func:`.mail_managers`, and
-  :meth:`.EmailMessage.send` is deprecated. See
-  :ref:`migrating-to-mailers-fail-silently` for alternatives.
+  :meth:`.EmailMessage.send` is deprecated.
 
 * The ``auth_user`` and ``auth_password`` arguments to :func:`.send_mail` and
   :func:`.send_mass_mail` are deprecated. Replace them with ``"username"`` and
   ``"password"`` :setting:`OPTIONS <MAILERS-OPTIONS>` in :setting:`MAILERS`.
-  See :ref:`migrating-to-mailers-auth`.
 
 * Directly constructing and using instances of the
   :ref:`smtp.EmailBackend <topic-email-smtp-backend>` class is deprecated. Use
@@ -653,13 +643,11 @@ Email
   unknown keyword arguments. Custom email backend subclasses should ensure they
   have consumed all supported ``**kwargs`` before forwarding the remainder to
   superclass init. The base class now issues a deprecation warning for unknown
-  arguments, and it will treat them as errors starting in Django 2028. See
-  :ref:`migrating-to-mailers-email-backends`.
+  arguments, and it will treat them as errors starting in Django 2028.
 
 * Support for ``fail_silently`` in the ``BaseEmailBackend`` is deprecated.
   A custom email backend that wants to support ``fail_silently`` should manage
-  its own local attribute, not pass it to the base backend constructor. See
-  :ref:`migrating-to-mailers-email-backends`.
+  its own local attribute, not pass it to the base backend constructor.
 
 Miscellaneous
 -------------
@@ -688,12 +676,12 @@ Miscellaneous
   unaffected by this deprecation.
 
 * The undocumented ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is
-  deprecated. See the :setting:`USE_BLANK_CHOICE_DASH` transitional setting for
+  deprecated. See the ``USE_BLANK_CHOICE_DASH`` transitional setting for
   migration advice.
 
-* The :setting:`USE_BLANK_CHOICE_DASH` transitional setting is deprecated.
+* The ``USE_BLANK_CHOICE_DASH`` transitional setting is deprecated.
 
-* The :setting:`SIGNED_COOKIE_LEGACY_SALT_FALLBACK` transitional setting is
+* The ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` transitional setting is
   deprecated.
 
 * The undocumented ``get_placeholder`` method of
@@ -711,7 +699,6 @@ Miscellaneous
 
 * The ``email_backend`` argument of :class:`.log.AdminEmailHandler` is
   deprecated in favor of the newly introduced ``using`` argument.
-  See :ref:`migrating-to-mailers-adminemailhandler` for details.
 
 * The ``BitAnd``, ``BitOr``, and ``BitXor`` classes in
   ``django.contrib.postgres.aggregates`` are deprecated in favor of the
@@ -739,7 +726,7 @@ Miscellaneous
 * Overriding ``ModelAdmin.get_action_choices()`` without the new
   ``action_location`` parameter is deprecated.
 
-* :func:`django.db.transaction.savepoint` is deprecated in favor of
+* ``django.db.transaction.savepoint()`` is deprecated in favor of
   :func:`~django.db.transaction.savepoint_create`.
 
 Features removed in 6.1

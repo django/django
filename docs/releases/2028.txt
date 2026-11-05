@@ -1,0 +1,408 @@
+=============================================
+Django 2028 release notes - UNDER DEVELOPMENT
+=============================================
+
+*Expected January 2028*
+
+Welcome to Django 2028!
+
+These release notes cover the :ref:`new features <whats-new-2028>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-2028>` you
+should be aware of when upgrading from Django 6.2 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-2028>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 2028 is the first release of the :ref:`annual release cycle
+<internal-release-cadence>`. Like every feature release from now on, it will
+receive :ref:`security and data loss fixes for three years
+<supported-versions-policy>` after its release.
+
+Python compatibility
+====================
+
+Django 2028 supports Python 3.14 and 3.15. We **highly recommend** and only
+officially support the latest release of each series.
+
+The Django 6.2.x series is the last to support Python 3.12 and 3.13.
+
+.. _whats-new-2028:
+
+What's new in Django 2028
+=========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  1,800,000 to 2,200,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSP
+~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* ...
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Tasks
+~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-2028:
+
+Backwards incompatible changes in 2028
+======================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+Miscellaneous
+-------------
+
+* ...
+
+.. _deprecated-features-2028:
+
+Features deprecated in 2028
+===========================
+
+Miscellaneous
+-------------
+
+* ...
+
+Features removed in 2028
+========================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 2028.
+
+See :ref:`deprecated-features-6.0` for details on these changes, including how
+to remove usage of these features.
+
+* The ``serialize`` keyword argument of
+  ``BaseDatabaseCreation.create_test_db()`` is removed.
+
+* The ``django.contrib.postgres.aggregates.StringAgg`` class is removed.
+
+* The ``django.contrib.postgres.aggregates.mixins.OrderableAggMixin`` class is
+  removed.
+
+* The default protocol in :tfilter:`urlize` and :tfilter:`urlizetrunc` is
+  changed from HTTP to HTTPS.
+
+* The ``URLIZE_ASSUME_HTTPS`` transitional setting is removed.
+
+* Using a percent sign in a column alias or annotation now raises
+  ``ValueError``.
+
+* Support for setting the ``ADMINS`` or ``MANAGERS`` settings to a list of
+  (name, address) tuples is removed.
+
+* The ``orphans`` argument being larger than or equal to the ``per_page``
+  argument of ``django.core.paginator.Paginator`` and
+  ``django.core.paginator.AsyncPaginator`` is no longer allowed.
+
+* The :mod:`django.core.mail` APIs no longer accept certain parameters as
+  positional arguments. These must be passed as keyword arguments instead.
+
+* Support for passing Python's legacy email ``email.mime.base.MIMEBase``
+  object to ``EmailMessage.attach()`` (or including one in the message's
+  ``attachments`` list) is removed.
+
+* The ``django.core.mail.BadHeaderError`` exception is removed.
+
+* The ``django.core.mail.SafeMIMEText`` and ``SafeMIMEMultipart`` classes are
+  removed.
+
+* The ``django.core.mail.forbid_multi_line_headers()`` and
+  ``django.core.mail.message.sanitize_address()`` functions are removed.
+
+See :ref:`deprecated-features-6.1` for details on these changes, including how
+to remove usage of these features.
+
+* Calling :meth:`.QuerySet.values_list` with ``flat=True`` and no field name
+  raises ``TypeError``.
+
+* The use of ``None`` when querying a :class:`~django.db.models.JSONField`
+  top-level value compiles to SQL ``IS NULL``. Use
+  :class:`~django.db.models.JSONNull` to query for a JSON ``null`` value
+  instead.
+
+* Support for overriding ``ModelAdmin.get_actions()`` without the new
+  ``action_location`` parameter is removed.
+
+* Support for unpacking or indexing the dictionary values of the
+  ``ModelAdmin.get_actions()`` return value is removed. Use
+  :class:`~django.contrib.admin.Action` attributes instead. Overrides of
+  ``ModelAdmin.get_actions()`` must return
+  :class:`~django.contrib.admin.Action` objects as dictionary values.
+
+* Support for overriding ``ModelAdmin.get_action_choices()`` without the new
+  ``action_location`` parameter is removed.
+
+* The ``django.db.models.fields.BLANK_CHOICE_DASH`` constant is removed.
+
+* The ``USE_BLANK_CHOICE_DASH`` transitional setting is removed.
+
+* The ``SIGNED_COOKIE_LEGACY_SALT_FALLBACK`` transitional setting is removed.
+  Signed cookies using the legacy salt derivation are no longer accepted.
+
+* The ``Field.get_placeholder_sql`` shim over the deprecated
+  ``get_placeholder`` method is removed.
+
+* The ``SQLCompiler.quote_name_unless_alias()`` method is removed.
+
+* The ``EMAIL_BACKEND``, ``EMAIL_FILE_PATH``, ``EMAIL_HOST``,
+  ``EMAIL_HOST_PASSWORD``, ``EMAIL_HOST_USER``, ``EMAIL_PORT``,
+  ``EMAIL_USE_TLS``, ``EMAIL_USE_SSL``, ``EMAIL_SSL_CERTFILE``,
+  ``EMAIL_SSL_KEYFILE``, and ``EMAIL_TIMEOUT`` settings are removed. The
+  default value of :setting:`MAILERS` is now ``{}``.
+
+* The ``django.core.mail.get_connection()`` function is removed.
+
+* The ``connection``, ``fail_silently``, ``auth_user``, and ``auth_password``
+  arguments are removed from :func:`.send_mail`, :func:`.send_mass_mail`,
+  :func:`.mail_admins`, :func:`.mail_managers`, the :class:`.EmailMessage`
+  constructor, and :meth:`.EmailMessage.send`. Support for the
+  ``EmailMessage.connection`` attribute is removed.
+
+* Directly creating instances of the ``smtp.EmailBackend`` class is
+  unsupported, and the class documentation for that backend is removed.
+
+* The ``BaseEmailBackend.__init__()`` method raises errors for unknown keyword
+  arguments and no longer supports ``fail_silently``.
+
+* The ``email_backend`` argument of :class:`.log.AdminEmailHandler` is
+  removed.
+
+* The ``django.contrib.postgres.aggregates.BitAnd``,
+  ``django.contrib.postgres.aggregates.BitOr``, and
+  ``django.contrib.postgres.aggregates.BitXor`` classes are removed.
+
+* Support for double-dot variable lookups, like ``{{ book..title }}``, is
+  removed.
+
+* The default value of the ``algorithm`` argument for
+  ``django.utils.crypto.salted_hmac()`` and
+  ``django.core.signing.base64_hmac()`` is changed from ``"sha1"`` to
+  ``"sha256"``.
+
+* Calling :meth:`.QuerySet.select_related` without arguments raises
+  :exc:`TypeError`.
+
+* :class:`.ModelAdmin` raises :exc:`ValueError` if subclassed with its
+  :attr:`.list_select_related` attribute set to ``True``.
+
+* :class:`.ModelAdmin` raises :exc:`ValueError` if its
+  :meth:`.get_list_select_related` method returns ``True``.
+
+* The ``django.db.transaction.savepoint()`` alias to
+  :func:`~django.db.transaction.savepoint_create` is removed.
+
+* Support for ``Model.from_db()`` methods that do not accept the
+  ``fetch_mode`` keyword argument is removed.
+
+See :ref:`deprecated-features-6.2` for details on these changes, including how
+to remove usage of these features.
+
+* ``django.VERSION`` has four components, ``(year, patch, status,
+  iteration)``, as calendar versions have no minor component. The deprecation
+  warnings for indexing it from its third component on, reading it in a way
+  that depends on its length, and comparing it against three or more
+  components are removed. Use the ``.feature``, ``.patch``, ``.status``, and
+  ``.iteration`` attributes instead.

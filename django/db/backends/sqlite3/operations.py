@@ -41,7 +41,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             for expr in expression.get_source_expressions():
                 try:
                     output_field = expr.output_field
-                except (AttributeError, FieldError):
+                except AttributeError, FieldError:
                     # Not every subexpression has an output_field which is fine
                     # to ignore.
                     pass

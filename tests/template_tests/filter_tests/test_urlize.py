@@ -2,7 +2,6 @@ from unittest import mock
 
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
 from django.utils.functional import lazy
 from django.utils.html import Urlizer
 from django.utils.safestring import mark_safe
@@ -110,7 +109,6 @@ class UrlizeTests(SimpleTestCase):
         )
 
 
-@override_settings(URLIZE_ASSUME_HTTPS=True)
 class FunctionTests(SimpleTestCase):
     def test_urls(self):
         self.assertEqual(

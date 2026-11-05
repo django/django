@@ -226,7 +226,7 @@ class BaseSpatialField(Field):
                     ):
                         raise blocked_err
                     raise err
-                except (GEOSException, GDALException):
+                except GEOSException, GDALException:
                     if isinstance(obj, bytes) or (
                         isinstance(obj, str) and json_regex.match(obj)
                     ):

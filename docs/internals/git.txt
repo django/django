@@ -35,7 +35,7 @@ The Git repository includes several `branches`_:
   the next packaged release of Django. This is where most development
   activity is focused.
 
-* ``stable/A.B.x`` are the branches where release preparation work happens.
+* ``stable/YYYY.x`` are the branches where release preparation work happens.
   They are also used for bugfix and security releases which occur as necessary
   after the initial release of a feature version.
 
@@ -85,29 +85,29 @@ coding style and how to generate and submit a patch.
 Stable branches
 ===============
 
-Django uses branches to prepare for releases of Django. Each major release
+Django uses branches to prepare for releases of Django. Each feature release
 series has its own stable branch.
 
-These branches can be found in the repository as ``stable/A.B.x``
+These branches can be found in the repository as ``stable/YYYY.x``
 branches and will be created right after the first alpha is tagged.
 
-For example, immediately after *Django 1.5 alpha 1* was tagged, the branch
-``stable/1.5.x`` was created and all further work on preparing the code for the
-final 1.5 release was done there.
+For example, immediately after *Django 2028 alpha 1* is tagged, the branch
+``stable/2028.x`` is created and all further work on preparing the code for the
+final 2028 release is done there.
 
 These branches also provide bugfix and security support as described in
 :ref:`supported-versions-policy`.
 
-For example, after the release of Django 1.5, the branch ``stable/1.5.x``
-receives only fixes for security and critical stability bugs, which are
-eventually released as Django 1.5.1 and so on, ``stable/1.4.x`` receives only
-security and data loss fixes, and ``stable/1.3.x`` no longer receives any
-updates.
+For example, after the release of Django ``YYYY``, the branch
+``stable/YYYY.x`` receives only fixes for security and critical stability bugs,
+which are eventually released as Django ``YYYY.1`` and so on,
+``stable/YYYY-1.x`` and ``stable/YYYY-2.x`` receive only security and data loss
+fixes, and ``stable/YYYY-3.x`` no longer receives any updates.
 
 .. admonition:: Historical information
 
-    This policy for handling ``stable/A.B.x`` branches was adopted starting
-    with the Django 1.5 release cycle.
+    This policy for handling stable branches was adopted starting with the
+    Django 1.5 release cycle.
 
     Previously, these branches weren't created until right after the releases
     and the stabilization work occurred on the main repository branch. Thus,

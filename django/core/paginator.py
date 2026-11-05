@@ -7,7 +7,6 @@ from math import ceil
 from asgiref.sync import sync_to_async
 
 from django.utils.asyncio import maybe_aclosing
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.inspect import method_has_no_args
 from django.utils.translation import gettext_lazy as _
 from django.utils.warnings import django_file_prefixes
@@ -58,18 +57,10 @@ class BasePaginator:
             else self.default_error_messages | error_messages
         )
         if self.per_page <= self.orphans:
-            # RemovedInDjango2028Warning: When the deprecation ends, replace
-            # with:
-            # raise ValueError(
-            #     "The orphans argument cannot be larger than or equal to the "
-            #     "per_page argument."
-            # )
-            msg = (
-                "Support for the orphans argument being larger than or equal to the "
-                "per_page argument is deprecated. This will raise a ValueError in "
-                "Django 2028."
+            raise ValueError(
+                "The orphans argument cannot be larger than or equal to the "
+                "per_page argument."
             )
-            warnings.warn(msg, category=RemovedInDjango2028Warning, stacklevel=2)
 
     def _check_object_list_is_ordered(self):
         """
@@ -137,7 +128,7 @@ class BasePaginator:
             if isinstance(number, float) and not number.is_integer():
                 raise ValueError
             number = int(number)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             raise PageNotAnInteger(self.error_messages["invalid_page"])
         if number < 1:
             raise EmptyPage(self.error_messages["min_page"])

@@ -73,7 +73,7 @@ class WSGIRequest(HttpRequest):
         self._set_content_type_params(environ)
         try:
             content_length = int(environ.get("CONTENT_LENGTH"))
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             content_length = 0
         self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
         self._read_started = False

@@ -411,7 +411,7 @@ class ChangeList:
                         ordering.append(order_field.removeprefix(pfx))
                     else:
                         ordering.append(pfx + order_field)
-                except (IndexError, ValueError):
+                except IndexError, ValueError:
                     continue  # Invalid ordering specified, skip it.
 
         # Add the given query's ordering fields, if any.
@@ -487,7 +487,7 @@ class ChangeList:
             # filters).
             q_object = build_q_object_from_lookup_parameters(remaining_lookup_params)
             qs = qs.filter(q_object)
-        except (SuspiciousOperation, ImproperlyConfigured):
+        except SuspiciousOperation, ImproperlyConfigured:
             # Allow certain types of errors to be re-raised as-is so that the
             # caller can treat them in a special way.
             raise
@@ -525,9 +525,6 @@ class ChangeList:
             return qs
 
     def apply_select_related(self, qs):
-        if self.list_select_related is True:
-            return qs.select_related()
-
         if self.list_select_related is False:
             if fields := self.get_select_related_fields():
                 return qs.select_related(*fields)

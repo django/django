@@ -339,10 +339,6 @@ receiver. In addition, async receivers are executed concurrently using
 All built-in signals, except those in the async request-response cycle, are
 dispatched using :meth:`Signal.send`.
 
-.. versionchanged:: 6.1
-
-    In older versions, async receivers were executed via ``asyncio.gather()``.
-
 Disconnecting signals
 =====================
 

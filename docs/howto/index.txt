@@ -62,7 +62,6 @@ Other guides
    custom-file-storage
    custom-management-commands
    custom-shell
-   mailers-migration
 
 .. seealso::
 

@@ -345,7 +345,7 @@ class IntegerField(Field):
         # Strip trailing decimal and zeros.
         try:
             value = int(self.re_decimal.sub("", str(value)))
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             raise ValidationError(self.error_messages["invalid"], code="invalid")
         return value
 
@@ -378,7 +378,7 @@ class FloatField(IntegerField):
             value = formats.sanitize_separators(value)
         try:
             value = float(value)
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             raise ValidationError(self.error_messages["invalid"], code="invalid")
         return value
 
@@ -471,7 +471,7 @@ class BaseTemporalField(Field):
         for format in self.input_formats:
             try:
                 return self.strptime(value, format)
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 continue
         raise ValidationError(self.error_messages["invalid"], code="invalid")
 
@@ -930,7 +930,7 @@ class TypedChoiceField(ChoiceField):
             return self.empty_value
         try:
             value = self.coerce(value)
-        except (ValueError, TypeError, ValidationError):
+        except ValueError, TypeError, ValidationError:
             raise ValidationError(
                 self.error_messages["invalid_choice"],
                 code="invalid_choice",
@@ -1007,7 +1007,7 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         for choice in value:
             try:
                 new_value.append(self.coerce(choice))
-            except (ValueError, TypeError, ValidationError):
+            except ValueError, TypeError, ValidationError:
                 raise ValidationError(
                     self.error_messages["invalid_choice"],
                     code="invalid_choice",
@@ -1363,7 +1363,7 @@ class JSONField(CharField):
             return value
         try:
             converted = json.loads(value, cls=self.decoder)
-        except (json.JSONDecodeError, RecursionError):
+        except json.JSONDecodeError, RecursionError:
             raise ValidationError(
                 self.error_messages["invalid"],
                 code="invalid",
@@ -1381,7 +1381,7 @@ class JSONField(CharField):
             return None
         try:
             return json.loads(data, cls=self.decoder)
-        except (json.JSONDecodeError, RecursionError):
+        except json.JSONDecodeError, RecursionError:
             return InvalidJSONInput(data)
 
     def prepare_value(self, value):

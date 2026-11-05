@@ -29,7 +29,6 @@ from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
 from django.utils.datastructures import OrderedSet
-from django.utils.version import PY313
 
 try:
     import ipdb as pdb
@@ -145,10 +144,7 @@ class PDBDebugResult(unittest.TextTestResult):
         self.buffer = False
         exc_type, exc_value, traceback = error
         print("\nOpening PDB: %r" % exc_value)
-        if PY313:
-            pdb.post_mortem(exc_value)
-        else:
-            pdb.post_mortem(traceback)
+        pdb.post_mortem(exc_value)
 
 
 class DummyList:
@@ -799,7 +795,7 @@ class DiscoverRunner:
         if not faulthandler.is_enabled() and enable_faulthandler:
             try:
                 faulthandler.enable(file=sys.stderr.fileno())
-            except (AttributeError, io.UnsupportedOperation):
+            except AttributeError, io.UnsupportedOperation:
                 faulthandler.enable(file=sys.__stderr__.fileno())
         self.pdb = pdb
         if self.pdb and self.parallel > 1:
@@ -1211,7 +1207,7 @@ def try_importing(label):
     """
     try:
         mod = import_module(label)
-    except (ImportError, TypeError):
+    except ImportError, TypeError:
         return (False, False)
 
     return (True, hasattr(mod, "__path__"))

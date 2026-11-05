@@ -1,6 +1,5 @@
 from django.template.defaultfilters import urlizetrunc
 from django.test import SimpleTestCase
-from django.test.utils import override_settings
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -49,7 +48,6 @@ class UrlizetruncTests(SimpleTestCase):
         )
 
 
-@override_settings(URLIZE_ASSUME_HTTPS=True)
 class FunctionTests(SimpleTestCase):
     def test_truncate(self):
         uri = "http://31characteruri.com/test/"

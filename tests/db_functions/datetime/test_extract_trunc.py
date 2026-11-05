@@ -925,7 +925,7 @@ class DateFunctionTests(TestCase):
                     "year', start_datetime)) OR 1=1;--",
                 )
             ).exists()
-        except (DataError, OperationalError):
+        except DataError, OperationalError:
             pass
         else:
             self.assertIs(exists, False)

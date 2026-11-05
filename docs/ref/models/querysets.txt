@@ -172,8 +172,6 @@ Here's the formal declaration of a ``QuerySet``:
 
     .. attribute:: totally_ordered
 
-        .. versionadded:: 6.1
-
         Returns ``True`` if the ``QuerySet`` is ordered and the ordering is
         deterministic. This requires that the ordering includes a field
         (or set of fields) that is unique and non-nullable.
@@ -799,7 +797,7 @@ rather than 1-tuples. An example should make the difference clearer:
     >>> Entry.objects.values_list("id", flat=True).order_by("id")
     <QuerySet [1, 2, 3, ...]>
 
-It is an error to pass in ``flat`` when there is more than one field.
+It is an error to pass in ``flat`` with no fields or with more than one field.
 
 You can pass ``named=True`` to get results as a
 :func:`~python:collections.namedtuple`:
@@ -1044,8 +1042,6 @@ See :meth:`union` for some restrictions.
 ``fetch_mode()``
 ~~~~~~~~~~~~~~~~
 
-.. versionadded:: 6.1
-
 .. method:: fetch_mode(mode)
 
 Returns a ``QuerySet`` that sets the given fetch mode for all model instances
@@ -1158,18 +1154,6 @@ If you need to clear the list of related fields added by past calls of
 Chaining ``select_related`` calls works in a similar way to other methods -
 that is that ``select_related('foo', 'bar')`` is equivalent to
 ``select_related('foo').select_related('bar')``.
-
-There may be some situations where you wish to call ``select_related()`` with a
-lot of related objects, or where you don't know all of the relations. In these
-cases it is possible to call ``select_related()`` with no arguments. This will
-follow all non-null foreign keys it can find - nullable foreign keys must be
-specified. This is not recommended in most cases as it is likely to make the
-underlying query more complex, and return more data, than is actually needed.
-
-.. deprecated:: 6.1
-
-    Calling ``select_related()`` with no arguments is deprecated, and support
-    for it will be removed in Django 2028. Specify the fields to fetch instead.
 
 ``prefetch_related()``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -1787,7 +1771,7 @@ You can defer loading of fields in related models (if the related models are
 loading via :meth:`select_related`) by using the standard double-underscore
 notation to separate related fields::
 
-    Blog.objects.select_related().defer("entry__headline", "entry__body")
+    Entry.objects.select_related("blog").defer("blog__name", "blog__tagline")
 
 If you want to clear the set of deferred fields, pass ``None`` as a parameter
 to ``defer()``::
@@ -2641,11 +2625,6 @@ Example:
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
-.. versionchanged:: 6.1
-
-    Support for chaining ``in_bulk()`` after :meth:`values` or
-    :meth:`values_list` was added.
-
 ``iterator()``
 ~~~~~~~~~~~~~~
 
@@ -2818,12 +2797,6 @@ equivalent to the above example::
         p = Article.objects.order_by("title", "pub_date")[0]
     except IndexError:
         p = None
-
-.. versionchanged:: 6.1
-
-    ``first()`` and :meth:`last` no longer order by the primary key when
-    ordering has been forcibly cleared by calling :meth:`order_by` with no
-    arguments.
 
 ``last()``
 ~~~~~~~~~~
@@ -3128,10 +3101,6 @@ ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
 
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
-
-.. versionchanged:: 6.1
-
-    Support for the ``DB_*`` variants of ``on_delete`` attribute was added.
 
 ``as_manager()``
 ~~~~~~~~~~~~~~~~
@@ -4124,8 +4093,6 @@ by the aggregate.
 
 .. class:: BitAnd(expression, filter=None, default=None, **extra)
 
-    .. versionadded:: 6.1
-
     Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
     ``default`` if all values are null.
 
@@ -4136,8 +4103,6 @@ by the aggregate.
 
 .. class:: BitOr(expression, filter=None, default=None, **extra)
 
-    .. versionadded:: 6.1
-
     Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
     ``default`` if all values are null.
 
@@ -4147,8 +4112,6 @@ by the aggregate.
 ~~~~~~~~~~
 
 .. class:: BitXor(expression, filter=None, default=None, **extra)
-
-    .. versionadded:: 6.1
 
     Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
     ``default`` if all values are null.
@@ -4270,11 +4233,6 @@ by the aggregate.
         each of the values. For example, ``Value(",")``. (On SQLite, the
         literal delimiter ``Value(",")`` is the only delimiter compatible with
         ``distinct=True``.)
-
-        .. versionchanged:: 6.1
-
-            Support for using ``distinct=True`` with a delimiter of
-            ``Value(",")`` on SQLite was added.
 
 Query-related tools
 ===================

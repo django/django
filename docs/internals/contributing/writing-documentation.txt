@@ -736,10 +736,10 @@ Our policy for new features is:
 New features and significant changes should be identified using Sphinx's
 ``versionadded`` and ``versionchanged`` directives in their documentation, and
 should also be mentioned in the appropriate section of the release notes
-(``docs/releases/A.B.txt``).
+(``docs/releases/YYYY.txt``).
 
 Our preferred way to mark a new feature is to preface its documentation with
-"``.. versionadded:: A.B``". This should usually be placed at the top of a
+"``.. versionadded:: YYYY``". This should usually be placed at the top of a
 section, just below the heading or Sphinx directive that introduces the new
 feature:
 
@@ -747,7 +747,7 @@ feature:
 
     .. class:: Author(last_name, first_name)
 
-        .. versionadded:: A.B
+        .. versionadded:: YYYY
 
         A person who writes books...
 
@@ -764,17 +764,17 @@ blank line and an indented description of what was added:
 
     Each book can have one or more :class:`Author`\s...
 
-    .. versionadded:: A.B
+    .. versionadded:: YYYY
 
         Support for multiple authors.
 
-Sphinx renders this as "Added in version A.B: Support for multiple authors."
+Sphinx renders this as "Added in version YYYY: Support for multiple authors."
 Avoid using "added" or similar words in the description when it would be
 redundant.
 
 General improvements and significant changes to APIs should be marked with
-"``.. versionchanged:: A.B``" followed by a blank line and an indented
-description of the changes. Sphinx renders this as "Changed in version A.B:"
+"``.. versionchanged:: YYYY``" followed by a blank line and an indented
+description of the changes. Sphinx renders this as "Changed in version YYYY:"
 followed by the description.
 
 Put ``versionchanged`` notes at the bottom of a section. Related changes in the
@@ -797,20 +797,21 @@ feature, do something like this:
 
         ``last_name`` and ``first_name`` are...
 
-        .. versionchanged:: A.B
+        .. versionchanged:: YYYY
 
             The ``first_name`` argument was made optional.
 
     .. class:: Book(author)
 
 When the time comes, we can delete the lines containing ``.. versionchanged::
-A.B`` and its indented description without editing any other lines.
+YYYY`` and its indented description without editing any other lines.
 
 For similar reasons, avoid referring to a specific version of Django outside a
 ``versionadded`` or ``versionchanged`` block. Such references become outdated
 and are difficult to maintain. (Even inside one of those blocks, it's often
 redundant to mention the version number in the description. Sphinx already
-includes it in the "Added in version A.B" or "Changed in version A.B" prefix.)
+includes it in the "Added in version YYYY" or "Changed in version YYYY"
+prefix.)
 
 Minimizing images
 =================

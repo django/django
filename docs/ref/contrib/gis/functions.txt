@@ -621,10 +621,6 @@ SpatiaLite
 Accepts a geographic field or expression and tests if the value is an empty
 geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
 
-.. versionchanged:: 6.1
-
-    SpatiaLite support was added.
-
 ``IsValid``
 -----------
 
@@ -659,8 +655,6 @@ Accepts a single geographic field or expression and returns the memory size
 
 ``NumDimensions``
 -----------------
-
-.. versionadded:: 6.1
 
 .. class:: NumDimensions(expression, **extra)
 

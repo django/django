@@ -37,7 +37,7 @@ class BaseDatabaseCache(BaseCache):
         options = params.get("OPTIONS", {})
         try:
             self._cull_probability = float(options.get("CULL_PROBABILITY", 0.1))
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             self._cull_probability = 0.1
 
         class CacheEntry:

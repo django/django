@@ -124,7 +124,7 @@ class ServerHandler(simple_server.ServerHandler):
         """
         try:
             content_length = int(environ.get("CONTENT_LENGTH"))
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             content_length = 0
         super().__init__(
             LimitedStream(stdin, content_length), stdout, stderr, environ, **kwargs
@@ -223,7 +223,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
             self.handle_one_request()
         try:
             self.connection.shutdown(socket.SHUT_WR)
-        except (AttributeError, OSError):
+        except AttributeError, OSError:
             pass
 
     def handle_one_request(self):

@@ -9,16 +9,16 @@ from django.utils.inspect import signature
 from django.utils.warnings import django_file_prefixes
 
 
-class RemovedInDjango2028Warning(DeprecationWarning):
+class RemovedInDjango2029Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango2029Warning(PendingDeprecationWarning):
+class RemovedInDjango2030Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango2028Warning
-RemovedAfterNextVersionWarning = RemovedInDjango2029Warning
+RemovedInNextVersionWarning = RemovedInDjango2029Warning
+RemovedAfterNextVersionWarning = RemovedInDjango2030Warning
 
 
 def __getattr__(name):
@@ -37,13 +37,6 @@ def __getattr__(name):
         from django.middleware import MiddlewareMixin
 
         return MiddlewareMixin
-    if name == "RemovedInDjango70Warning":
-        warnings.warn(
-            "RemovedInDjango2028Warning should be used instead of "
-            "RemovedInDjango70Warning.",
-            stacklevel=2,
-        )
-        return RemovedInDjango2028Warning
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
@@ -161,7 +154,7 @@ def warn_about_implementation(message, category, target):
     try:
         filename = inspect.getsourcefile(function)
         _, lineno = inspect.getsourcelines(function)
-    except (AttributeError, OSError, TypeError):
+    except AttributeError, OSError, TypeError:
         # Can't identify the source. Issue the warning generically.
         warnings.warn(message, category, skip_file_prefixes=django_file_prefixes())
         return
@@ -170,7 +163,7 @@ def warn_about_implementation(message, category, target):
     module = function.__module__
     try:
         registry = sys.modules[module].__dict__.setdefault("__warningregistry__", {})
-    except (AttributeError, KeyError):
+    except AttributeError, KeyError:
         registry = None
 
     warnings.warn_explicit(

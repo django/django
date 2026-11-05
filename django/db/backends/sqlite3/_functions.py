@@ -28,7 +28,7 @@ from math import (
     tan,
 )
 from re import search as re_search
-from uuid import uuid4
+from uuid import uuid4, uuid7
 
 from django.db.backends.utils import (
     split_tzname_delta,
@@ -37,10 +37,6 @@ from django.db.backends.utils import (
 )
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
-from django.utils.version import PY314
-
-if PY314:
-    from uuid import uuid7
 
 
 def register(connection):
@@ -91,8 +87,7 @@ def register(connection):
     connection.create_aggregate("BIT_OR", 1, BitOr)
     connection.create_aggregate("BIT_XOR", 1, BitXor)
     connection.create_function("UUIDV4", 0, _sqlite_uuid4)
-    if PY314:
-        connection.create_function("UUIDV7", 0, _sqlite_uuid7)
+    connection.create_function("UUIDV7", 0, _sqlite_uuid7)
     # Some math functions are enabled by default in SQLite 3.35+.
     sql = "select sqlite_compileoption_used('ENABLE_MATH_FUNCTIONS')"
     if not connection.execute(sql).fetchone()[0]:
@@ -121,7 +116,7 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
         return None
     try:
         dt = typecast_timestamp(dt)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return None
     if conn_tzname:
         dt = dt.replace(tzinfo=zoneinfo.ZoneInfo(conn_tzname))
@@ -164,7 +159,7 @@ def _sqlite_time_trunc(lookup_type, dt, tzname, conn_tzname):
     if dt_parsed is None:
         try:
             dt = typecast_time(dt)
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             return None
     else:
         dt = dt_parsed
@@ -245,7 +240,7 @@ def _sqlite_time_extract(lookup_type, dt):
         return None
     try:
         dt = typecast_time(dt)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return None
     return getattr(dt, lookup_type)
 
@@ -272,7 +267,7 @@ def _sqlite_format_dtdelta(connector, lhs, rhs):
     try:
         real_lhs = _sqlite_prepare_dtdelta_param(connector, lhs)
         real_rhs = _sqlite_prepare_dtdelta_param(connector, rhs)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return None
     if connector == "+":
         # typecast_timestamp() returns a date or a datetime without timezone.

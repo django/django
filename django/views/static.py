@@ -117,6 +117,6 @@ def was_modified_since(header=None, mtime=0):
         header_mtime = parse_http_date(header)
         if int(mtime) > header_mtime:
             raise ValueError
-    except (ValueError, OverflowError):
+    except ValueError, OverflowError:
         return True
     return False

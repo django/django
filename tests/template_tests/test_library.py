@@ -1,10 +1,8 @@
 import functools
-import unittest
 
 from django.template import Library
 from django.template.base import Node
 from django.test import SimpleTestCase
-from django.utils.version import PY314
 
 
 class FilterRegistrationTests(SimpleTestCase):
@@ -80,7 +78,6 @@ class InclusionTagRegistrationTests(SimpleTestCase):
         self.assertIs(func_wrapped, func)
         self.assertTrue(hasattr(func_wrapped, "cache_info"))
 
-    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     def test_inclusion_tag_deferred_annotation(self):
         @self.library.inclusion_tag("template.html")
         def func(arg: SomeType):  # NOQA: F821
@@ -114,7 +111,6 @@ class SimpleTagRegistrationTests(SimpleTestCase):
 
         self.assertIn("name", self.library.tags)
 
-    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     def test_tag_deferred_annotation(self):
         @self.library.simple_tag
         def func(parser, token: SomeType):  # NOQA: F821
@@ -163,7 +159,6 @@ class SimpleBlockTagRegistrationTests(SimpleTestCase):
 
         self.assertIn("name", self.library.tags)
 
-    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     def test_simple_block_tag_deferred_annotation(self):
         @self.library.simple_block_tag
         def func(content: SomeType):  # NOQA: F821

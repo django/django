@@ -7,9 +7,6 @@ from io import BytesIO
 from unittest import mock
 from urllib.parse import quote
 
-from mail import override_deprecated_email_settings
-from mail.custombackend import FailingEmailBackend
-
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import PermissionDenied
@@ -505,17 +502,6 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.req.META["HTTP_REFERER"] = self.req.path_info[:-1]
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
-
-    # RemovedInDjango2028Warning.
-    @override_deprecated_email_settings(
-        EMAIL_BACKEND="mail.custombackend.FailingEmailBackend"
-    )
-    def test_sends_using_fail_silently(self):
-        del settings.MAILERS
-        self.addCleanup(FailingEmailBackend.reset)
-        self.req.META["HTTP_REFERER"] = "/another/url/"
-        BrokenLinkEmailsMiddleware(self.get_response)(self.req)
-        self.assertIs(FailingEmailBackend.init_kwargs[0]["fail_silently"], True)
 
     def test_sends_using_default_mailer(self):
         self.req.META["HTTP_REFERER"] = "/another/url/"

@@ -30,26 +30,9 @@ class MailersHandler:
 
     @property
     def settings(self):
-        # RemovedInDjango2028Warning: change to:
-        #   return settings.MAILERS
-        return getattr(settings, "MAILERS", {})
+        return settings.MAILERS
 
-    # RemovedInDjango2028Warning.
-    @property
-    def _is_configured(self):
-        """True if settings.py has opted into MAILERS support."""
-        return hasattr(settings, "MAILERS")
-
-    # RemovedInDjango2028Warning: _deprecated_kwargs.
-    def create_connection(self, alias, /, *, _deprecated_kwargs=None):
-        # RemovedInDjango2028Warning.
-        if not self._is_configured and alias == DEFAULT_MAILER_ALIAS:
-            # Create mailers.default from deprecated settings.
-            from django.core.mail import get_connection
-
-            assert _deprecated_kwargs is None
-            return get_connection()
-
+    def create_connection(self, alias, /):
         try:
             config = self.settings[alias]
         except KeyError:
@@ -58,15 +41,6 @@ class MailersHandler:
         options = config.get("OPTIONS", {})
         if "alias" in options:
             raise InvalidMailer("OPTIONS must not define 'alias'.", alias=alias)
-
-        # RemovedInDjango2028Warning.
-        if _deprecated_kwargs:
-            # Being called from get_connection() to create default mailer
-            # instance with some overrides. _ignore_unknown_kwargs prevents
-            # BaseEmailBackend from reporting these as unknown OPTIONS.
-            assert alias == DEFAULT_MAILER_ALIAS
-            options = options | _deprecated_kwargs
-            options |= {"_ignore_unknown_kwargs": set(_deprecated_kwargs)}
 
         backend_path = config.get("BACKEND", DEFAULT_MAILER_BACKEND)
         try:

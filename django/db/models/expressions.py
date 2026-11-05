@@ -788,11 +788,11 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         if not isinstance(self, (DurationExpression, TemporalSubtraction)):
             try:
                 lhs_type = resolved.lhs.output_field.get_internal_type()
-            except (AttributeError, FieldError):
+            except AttributeError, FieldError:
                 lhs_type = None
             try:
                 rhs_type = resolved.rhs.output_field.get_internal_type()
-            except (AttributeError, FieldError):
+            except AttributeError, FieldError:
                 rhs_type = None
             if "DurationField" in {lhs_type, rhs_type} and lhs_type != rhs_type:
                 return DurationExpression(
@@ -847,7 +847,7 @@ class DurationExpression(CombinedExpression):
             try:
                 lhs_type = self.lhs.output_field.get_internal_type()
                 rhs_type = self.rhs.output_field.get_internal_type()
-            except (AttributeError, FieldError):
+            except AttributeError, FieldError:
                 pass
             else:
                 allowed_fields = {

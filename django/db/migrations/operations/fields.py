@@ -1,8 +1,8 @@
+from copy import replace
 from functools import cached_property
 
 from django.db.migrations.utils import field_references
 from django.db.models import NOT_PROVIDED, Model
-from django.utils.copy import replace
 
 from .base import Operation, OperationCategory
 

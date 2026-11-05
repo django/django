@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.checks import Error, Tags, Warning, register
-from django.core.mail import DEFAULT_MAILER_ALIAS
+from django.core.mail.handler import DEFAULT_MAILER_ALIAS
 
 
 @register(Tags.mail)
@@ -41,9 +41,9 @@ NON_PRODUCTION_EMAIL_BACKENDS = {
 def check_mailers_production_backend(app_configs, **kwargs):
     try:
         backend = settings.MAILERS[DEFAULT_MAILER_ALIAS]["BACKEND"]
-    except (AttributeError, KeyError):
-        # There is no "default" backend to inspect: either MAILERS is not
-        # defined, or there is no "default" entry, or no "BACKEND" key in it.
+    except KeyError:
+        # There is no "default" backend to inspect: either there is no
+        # "default" entry in "MAILERS", or no "BACKEND" key in it.
         # An omitted BACKEND defaults to SMTP, which is fine.
         return []
 

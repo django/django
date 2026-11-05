@@ -1,3 +1,5 @@
+default_language_version:
+  python: python3.14
 repos:
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 26.5.1

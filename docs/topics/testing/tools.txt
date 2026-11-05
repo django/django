@@ -2127,10 +2127,6 @@ and contents::
             # Verify the message was sent with the "default" mailer.
             self.assertEqual(mail.outbox[0].sent_using, "default")
 
-.. versionchanged:: 6.1
-
-    The ``sent_using`` attribute was added to messages in the outbox.
-
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
 at the start of every test in a Django ``*TestCase``. To empty the outbox
 manually, assign the empty list to ``mail.outbox``::

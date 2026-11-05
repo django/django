@@ -86,7 +86,6 @@ from .models import (
     Language,
     Link,
     MainPrepopulated,
-    ModelAction,
     ModelWithStringPrimaryKey,
     NotReferenced,
     OldSubscriber,
@@ -1291,23 +1290,6 @@ class CourseAdmin(admin.ModelAdmin):
     )
 
 
-# RemovedInDjango2028Warning: When the deprecation ends, remove.
-class OverriddenActionAdmin(admin.ModelAdmin):
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        func, name, _ = actions["delete_selected"]
-        description = actions["delete_selected"][2]
-        actions["delete_selected"] = (func, name, description + " (extra)")
-        return actions
-
-    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
-        return super().get_action_choices(request, default_choices)
-
-    @admin.action(location=[ActionLocation.CHANGE_LIST, ActionLocation.CHANGE_FORM])
-    def test_action(self, request, selected):
-        pass
-
-
 site = admin.AdminSite(name="admin")
 site.site_url = "/my-site-url/"
 site.register(Article, ArticleAdmin)
@@ -1383,8 +1365,6 @@ site.register(ParentWithUUIDPK)
 site.register(RelatedPrepopulated, search_fields=["name"])
 site.register(RelatedWithUUIDPKModel)
 site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
-# RemovedInDjango2028Warning: When the deprecation ends, remove.
-site.register(ModelAction, OverriddenActionAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor
 # ChapterXtra2. That way we cover all four cases:

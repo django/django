@@ -119,8 +119,8 @@ copyright = "Django Software Foundation and contributors"
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-# The short X.Y version.
-version = "6.2"
+# The short version, without the patch number.
+version = "2028"
 # The full version, including alpha/beta/rc tags.
 try:
     from django import VERSION, get_version
@@ -141,7 +141,7 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = "6.2"
+django_next_version = "2028"
 
 extlinks = {
     "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-%s"),

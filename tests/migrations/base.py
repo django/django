@@ -211,7 +211,7 @@ class MigrationTestBase(TransactionTestCase):
 
             try:
                 source_migrations_dir = module_dir(import_module(module))
-            except (ImportError, ValueError):
+            except ImportError, ValueError:
                 pass
             else:
                 shutil.copytree(source_migrations_dir, target_migrations_dir)

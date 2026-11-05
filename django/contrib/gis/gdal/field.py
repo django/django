@@ -179,7 +179,7 @@ class OFTDate(Field):
         try:
             yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
             return date(yy.value, mm.value, dd.value)
-        except (TypeError, ValueError, GDALException):
+        except TypeError, ValueError, GDALException:
             return None
 
 
@@ -204,7 +204,7 @@ class OFTDateTime(Field):
                 seconds,
                 milliseconds * 1000,
             )
-        except (TypeError, ValueError, GDALException):
+        except TypeError, ValueError, GDALException:
             return None
 
 
@@ -217,7 +217,7 @@ class OFTTime(Field):
             seconds = int(ss.value)
             milliseconds = int(round((ss.value - seconds) * 1000))
             return time(hh.value, mn.value, seconds, milliseconds * 1000)
-        except (TypeError, ValueError, GDALException):
+        except TypeError, ValueError, GDALException:
             return None
 
 

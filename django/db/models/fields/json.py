@@ -1,5 +1,4 @@
 import json
-import warnings
 
 from django import forms
 from django.core import checks, exceptions
@@ -12,9 +11,7 @@ from django.db.models.lookups import (
     PostgresOperatorLookup,
     Transform,
 )
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.translation import gettext_lazy as _
-from django.utils.warnings import django_file_prefixes
 
 from . import Field
 from .mixins import CheckFieldDefaultMixin
@@ -334,27 +331,8 @@ class CaseInsensitiveMixin:
 
 
 class JSONExact(lookups.Exact):
-    # RemovedInDjango2028Warning: When the deprecation period is over, remove
-    # the following line.
-    can_use_none_as_rhs = True
-
     def process_rhs(self, compiler, connection):
-        if self.rhs is None and not isinstance(self.lhs, KeyTransform):
-            warnings.warn(
-                "Using None as the right-hand side of an exact lookup on JSONField to "
-                "mean JSON scalar 'null' is deprecated. Use JSONNull() instead (or use "
-                "the __isnull lookup if you meant SQL NULL).",
-                RemovedInDjango2028Warning,
-                skip_file_prefixes=django_file_prefixes(),
-            )
-
         rhs, rhs_params = super().process_rhs(compiler, connection)
-
-        # RemovedInDjango2028Warning: When the deprecation ends, remove
-        # The following if-block entirely.
-        # Treat None lookup values as null.
-        if rhs == "%s" and (*rhs_params,) == (None,):
-            rhs_params = ("null",)
         if connection.vendor == "mysql" and not isinstance(
             self.rhs, expressions.JSONNull
         ):
@@ -658,9 +636,7 @@ class KeyTransformIn(JSONIn):
 
 
 class KeyTransformExact(JSONExact):
-    # RemovedInDjango2028Warning: When deprecation period ends, uncomment the
-    # flag below.
-    # can_use_none_as_rhs = True
+    can_use_none_as_rhs = True
 
     def process_rhs(self, compiler, connection):
         if isinstance(self.rhs, KeyTransform):

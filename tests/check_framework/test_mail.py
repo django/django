@@ -67,7 +67,8 @@ class MailersProductionBackendTests(SimpleTestCase):
             check_mailers_production_backend, registry.registry.registered_checks
         )
 
-    def test_mailers_not_defined(self):
+    @override_settings(MAILERS={})
+    def test_mailers_empty(self):
         self.assertEqual(check_mailers_production_backend(None), [])
 
     def test_production_backends(self):

@@ -164,10 +164,6 @@ You could also write a decorator to encapsulate this logic::
 Just be aware that this logic will disable the signals whenever fixtures are
 deserialized, not just during :djadmin:`loaddata`.
 
-.. versionchanged:: 6.1
-
-    The ``raw`` argument was added to ``m2m_changed`` signals.
-
 Compressed fixtures
 ===================
 

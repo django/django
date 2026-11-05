@@ -142,7 +142,7 @@ class HttpResponseBase:
         if status is not None:
             try:
                 self.status_code = int(status)
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 raise TypeError("HTTP status code must be an integer.")
 
             if not 100 <= self.status_code <= 599:

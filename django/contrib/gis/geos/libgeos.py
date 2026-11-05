@@ -26,7 +26,7 @@ def load_geos():
         from django.conf import settings
 
         lib_path = settings.GEOS_LIBRARY_PATH
-    except (AttributeError, ImportError, ImproperlyConfigured, OSError):
+    except AttributeError, ImportError, ImproperlyConfigured, OSError:
         lib_path = None
 
     # Setting the appropriate names for the GEOS-C library.

@@ -798,7 +798,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 self.instance._prefetched_objects_cache.pop(
                     self.field.remote_field.cache_name
                 )
-            except (AttributeError, KeyError):
+            except AttributeError, KeyError:
                 pass  # nothing to clear from cache
 
         def get_queryset(self):
@@ -814,7 +814,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 return self.instance._prefetched_objects_cache[
                     self.field.remote_field.cache_name
                 ]
-            except (AttributeError, KeyError):
+            except AttributeError, KeyError:
                 queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
 
@@ -1188,7 +1188,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             for instance, _ in _traverse_ancestors(rel.field.model, self.instance):
                 try:
                     return instance._prefetched_objects_cache[self.prefetch_cache_name]
-                except (AttributeError, KeyError):
+                except AttributeError, KeyError:
                     pass
             return None
 
@@ -1198,7 +1198,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             for instance, _ in _traverse_ancestors(rel.field.model, self.instance):
                 try:
                     instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
-                except (AttributeError, KeyError):
+                except AttributeError, KeyError:
                     pass  # nothing to clear from cache
 
         def get_queryset(self):

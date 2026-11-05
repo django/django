@@ -53,7 +53,6 @@ from django.test.utils import (
     teardown_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.html import VOID_ELEMENTS
 
 from .models import Car, Person, PossessedCar
@@ -186,11 +185,7 @@ class SkippingClassTestCase(TransactionTestCase):
         except unittest.SkipTest:
             self.fail("SkipTest should not be raised here.")
         result = unittest.TextTestRunner(stream=StringIO()).run(test_suite)
-        # PY312: Python 3.12.1 does not include skipped tests in the number of
-        # running tests.
-        self.assertEqual(
-            result.testsRun, 1 if sys.version_info[:3] == (3, 12, 1) else 3
-        )
+        self.assertEqual(result.testsRun, 3)
         self.assertEqual(len(result.skipped), 2)
         self.assertEqual(result.skipped[0][1], "Database has feature(s) __class__")
         self.assertEqual(result.skipped[1][1], "Database has feature(s) __class__")
@@ -2011,28 +2006,6 @@ class SetupTestEnvironmentTests(SimpleTestCase):
                     setup_test_environment()
                     self.assertEqual(settings.ALLOWED_HOSTS, ["*", "testserver"])
 
-    # RemovedInDjango2028Warning.
-    @ignore_warnings(category=RemovedInDjango2028Warning)
-    def test_email_backend_override(self):
-        with (
-            self.mock_test_state(),
-            self.settings(
-                EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend"
-            ),
-        ):
-            setup_test_environment()
-            self.assertEqual(
-                settings.EMAIL_BACKEND,
-                "django.core.mail.backends.locmem.EmailBackend",
-            )
-            self.assertFalse(hasattr(settings, "MAILERS"))
-            teardown_test_environment()
-            self.assertEqual(
-                settings.EMAIL_BACKEND,
-                "django.core.mail.backends.console.EmailBackend",
-            )
-            self.assertFalse(hasattr(settings, "MAILERS"))
-
     def test_mailers_override(self):
         expected_value = {
             "default": {
@@ -2059,12 +2032,9 @@ class SetupTestEnvironmentTests(SimpleTestCase):
             )
             # setup_test_environment() shouldn't mutate original setting value.
             self.assertEqual(settings_value, expected_value)
-            # RemovedInDjango2028Warning: Remove both EMAIL_BACKEND assertions.
-            self.assertFalse(hasattr(settings, "EMAIL_BACKEND"))
 
             teardown_test_environment()
             self.assertEqual(settings.MAILERS, expected_value)
-            self.assertFalse(hasattr(settings, "EMAIL_BACKEND"))
 
 
 class OverrideSettingsTests(SimpleTestCase):

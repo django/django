@@ -828,13 +828,6 @@ can be useful during testing.
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
 
-    .. deprecated:: 6.0
-
-        The ``serialize`` keyword argument is deprecated. Passing
-        ``serialize=True`` would automatically call
-        :func:`serialize_db_to_string` but it was deprecated as it could result
-        in queries against non-test databases during serialization.
-
 .. function:: destroy_test_db(old_database_name, verbosity=1, keepdb=False)
 
     Destroys the database whose name is the value of :setting:`NAME` in

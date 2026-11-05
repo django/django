@@ -1,11 +1,7 @@
 from django.core.mail import InvalidMailer, MailerDoesNotExist, mailers
-from django.core.mail.backends import locmem, smtp
+from django.core.mail.backends import smtp
 from django.test import SimpleTestCase, override_settings
 
-from . import (
-    ignore_no_default_mailer_warning,
-    override_deprecated_email_settings,
-)
 from .custombackend import OptionsCapturingBackend
 
 
@@ -89,8 +85,6 @@ class MailersTests(SimpleTestCase):
         backend = mailers.default
         self.assertEqual(backend.alias, "default")
 
-    # RemovedInDjango2028Warning: remove override_settings (but keep the test).
-    # (MAILERS={} becomes the default in Django 2028.)
     @override_settings(MAILERS={})
     def test_default_mailers(self):
         msg = "The mailer 'default' is not configured."
@@ -202,32 +196,3 @@ class MailersTests(SimpleTestCase):
         msg = "MailerDoesNotExist.__init__() takes 1 positional argument"
         with self.assertRaisesMessage(TypeError, msg):
             MailerDoesNotExist("Some other configuration problem")
-
-
-# RemovedInDjango2028Warning.
-class MailersCompatibilityTests(SimpleTestCase):
-    """mailers.default is usable even when MAILERS is not defined."""
-
-    @override_deprecated_email_settings(
-        EMAIL_BACKEND="mail.custombackend.OptionsCapturingBackend"
-    )
-    def test_default_mailer_with_deprecated_settings(self):
-        self.addCleanup(OptionsCapturingBackend.reset)
-        backend = mailers.default
-        self.assertIsNone(backend.alias)
-        self.assertIsInstance(backend, OptionsCapturingBackend)
-        self.assertNotIn("alias", OptionsCapturingBackend.init_kwargs[0])
-
-    @ignore_no_default_mailer_warning()
-    def test_default_mailer_with_no_settings(self):
-        backend = mailers.default
-        # Django's test runner changes the default EMAIL_BACKEND to locmem.
-        self.assertIsInstance(backend, locmem.EmailBackend)
-        # In compatibility mode, backends are constructed with no 'alias' arg.
-        self.assertIsNone(backend.alias)
-
-    def test_unknown_mailer_with_no_settings(self):
-        # Compatibility only applies to the default mailer.
-        msg = "The mailer 'unknown' is not configured."
-        with self.assertRaisesMessage(MailerDoesNotExist, msg):
-            _ = mailers["unknown"]

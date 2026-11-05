@@ -100,7 +100,7 @@ class SessionStore(SessionBase):
                     session_data = {}
                     self.delete()
                     self.create()
-        except (OSError, SuspiciousOperation):
+        except OSError, SuspiciousOperation:
             self._session_key = None
         return session_data
 
@@ -180,7 +180,7 @@ class SessionStore(SessionBase):
             finally:
                 if not renamed:
                     os.unlink(output_file_name)
-        except (EOFError, OSError):
+        except EOFError, OSError:
             pass
 
     async def asave(self, must_create=False):

@@ -63,7 +63,7 @@ class BaseCache:
         if timeout is not None:
             try:
                 timeout = int(timeout)
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 timeout = 300
         self.default_timeout = timeout
 
@@ -71,13 +71,13 @@ class BaseCache:
         max_entries = params.get("max_entries", options.get("MAX_ENTRIES", 300))
         try:
             self._max_entries = int(max_entries)
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             self._max_entries = 300
 
         cull_frequency = params.get("cull_frequency", options.get("CULL_FREQUENCY", 3))
         try:
             self._cull_frequency = int(cull_frequency)
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             self._cull_frequency = 3
 
         self.key_prefix = params.get("KEY_PREFIX", "")

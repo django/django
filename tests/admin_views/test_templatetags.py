@@ -1,5 +1,4 @@
 import datetime
-import unittest
 
 from django import template
 from django.contrib.admin import ModelAdmin
@@ -13,7 +12,6 @@ from django.contrib.auth.models import User
 from django.template.base import Token, TokenType
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.urls import reverse
-from django.utils.version import PY314
 
 from .admin import ArticleAdmin, site
 from .models import Article, Question
@@ -251,7 +249,6 @@ class AdminTemplateTagsTest(AdminViewBasicTestCase):
         self.assertContains(response, "override-pagination")
         self.assertContains(response, "override-search_form")
 
-    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     def test_inclusion_admin_node_deferred_annotation(self):
         def action(arg: SomeType = None):  # NOQA: F821
             pass

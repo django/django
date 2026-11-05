@@ -135,7 +135,7 @@ their clone would become corrupt when you edit commits.
 
 There are also "public branches". These are branches other people are supposed
 to fork, so the history of these branches should never change. Good examples
-of public branches are the ``main`` and ``stable/A.B.x`` branches in the
+of public branches are the ``main`` and ``stable/YYYY.x`` branches in the
 ``django/django`` repository.
 
 When you think your work is ready to be pulled into Django, you should create

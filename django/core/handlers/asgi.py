@@ -205,7 +205,7 @@ class ASGIHandler(base.BaseHandler):
                         response = await self.run_get_response(request)
                         await self.send_response(response, send)
                         raise RequestProcessed
-                except* (RequestProcessed, RequestAborted):
+                except* RequestProcessed, RequestAborted:
                     pass
             except BaseExceptionGroup as exception_group:
                 if len(exception_group.exceptions) == 1:

@@ -518,7 +518,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         try:
             with super()._nodb_cursor() as cursor:
                 yield cursor
-        except (Database.DatabaseError, WrappedDatabaseError):
+        except Database.DatabaseError, WrappedDatabaseError:
             if cursor is not None:
                 raise
             warnings.warn(

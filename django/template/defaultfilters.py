@@ -155,7 +155,7 @@ def floatformat(text, arg=-1):
     except InvalidOperation:
         try:
             d = Decimal(str(float(text)))
-        except (ValueError, InvalidOperation, TypeError):
+        except ValueError, InvalidOperation, TypeError:
             return ""
     try:
         p = int(arg)
@@ -178,7 +178,7 @@ def floatformat(text, arg=-1):
 
     try:
         m = int(d) - d
-    except (ValueError, OverflowError, InvalidOperation):
+    except ValueError, OverflowError, InvalidOperation:
         return input_val
 
     if not m and p <= 0:
@@ -290,7 +290,7 @@ def stringformat(value, arg):
         value = str(value)
     try:
         return ("%" + str(arg)) % value
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return ""
 
 
@@ -566,7 +566,7 @@ def _property_resolver(arg):
             for part in parts:
                 try:
                     value = value[part]
-                except (AttributeError, IndexError, KeyError, TypeError, ValueError):
+                except AttributeError, IndexError, KeyError, TypeError, ValueError:
                     value = getattr(value, part)
             return value
 
@@ -583,7 +583,7 @@ def dictsort(value, arg):
     """
     try:
         return sorted(value, key=_property_resolver(arg))
-    except (AttributeError, TypeError):
+    except AttributeError, TypeError:
         return ""
 
 
@@ -595,7 +595,7 @@ def dictsortreversed(value, arg):
     """
     try:
         return sorted(value, key=_property_resolver(arg), reverse=True)
-    except (AttributeError, TypeError):
+    except AttributeError, TypeError:
         return ""
 
 
@@ -635,7 +635,7 @@ def length(value):
     """Return the length of the value - useful for lists."""
     try:
         return len(value)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return 0
 
 
@@ -662,7 +662,7 @@ def slice_filter(value, arg):
                 bits.append(int(x))
         return value[slice(*bits)]
 
-    except (ValueError, TypeError, KeyError):
+    except ValueError, TypeError, KeyError:
         return value  # Fail silently.
 
 
@@ -748,7 +748,7 @@ def add(value, arg):
     """Add the arg to the value."""
     try:
         return int(value) + int(arg)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         try:
             return value + arg
         except Exception:
@@ -802,10 +802,10 @@ def time(value, arg=None):
         return ""
     try:
         return formats.time_format(value, arg)
-    except (AttributeError, TypeError):
+    except AttributeError, TypeError:
         try:
             return time_format(value, arg)
-        except (AttributeError, TypeError):
+        except AttributeError, TypeError:
             return ""
 
 
@@ -818,7 +818,7 @@ def timesince_filter(value, arg=None):
         if arg:
             return timesince(value, arg)
         return timesince(value)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return ""
 
 
@@ -829,7 +829,7 @@ def timeuntil_filter(value, arg=None):
         return ""
     try:
         return timeuntil(value, arg)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return ""
 
 
@@ -905,7 +905,7 @@ def filesizeformat(bytes_):
     """
     try:
         bytes_ = int(bytes_)
-    except (TypeError, ValueError, UnicodeDecodeError):
+    except TypeError, ValueError, UnicodeDecodeError:
         value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {"size": 0}
         return avoid_wrapping(value)
 

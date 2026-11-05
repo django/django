@@ -588,8 +588,6 @@ arithmetic on ``F()`` expressions with different types as described in
 ``JSONNull()`` expression
 -------------------------
 
-.. versionadded:: 6.1
-
 .. class:: JSONNull()
 
 Specialized expression to represent JSON scalar ``null`` on a

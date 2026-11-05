@@ -33,7 +33,7 @@ Set up
 
    .. code-block:: shell
 
-       $ # This needs to be >= 3.12
+       $ # This needs to be >= 3.14
        $ python -V
        $ python -m venv ~/.virtualenvs/djangodev
        $ source ~/.virtualenvs/djangodev/bin/activate

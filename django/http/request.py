@@ -408,7 +408,7 @@ class HttpRequest:
             # comma-joins duplicate Content-Length headers).
             try:
                 content_length = int(self.META.get("CONTENT_LENGTH") or 0)
-            except (ValueError, TypeError):
+            except ValueError, TypeError:
                 content_length = 0
             # Limit the maximum request data size that will be handled
             # in-memory. Reject early when Content-Length is present and
@@ -467,7 +467,7 @@ class HttpRequest:
                 data = self
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
-            except (MultiPartParserError, TooManyFilesSent):
+            except MultiPartParserError, TooManyFilesSent:
                 # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent

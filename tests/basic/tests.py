@@ -24,7 +24,6 @@ from django.test import (
 )
 from django.test.utils import CaptureQueriesContext
 from django.utils.connection import ConnectionDoesNotExist
-from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -33,8 +32,6 @@ from .models import (
     ChildPrimaryKeyWithDefault,
     FeaturedArticle,
     FromDbNewSignature,
-    FromDbOldSignature,
-    FromDbOldSignatureRelated,
     PrimaryKeyWithDbDefault,
     PrimaryKeyWithDefault,
     PrimaryKeyWithFalseyDbDefault,
@@ -1131,45 +1128,6 @@ class ModelRefreshTests(TestCase):
 
 
 class ModelFromDbTests(TestCase):
-    # RemovedInDjango2028Warning: Remove the FromDbOldSignature tests when the
-    # deprecation ends.
-    deprecation_msg = (
-        "FromDbOldSignature.from_db() must accept a fetch_mode keyword "
-        "argument. Support for from_db() methods that do not accept it is "
-        "deprecated."
-    )
-
-    def test_old_signature_iteration(self):
-        obj = FromDbOldSignature.objects.create(name="test")
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.deprecation_msg):
-            instances = list(FromDbOldSignature.objects.all())
-        self.assertEqual(instances, [obj])
-        self.assertEqual(instances[0]._loaded_values, {"id": obj.pk, "name": "test"})
-
-    def test_old_signature_get(self):
-        obj = FromDbOldSignature.objects.create(name="test")
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.deprecation_msg):
-            fetched = FromDbOldSignature.objects.get(pk=obj.pk)
-        self.assertEqual(fetched._loaded_values, {"id": obj.pk, "name": "test"})
-
-    def test_old_signature_select_related(self):
-        obj = FromDbOldSignature.objects.create(name="test")
-        related = FromDbOldSignatureRelated.objects.create(old=obj)
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.deprecation_msg):
-            fetched = FromDbOldSignatureRelated.objects.select_related("old").get(
-                pk=related.pk
-            )
-        self.assertEqual(fetched.old._loaded_values, {"id": obj.pk, "name": "test"})
-
-    def test_old_signature_raw(self):
-        obj = FromDbOldSignature.objects.create(name="test")
-        with self.assertWarnsMessage(RemovedInDjango2028Warning, self.deprecation_msg):
-            instances = list(
-                FromDbOldSignature.objects.raw("SELECT * FROM basic_fromdboldsignature")
-            )
-        self.assertEqual(instances, [obj])
-        self.assertEqual(instances[0]._loaded_values, {"id": obj.pk, "name": "test"})
-
     def test_new_signature_receives_fetch_mode(self):
         obj = FromDbNewSignature.objects.create(name="test")
         fetched = FromDbNewSignature.objects.get(pk=obj.pk)

@@ -2,11 +2,8 @@ from django.template import Engine
 from django.template.base import Origin, Template, TemplateSyntaxError
 from django.template.context import Context
 from django.template.loader_tags import BlockContext, BlockNode
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import (
-    RemovedInDjango2028Warning,
-    RemovedInDjango2029Warning,
-)
+from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.views.debug import ExceptionReporter
 
 from ..utils import SilentAttrClass, SilentGetItemClass, SomeClass, setup
@@ -567,41 +564,13 @@ class BasicSyntaxTests(SimpleTestCase):
         output = self.engine.render_to_string("template", {"meals": Meals})
         self.assertEqual(output, "soup is yummy.")
 
+    @setup({"template": "{{ doubledot..lookup }}"})
     def test_double_dot_lookup(self):
-        loaders = [
-            (
-                "django.template.loaders.cached.Loader",
-                [
-                    (
-                        "django.template.loaders.locmem.Loader",
-                        {"template": "{{ doubledot..lookup }}"},
-                    ),
-                ],
-            ),
-        ]
-
-        msg = (
-            "Support for double-dot lookups '..' which maps to a lookup of the empty "
-            "string is deprecated.\n  Template: template\n  Line: 1"
-        )
-
-        for debug in [True, False]:
-            with self.subTest(debug=debug):
-                engine = Engine(loaders=loaders, debug=debug)
-                with self.assertWarnsMessage(RemovedInDjango2028Warning, msg):
-                    engine.render_to_string("template", {})
-                # Cached loader results in warning only on first access.
-                engine.render_to_string("template", {})
-
-    # RemovedInDjango2028Warning.
-    # Replace the above test with the following.
-    # @setup({"template": "{{ doubledot..lookup }}"})
-    # def test_double_dot_lookup(self):
-    #     with self.assertRaisesMessage(
-    #         TemplateSyntaxError,
-    #         "Variable contains '..' on line 1",
-    #     ):
-    #         self.engine.render_to_string("template")
+        with self.assertRaisesMessage(
+            TemplateSyntaxError,
+            "Variable contains '..' on line 1",
+        ):
+            self.engine.render_to_string("template")
 
     def test_double_dot_in_literal(self):
         tests = [
@@ -653,12 +622,3 @@ class TemplateNameInExceptionTests(SimpleTestCase):
             Template("{% endfor %}")
         except TemplateSyntaxError as e:
             self.assertEqual(str(e), self.template_error_msg)
-
-
-# RemovedInDjango2028Warning
-@ignore_warnings(category=RemovedInDjango2028Warning)
-class DeprecatedTests(SimpleTestCase):
-    @setup({"template": "{{ doubledot..lookup }}"})
-    def test_double_dot_lookup(self):
-        context = Context({"doubledot": {"": {"lookup": "value"}}})
-        self.assertEqual(self.engine.render_to_string("template", context), "value")

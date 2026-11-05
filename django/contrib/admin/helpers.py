@@ -276,7 +276,7 @@ class AdminReadonlyField:
         )
         try:
             f, attr, value = lookup_field(field, obj, model_admin)
-        except (AttributeError, ValueError, ObjectDoesNotExist):
+        except AttributeError, ValueError, ObjectDoesNotExist:
             result_repr = self.empty_value_display
         else:
             if f is None:

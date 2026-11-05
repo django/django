@@ -178,10 +178,6 @@ The functions defined in this module share the following properties:
         ISO 8601 years (``Y``) and months (``M``) are unsupported as they
         cannot be represented by :class:`~datetime.timedelta`.
 
-    .. versionchanged:: 6.1
-
-        ISO 8601 duration parsing now supports weeks (``PnW``).
-
 ``django.utils.decorators``
 ===========================
 

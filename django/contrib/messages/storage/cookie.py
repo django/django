@@ -206,7 +206,7 @@ class CookieStorage(BaseStorage):
             return None
         try:
             return self._signer.unsign_object(data, serializer=MessageSerializer)
-        except (signing.BadSignature, binascii.Error, json.JSONDecodeError):
+        except signing.BadSignature, binascii.Error, json.JSONDecodeError:
             pass
         # Mark the data as used (so it gets removed) since something was wrong
         # with the data.

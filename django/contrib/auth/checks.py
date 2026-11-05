@@ -19,7 +19,7 @@ def _subclass_index(class_path, candidate_paths):
             candidate_cls = import_string(path)
             if issubclass(candidate_cls, cls):
                 return index
-        except (ImportError, TypeError):
+        except ImportError, TypeError:
             continue
     return -1
 

@@ -1,5 +1,4 @@
 import itertools
-import unittest
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -9,7 +8,6 @@ from django.core.management.utils import get_random_secret_key
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.csp import CSP
-from django.utils.version import PY314
 from django.views.generic import View
 
 if TYPE_CHECKING:
@@ -620,10 +618,8 @@ def failure_view_with_invalid_signature():
     pass
 
 
-if PY314:
-
-    def failure_view_with_deferred_annotations(request: HttpRequest, reason: str):
-        pass
+def failure_view_with_deferred_annotations(request: HttpRequest, reason: str):
+    pass
 
 
 good_class_based_csrf_failure_view = View.as_view()
@@ -666,7 +662,6 @@ class CSRFFailureViewTest(SimpleTestCase):
     def test_failure_view_valid_class_based(self):
         self.assertEqual(csrf.check_csrf_failure_view(None), [])
 
-    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     @override_settings(
         CSRF_FAILURE_VIEW=(
             "check_framework.test_security.failure_view_with_deferred_annotations"

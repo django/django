@@ -78,7 +78,6 @@ from django.test.utils import (
     register_lookup,
 )
 from django.utils.functional import SimpleLazyObject
-from django.utils.version import PY314
 
 from .models import (
     UUID,
@@ -1618,7 +1617,6 @@ class SimpleExpressionTests(SimpleTestCase):
         replaced = expression.replace_expressions({"replacement": Expression()})
         self.assertEqual(replaced.get_source_expressions(), [falsey])
 
-    @unittest.skipUnless(PY314, "Deferred annotations are Python 3.14+ only")
     def test_expression_signature_uses_deferred_annotations(self):
         class AnnotatedExpression(Expression):
             def __init__(self, *args, my_kw: AnnotatedKwarg, **kwargs):

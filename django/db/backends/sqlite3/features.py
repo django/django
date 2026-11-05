@@ -5,7 +5,6 @@ from functools import cached_property
 from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import OperationalError
-from django.utils.version import PY314
 
 from .base import Database
 
@@ -61,10 +60,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_return_rows_from_bulk_insert = True
     can_return_rows_from_update = True
     supports_uuid4_function = True
-
-    @cached_property
-    def supports_uuid7_function(self):
-        return PY314
+    supports_uuid7_function = True
 
     @cached_property
     def django_test_skips(self):
