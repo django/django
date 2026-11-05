@@ -11,7 +11,7 @@ class GISConfig(AppConfig):
     verbose_name = _("GIS")
 
     def ready(self):
-        serializers.BUILTIN_SERIALIZERS.setdefault(
+        serializers.register_serializer(
             "geojson", "django.contrib.gis.serializers.geojson"
         )
         checks.register(check_gdal_39, checks.Tags.gis, checks.Tags.security)
