@@ -26,6 +26,18 @@ class Group(models.Model):
         through="TestNoDefaultsOrNulls",
         related_name="testnodefaultsnonulls",
     )
+    proxy_members = models.ManyToManyField(
+        Person,
+        through="ProxyMembership",
+        through_fields=("group", "proxy_person"),
+        related_name="proxy_groups",
+    )
+    double_proxy_members = models.ManyToManyField(
+        "ProxyPerson",
+        through="DoubleProxyMembership",
+        through_fields=("proxy_group", "proxy_person"),
+        related_name="double_proxy_groups",
+    )
 
     class Meta:
         ordering = ("name",)
@@ -155,3 +167,24 @@ class Recipe(models.Model):
 class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, models.CASCADE, to_field="iname")
     recipe = models.ForeignKey(Recipe, models.CASCADE, to_field="rname")
+
+
+class ProxyPerson(Person):
+    class Meta:
+        proxy = True
+
+
+class ProxyGroup(Group):
+    class Meta:
+        proxy = True
+
+
+class ProxyMembership(models.Model):
+    proxy_person = models.ForeignKey(ProxyPerson, models.CASCADE)
+    group = models.ForeignKey(Group, models.CASCADE)
+    joined = models.DateTimeField(default=datetime.now)
+
+
+class DoubleProxyMembership(models.Model):
+    proxy_person = models.ForeignKey(ProxyPerson, models.CASCADE)
+    proxy_group = models.ForeignKey(ProxyGroup, models.CASCADE)
