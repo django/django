@@ -237,6 +237,11 @@ Creates the cache tables for use with the database cache backend using the
 information from your settings file. See :doc:`/topics/cache` for more
 information.
 
+.. deprecated:: 6.2
+
+    Passing table names as positional arguments is deprecated. Configure cache
+    tables in the :setting:`CACHES` setting instead.
+
 .. cli-option:: --database DATABASE
 
 Specifies the database in which the cache table(s) will be created. Defaults to

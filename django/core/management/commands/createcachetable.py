@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
@@ -10,6 +12,8 @@ from django.db import (
     router,
     transaction,
 )
+from django.utils.deprecation import RemovedInDjango2029Warning
+from django.utils.warnings import django_file_prefixes
 
 
 class Command(BaseCommand):
@@ -18,11 +22,13 @@ class Command(BaseCommand):
     requires_system_checks = []
 
     def add_arguments(self, parser):
+        # RemovedInDjango2029Warning.
         parser.add_argument(
             "args",
             metavar="table_name",
             nargs="*",
             help=(
+                "Deprecated: configure cache tables in settings.CACHES instead. "
                 "Optional table names. Otherwise, settings.CACHES is used to find "
                 "cache tables."
             ),
@@ -40,12 +46,24 @@ class Command(BaseCommand):
             help="Does not create the table, just prints the SQL that would be run.",
         )
 
+    # RemovedInDjango2029Warning: When the deprecation ends, replace with:
+    # def handle(self, **options):
     def handle(self, *tablenames, **options):
         db = options["database"]
         self.verbosity = options["verbosity"]
         dry_run = options["dry_run"]
+        # RemovedInDjango2029Warning: When the deprecation ends, replace with:
+        # for cache_alias in settings.CACHES:
+        #     cache = caches[cache_alias]
+        #     if isinstance(cache, BaseDatabaseCache):
+        #         self.create_table(db, cache._table, dry_run)
         if tablenames:
-            # Legacy behavior, tablename specified as argument
+            warnings.warn(
+                "Passing table names to createcachetable is deprecated. "
+                "Configure cache tables in the CACHES setting instead.",
+                RemovedInDjango2029Warning,
+                skip_file_prefixes=django_file_prefixes(),
+            )
             for tablename in tablenames:
                 self.create_table(db, tablename, dry_run)
         else:
