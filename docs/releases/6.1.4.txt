@@ -9,4 +9,7 @@ Django 6.1.4 fixes several bugs in 6.1.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 6.1 where the ``models.E050`` system check did not
+  detect mixed ``on_delete`` variants for models with a
+  :class:`~django.contrib.contenttypes.fields.GenericRelation`
+  (:ticket:`37471`).
