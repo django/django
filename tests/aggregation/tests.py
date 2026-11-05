@@ -2746,6 +2746,55 @@ class AggregateAnnotationPruningTests(TestCase):
         self.assertEqual(sql.count("select"), 2, "Subquery wrapping required")
         self.assertNotIn("authors_count", sql)
 
+    def test_values_only_masked_aggregate_annotations(self):
+        qs = Author.objects.annotate(book_count=Count("book")).values("book_count")
+        self.assertEqual(qs.count(), 2)
+        self.assertEqual(qs.filter(book_count__gt=1).count(), 1)
+        self.assertEqual(qs.aggregate(max_age=Max("age")), {"max_age": 2})
+        self.assertEqual(
+            qs.filter(book_count__gt=1).aggregate(max_age=Max("age")),
+            {"max_age": 1},
+        )
+        self.assertEqual(
+            qs.order_by("book_count")[:1].aggregate(max_age=Max("age")),
+            {"max_age": 2},
+        )
+
+    def test_values_only_masked_aggregate_annotations_explicit_group_by(self):
+        Book.objects.create(
+            name="b3",
+            publisher=self.p1,
+            pages=200,
+            rating=4.5,
+            price=10,
+            contact=self.a1,
+            pubdate=datetime.date.today(),
+        )
+        qs = (
+            Book.objects.values("publisher")
+            .annotate(book_count=Count("pk"))
+            .values("book_count")
+        )
+        self.assertEqual(qs.count(), 2)
+        self.assertEqual(qs.filter(book_count__gt=1).count(), 1)
+        # Ordering by a column adds it to the GROUP BY clause.
+        self.assertEqual(qs.order_by("pages").count(), 3)
+
+    def test_values_only_masked_aggregate_annotations_constant_group(self):
+        qs = (
+            Book.objects.order_by()
+            .values(constant=Value(1))
+            .annotate(book_count=Count("pk"))
+            .values("book_count")
+        )
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs.filter(book_count__gt=0).count(), 1)
+        self.assertEqual(qs.filter(book_count__gt=100).count(), 0)
+        # Aggregating over no rows still returns a single row.
+        empty_qs = qs.filter(pages__lt=0)
+        self.assertEqual(empty_qs.count(), 1)
+        self.assertEqual(empty_qs.filter(book_count__gt=0).count(), 0)
+
     def test_unused_aliased_aggregate_and_annotation_reverse_fk(self):
         Book.objects.create(
             name="b3",
