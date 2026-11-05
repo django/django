@@ -36,6 +36,10 @@ details on these changes.
 * The ``allow_multiline_tags`` transitional template engine option will be
   removed.
 
+* Support for passing table names as command-line arguments to
+  :cli:`createcachetable` will be removed. Configure cache tables in the
+  :setting:`CACHES` setting instead.
+
 .. _deprecation-removed-in-2028:
 
 2028
