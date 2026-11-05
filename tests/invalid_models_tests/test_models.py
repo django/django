@@ -1,5 +1,7 @@
 import unittest
 
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.core.checks import Error, Warning
 from django.core.checks.model_checks import _check_lazy_references
 from django.db import connection, connections, models
@@ -3123,3 +3125,29 @@ class RelatedFieldTests(SimpleTestCase):
             artist = models.ForeignKey(Artist, models.DB_CASCADE)
 
         self.assertEqual(Song.check(databases=self.databases), [])
+
+    def test_on_delete_db_variant_generic_relation(self):
+        class Tag(models.Model):
+            content_type = models.ForeignKey(ContentType, models.CASCADE)
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey()
+
+        class Artist(models.Model):
+            pass
+
+        class Album(models.Model):
+            artist = models.ForeignKey(Artist, models.DB_CASCADE)
+            tags = GenericRelation(Tag)
+
+        self.assertEqual(
+            Album.check(databases=self.databases),
+            [
+                Error(
+                    "The model cannot have related fields with both database-level and "
+                    "Python-level on_delete variants.",
+                    hint="Generic relations use Python-level cascading.",
+                    obj=Album,
+                    id="models.E050",
+                ),
+            ],
+        )

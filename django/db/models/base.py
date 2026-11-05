@@ -2475,6 +2475,7 @@ class Model(AltersData, metaclass=ModelBase):
     def _check_related_fields(cls):
         has_db_variant = False
         has_python_variant = False
+        hint = None
         for rel in cls._meta.get_fields():
             if rel.related_model:
                 if not (on_delete := getattr(rel.remote_field, "on_delete", None)):
@@ -2483,12 +2484,18 @@ class Model(AltersData, metaclass=ModelBase):
                     has_db_variant = True
                 elif on_delete != DO_NOTHING:
                     has_python_variant = True
+                elif hasattr(rel, "bulk_related_objects"):
+                    # Generic relations use Python-level cascading despite
+                    # on_delete=DO_NOTHING.
+                    has_python_variant = True
+                    hint = "Generic relations use Python-level cascading."
                 if has_db_variant and has_python_variant:
                     return [
                         checks.Error(
                             "The model cannot have related fields with both "
                             "database-level and Python-level on_delete variants.",
                             obj=cls,
+                            hint=hint,
                             id="models.E050",
                         )
                     ]
