@@ -37,6 +37,7 @@ from django.db.models.functions import (
     Length,
     Lower,
     Trim,
+    TruncMonth,
 )
 from django.db.models.sql.query import get_field_names_from_opts
 from django.test import TestCase, skipUnlessDBFeature
@@ -585,6 +586,29 @@ class NonAggregateAnnotationTestCase(TestCase):
         book = qs.annotate(other_isbn=F("isbn")).get(other_rating=4)
         self.assertEqual(book["other_rating"], 4)
         self.assertEqual(book["other_isbn"], "155860191")
+
+    def test_values_transform_on_annotation_grouped(self):
+        qs = (
+            Book.objects.filter(pk=self.b1.pk)
+            .annotate(published=TruncMonth("pubdate"))
+            .values("published__year")
+            .annotate(count=Count("pk"))
+        )
+        self.assertEqual(
+            list(qs.values_list("published__year", "count")),
+            [(self.b1.pubdate.year, 1)],
+        )
+
+    def test_values_transform_on_annotation_chained(self):
+        qs = (
+            Book.objects.filter(pk=self.b1.pk)
+            .annotate(published=TruncMonth("pubdate"))
+            .values("published__year")
+        )
+        self.assertEqual(
+            list(qs.values("published__year")),
+            [{"published__year": self.b1.pubdate.year}],
+        )
 
     def test_values_fields_annotations_order(self):
         qs = Book.objects.annotate(other_rating=F("rating") - 1).values(
@@ -1553,6 +1577,18 @@ class AliasTests(TestCase):
             with self.subTest(operation=operation):
                 with self.assertRaisesMessage(FieldError, msg):
                     getattr(qs, operation)("rating_alias")
+
+    def test_values_alias_containing_lookup_separator(self):
+        msg = "Cannot select the 'pub__date' alias. Use annotate() to promote it."
+        with self.assertRaisesMessage(FieldError, msg):
+            Book.objects.alias(pub__date=TruncMonth("pubdate")).values("pub__date")
+        qs = Book.objects.annotate(pub__date=TruncMonth("pubdate"))
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.values("pk").values("pub__date")
+        self.assertEqual(
+            qs.values("pub__date").get(pk=self.b1.pk)["pub__date"],
+            self.b1.pubdate.replace(day=1),
+        )
 
     def test_alias_after_values(self):
         qs = Book.objects.values_list("pk").alias(other_pk=F("pk"))
