@@ -20,9 +20,12 @@ rather than the HTML rendered to the end-user.
 
 """
 
+import asyncio
 import copy
+import gc
 import itertools
 import tempfile
+import weakref
 from contextlib import aclosing
 from unittest import mock
 
@@ -99,6 +102,18 @@ class ClientTest(TestCase):
                 self.assertIs(response_copy.client, response.client)
                 self.assertIs(response_copy.resolver_match, response.resolver_match)
                 self.assertIs(response_copy.wsgi_request, response.wsgi_request)
+
+    def test_response_not_in_reference_cycle(self):
+        response = self.client.get("/get_view/")
+        response_ref = weakref.ref(response)
+        gc_enabled = gc.isenabled()
+        gc.disable()
+        try:
+            del response
+            self.assertIsNone(response_ref())
+        finally:
+            if gc_enabled:
+                gc.enable()
 
     async def test_copy_response_async(self):
         response = await self.async_client.get("/async_get_view/")
@@ -1294,6 +1309,22 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.get("/async_get_view/")
         self.assertTrue(hasattr(response, "resolver_match"))
         self.assertEqual(response.resolver_match.url_name, "async_get_view")
+
+    async def test_response_not_in_reference_cycle(self):
+        async def get_response_ref():
+            response = await self.async_client.get("/async_get_view/")
+            return weakref.ref(response)
+
+        gc_enabled = gc.isenabled()
+        gc.disable()
+        try:
+            response_ref = await get_response_ref()
+            # Let the event loop drop the finished future holding the response.
+            await asyncio.sleep(0)
+            self.assertIsNone(response_ref())
+        finally:
+            if gc_enabled:
+                gc.enable()
 
     async def test_aclosing_iterator_wrapper_closes_inner_iterable_promptly(self):
         finally_ran = False

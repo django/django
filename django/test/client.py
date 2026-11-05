@@ -2,6 +2,7 @@ import json
 import mimetypes
 import os
 import sys
+import weakref
 from collections.abc import Iterable
 from copy import copy
 from functools import partial
@@ -1129,7 +1130,10 @@ class Client(ClientMixin, RequestFactory):
         # Add any rendered template detail to the response.
         response.templates = data.get("templates", [])
         response.context = data.get("context")
-        response.json = partial(self._parse_json, response)
+        # A weak reference avoids a reference cycle that would keep the
+        # response (with its templates and contexts) alive until the cyclic
+        # garbage collector runs.
+        response.json = partial(self._parse_json, weakref.proxy(response))
         # Attach the ResolverMatch instance to the response.
         urlconf = getattr(response.wsgi_request, "urlconf", None)
         response.resolver_match = SimpleLazyObject(
@@ -1521,7 +1525,10 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
         # Add any rendered template detail to the response.
         response.templates = data.get("templates", [])
         response.context = data.get("context")
-        response.json = partial(self._parse_json, response)
+        # A weak reference avoids a reference cycle that would keep the
+        # response (with its templates and contexts) alive until the cyclic
+        # garbage collector runs.
+        response.json = partial(self._parse_json, weakref.proxy(response))
         # Attach the ResolverMatch instance to the response.
         urlconf = getattr(response.asgi_request, "urlconf", None)
         response.resolver_match = SimpleLazyObject(
