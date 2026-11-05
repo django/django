@@ -440,11 +440,17 @@ class Command(BaseCommand):
                     if match:
                         locale_parts = match.groupdict()
                         language = locale_parts["language"].lower()
-                        territory = (
-                            locale_parts["territory"][:2].upper()
-                            + locale_parts["territory"][2:]
+                        territory, x, private = locale_parts["territory"].partition(
+                            "-x-"
                         )
-                        proposed_locale = f"{language}_{territory}"
+                        # Two-letter subtags are region codes (e.g. GB), which
+                        # are uppercased. Others, such as scripts (e.g. Hans),
+                        # are title-cased.
+                        if len(territory) == 2:
+                            territory = territory.upper()
+                        else:
+                            territory = territory.title()
+                        proposed_locale = f"{language}_{territory}" + x + private
                     else:
                         # It could be a language in uppercase
                         proposed_locale = locale.lower()
