@@ -9,6 +9,7 @@ from django.db.models.expressions import (
     ColPairs,
     Expression,
     ExpressionList,
+    F,
     Func,
     Value,
     When,
@@ -382,16 +383,30 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
                     "The QuerySet value for an exact lookup must be limited to "
                     "one result using slicing."
                 )
-            lhs_len = len(self.lhs) if isinstance(self.lhs, (ColPairs, tuple)) else 1
-            if (rhs_len := query._subquery_fields_len) != lhs_len:
-                raise ValueError(
-                    f"The QuerySet value for the exact lookup must have {lhs_len} "
-                    f"selected fields (received {rhs_len})"
-                )
+            # The number of fields of an F() expression, e.g. F("pk") of a
+            # composite primary key, is unknown until it's resolved.
+            if not isinstance(self.lhs, F):
+                self.check_rhs_select_length_equals_lhs_length()
             if not query.has_select_fields:
                 query.clear_select_clause()
                 query.add_fields(["pk"])
         return super().get_prep_lookup()
+
+    def check_rhs_select_length_equals_lhs_length(self):
+        lhs_len = len(self.lhs) if isinstance(self.lhs, (ColPairs, tuple)) else 1
+        if (rhs_len := self.rhs._subquery_fields_len) != lhs_len:
+            raise ValueError(
+                f"The QuerySet value for the exact lookup must have {lhs_len} "
+                f"selected fields (received {rhs_len})"
+            )
+
+    def resolve_expression(self, *args, **kwargs):
+        from django.db.models.sql.query import Query  # avoid circular import
+
+        lookup = super().resolve_expression(*args, **kwargs)
+        if isinstance(self.lhs, F) and isinstance(self.rhs, Query):
+            lookup.check_rhs_select_length_equals_lhs_length()
+        return lookup
 
     def as_sql(self, compiler, connection):
         # Avoid comparison against direct rhs if lhs is a boolean value. That
@@ -507,17 +522,31 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         from django.db.models.sql.query import Query  # avoid circular import
 
         if isinstance(self.rhs, Query):
-            lhs_len = len(self.lhs) if isinstance(self.lhs, (ColPairs, tuple)) else 1
-            if (rhs_len := self.rhs._subquery_fields_len) != lhs_len:
-                raise ValueError(
-                    f"The QuerySet value for the 'in' lookup must have {lhs_len} "
-                    f"selected fields (received {rhs_len})"
-                )
+            # The number of fields of an F() expression, e.g. F("pk") of a
+            # composite primary key, is unknown until it's resolved.
+            if not isinstance(self.lhs, F):
+                self.check_rhs_select_length_equals_lhs_length()
             self.rhs.clear_ordering(clear_default=True)
             if not self.rhs.has_select_fields:
                 self.rhs.clear_select_clause()
                 self.rhs.add_fields(["pk"])
         return super().get_prep_lookup()
+
+    def check_rhs_select_length_equals_lhs_length(self):
+        lhs_len = len(self.lhs) if isinstance(self.lhs, (ColPairs, tuple)) else 1
+        if (rhs_len := self.rhs._subquery_fields_len) != lhs_len:
+            raise ValueError(
+                f"The QuerySet value for the 'in' lookup must have {lhs_len} "
+                f"selected fields (received {rhs_len})"
+            )
+
+    def resolve_expression(self, *args, **kwargs):
+        from django.db.models.sql.query import Query  # avoid circular import
+
+        lookup = super().resolve_expression(*args, **kwargs)
+        if isinstance(self.lhs, F) and isinstance(self.rhs, Query):
+            lookup.check_rhs_select_length_equals_lhs_length()
+        return lookup
 
     def process_rhs(self, compiler, connection):
         db_rhs = getattr(self.rhs, "_db", None)

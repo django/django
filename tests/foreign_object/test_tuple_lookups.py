@@ -1,5 +1,4 @@
 import itertools
-import unittest
 
 from django.db.models import F
 from django.db.models.fields.tuple_lookups import (
@@ -169,15 +168,15 @@ class TupleLookupsTests(TestCase):
             with self.subTest(customer=customer.id, query=str(qs.query)):
                 self.assertSequenceEqual(qs, contacts)
 
-    @unittest.expectedFailure
-    def test_tuple_in_subquery_lhs_f_pk(self):
-        # This no longer hangs, but it should not raise ValueError (#37383).
-        self.assertCountEqual(
-            Contact.objects.filter(
-                TupleIn(F("pk"), Contact.objects.values("customer").query)
-            ),
-            Contact.objects.all(),
+    def test_tuple_in_subquery_lhs_f_pk_must_have_1_field(self):
+        # The number of fields of F("pk") is checked once it's resolved.
+        lookup = TupleIn(F("pk"), Contact.objects.values("customer").query)
+        msg = (
+            "The QuerySet value for the 'in' lookup must have 1 selected "
+            "fields (received 2)"
         )
+        with self.assertRaisesMessage(ValueError, msg):
+            Contact.objects.filter(lookup)
 
     def test_tuple_lookups_f_invalid_rhs(self):
         lookups = (
