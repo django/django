@@ -8,7 +8,7 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import ColPairs, F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import Col, ColPairs, F, OrderBy, RawSQL, Ref, Value
 from django.db.models.fields import AutoField, composite
 from django.db.models.functions import Cast, Random
 from django.db.models.lookups import Lookup
@@ -329,7 +329,9 @@ class SQLCompiler:
                 sql, params = self.compile(Value(True))
             else:
                 sql, params = col.select_format(self, sql, params)
-            if alias is None and with_col_aliases:
+            # ColPairs cannot be aliased, the alias would only name the last
+            # column.
+            if alias is None and with_col_aliases and not isinstance(col, ColPairs):
                 alias = f"col{col_idx}"
                 col_idx += 1
             ret.append((col, (sql, params), alias))
@@ -495,6 +497,35 @@ class SQLCompiler:
                         default_order=default_order,
                     )
 
+    def _split_combined_composite_order_by(self, pairs):
+        """
+        Replace the terms of a combined query that order by a composite
+        expression, e.g. a composite primary key, with one term per column as
+        columns of the result set are referenced individually.
+        """
+        for expr, is_ref in pairs:
+            if (
+                not is_ref
+                and self.query.combinator
+                and self.select
+                and isinstance(expr.expression, F)
+                and isinstance(
+                    cols := expr.expression.resolve_expression(
+                        self.query, allow_joins=True, reuse=None
+                    ),
+                    ColPairs,
+                )
+            ):
+                prefix, _, _ = expr.expression.name.rpartition(LOOKUP_SEP)
+                for col in cols.get_cols():
+                    col_expr = expr.copy()
+                    col_expr.expression = F(
+                        LOOKUP_SEP.join(filter(None, [prefix, col.target.name]))
+                    )
+                    yield col_expr, is_ref
+            else:
+                yield expr, is_ref
+
     def get_order_by(self):
         """
         Return a list of 2-tuples of the form (expr, (sql, params, is_ref)) for
@@ -506,13 +537,22 @@ class SQLCompiler:
         """
         result = []
         seen = set()
-        for expr, is_ref in self._order_by_pairs():
+        for expr, is_ref in self._split_combined_composite_order_by(
+            self._order_by_pairs()
+        ):
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
             if not is_ref and self.query.combinator and self.select:
                 src = resolved.expression
                 expr_src = expr.expression
                 for sel_expr, _, col_alias in self.select:
-                    if src == sel_expr:
+                    if src == sel_expr or (
+                        isinstance(sel_expr, ColPairs)
+                        and isinstance(src, Col)
+                        and any(
+                            (col.alias, col.target) == (src.alias, src.target)
+                            for col in sel_expr.get_cols()
+                        )
+                    ):
                         # When values() is used the exact alias must be used to
                         # reference annotations.
                         if (
