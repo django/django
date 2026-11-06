@@ -520,7 +520,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     * ``input_type``: ``'email'``
     * ``template_name``: :sourcefile:`'django/forms/widgets/email.html'
       <django/forms/templates/django/forms/widgets/email.html>`
-    * Renders as: ``<input type="email" ...>``
+    * Renders as: ``<input type="email" dir="ltr" ...>``
 
 ``URLInput``
 ~~~~~~~~~~~~
@@ -530,7 +530,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     * ``input_type``: ``'url'``
     * ``template_name``: :sourcefile:`'django/forms/widgets/url.html'
       <django/forms/templates/django/forms/widgets/url.html>`
-    * Renders as: ``<input type="url" ...>``
+    * Renders as: ``<input type="url" dir="ltr" ...>``
 
 ``ColorInput``
 ~~~~~~~~~~~~~~

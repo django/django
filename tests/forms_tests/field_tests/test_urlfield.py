@@ -9,7 +9,9 @@ from . import FormFieldAssertionsMixin
 class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_urlfield_widget(self):
         f = URLField()
-        self.assertWidgetRendersTo(f, '<input type="url" name="f" id="id_f" required>')
+        self.assertWidgetRendersTo(
+            f, '<input type="url" name="f" id="id_f" required dir="ltr">'
+        )
 
     def test_urlfield_widget_max_min_length(self):
         f = URLField(min_length=15, max_length=20)
@@ -17,7 +19,7 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertWidgetRendersTo(
             f,
             '<input id="id_f" type="url" name="f" maxlength="20" '
-            'minlength="15" required>',
+            'minlength="15" required dir="ltr">',
         )
         msg = "'Ensure this value has at least 15 characters (it has 12).'"
         with self.assertRaisesMessage(ValidationError, msg):
