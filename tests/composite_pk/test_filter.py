@@ -1,4 +1,3 @@
-import unittest
 from unittest.mock import patch
 
 from django.db import NotSupportedError, connection
@@ -13,7 +12,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.fields.tuple_lookups import TupleIn
+from django.db.models.fields.tuple_lookups import TupleExact, TupleIn
 from django.db.models.functions import Cast
 from django.db.models.lookups import Exact
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -547,15 +546,38 @@ class CompositePKFilterTests(TestCase):
             Comment.objects.count(),
         )
 
-    @unittest.expectedFailure
     def test_filter_by_pk_in_rhs_f_object_lhs(self):
-        # This no longer hangs, but it should not raise ValueError (#37383).
         self.assertCountEqual(
             Comment.objects.filter(
                 TupleIn(F("pk"), Comment.objects.values("pk").query)
             ),
             Comment.objects.all(),
         )
+
+    def test_filter_by_pk_in_rhs_f_object_lhs_invalid_selected_columns(self):
+        msg = (
+            "The QuerySet value for the 'in' lookup must have 2 selected "
+            "fields (received 1)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.filter(TupleIn(F("pk"), Comment.objects.values("id").query))
+
+    def test_filter_by_pk_exact_rhs_f_object_lhs(self):
+        subquery = Comment.objects.filter(pk=self.comment_1.pk).values("pk")[:1]
+        self.assertSequenceEqual(
+            Comment.objects.filter(TupleExact(F("pk"), subquery.query)),
+            [self.comment_1],
+        )
+
+    def test_filter_by_pk_exact_rhs_f_object_lhs_invalid_selected_columns(self):
+        msg = (
+            "The QuerySet value for the exact lookup must have 2 selected "
+            "fields (received 1)"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Comment.objects.filter(
+                TupleExact(F("pk"), Comment.objects.values("id")[:1].query)
+            )
 
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_filter_comments_by_pk_exact_subquery(self):
