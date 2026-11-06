@@ -1773,3 +1773,75 @@ class SensitiveVariablesTest(TestDataMixin, TestCase):
                 self.assertContains(
                     response, password2_fragment, html=True, status_code=500
                 )
+
+
+class UsernameFieldTest(SimpleTestCase):
+    def test_unicode_normalization_before_stripping(self):
+        """
+        Characters that NFKC-normalize to SPACE + combining mark (e.g.
+        U+00A8 DIAERESIS → \\x20\\u0308) should not leave whitespace or
+        orphan combining marks in the username.
+        """
+        field = UsernameField(max_length=150)
+        # These chars are NOT whitespace (strip() ignores them) but
+        # NFKC-normalize to SPACE + combining mark.
+        attack_chars = [
+            0x00A8,  # DIAERESIS
+            0x00AF,  # MACRON
+            0x00B4,  # ACUTE ACCENT
+            0x00B8,  # CEDILLA
+            0x02D8,  # BREVE
+            0x02D9,  # DOT ABOVE
+            0x02DA,  # RING ABOVE
+            0x02DB,  # OGONEK
+            0x02DC,  # SMALL TILDE
+            0x02DD,  # DOUBLE ACUTE ACCENT
+        ]
+        for cp in attack_chars:
+            char = chr(cp)
+            with self.subTest(codepoint=hex(cp)):
+                result = field.clean(char + "testuser" + char)
+                self.assertEqual(result, "testuser")
+                self.assertNotIn(" ", result)
+
+    def test_regular_whitespace_stripping(self):
+        """Regular whitespace is stripped regardless of normalization order."""
+        field = UsernameField(max_length=150)
+        tests = [
+            ("  testuser  ", "testuser"),
+            ("\t testuser\t ", "testuser"),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=repr(value)):
+                self.assertEqual(field.clean(value), expected)
+
+    def test_unicode_whitespace_stripping(self):
+        """Unicode whitespace chars are stripped by str.strip()."""
+        field = UsernameField(max_length=150)
+        tests = [
+            ("\u1680testuser\u1680", "testuser"),  # OGHAM SPACE MARK
+            ("\u3000testuser\u3000", "testuser"),  # IDEOGRAPHIC SPACE
+            ("\u2000testuser\u200a", "testuser"),  # EN QUAD / HAIR SPACE
+        ]
+        for value, expected in tests:
+            with self.subTest(value=repr(value)):
+                self.assertEqual(field.clean(value), expected)
+
+    def test_accented_usernames_preserved(self):
+        """NFKC-composed accented characters are not stripped."""
+        field = UsernameField(max_length=150)
+        for username in ("café", "naïve", "über", "résumé"):
+            with self.subTest(username=username):
+                self.assertEqual(field.clean(username), username)
+
+    def test_exceeding_max_length_skips_normalization(self):
+        """Values exceeding max_length skip normalization (DoS protection)."""
+        field = UsernameField(max_length=5)
+        with self.assertRaises(ValidationError):
+            field.clean("a" * 10)
+
+    def test_empty_value(self):
+        """Empty/None values are handled without errors."""
+        field = UsernameField(max_length=150, required=False)
+        self.assertEqual(field.clean(""), "")
+        self.assertEqual(field.clean(None), "")

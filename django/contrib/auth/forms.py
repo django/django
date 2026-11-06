@@ -58,15 +58,34 @@ class ReadOnlyPasswordHashField(forms.Field):
 
 class UsernameField(forms.CharField):
     def to_python(self, value):
+        if value not in self.empty_values:
+            if self.max_length is None or len(value) <= self.max_length:
+                # Normalize before stripping so that characters which
+                # NFKC-normalize to SPACE + combining mark (e.g. U+00A8
+                # DIAERESIS → \x20\u0308) are properly cleaned.
+                # Normalization can increase the string length (e.g.
+                # "ﬀ" -> "ff", "½" -> "1⁄2") but cannot reduce it, so
+                # there is no point in normalizing invalid data. Moreover,
+                # Unicode normalization is very slow on Windows and can be
+                # a DoS attack vector.
+                value = unicodedata.normalize("NFKC", value)
+        # CharField.to_python() performs whitespace stripping.
         value = super().to_python(value)
-        if self.max_length is not None and len(value) > self.max_length:
-            # Normalization can increase the string length (e.g.
-            # "ﬀ" -> "ff", "½" -> "1⁄2") but cannot reduce it, so there is no
-            # point in normalizing invalid data. Moreover, Unicode
-            # normalization is very slow on Windows and can be a DoS attack
-            # vector.
-            return value
-        return unicodedata.normalize("NFKC", value)
+        # Strip orphan combining marks (Unicode category M) and any
+        # adjacent whitespace left at the edges after normalization.
+        # NFKC can produce SPACE + combining mark sequences from single
+        # chars (e.g. U+00A8 → \x20\u0308), so we must strip both.
+        # This is safe because NFKC composes valid base+combining
+        # sequences (e.g. e + \u0301 → é, category Ll, not M).
+        while value and (
+            value[0].isspace() or unicodedata.category(value[0]).startswith("M")
+        ):
+            value = value[1:]
+        while value and (
+            value[-1].isspace() or unicodedata.category(value[-1]).startswith("M")
+        ):
+            value = value[:-1]
+        return value
 
     def widget_attrs(self, widget):
         return {
