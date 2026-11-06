@@ -1795,7 +1795,7 @@ class LiveServerTestCase(TransactionTestCase):
     """
     Do basically the same as TransactionTestCase but also launch a live HTTP
     server in a separate thread so that the tests may use another testing
-    framework, such as Selenium for example, instead of the built-in dummy
+    framework, such as Playwright for example, instead of the built-in dummy
     client.
     It inherits from TransactionTestCase instead of TestCase because the
     threads don't share the same transactions (unless if using in-memory
