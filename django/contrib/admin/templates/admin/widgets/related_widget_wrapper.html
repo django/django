@@ -8,7 +8,7 @@
         <a class="related-widget-wrapper-link change-related" id="change_id_{{ name }}"
             data-href-template="{{ change_related_template_url }}?{{ url_params }}"
             data-popup="yes"
-            title="{% blocktranslate %}Change selected {{ model }}{% endblocktranslate %}">
+            title="{% blocktranslate force_escape %}Change selected {{ model }}{% endblocktranslate %}">
             <img src="{% static 'admin/img/icon-changelink.svg' %}" alt="" width="24" height="24">
         </a>
         {% endif %}
@@ -16,7 +16,7 @@
         <a class="related-widget-wrapper-link add-related" id="add_id_{{ name }}"
             data-popup="yes"
             href="{{ add_related_url }}?{{ url_params }}"
-            title="{% blocktranslate %}Add another {{ model }}{% endblocktranslate %}">
+            title="{% blocktranslate force_escape %}Add another {{ model }}{% endblocktranslate %}">
             <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="" width="24" height="24">
         </a>
         {% endif %}
@@ -24,14 +24,14 @@
         <a class="related-widget-wrapper-link delete-related" id="delete_id_{{ name }}"
             data-href-template="{{ delete_related_template_url }}?{{ url_params }}"
             data-popup="yes"
-            title="{% blocktranslate %}Delete selected {{ model }}{% endblocktranslate %}">
+            title="{% blocktranslate force_escape %}Delete selected {{ model }}{% endblocktranslate %}">
             <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="" width="24" height="24">
         </a>
         {% endif %}
         {% if can_view_related %}
           <a class="related-widget-wrapper-link view-related" id="view_id_{{ name }}"
              data-href-template="{{ change_related_template_url }}?{{ view_related_url_params }}"
-             title="{% blocktranslate %}View selected {{ model }}{% endblocktranslate %}">
+             title="{% blocktranslate force_escape %}View selected {{ model }}{% endblocktranslate %}">
             <img src="{% static 'admin/img/icon-viewlink.svg' %}" alt="" width="24" height="24">
           </a>
         {% endif %}

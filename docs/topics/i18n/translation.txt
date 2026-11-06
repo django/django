@@ -654,6 +654,19 @@ using the ``context`` keyword:
 
     {% translate "May" context "month name" %}
 
+Translated strings aren't escaped, since they are trusted like the template
+itself and may contain HTML markup. When a translation is rendered inside an
+HTML attribute, a quote or an ampersand in the translated string can break the
+markup. Use the ``force_escape`` option to HTML-escape the translated string:
+
+.. code-block:: html+django
+
+    <input type="submit" value="{% translate "Save" force_escape %}">
+
+.. versionadded:: 6.2
+
+    The ``force_escape`` option was added.
+
 .. templatetag:: blocktrans
 .. templatetag:: blocktranslate
 
@@ -787,6 +800,21 @@ For instance, the following ``{% blocktranslate %}`` tag:
 will result in the entry ``"First sentence. Second paragraph."`` in the ``.po``
 file, compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
 ``trimmed`` option had not been specified.
+
+Like ``{% translate %}``, ``{% blocktranslate %}`` doesn't escape the
+translated text, only the variables inside it. Use the ``force_escape`` option
+to also escape the translated text, for example inside an HTML attribute:
+
+.. code-block:: html+django
+
+    <a href="/" title="{% blocktranslate force_escape %}Back to {{ race }}{% endblocktranslate %}">
+
+The translated text is escaped before the variables are substituted, so the
+variables aren't escaped twice.
+
+.. versionadded:: 6.2
+
+    The ``force_escape`` option was added.
 
 String literals passed to tags and filters
 ------------------------------------------
