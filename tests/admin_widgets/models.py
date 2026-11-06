@@ -3,7 +3,7 @@ import uuid
 
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
-from django.db import models
+from django.db import connection, models
 
 try:
     from PIL import Image
@@ -104,11 +104,15 @@ class Inventory(models.Model):
         return self.name
 
 
+def get_event_choices():
+    return models.Q(pk__gt=connection.ops.get_hardcoded_pk(0))
+
+
 class Event(models.Model):
     main_band = models.ForeignKey(
         Band,
         models.CASCADE,
-        limit_choices_to=models.Q(pk__gt=0),
+        limit_choices_to=get_event_choices,
         related_name="events_main_band_at",
     )
     supporting_bands = models.ManyToManyField(
