@@ -128,8 +128,8 @@ The functions defined in this module share the following properties:
 
     Parses a string and returns a :class:`datetime.time`.
 
-    UTC offsets aren't supported; if ``value`` describes one, the result is
-    ``None``.
+    UTC offsets aren't supported; if ``value`` describes one, the offset is
+    ignored and a naive :class:`datetime.time` is returned.
 
 .. function:: parse_datetime(value)
 

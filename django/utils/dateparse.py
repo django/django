@@ -82,11 +82,10 @@ def parse_date(value):
 def parse_time(value):
     """Parse a string and return a datetime.time.
 
-    This function doesn't support time zone offsets.
+    This function doesn't support time zone offsets: an offset is ignored.
 
     Raise ValueError if the input is well formatted but not a valid time.
-    Return None if the input isn't well formatted, in particular if it
-    contains an offset.
+    Return None if the input isn't well formatted.
     """
     try:
         # The fromisoformat() method takes time zone info into account and
