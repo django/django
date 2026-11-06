@@ -1,7 +1,7 @@
 import warnings
-from asyncio import iscoroutinefunction
 from contextlib import ContextDecorator, contextmanager
 from functools import wraps
+from inspect import iscoroutinefunction
 
 from django.db import (
     DEFAULT_DB_ALIAS,
