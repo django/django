@@ -149,3 +149,9 @@ Bugfixes
 * Fixed a crash in :cli:`makemessages` on Windows when processing files
   with non-ASCII names on Python 3.15+, or with :ref:`UTF-8 mode
   <python:utf8-mode>` enabled on older Python versions (:ticket:`37447`).
+
+* The :class:`~django.db.migrations.operations.DeleteModel` operation no longer uses
+  ``CASCADE`` on PostgreSQL and MySQL. This prevents implicit deletion of foreign key
+  constraints on referencing tables. Attempting to delete a model referenced by other
+  tables will now raise a :exc:`~django.db.DatabaseError`, requiring the referencing
+  field to be removed first.
