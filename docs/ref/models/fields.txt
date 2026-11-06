@@ -1772,6 +1772,9 @@ relation works.
 
     The database variants cannot be mixed with Python variants (other than
     :attr:`DO_NOTHING`) in the same model and in models related to each other.
+    A :class:`~django.contrib.contenttypes.fields.GenericRelation` is a Python
+    variant, because Django deletes the generic related objects. A model with
+    one cannot have a field that uses a database variant.
 
 .. versionchanged:: 6.1
 

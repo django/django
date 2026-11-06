@@ -9,4 +9,8 @@ Django 6.1.4 fixes several bugs in 6.1.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 6.1 where the ``models.E050`` system check did not
+  detect a :class:`~django.contrib.contenttypes.fields.GenericRelation` on a
+  model with a database-level ``on_delete`` variant, which left the generic
+  related objects behind when the database deleted the model's rows
+  (:ticket:`37471`).
