@@ -10,6 +10,12 @@ def example_view(request):
     return HttpResponse("example view")
 
 
+def wrong_length_view(request):
+    response = HttpResponse("")
+    response["Content-Length"] = "42"
+    return response
+
+
 def streaming_example_view(request):
     return StreamingHttpResponse((b"I", b"am", b"a", b"stream"))
 
