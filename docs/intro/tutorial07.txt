@@ -348,9 +348,12 @@ when loading Django templates; it's a search path.
     :doc:`reusable apps tutorial </intro/reusable-apps>` *why* we do this.
 
 Now create a directory called ``admin`` inside ``templates``, and copy the
-template ``admin/base_site.html`` from within the default Django admin
-template directory in the source code of Django itself
-(:source:`django/contrib/admin/templates`) into that directory.
+template
+:sourcefile:`admin/base_site.html
+<django/contrib/admin/templates/admin/base_site.html>`
+from within the default Django admin template directory in the source code of
+Django itself (:sourcefile:`django/contrib/admin/templates`) into that
+directory.
 
 .. admonition:: Where are the Django source files?
 
@@ -421,12 +424,15 @@ been registered with the admin application, in alphabetical order. You may want
 to make significant changes to the layout. After all, the index is probably the
 most important page of the admin, and it should be easy to use.
 
-The template to customize is ``admin/index.html``. (Do the same as with
-``admin/base_site.html`` in the previous section -- copy it from the default
-directory to your custom template directory). Edit the file, and you'll see it
-uses a template variable called ``app_list``. That variable contains every
-installed Django app. Instead of using that, you can hardcode links to
-object-specific admin pages in whatever way you think is best.
+The template to customize is
+:sourcefile:`admin/index.html
+<django/contrib/admin/templates/admin/index.html>`.
+(Do the same as with ``admin/base_site.html`` in the previous section -- copy
+it from the default directory to your custom template directory). Edit the
+file, and you'll see it uses a template variable called ``app_list``. That
+variable contains every installed Django app. Instead of using that, you can
+hardcode links to object-specific admin pages in whatever way you think is
+best.
 
 When you're comfortable with the admin, read :doc:`part 8 of this
 tutorial </intro/tutorial08>` to learn how to use third-party packages.
