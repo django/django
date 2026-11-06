@@ -315,6 +315,13 @@ class FooAccount(Account):
     servicename = "foo"
 
 
+class FooAccountProxy(FooAccount):
+    """For testing proxy models in the admin delete action."""
+
+    class Meta:
+        proxy = True
+
+
 class BarAccount(Account):
     """A service-specific account of type Bar."""
 
