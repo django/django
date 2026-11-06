@@ -20,6 +20,7 @@ jobs:
           - '3.13'
           - '3.14'
           - '3.15'
+          - '3.16-dev'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     timeout-minutes: 60
     continue-on-error: true
