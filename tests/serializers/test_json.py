@@ -93,9 +93,11 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         self.assertIn('"fields": {"score": "1"}', json_data)
 
     def test_json_deserializer_exception(self):
-        with self.assertRaises(DeserializationError):
+        with self.assertRaises(DeserializationError) as cm:
             for obj in serializers.deserialize("json", """[{"pk":1}"""):
                 pass
+        self.assertIsInstance(cm.exception.__cause__, json.JSONDecodeError)
+        self.assertEqual(str(cm.exception), str(cm.exception.__cause__))
 
     def test_helpful_error_message_invalid_pk(self):
         """
