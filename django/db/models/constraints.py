@@ -674,8 +674,9 @@ class UniqueConstraint(BaseConstraint):
                         model, self.fields
                     )
                     raise ValidationError(
-                        validation_error_message,
-                        code=validation_error_message.code,
+                        validation_error_message.message,
+                        code=self.violation_error_code or validation_error_message.code,
+                        params=validation_error_message.params,
                     )
                 raise ValidationError(
                     self.get_violation_error_message(),
