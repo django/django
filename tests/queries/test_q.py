@@ -435,3 +435,35 @@ class QCheckTests(TestCase):
             self.assertIs(q.check({"price": 10}), True)
         error = cm.records[0].getMessage().removeprefix(prefix)
         self.assertRegex(error, r"^.{10}… <trimmed \d+ chars out of \d+>$")
+
+    def test_rawsql_nested(self):
+        """
+        When RawSQL is nested inside a compound Q expression and causes a
+        database error, Q.check() still returns True.
+        """
+        q = Q(price__gt=20) & Q(
+            RawSQL("name IS NOT NULL", params=(), output_field=BooleanField())
+        )
+        with self.assertLogs("django.db.models", "WARNING") as cm:
+            self.assertIs(q.check({"price": 10}), True)
+        self.assertIn(
+            f"Got a database error calling check() on {q!r}: ",
+            cm.records[0].getMessage(),
+        )
+
+    def test_database_error_without_rawsql(self):
+        """
+        When a non-RawSQL expression causes a DatabaseError (e.g. an invalid
+        regex), Q.check() returns False so that constraint validation properly
+        reports a violation (#37446).
+        """
+        q = Q(code__regex="[")
+        with self.assertLogs("django.db.models", "WARNING") as cm:
+            self.assertIs(q.check({"code": "abc"}), False)
+        self.assertIn(
+            f"Got a database error calling check() on {q!r}: ",
+            cm.records[0].getMessage(),
+        )
+
+        # We must leave the connection in a usable state (#35712).
+        self.assertTrue(connection.is_usable())

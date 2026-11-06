@@ -442,6 +442,20 @@ class CheckConstraintTests(TestCase):
                 ModelWithDatabaseDefault(field_with_db_default="other value"),
             )
 
+    def test_validate_database_error_non_rawsql(self):
+        """
+        A CheckConstraint with a non-RawSQL expression that triggers a
+        DatabaseError during Q.check() should raise a ValidationError
+        instead of silently passing (#37446).
+        """
+        constraint = models.CheckConstraint(
+            condition=models.Q(unit__regex="["),
+            name="invalid_regex_check",
+        )
+        msg = f"Constraint \u201c{constraint.name}\u201d is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(price=10, unit="test"))
+
 
 class UniqueConstraintTests(TestCase):
     @classmethod
