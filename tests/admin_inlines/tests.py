@@ -936,6 +936,91 @@ class TestInline(TestDataMixin, TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_inlines.urls")
+class TestTabularInlineDeleteRendering(TestCase):
+    """
+    Make sure "Delete?" table heading & delete checkbox are rendered only if
+    inline object exists and user can delete.
+    They should be removed if: user can't delete or if they are next to an
+    empty inline for adding new rows.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="testing",
+            password="password",
+            is_staff=True,
+        )
+
+        pc_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(ProfileCollection)
+        )
+        p_permission = Permission.objects.filter(
+            codename__in=["view_profile", "delete_profile"],
+            content_type=ContentType.objects.get_for_model(Profile),
+        )
+        pc = ProfileCollection.objects.create()
+        Profile.objects.create(collection=pc, first_name="John", last_name="Doe")
+
+        sp_permission = Permission.objects.filter(
+            content_type=ContentType.objects.get_for_model(SomeParentModel)
+        )
+        sc_permission = Permission.objects.filter(
+            codename__in=["view_somechildmodel"],
+            content_type=ContentType.objects.get_for_model(SomeChildModel),
+        )
+        sp = SomeParentModel.objects.create(name="p")
+        SomeChildModel.objects.create(name="c", position="0", parent=sp)
+
+        cls.user.user_permissions.add(
+            *pc_permission, *p_permission, *sp_permission, *sc_permission
+        )
+
+        cls.pc_url = reverse(
+            "admin:admin_inlines_profilecollection_change", args=(pc.pk,)
+        )
+        cls.sp_url = reverse(
+            "admin:admin_inlines_someparentmodel_change", args=(sp.pk,)
+        )
+
+        cls.empty_pc = ProfileCollection.objects.create()
+        cls.empty_pc_url = reverse(
+            "admin:admin_inlines_profilecollection_change",
+            args=(cls.empty_pc.pk,),
+        )
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_inline_delete_heading_rendered_only_when_delete_allowed(self):
+        response = self.client.get(self.pc_url)
+        self.assertContains(response, "<th>Delete?</th>", html=True)
+        # User can't delete, so no delete heading
+        response = self.client.get(self.sp_url)
+        self.assertNotContains(response, "<th>Delete?</th>", html=True)
+        # No inline objects. So no delete heading
+        response = self.client.get(self.empty_pc_url)
+        self.assertNotContains(response, "<th>Delete?</th>", html=True)
+
+    def test_inline_delete_checkbox_rendered_only_when_delete_allowed(self):
+        response = self.client.get(self.pc_url)
+        self.assertContains(
+            response,
+            '<input type="checkbox" name="profile_set-0-DELETE" '
+            'id="id_profile_set-0-DELETE">',
+            html=True,
+        )
+        # User can't delete, so no delete checkbox
+        response = self.client.get(self.sp_url)
+        self.assertNotContains(
+            response, 'id="id_somechildmodel_set-0-DELETE"', html=True
+        )
+        # No inline objects, so no delete checkbox
+        response = self.client.get(self.empty_pc_url)
+        self.assertNotContains(response, 'name="profile_set-0-DELETE"', html=True)
+
+
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
 class TestInlineMedia(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -2519,7 +2604,7 @@ class PlaywrightTests(AdminPlaywrightTestCase):
                 "CREATION DATE",
                 "UPDATE DATE",
                 "UPDATED BY",
-                "DELETE?",
+                "",
             ],
             use_inner_text=True,
         )
