@@ -1,6 +1,7 @@
-from django.core.exceptions import FieldFetchBlocked
+from django.core.exceptions import FieldFetchBlocked, SynchronousOnlyOperation
 from django.db import IntegrityError, connection, transaction
 from django.db.models import FETCH_PEERS, FETCH_RAISE
+from django.db.models.fetch_modes import ASYNC_UNSAFE_FETCH_MSG
 from django.test import TestCase
 
 from .models import (
@@ -657,6 +658,18 @@ class OneToOneTests(TestCase):
             p.restaurant
         self.assertIsNone(cm.exception.__cause__)
         self.assertTrue(cm.exception.__suppress_context__)
+
+    async def test_fetch_mode_async_forward(self):
+        r = await Restaurant.objects.aget(pk=self.r1.pk)
+        msg = ASYNC_UNSAFE_FETCH_MSG.format(model="Restaurant", field="place")
+        with self.assertRaisesMessage(SynchronousOnlyOperation, msg):
+            r.place
+
+    async def test_fetch_mode_async_reverse(self):
+        p = await Place.objects.aget(pk=self.p1.pk)
+        msg = ASYNC_UNSAFE_FETCH_MSG.format(model="Place", field="restaurant")
+        with self.assertRaisesMessage(SynchronousOnlyOperation, msg):
+            p.restaurant
 
     def test_fetch_mode_copied_forward_fetching_one(self):
         r1 = Restaurant.objects.fetch_mode(FETCH_PEERS).get(pk=self.r1.pk)
