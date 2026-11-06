@@ -208,12 +208,12 @@ def naturalday(value, arg=None):
 # This filter doesn't require expects_localtime=True because it deals properly
 # with both naive and aware datetimes. Therefore avoid the cost of conversion.
 @register.filter
-def naturaltime(value):
+def naturaltime(value, depth=None):
     """
     For date and time values show how many seconds, minutes, or hours ago
     compared to current timestamp return representing string.
     """
-    return NaturalTimeFormatter.string_for(value)
+    return NaturalTimeFormatter.string_for(value, depth=depth)
 
 
 class NaturalTimeFormatter:
@@ -303,9 +303,13 @@ class NaturalTimeFormatter:
     }
 
     @classmethod
-    def string_for(cls, value):
+    def string_for(cls, value, depth=None):
         if not isinstance(value, date):  # datetime is a subclass of date
             return value
+
+        timesince_kwargs = {}
+        if depth is not None:
+            timesince_kwargs = {"depth": depth}
 
         now = datetime.now(UTC if is_aware(value) else None)
         if value < now:
@@ -313,7 +317,7 @@ class NaturalTimeFormatter:
             if delta.days != 0:
                 return cls.time_strings["past-day"] % {
                     "delta": defaultfilters.timesince(
-                        value, now, time_strings=cls.past_substrings
+                        value, now, time_strings=cls.past_substrings, **timesince_kwargs
                     ),
                 }
             elif delta.seconds == 0:
@@ -331,7 +335,10 @@ class NaturalTimeFormatter:
             if delta.days != 0:
                 return cls.time_strings["future-day"] % {
                     "delta": defaultfilters.timeuntil(
-                        value, now, time_strings=cls.future_substrings
+                        value,
+                        now,
+                        time_strings=cls.future_substrings,
+                        **timesince_kwargs,
                     ),
                 }
             elif delta.seconds == 0:

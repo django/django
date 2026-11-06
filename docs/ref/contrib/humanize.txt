@@ -129,6 +129,18 @@ Examples (when 'now' is 17 Feb 2007 16:30:00):
 * ``18 Feb 2007 16:31:29`` becomes ``1 day from now``.
 * ``26 Feb 2007 18:31:29`` becomes ``1 week, 2 days from now``.
 
+Takes an optional argument that is an integer specifying the number of
+adjacent time units to return. For example:
+
+* ``{{ value|naturaltime:1 }}`` may return ``1 week ago``.
+* ``{{ value|naturaltime:2 }}`` may return ``1 week, 2 days ago``.
+* ``{{ value|naturaltime:3 }}`` may return ``1 week, 2 days, 3 hours ago``.
+* ``{{ value|naturaltime:4 }}`` may return ``1 week, 2 days, 3 hours, 4 minutes ago``.
+
+.. code-block:: html+django
+
+    {{ blog_date|timesince:comment_date }}
+
 .. templatefilter:: ordinal
 
 ``ordinal``
