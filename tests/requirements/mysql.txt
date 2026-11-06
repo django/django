@@ -1,1 +1,2 @@
+# Deprecated: this file is kept for CI compatibility and will be removed in a future cleanup.
 mysqlclient >= 2.2.1
