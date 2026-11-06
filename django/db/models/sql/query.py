@@ -568,7 +568,13 @@ class Query(BaseExpression):
                     for annotation_alias, annotation in self.annotation_select.items():
                         if annotation.get_group_by_cols():
                             annotation_mask.add(annotation_alias)
+                    selected = inner_query.selected
                     inner_query.set_annotation_mask(annotation_mask)
+                    # Keep the annotations if masking them leaves nothing to
+                    # select, as eliding all of them could alter the query.
+                    if inner_query.selected == {}:
+                        inner_query.selected = selected
+                        inner_query.set_annotation_mask(selected.values())
                     # Annotations that possibly return multiple rows cannot
                     # be masked as they might have an incidence on the query.
                     annotation_mask |= set_returning_annotations
