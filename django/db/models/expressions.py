@@ -1598,6 +1598,8 @@ class NegatedExpression(ExpressionWrapper):
             if not features.supports_boolean_expr_in_select_clause:
                 return "1=1", ()
             return compiler.compile(Value(True))
+        except FullResultSet:
+            raise EmptyResultSet
         ops = compiler.connection.ops
         # Some database backends (e.g. Oracle) don't allow EXISTS() and filters
         # to be compared to another expression unless they're wrapped in a CASE
