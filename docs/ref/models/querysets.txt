@@ -586,19 +586,21 @@ Examples (those after the first will only work on PostgreSQL):
     <QuerySet [...]>
 
 .. note::
-    Keep in mind that :meth:`order_by` uses any default related model ordering
-    that has been defined. You might have to explicitly order by the relation
-    ``_id`` or referenced field to make sure the ``DISTINCT ON`` expressions
-    match those at the beginning of the ``ORDER BY`` clause. For example, if
-    the ``Blog`` model defined an :attr:`~django.db.models.Options.ordering` by
-    ``name``::
+    Keep in mind that :meth:`order_by` expands a related field to the
+    related model's :attr:`~django.db.models.Options.ordering`, while
+    :meth:`distinct` resolves the same field to its primary key. For example,
+    if the ``Blog`` model defined an
+    :attr:`~django.db.models.Options.ordering` by ``name``::
 
         Entry.objects.order_by("blog").distinct("blog")
 
-    ...wouldn't work because the query would be ordered by ``blog__name`` thus
-    mismatching the ``DISTINCT ON`` expression. You'd have to explicitly order
-    by the relation ``_id`` field (``blog_id`` in this case) or the referenced
-    one (``blog__pk``) to make sure both expressions match.
+    ...wouldn't work because the query would be ordered by ``blog__name``
+    while ``DISTINCT ON`` would use ``blog_id``, mismatching the ``ORDER BY``
+    clause. The same applies to a relation at the end of a longer path (e.g.
+    ``author__blog``), since the ordering expansion is recursive. Use the
+    concrete column in both calls to make the expressions match::
+
+        Entry.objects.order_by("blog_id").distinct("blog_id")
 
 ``values()``
 ~~~~~~~~~~~~
