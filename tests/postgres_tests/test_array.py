@@ -1072,12 +1072,22 @@ class TestValidation(PostgreSQLSimpleTestCase):
     def test_unbounded(self):
         field = ArrayField(models.IntegerField())
         with self.assertRaises(exceptions.ValidationError) as cm:
-            field.clean([1, None], None)
-        self.assertEqual(cm.exception.code, "item_invalid")
-        self.assertEqual(
-            cm.exception.message % cm.exception.params,
-            "Item 2 in the array did not validate: This field cannot be null.",
-        )
+            field.clean([1, None, None, 2], None)
+
+        self.assertEqual(len(cm.exception.error_list), 2)
+        expected = [
+            {
+                "message": "Item 2 in the array did not validate: "
+                "This field cannot be null.",
+            },
+            {
+                "message": "Item 3 in the array did not validate: "
+                "This field cannot be null.",
+            },
+        ]
+        for error, exp in zip(cm.exception.error_list, expected):
+            self.assertEqual(error.code, "item_invalid")
+            self.assertEqual(error.message, exp["message"])
 
     def test_blank_true(self):
         field = ArrayField(models.IntegerField(blank=True, null=True))
@@ -1103,27 +1113,42 @@ class TestValidation(PostgreSQLSimpleTestCase):
         field.clean([[1, 2], [3, 4]], None)
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean([[1, 2], [3, 4, 5]], None)
-        self.assertEqual(cm.exception.code, "nested_array_mismatch")
+
+        self.assertEqual(len(cm.exception.error_list), 1)
+        self.assertEqual(cm.exception.error_list[0].code, "nested_array_mismatch")
         self.assertEqual(
-            cm.exception.messages[0], "Nested arrays must have the same length."
+            cm.exception.error_list[0].messages[0],
+            "Nested arrays must have the same length.",
         )
 
     def test_with_base_field_error_params(self):
         field = ArrayField(models.CharField(max_length=2))
         with self.assertRaises(exceptions.ValidationError) as cm:
-            field.clean(["abc"], None)
-        self.assertEqual(len(cm.exception.error_list), 1)
-        exception = cm.exception.error_list[0]
-        self.assertEqual(
-            exception.message,
-            "Item 1 in the array did not validate: Ensure this value has at most 2 "
-            "characters (it has 3).",
-        )
-        self.assertEqual(exception.code, "item_invalid")
-        self.assertEqual(
-            exception.params,
-            {"nth": 1, "value": "abc", "limit_value": 2, "show_value": 3},
-        )
+            field.clean(["abc", "aa", "defg"], None)
+
+        self.assertEqual(len(cm.exception.error_list), 2)
+        expected = [
+            {
+                "message": "Item 1 in the array did not validate:"
+                " Ensure this value has at most 2 characters (it has 3).",
+                "params": {"limit_value": 2, "show_value": 3, "value": "abc", "nth": 1},
+            },
+            {
+                "message": "Item 3 in the array did not validate: "
+                "Ensure this value has at most 2 characters (it has 4).",
+                "params": {
+                    "limit_value": 2,
+                    "show_value": 4,
+                    "value": "defg",
+                    "nth": 3,
+                },
+            },
+        ]
+
+        for error, exp in zip(cm.exception.error_list, expected):
+            self.assertEqual(error.code, "item_invalid")
+            self.assertEqual(error.message, exp["message"])
+            self.assertEqual(error.params, exp["params"])
 
     def test_with_validators(self):
         field = ArrayField(
@@ -1131,18 +1156,58 @@ class TestValidation(PostgreSQLSimpleTestCase):
         )
         field.clean([1, 2], None)
         with self.assertRaises(exceptions.ValidationError) as cm:
-            field.clean([0], None)
-        self.assertEqual(len(cm.exception.error_list), 1)
-        exception = cm.exception.error_list[0]
-        self.assertEqual(
-            exception.message,
-            "Item 1 in the array did not validate: Ensure this value is greater than "
-            "or equal to 1.",
+            field.clean([0, 1, -3, 4], None)
+        self.assertEqual(len(cm.exception.error_list), 2)
+        expected = [
+            {
+                "message": "Item 1 in the array did not validate: "
+                "Ensure this value is greater than or equal to 1.",
+                "params": {"limit_value": 1, "show_value": 0, "value": 0, "nth": 1},
+            },
+            {
+                "message": "Item 3 in the array did not validate: "
+                "Ensure this value is greater than or equal to 1.",
+                "params": {"limit_value": 1, "show_value": -3, "value": -3, "nth": 3},
+            },
+        ]
+
+        for error, exp in zip(cm.exception.error_list, expected):
+            self.assertEqual(error.code, "item_invalid")
+            self.assertEqual(error.message, exp["message"])
+            self.assertEqual(error.params, exp["params"])
+
+    def test_with_multiple_validators_same_item(self):
+        field = ArrayField(
+            models.IntegerField(
+                validators=[
+                    validators.MinValueValidator(0),
+                    validators.MinValueValidator(5),
+                ]
+            )
         )
-        self.assertEqual(exception.code, "item_invalid")
-        self.assertEqual(
-            exception.params, {"nth": 1, "value": 0, "limit_value": 1, "show_value": 0}
-        )
+        field.clean(value=[10], model_instance=None)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean(value=[15, -20], model_instance=None)
+
+        # Two fails value -20 is less than 0 and less than 5.
+        self.assertEqual(len(cm.exception.error_list), 2)
+        expected = [
+            {
+                "message": "Item 2 in the array did not validate: "
+                "Ensure this value is greater than or equal to 0.",
+                "params": {"limit_value": 0, "show_value": -20, "value": -20, "nth": 2},
+            },
+            {
+                "message": "Item 2 in the array did not validate: "
+                "Ensure this value is greater than or equal to 5.",
+                "params": {"limit_value": 5, "show_value": -20, "value": -20, "nth": 2},
+            },
+        ]
+
+        for error, exp in zip(cm.exception.error_list, expected):
+            self.assertEqual(error.code, "item_invalid")
+            self.assertEqual(error.message, exp["message"])
+            self.assertEqual(error.params, exp["params"])
 
 
 class TestSimpleFormField(PostgreSQLSimpleTestCase):
