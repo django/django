@@ -85,6 +85,9 @@ class TestUtils(SimpleTestCase):
             ("UTC-04:43", ("UTC", "-", "04:43")),
             ("UTC", ("UTC", None, None)),
             ("UTC+1", ("UTC+1", None, None)),
+            ("UTC+05", ("UTC", "+", "05:00")),
+            ("-0500", ("", "-", "05:00")),
+            ("+0530", ("", "+", "05:30")),
         ]
         for tzname, expected in tests:
             with self.subTest(tzname=tzname):
