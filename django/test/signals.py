@@ -17,6 +17,7 @@ from django.utils.functional import empty
 from django.utils.log import configure_logging
 
 template_rendered = Signal()
+pre_capture_queries = Signal()
 
 # Most setting_changed receivers are supposed to be added below,
 # except for cases where the receiver is related to a contrib app.
@@ -259,3 +260,19 @@ def user_model_swapped(*, setting, **kwargs):
 def update_logging_config(*, setting, **kwargs):
     if setting in {"LOGGING", "LOGGING_CONFIG"}:
         configure_logging(settings.LOGGING_CONFIG, settings.LOGGING)
+
+
+@receiver(pre_capture_queries)
+def clear_content_types_cache(*args, **kwargs):
+    if apps.is_installed("django.contrib.contenttypes"):
+        from django.contrib.contenttypes.models import ContentType
+
+        ContentType.objects.clear_cache()
+
+
+@receiver(pre_capture_queries)
+def clear_sites_cache(*args, **kwargs):
+    if apps.is_installed("django.contrib.sites"):
+        from django.contrib.sites.models import Site
+
+        Site.objects.clear_cache()
