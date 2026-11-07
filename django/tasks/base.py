@@ -11,7 +11,7 @@ from django.utils.json import normalize_json
 from django.utils.module_loading import import_string, qualname
 from django.utils.translation import pgettext_lazy
 
-from .exceptions import TaskResultMismatch
+from .exceptions import InvalidTask, TaskDoesNotExist, TaskResultMismatch
 
 DEFAULT_TASK_BACKEND_ALIAS = "default"
 DEFAULT_TASK_PRIORITY = 0
@@ -61,9 +61,10 @@ class Task:
         try:
             func = import_string(func_path)
             kwargs["func"] = func.func
-        except (ImportError, AttributeError) as e:
-            msg = f"Expected {func_path!r} to point to a Task instance."
-            raise ValueError(msg) from e
+        except ImportError as e:
+            raise TaskDoesNotExist(func_path) from e
+        except AttributeError as e:
+            raise InvalidTask("Task function not found.") from e
         return cls(**kwargs)
 
     def __reduce__(self):
