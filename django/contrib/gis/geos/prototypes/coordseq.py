@@ -97,6 +97,12 @@ cs_getx = CsOperation("GEOSCoordSeq_getX", get=True)
 cs_gety = CsOperation("GEOSCoordSeq_getY", get=True)
 cs_getz = CsOperation("GEOSCoordSeq_getZ", get=True)
 cs_getm = CsOperation("GEOSCoordSeq_getM", get=True)
+cs_copy_to_buffer = GEOSFuncFactory(
+    "GEOSCoordSeq_copyToBuffer",
+    restype=c_int,
+    argtypes=[CS_PTR, POINTER(c_double), c_int, c_int],
+    errcheck=check_cs_op,
+)
 
 # For setting, x, y, z, m
 cs_setx = CsOperation("GEOSCoordSeq_setX")

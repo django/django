@@ -7,6 +7,7 @@ via ctypes.
 from django.contrib.gis.geos.prototypes.coordseq import (  # NOQA
     create_cs,
     cs_clone,
+    cs_copy_to_buffer,
     cs_getdims,
     cs_getm,
     cs_getordinate,
