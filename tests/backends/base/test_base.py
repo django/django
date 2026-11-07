@@ -49,6 +49,11 @@ class DatabaseWrapperTests(SimpleTestCase):
         self.assertEqual(BaseDatabaseWrapper.display_name, "unknown")
         self.assertNotEqual(connection.display_name, "unknown")
 
+    def test_is_usable_without_connection(self):
+        test_connection = connection.copy()
+        # SQLite always considers its connections usable.
+        self.assertIs(test_connection.is_usable(), connection.vendor == "sqlite")
+
     def test_get_database_version(self):
         with patch.object(BaseDatabaseWrapper, "__init__", return_value=None):
             msg = (
