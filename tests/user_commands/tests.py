@@ -25,7 +25,7 @@ from django.db import connection
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
-from django.utils.version import PY314, PY315
+from django.utils.version import PY314, PY315, PY316
 
 from .management.commands import dance
 from .utils import AssertFormatterFailureCaughtContext
@@ -301,11 +301,17 @@ class CommandTests(SimpleTestCase):
             "mutually_exclusive_required", foo_name="foo", stdout=out
         )
         self.assertIn("foo_name", out.getvalue())
-        msg = (
-            "Error: one of the arguments --foo-id --foo-name --foo-list "
-            "--append_const --const --count --flag_false --flag_true is "
-            "required"
-        )
+        if PY316:
+            msg = (
+                "Error: one of the following arguments is required: --foo-id, "
+                "--foo-name, --foo-list, --append_const, --const, --count, "
+                "--flag_false, --flag_true"
+            )
+        else:
+            msg = (
+                "Error: one of the arguments --foo-id --foo-name --foo-list "
+                "--append_const --const --count --flag_false --flag_true is required"
+            )
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command("mutually_exclusive_required", stdout=out)
 
