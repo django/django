@@ -79,14 +79,26 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute("""
+        return self._get_table_list(cursor)
+
+    def get_table_list_for_names(self, cursor, table_names):
+        return self._get_table_list(cursor, table_names)
+
+    def _get_table_list(self, cursor, table_names=None):
+        sql = """
             SELECT
                 table_name,
                 table_type,
                 table_comment
             FROM information_schema.tables
             WHERE table_schema = DATABASE()
-            """)
+            """
+        params = None
+        if table_names is not None:
+            placeholders = ", ".join(["%s"] * len(table_names))
+            sql += f" AND table_name IN ({placeholders})"
+            params = sorted(table_names)
+        cursor.execute(sql, params)
         return [
             TableInfo(row[0], {"BASE TABLE": "t", "VIEW": "v"}.get(row[1]), row[2])
             for row in cursor.fetchall()
