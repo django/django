@@ -76,3 +76,48 @@ def get_task_id(context):
 def test_context(context, attempt):
     assert isinstance(context, TaskContext)
     assert context.attempt == attempt
+
+
+@task(takes_context=True)
+def update_metadata(context, **values):
+    context.metadata.update(values)
+
+
+@task(takes_context=True)
+async def update_metadata_async(context, **values):
+    context.metadata.update(values)
+
+
+@task(takes_context=True)
+def update_metadata_and_fail(context, **values):
+    context.metadata.update(values)
+    raise ValueError("Task failed after updating metadata")
+
+
+@task(takes_context=True)
+def save_metadata_explicitly(context, key, value):
+    context.metadata[key] = value
+    context.save_metadata()
+    return context.task_result.metadata
+
+
+@task(takes_context=True)
+async def save_metadata_explicitly_async(context, key, value):
+    context.metadata[key] = value
+    await context.asave_metadata()
+    return context.task_result.metadata
+
+
+@task(takes_context=True)
+def append_to_metadata_list(context, key, value):
+    context.metadata[key].append(value)
+
+
+@task(takes_context=True)
+def get_metadata(context):
+    return context.metadata
+
+
+@task(takes_context=True)
+def set_invalid_metadata(context):
+    context.metadata["invalid"] = {1, 2}
