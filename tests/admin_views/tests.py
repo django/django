@@ -6943,10 +6943,9 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         self.expect(selected_option).to_have_text("<i>edited section</i>")
         # Rendered select2 input.
         select2_display = self.page.locator(".select2-selection__rendered")
-        # Clear button (×) is included in text whereas \n is browser-dependent.
-        self.expect(select2_display).to_have_text(
-            re.compile(r"^×\n?<i>edited section</i>$")
-        )
+        # Clear button is rendered outside select2-selection__rendered in
+        # Select2 4.1.0.
+        self.expect(select2_display).to_have_text("<i>edited section</i>")
 
         # Add popup
         with self.page.expect_popup() as popup_info:
@@ -6959,8 +6958,7 @@ class PlaywrightTests(AdminPlaywrightTestCase):
         selected_option = self.page.locator("#id_form-0-section option:checked")
         self.expect(selected_option).to_have_text("new section")
         select2_display = self.page.locator(".select2-selection__rendered")
-        # Clear button (×) is included in text whereas \n is browser-dependent.
-        self.expect(select2_display).to_have_text(re.compile(r"^×\n?new section$"))
+        self.expect(select2_display).to_have_text("new section")
 
     def test_inline_uuid_pk_edit_with_popup(self):
         parent = ParentWithUUIDPK.objects.create(title="test")

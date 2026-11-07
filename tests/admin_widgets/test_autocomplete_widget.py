@@ -176,7 +176,10 @@ class AutocompleteMixinTests(TestCase):
             # Language with code 00 does not exist.
             ("00", None),
             # Language files are case sensitive.
+            ("af", "af"),
+            ("eo", "eo"),
             ("sr-cyrl", "sr-Cyrl"),
+            ("ug", "ug"),
             ("zh-hans", "zh-CN"),
             ("zh-hant", "zh-TW"),
             (None, None),
