@@ -695,6 +695,18 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         resp = ConditionalGetMiddleware(self.get_response)(self.req)
         self.assertEqual(resp.status_code, 304)
 
+    def test_if_modified_since_and_epoch_last_modified(self):
+        self.req.META["HTTP_IF_MODIFIED_SINCE"] = "Thu, 01 Jan 1970 00:00:00 GMT"
+        self.resp_headers["Last-Modified"] = "Thu, 01 Jan 1970 00:00:00 GMT"
+        resp = ConditionalGetMiddleware(self.get_response)(self.req)
+        self.assertEqual(resp.status_code, 304)
+
+    def test_epoch_if_unmodified_since_and_last_modified(self):
+        self.req.META["HTTP_IF_UNMODIFIED_SINCE"] = "Thu, 01 Jan 1970 00:00:00 GMT"
+        self.resp_headers["Last-Modified"] = "Sat, 12 Feb 2011 17:38:44 GMT"
+        resp = ConditionalGetMiddleware(self.get_response)(self.req)
+        self.assertEqual(resp.status_code, 412)
+
     def test_if_modified_since_and_last_modified_in_the_future(self):
         self.req.META["HTTP_IF_MODIFIED_SINCE"] = "Sat, 12 Feb 2011 17:38:44 GMT"
         self.resp_headers["Last-Modified"] = "Sat, 12 Feb 2011 17:41:44 GMT"

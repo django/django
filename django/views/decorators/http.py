@@ -125,7 +125,9 @@ def condition(etag_func=None, last_modified_func=None):
             # Set relevant headers on the response if they don't already exist
             # and if the request method is safe.
             if request.method in ("GET", "HEAD", "QUERY"):
-                if res_last_modified and not response.has_header("Last-Modified"):
+                if res_last_modified is not None and not response.has_header(
+                    "Last-Modified"
+                ):
                     response.headers["Last-Modified"] = http_date(res_last_modified)
                 if res_etag:
                     response.headers.setdefault("ETag", res_etag)

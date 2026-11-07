@@ -171,13 +171,11 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
 
     # Get HTTP request headers.
     if_match_etags = parse_etags(request.META.get("HTTP_IF_MATCH", ""))
-    if_unmodified_since = request.META.get("HTTP_IF_UNMODIFIED_SINCE")
-    if_unmodified_since = if_unmodified_since and parse_http_date_safe(
-        if_unmodified_since
+    if_unmodified_since = parse_http_date_safe(
+        request.META.get("HTTP_IF_UNMODIFIED_SINCE")
     )
     if_none_match_etags = parse_etags(request.META.get("HTTP_IF_NONE_MATCH", ""))
-    if_modified_since = request.META.get("HTTP_IF_MODIFIED_SINCE")
-    if_modified_since = if_modified_since and parse_http_date_safe(if_modified_since)
+    if_modified_since = parse_http_date_safe(request.META.get("HTTP_IF_MODIFIED_SINCE"))
 
     # Evaluation of request preconditions below follows RFC 9110 Section
     # 13.2.2.
@@ -188,7 +186,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
     # Step 2: Test the If-Unmodified-Since precondition.
     if (
         not if_match_etags
-        and if_unmodified_since
+        and if_unmodified_since is not None
         and not _if_unmodified_since_passes(last_modified, if_unmodified_since)
     ):
         return _precondition_failed(request)
@@ -203,7 +201,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
     # Step 4: Test the If-Modified-Since precondition.
     if (
         not if_none_match_etags
-        and if_modified_since
+        and if_modified_since is not None
         and not _if_modified_since_passes(last_modified, if_modified_since)
         and request.method in ("GET", "HEAD", "QUERY")
     ):
@@ -241,7 +239,7 @@ def _if_unmodified_since_passes(last_modified, if_unmodified_since):
     Test the If-Unmodified-Since comparison as defined in RFC 9110 Section
     13.1.4.
     """
-    return last_modified and last_modified <= if_unmodified_since
+    return last_modified is not None and last_modified <= if_unmodified_since
 
 
 def _if_none_match_passes(target_etag, etags):
@@ -268,7 +266,7 @@ def _if_modified_since_passes(last_modified, if_modified_since):
     Test the If-Modified-Since comparison as defined in RFC 9110 Section
     13.1.3.
     """
-    return not last_modified or last_modified > if_modified_since
+    return last_modified is None or last_modified > if_modified_since
 
 
 def patch_response_headers(response, cache_timeout=None):

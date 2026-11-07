@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from django.test import SimpleTestCase, override_settings
 
@@ -8,6 +8,8 @@ LAST_MODIFIED_STR = "Sun, 21 Oct 2007 23:21:47 GMT"
 LAST_MODIFIED_NEWER_STR = "Mon, 18 Oct 2010 16:56:23 GMT"
 LAST_MODIFIED_INVALID_STR = "Mon, 32 Oct 2010 16:56:23 GMT"
 EXPIRED_LAST_MODIFIED_STR = "Sat, 20 Oct 2007 23:21:47 GMT"
+EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
+EPOCH_STR = "Thu, 01 Jan 1970 00:00:00 GMT"
 ETAG = '"b4246ffc4f62314ca13147c9d4f76974"'
 WEAK_ETAG = 'W/"b4246ffc4f62314ca13147c9d4f76974"'  # weak match to ETAG
 EXPIRED_ETAG = '"7fae4cd4b0f81e7d2914700043aa8ed6"'
@@ -66,6 +68,23 @@ class ConditionalGet(SimpleTestCase):
         self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = EXPIRED_LAST_MODIFIED_STR
         response = self.client.get("/condition/")
         self.assertEqual(response.status_code, 412)
+
+    def test_epoch_if_unmodified_since(self):
+        self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = EPOCH_STR
+        response = self.client.get("/condition/")
+        self.assertEqual(response.status_code, 412)
+
+    def test_epoch_last_modified(self):
+        response = self.client.get("/condition/epoch_last_modified/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Last-Modified"], EPOCH_STR)
+        self.client.defaults["HTTP_IF_MODIFIED_SINCE"] = EPOCH_STR
+        response = self.client.get("/condition/epoch_last_modified/")
+        self.assertNotModified(response)
+        del self.client.defaults["HTTP_IF_MODIFIED_SINCE"]
+        self.client.defaults["HTTP_IF_UNMODIFIED_SINCE"] = EPOCH_STR
+        response = self.client.get("/condition/epoch_last_modified/")
+        self.assertEqual(response.status_code, 200)
 
     def test_if_none_match(self):
         self.client.defaults["HTTP_IF_NONE_MATCH"] = ETAG

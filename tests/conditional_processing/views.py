@@ -1,11 +1,16 @@
 from django.http import HttpResponse
 from django.views.decorators.http import condition, etag, last_modified
 
-from .tests import ETAG, FULL_RESPONSE, LAST_MODIFIED, WEAK_ETAG
+from .tests import EPOCH, ETAG, FULL_RESPONSE, LAST_MODIFIED, WEAK_ETAG
 
 
 @condition(lambda r: ETAG, lambda r: LAST_MODIFIED)
 def index(request):
+    return HttpResponse(FULL_RESPONSE)
+
+
+@last_modified(lambda r: EPOCH)
+def epoch_last_modified_view(request):
     return HttpResponse(FULL_RESPONSE)
 
 

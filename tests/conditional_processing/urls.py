@@ -6,6 +6,7 @@ urlpatterns = [
     path("condition/", views.index),
     path("condition/last_modified/", views.last_modified_view1),
     path("condition/last_modified2/", views.last_modified_view2),
+    path("condition/epoch_last_modified/", views.epoch_last_modified_view),
     path("condition/etag/", views.etag_view1),
     path("condition/etag2/", views.etag_view2),
     path("condition/unquoted_etag/", views.etag_view_unquoted),
