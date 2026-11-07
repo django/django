@@ -5,7 +5,6 @@ Schema editor for DuckDB backend.
 import copy
 
 from django.apps.registry import Apps
-from django.db import NotSupportedError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
 from django.db.backends.utils import strip_quotes

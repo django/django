@@ -5,10 +5,9 @@ Database operations for DuckDB backend.
 import datetime
 import decimal
 import uuid
-from functools import cached_property
 
 from django.conf import settings
-from django.db import DatabaseError, NotSupportedError, models
+from django.db import DatabaseError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models.constants import OnConflict
 from django.db.models.expressions import Col

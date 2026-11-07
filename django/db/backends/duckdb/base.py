@@ -2,15 +2,11 @@
 DuckDB backend for Django.
 """
 
-import datetime
-import decimal
 from pathlib import Path
 from collections.abc import Mapping
 
 import duckdb
 
-from django.core.exceptions import ImproperlyConfigured
-from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.asyncio import async_unsafe
 
