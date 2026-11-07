@@ -1756,6 +1756,13 @@ class Query(BaseExpression):
                 "FilteredRelation's relation_name cannot contain lookups "
                 "(got %r)." % filtered_relation.relation_name
             )
+        relation_opts = None
+        if relation_field_parts:
+            relation_path, *_ = self.names_to_path(
+                relation_field_parts, self.get_meta()
+            )
+            if relation_path:
+                relation_opts = relation_path[-1].to_opts
         for lookup in get_children_from_q(filtered_relation.condition):
             lookup_parts, lookup_field_parts, _ = self.solve_lookup_type(lookup)
             shift = 2 if not lookup_parts else 1
@@ -1768,7 +1775,17 @@ class Query(BaseExpression):
                             "relations outside the %r (got %r)."
                             % (filtered_relation.relation_name, lookup)
                         )
-            if len(lookup_field_parts) > len(relation_field_parts) + 1:
+            if len(lookup_field_parts) > len(relation_field_parts) + 1 or (
+                relation_opts is not None
+                and lookup_field_parts[:-1] == relation_field_parts
+                and lookup_field_parts[-1] != "pk"
+                # Fields inherited through multi-table inheritance require an
+                # implicit join to the parent model.
+                and relation_opts.get_field(
+                    lookup_field_parts[-1]
+                ).model._meta.concrete_model
+                is not relation_opts.concrete_model
+            ):
                 raise ValueError(
                     "FilteredRelation's condition doesn't support nested "
                     "relations deeper than the relation_name (got %r for "
