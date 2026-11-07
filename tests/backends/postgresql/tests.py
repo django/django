@@ -309,6 +309,32 @@ class Tests(TestCase):
             new_connection.close_pool()
 
     @unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
+    def test_connect_pool_with_assume_role(self):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT session_user")
+            role = cursor.fetchone()[0]
+
+        new_connection = no_pool_connection(alias="default_pool")
+        new_connection.settings_dict["CONN_MAX_AGE"] = 0
+        new_connection.settings_dict["OPTIONS"].update(
+            {
+                "assume_role": role,
+                "pool": {
+                    "min_size": 1,
+                    "max_size": 1,
+                    "timeout": 5,
+                },
+            }
+        )
+        try:
+            with new_connection.cursor() as cursor:
+                cursor.execute("SELECT current_user")
+                self.assertEqual(cursor.fetchone()[0], role)
+        finally:
+            new_connection.close()
+            new_connection.close_pool()
+
+    @unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
     def test_pooling_health_checks(self):
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["OPTIONS"]["pool"] = True
