@@ -1053,6 +1053,13 @@ Methods
       Use ``samesite='None'`` (string) to explicitly state that this cookie is
       sent with all same-site and cross-site requests.
 
+    The ``Secure`` flag is applied automatically when the cookie name uses
+    the ``__Secure-``, ``__Host-``, or ``__Http-`` prefixes, and when
+    ``samesite='None'``. The ``HttpOnly`` flag is applied automatically for
+    the ``__Http-`` and ``__Host-Http-`` prefixes. Browsers silently discard
+    cookies that carry those prefixes, or ``SameSite=None``, without the
+    required flags.
+
     .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
 

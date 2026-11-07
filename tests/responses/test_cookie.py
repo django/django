@@ -118,6 +118,36 @@ class SetCookieTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             HttpResponse().set_cookie("example", samesite="invalid")
 
+    def test_secure_prefix_sets_secure(self):
+        response = HttpResponse()
+        for prefix in ("Secure", "Host", "Http", "Host-Http"):
+            with self.subTest(prefix=prefix):
+                cookie_name = f"__{prefix}-c"
+                response.set_cookie(cookie_name, "value")
+                self.assertIs(response.cookies[cookie_name]["secure"], True)
+
+    def test_http_prefix_sets_httponly(self):
+        response = HttpResponse()
+        for prefix in ("Http", "Host-Http"):
+            with self.subTest(prefix=prefix):
+                cookie_name = f"__{prefix}-c"
+                response.set_cookie(cookie_name, "value")
+                self.assertIs(response.cookies[cookie_name]["httponly"], True)
+
+    def test_samesite_none_sets_secure(self):
+        # Browsers drop SameSite=None cookies that lack the secure flag.
+        response = HttpResponse()
+        response.set_cookie("c", "value", samesite="None")
+        self.assertIs(response.cookies["c"]["secure"], True)
+        response.set_cookie("d", "value", samesite="none")
+        self.assertIs(response.cookies["d"]["secure"], True)
+
+    def test_plain_cookie_does_not_get_flags(self):
+        response = HttpResponse()
+        response.set_cookie("c", "value")
+        self.assertEqual(response.cookies["c"]["secure"], "")
+        self.assertEqual(response.cookies["c"]["httponly"], "")
+
 
 class DeleteCookieTests(SimpleTestCase):
     def test_default(self):
