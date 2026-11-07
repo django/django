@@ -783,13 +783,15 @@ class BaseDatabaseSchemaEditor:
         ):
             constraint_suffix = "_fk_%(to_table)s_%(to_column)s"
             # Add FK constraint inline, if supported.
-            if self.sql_create_column_inline_fk:
+            if sql_create_column_inline_fk := self._get_sql_create_column_inline_fk(
+                field
+            ):
                 to_table = field.remote_field.model._meta.db_table
                 to_column = field.remote_field.model._meta.get_field(
                     field.remote_field.field_name
                 ).column
                 namespace, _ = split_identifier(model._meta.db_table)
-                definition += " " + self.sql_create_column_inline_fk % {
+                definition += " " + sql_create_column_inline_fk % {
                     "name": self._fk_constraint_name(model, field, constraint_suffix),
                     "namespace": (
                         "%s." % self.quote_name(namespace) if namespace else ""
@@ -803,7 +805,12 @@ class BaseDatabaseSchemaEditor:
             # Otherwise, add FK constraints later.
             else:
                 self.deferred_sql.append(
-                    self._create_fk_sql(model, field, constraint_suffix)
+                    self._create_fk_sql(
+                        model,
+                        field,
+                        constraint_suffix,
+                        create_fk_sql=self._get_sql_create_added_column_fk(field),
+                    )
                 )
         # Build the SQL and run it
         sql = self.sql_create_column % {
@@ -845,6 +852,12 @@ class BaseDatabaseSchemaEditor:
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
+
+    def _get_sql_create_column_inline_fk(self, field):
+        return self.sql_create_column_inline_fk
+
+    def _get_sql_create_added_column_fk(self, field):
+        return self.sql_create_fk
 
     def remove_field(self, model, field):
         """
@@ -1798,7 +1811,7 @@ class BaseDatabaseSchemaEditor:
             "type": new_type,
         }
 
-    def _create_fk_sql(self, model, field, suffix):
+    def _create_fk_sql(self, model, field, suffix, create_fk_sql=None):
         table = Table(model._meta.db_table, self.quote_name)
         name = self._fk_constraint_name(model, field, suffix)
         column = Columns(model._meta.db_table, [field.column], self.quote_name)
@@ -1810,7 +1823,7 @@ class BaseDatabaseSchemaEditor:
         )
         deferrable = self.connection.ops.deferrable_sql()
         return Statement(
-            self.sql_create_fk,
+            create_fk_sql or self.sql_create_fk,
             table=table,
             name=name,
             column=column,
