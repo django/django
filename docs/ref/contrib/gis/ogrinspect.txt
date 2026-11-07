@@ -2,10 +2,77 @@
 OGR Inspection
 ==============
 
+.. module:: django.contrib.gis.utils.ogrinfo
+    :synopsis: Utilities for printing a summary of OGR data sources.
+
 .. module:: django.contrib.gis.utils.ogrinspect
     :synopsis: Utilities for inspecting OGR data sources.
 
 .. currentmodule:: django.contrib.gis.utils
+
+``ogrinfo``
+===========
+
+.. function:: ogrinfo(data_source, num_features=10)
+    :noindex:
+
+Displays a summary of each layer in a GDAL data source, in a similar format to
+the output of the GDAL `ogrinfo`__ command-line utility. The ``data_source``
+may be the path to a file readable by GDAL, or a
+:class:`~django.contrib.gis.gdal.DataSource` instance.
+
+Each layer's output first displays the geometry type, number of features,
+spatial reference system, and extent. It then lists the name, type, and value
+of every field for the first ``num_features`` features.
+
+``num_features`` sets how many features are listed per layer, and defaults
+to 10. It is used as a list slice, so it should be a non-negative integer.
+
+GDAL's ``ogrinfo`` prints only a brief, one-line summary per layer by default.
+To produce comparable output on the command line, use the ``-al`` option to
+list all features, or ``-so`` to show the layer summary alone.
+
+__ https://gdal.org/programs/ogrinfo.html
+
+Example:
+
+.. code-block:: pycon
+
+    >>> from django.contrib.gis.utils import ogrinfo
+    >>> ogrinfo("cities.shp", num_features=3)
+    data source : cities.shp
+    ==== layer 0
+      shape type: Point
+      # features: 3
+             srs: GEOGCS["WGS 84",
+        DATUM["WGS_1984",
+            SPHEROID["WGS 84",6378137,298.257223563,
+                AUTHORITY["EPSG","7030"]],
+            AUTHORITY["EPSG","6326"]],
+        PRIMEM["Greenwich",0,
+            AUTHORITY["EPSG","8901"]],
+        UNIT["degree",0.0174532925199433,
+            AUTHORITY["EPSG","9122"]],
+        AXIS["Latitude",NORTH],
+        AXIS["Longitude",EAST],
+        AUTHORITY["EPSG","4326"]]
+          extent: (-104.609252, 29.763374) - (-95.23506, 38.971823)
+    Displaying the first 3 features ====
+    === Feature 0
+           Name: b'String' ("Pueblo")
+     Population: b'Integer' (102121)
+        Density: b'Real' (874.7)
+        Created: b'Date' (1999-05-23)
+    === Feature 1
+           Name: b'String' ("Lawrence")
+     Population: b'Integer' (80098)
+        Density: b'Real' (1100.2)
+        Created: b'Date' (2005-05-23)
+    === Feature 2
+           Name: b'String' ("Houston")
+     Population: b'Integer' (2144491)
+        Density: b'Real' (1429.0)
+        Created: b'Date' (2007-05-23)
 
 ``ogrinspect``
 ==============
