@@ -1,6 +1,7 @@
 from django.contrib.admin.decorators import action, display, register
 from django.contrib.admin.filters import (
     AllValuesFieldListFilter,
+    AutocompleteFieldListFilter,
     BooleanFieldListFilter,
     ChoicesFieldListFilter,
     DateFieldListFilter,
@@ -45,6 +46,7 @@ __all__ = [
     "ChoicesFieldListFilter",
     "DateFieldListFilter",
     "AllValuesFieldListFilter",
+    "AutocompleteFieldListFilter",
     "EmptyFieldListFilter",
     "RelatedOnlyFieldListFilter",
     "ShowFacets",

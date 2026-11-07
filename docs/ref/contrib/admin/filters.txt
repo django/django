@@ -167,6 +167,18 @@ Assuming ``author`` is a ``ForeignKey`` to a ``User`` model, this will
 limit the ``list_filter`` choices to the users who have written a book,
 instead of listing all users.
 
+For related fields with many possible values, use
+``AutocompleteFieldListFilter`` to search for a value instead of loading all
+choices::
+
+    class BookAdmin(admin.ModelAdmin):
+        list_filter = [
+            ("author", admin.AutocompleteFieldListFilter),
+        ]
+
+The related model's ``ModelAdmin`` must define ``search_fields`` and grant the
+user view or change permission, as with :attr:`ModelAdmin.autocomplete_fields`.
+
 You can filter empty values using ``EmptyFieldListFilter``, which can
 filter on both empty strings and nulls, depending on what the field
 allows to store::

@@ -1,10 +1,12 @@
 import datetime
 import sys
 import unittest
+from unittest import mock
 
 from django.contrib.admin import (
     AdminSite,
     AllValuesFieldListFilter,
+    AutocompleteFieldListFilter,
     BooleanFieldListFilter,
     EmptyFieldListFilter,
     FieldListFilter,
@@ -18,6 +20,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
+from django.template.loader import render_to_string
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 
 from .models import Book, Bookmark, Department, Employee, ImprovedBook, TaggedItem
@@ -705,6 +708,68 @@ class ListFiltersTests(TestCase):
         self.assertEqual(
             choice["query_string"], "?author__id__exact=%s" % self.alfred.pk
         )
+
+    def test_autocompletefieldlistfilter_foreignkey(self):
+        class BookAdmin(ModelAdmin):
+            list_filter = (("author", AutocompleteFieldListFilter),)
+
+        modeladmin = BookAdmin(Book, site)
+        request = self.request_factory.get(
+            "/", {"author__id__exact": self.bob.pk, "o": "1"}
+        )
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+
+        self.assertEqual(filterspec.lookup_choices, ())
+        self.assertTrue(filterspec.has_output())
+        self.assertEqual(filterspec.form_field.value(), [str(self.bob.pk)])
+        self.assertEqual(filterspec.extra_parameters, [("o", "1")])
+        self.assertEqual(list(changelist.get_queryset(request)), [self.django_book])
+        with mock.patch.object(site, "each_context", return_value={}):
+            response = modeladmin.changelist_view(request)
+        self.assertIn("admin/js/autocomplete.js", response.context_data["media"]._js)
+
+        with mock.patch(
+            "django.contrib.admin.widgets.reverse", return_value="/admin/autocomplete/"
+        ):
+            rendered_widget = str(filterspec.form_field)
+            rendered_filter = render_to_string(
+                filterspec.template,
+                {
+                    "title": filterspec.title,
+                    "choices": list(filterspec.choices(changelist)),
+                    "spec": filterspec,
+                },
+            )
+        self.assertIn('class="admin-autocomplete"', rendered_widget)
+        self.assertIn('data-field-name="author"', rendered_widget)
+        self.assertIn("bob", rendered_widget)
+        self.assertIn("admin/js/autocomplete.js", filterspec.media._js)
+        self.assertIn('name="o" value="1"', rendered_filter)
+        self.assertIn('name="author__isnull" value="True"', rendered_filter)
+
+        request = self.request_factory.get("/", {"author__isnull": "True"})
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(list(changelist.get_queryset(request)), [self.guitar_book])
+        self.assertEqual(filterspec.lookup_val_isnull, "True")
+
+    def test_autocompletefieldlistfilter_manytomany(self):
+        class BookAdmin(ModelAdmin):
+            list_filter = (("contributors", AutocompleteFieldListFilter),)
+
+        modeladmin = BookAdmin(Book, site)
+        request = self.request_factory.get(
+            "/", {"contributors__id__exact": self.bob.pk}
+        )
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+
+        self.assertEqual(filterspec.form_field.value(), [str(self.bob.pk)])
+        self.assertEqual(list(changelist.get_queryset(request)), [self.guitar_book])
 
     def test_relatedfieldlistfilter_foreignkey_ordering(self):
         """RelatedFieldListFilter ordering respects ModelAdmin.ordering."""
