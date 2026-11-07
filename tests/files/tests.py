@@ -1,6 +1,7 @@
 import errno
 import gzip
 import os
+import stat
 import struct
 import tempfile
 import unittest
@@ -519,6 +520,49 @@ class FileMoveSafeTests(unittest.TestCase):
             content = f.read()
 
         self.assertEqual(content, b"content")
+
+    @unittest.skipUnless(os.name == "posix", "Requires POSIX permissions.")
+    def test_file_move_preserves_private_permissions_during_copy(self):
+        real_write = os.write
+
+        def recording_write(fd, content):
+            written = real_write(fd, content)
+            if written:
+                observed_modes.append(stat.S_IMODE(os.fstat(fd).st_mode))
+            return written
+
+        # umask() returns the current mask, so it'll be restored on cleanup.
+        self.addCleanup(os.umask, os.umask(0o000))
+        destination_creation_mode = 0o600
+
+        for source_mode in (0o600, 0o640):
+            with (
+                self.subTest(source_mode=source_mode),
+                tempfile.TemporaryDirectory() as temp_dir,
+            ):
+                observed_modes = []
+                source = Path(temp_dir) / "source"
+                destination = Path(temp_dir) / "destination"
+                source.write_bytes(b"private content")
+                source.chmod(source_mode)
+
+                with (
+                    mock.patch(
+                        "django.core.files.move.os.rename",
+                        side_effect=OSError(errno.EXDEV),
+                    ),
+                    mock.patch(
+                        "django.core.files.move.os.write",
+                        side_effect=recording_write,
+                    ),
+                ):
+                    file_move_safe(source, destination)
+
+                # Keep contents private until copying has finished.
+                self.assertEqual(set(observed_modes), {destination_creation_mode})
+                self.assertEqual(stat.S_IMODE(destination.stat().st_mode), source_mode)
+                self.assertEqual(destination.read_bytes(), b"private content")
+                self.assertFalse(source.exists())
 
 
 class SpooledTempTests(unittest.TestCase):
