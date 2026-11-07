@@ -439,9 +439,7 @@ Here's an example with the ``Count`` aggregate:
 
 .. code-block:: pycon
 
-    >>> a, b = Publisher.objects.annotate(num_books=Count("book", distinct=True)).filter(
-    ...     book__rating__gt=3.0
-    ... )
+    >>> a, b = Publisher.objects.annotate(num_books=Count("book")).filter(book__rating__gt=3.0)
     >>> a, a.num_books
     (<Publisher: A>, 2)
     >>> b, b.num_books
@@ -457,8 +455,18 @@ Both queries return a list of publishers that have at least one book with a
 rating exceeding 3.0, hence publisher C is excluded.
 
 In the first query, the annotation precedes the filter, so the filter has no
-effect on the annotation. ``distinct=True`` is required to avoid a :ref:`query
-bug <combining-multiple-aggregations>`.
+effect on the annotation.
+
+.. versionchanged:: 6.2
+
+    In older versions, the ``filter()`` in the first query inflated
+    ``num_books``, and ``Count("book", distinct=True)`` was required to get
+    the correct count.
+
+If a later ``values()``, ``order_by()``, or ``annotate()`` refers to the
+relationship used in such a ``filter()``, or if the ``filter()`` also refers to
+an annotation or an aggregate, the filter's join is used and the annotation is
+computed over the duplicated rows.
 
 The second query counts the number of books that have a rating exceeding 3.0
 for each publisher. The filter precedes the annotation, so the filter
