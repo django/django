@@ -3,9 +3,12 @@ import json
 import logging
 import pickle
 import posixpath
+import re
 import sys
 import threading
+import types
 import unittest
+import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy, deepcopy
@@ -55,7 +58,8 @@ from django.test.utils import (
     modify_settings,
     override_settings,
 )
-from django.utils.functional import classproperty
+from django.utils.functional import classproperty, partition
+from django.utils.version import PY315
 from django.views.static import serve
 
 logger = logging.getLogger("django.test")
@@ -885,19 +889,46 @@ class SimpleTestCase(unittest.TestCase):
             **kwargs,
         )
 
+    @contextmanager
+    def _assertWarnsMessageContext(self, expected_warning, expected_message):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.filterwarnings("always")
+            result = types.SimpleNamespace(warnings=caught)
+            yield result
+
+        def is_match(warning):
+            return issubclass(
+                warning.category, expected_warning
+            ) and expected_message in str(warning.message)
+
+        non_matching, matching = partition(is_match, caught)
+
+        if matching:
+            result.filename = matching[0].filename
+            result.lineno = matching[0].lineno
+            result.warning = matching[0].message
+        else:
+            msg = (
+                f"No {expected_warning.__name__!r} warning was triggered with "
+                f"a message containing {expected_message!r}."
+            )
+            if non_matching:
+                msg += " But these warnings were triggered:\n"
+                msg += "\n".join(repr(w.message) for w in non_matching)
+            raise self.failureException(msg)
+
     def assertWarnsMessage(self, expected_warning, expected_message, *args, **kwargs):
-        """
-        Same as assertRaisesMessage but for assertWarns() instead of
-        assertRaises().
-        """
-        return self._assertFooMessage(
-            self.assertWarns,
-            "warning",
-            expected_warning,
-            expected_message,
-            *args,
-            **kwargs,
-        )
+        if PY315:
+            return self.assertWarnsRegex(
+                expected_warning, re.escape(expected_message), *args, **kwargs
+            )
+
+        if not args:
+            return self._assertWarnsMessageContext(expected_warning, expected_message)
+
+        func, *func_args = args
+        with self._assertWarnsMessageContext(expected_warning, expected_message):
+            return func(*func_args, **kwargs)
 
     def assertFieldOutput(
         self,
