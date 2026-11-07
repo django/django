@@ -286,11 +286,25 @@ browsers.
 Specifying ``--playwright`` automatically sets ``--tags=playwright`` to run
 only the tests that require Playwright.
 
-Browsers run in headless mode by default, which is faster and more stable.
-Add the ``--headed`` option to run with a visible browser window instead.
+There are several more options you can pass to ``runtests.py`` to configure
+Playwright tests:
 
-To slow down Playwright operations for debugging, pass ``--slowmo=<MS>`` with a
-delay in milliseconds, for example ``--slowmo=500``.
+* ``--headed``: Browsers run in headless mode by default. Add this option to
+  run with a visible browser window instead.
+* ``--slowmo=<MS>``: To slow down Playwright operations for debugging, pass a
+  delay in milliseconds, for example ``--slowmo=500``.
+* ``--video=<MODE>``: Record a Playwright video for each test (``off``
+  (default), ``on``, or ``retain-on-failure``). Videos are saved to
+  ``tests/videos/<browser>/`` directory. The first page is saved as
+  ``<test label>.webm``. Each additional page, such as a popup, is saved as
+  ``<test label>-2.webm``, ``<test label>-3.webm``, and so on.
+* ``--tracing=<MODE>``: Record a Playwright trace for each test (``off``
+  (default), ``on``, or ``retain-on-failure``). Traces are saved to
+  ``tests/traces/<browser>/`` directory. Open a saved trace with:
+
+  .. console::
+
+      $ python -m playwright show-trace tests/traces/chromium/<trace>.zip
 
 .. _Playwright browsers: https://playwright.dev/python/docs/browsers
 
