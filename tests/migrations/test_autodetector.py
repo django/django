@@ -2718,6 +2718,66 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes, "testapp", 0, 0, old_name="EntityA", new_name="RenamedEntityA"
         )
 
+    def test_rename_model_with_new_related_model_and_altered_options(self):
+        """
+        Operations on a renamed model come after RenameModel, even when a new
+        model with a foreign key to the renamed model is added.
+        """
+        before = [
+            ModelState(
+                "testapp",
+                "Author",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("name", models.CharField(max_length=200)),
+                ],
+            ),
+        ]
+        after = [
+            ModelState(
+                "testapp",
+                "Writer",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("name", models.CharField(max_length=200)),
+                ],
+                {
+                    "ordering": ["name"],
+                    "indexes": [models.Index(fields=["name"], name="writer_idx")],
+                    "constraints": [
+                        models.UniqueConstraint(fields=["name"], name="writer_uniq")
+                    ],
+                },
+            ),
+            ModelState(
+                "testapp",
+                "Book",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("writer", models.ForeignKey("testapp.Writer", models.CASCADE)),
+                ],
+            ),
+        ]
+        changes = self.get_changes(
+            before, after, MigrationQuestioner({"ask_rename_model": True})
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "testapp",
+            0,
+            [
+                "RenameModel",
+                "CreateModel",
+                "AlterModelOptions",
+                "AddIndex",
+                "AddConstraint",
+            ],
+        )
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, old_name="Author", new_name="Writer"
+        )
+
     def test_fk_dependency(self):
         """Having a ForeignKey automatically adds a dependency."""
         # Note that testapp (author) has no dependencies,

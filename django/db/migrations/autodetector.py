@@ -412,8 +412,20 @@ class MigrationAutodetector:
         """
         for app_label, ops in sorted(self.generated_operations.items()):
             ts = TopologicalSorter()
+            renamed_models = {
+                op.new_name_lower: op
+                for op in ops
+                if isinstance(op, operations.RenameModel)
+            }
             for op in ops:
                 ts.add(op)
+                # Operations on a renamed model use its new name, so they must
+                # come after the rename.
+                model_name = getattr(op, "model_name_lower", None) or getattr(
+                    op, "name_lower", None
+                )
+                if (rename := renamed_models.get(model_name)) and rename is not op:
+                    ts.add(op, rename)
                 for dep in op._auto_deps:
                     # Resolve intra-app dependencies to handle circular
                     # references involving a swappable model.
