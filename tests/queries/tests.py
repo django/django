@@ -3276,6 +3276,48 @@ class ExcludeTests(TestCase):
         JobResponsibilities.objects.create(job=cls.j1, responsibility=cls.r1)
         JobResponsibilities.objects.create(job=cls.j2, responsibility=cls.r2)
 
+    def test_negated_q_branch_order(self):
+        excluded = Note.objects.create(note="excluded")
+        positive = Note.objects.create(note="positive")
+        negative = Note.objects.create(note="negative")
+        empty = Note.objects.create(note="empty")
+        ExtraInfo.objects.bulk_create(
+            [
+                ExtraInfo(note=excluded, info="target", value=40),
+                ExtraInfo(note=excluded, info="other", value=100),
+                ExtraInfo(note=positive, info="target", value=60),
+                ExtraInfo(note=negative, info="other", value=40),
+            ]
+        )
+        matching = Q(extrainfo__info="target", extrainfo__value__gte=50)
+        not_target = ~Q(extrainfo__info="target")
+        other = Q(extrainfo__info="other")
+        expected = [empty, negative, positive]
+        cases = (
+            (matching | not_target, expected),
+            (not_target | matching, expected),
+            (other & not_target, [negative]),
+            (not_target & other, [negative]),
+        )
+        for condition, expected in cases:
+            with self.subTest(condition=condition):
+                self.assertSequenceEqual(
+                    Note.objects.filter(condition).distinct(), expected
+                )
+
+    def test_exclude_reverse_relation_f_same_row(self):
+        crossed = Note.objects.create(note="crossed")
+        matching = Note.objects.create(note="matching")
+        left = ExtraInfo.objects.create(note=crossed, info="left")
+        right = ExtraInfo.objects.create(note=crossed, info="right")
+        same = ExtraInfo.objects.create(note=matching, info="same")
+        left.value, right.value, same.value = right.pk, left.pk, same.pk
+        ExtraInfo.objects.bulk_update([left, right, same], ["value"])
+        self.assertSequenceEqual(
+            Note.objects.exclude(extrainfo__pk=F("extrainfo__value")).distinct(),
+            [crossed],
+        )
+
     def test_to_field(self):
         self.assertSequenceEqual(
             Food.objects.exclude(eaten__meal="dinner"),
