@@ -39,6 +39,25 @@ _charset_from_content_type_re = _lazy_re_compile(
 _control_chars_re = _lazy_re_compile(r"[\x00-\x1f\x7f-\x9f]")
 
 
+def _cookie_required_flags(key, secure, httponly, samesite):
+    """
+    Return the flags a browser requires before it stores a cookie.
+
+    RFC 6265bis requires ``Secure`` for the ``__Secure-`` and ``__Host-``
+    prefixes, and browsers require it for ``SameSite=None``. The ``__Http-``
+    and ``__Host-Http-`` prefixes additionally require ``HttpOnly``. A cookie
+    that breaks these rules is dropped without any error, so the flags are
+    applied here instead of emitting a header the browser discards.
+    """
+    if key.startswith(("__Secure-", "__Host-", "__Http-")) or (
+        samesite and samesite.lower() == "none"
+    ):
+        secure = True
+    if key.startswith(("__Http-", "__Host-Http-")):
+        httponly = True
+    return secure, httponly
+
+
 class ResponseHeaders(CaseInsensitiveMapping):
     def __init__(self, data):
         """
@@ -277,6 +296,7 @@ class HttpResponseBase:
             self.cookies[key]["path"] = path
         if domain is not None:
             self.cookies[key]["domain"] = domain
+        secure, httponly = _cookie_required_flags(key, secure, httponly, samesite)
         if secure:
             self.cookies[key]["secure"] = True
         if httponly:
@@ -297,14 +317,7 @@ class HttpResponseBase:
         return self.set_cookie(key, value, **kwargs)
 
     def delete_cookie(self, key, path="/", domain=None, samesite=None):
-        # Browsers can ignore the Set-Cookie header if the cookie doesn't use
-        # the secure flag and either:
-        # - the cookie name starts with "__Host-", "__Secure-", or "__Http-"
-        # - the samesite is "none".
-        secure = key.startswith(("__Secure-", "__Host-", "__Http-")) or (
-            samesite and samesite.lower() == "none"
-        )
-        httponly = key.startswith(("__Http-", "__Host-Http-"))
+        secure, httponly = _cookie_required_flags(key, False, False, samesite)
         self.set_cookie(
             key,
             max_age=0,
