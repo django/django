@@ -1315,14 +1315,33 @@ class ModelAdmin(BaseModelAdmin):
             field_to_validate is set for non-text exact lookups so that
             invalid search terms can be skipped (preserving index usage).
             """
+            prefix = ""
             if field_name.startswith("^"):
-                return "%s__istartswith" % field_name.removeprefix("^"), None
+                prefix = "__istartswith"
+                field_name = field_name.removeprefix("^")
             elif field_name.startswith("="):
-                return "%s__iexact" % field_name.removeprefix("="), None
+                prefix = "__iexact"
+                field_name = field_name.removeprefix("=")
             elif field_name.startswith("@"):
-                return "%s__search" % field_name.removeprefix("@"), None
-            # Use field_name if it includes a lookup.
+                prefix = "__search"
+                field_name = field_name.removeprefix("@")
+            else:
+                prefix = "__icontains"
+
             opts = queryset.model._meta
+
+            # Handle 'pk' expansion for MTI / inherited models
+            if field_name.startswith("pk__"):
+                if opts.pk.remote_field:
+                    target_pk_name = opts.pk.remote_field.model._meta.pk.name
+                    field_name = field_name.replace(
+                        "pk", f"{opts.pk.name}__{target_pk_name}", 1
+                    )
+                else:
+                    field_name = field_name.replace("pk", opts.pk.name, 1)
+            elif field_name == "pk":
+                field_name = opts.pk.name
+
             lookup_fields = field_name.split(LOOKUP_SEP)
             # Go through the fields, following all relations.
             prev_field = None
@@ -1332,21 +1351,42 @@ class ModelAdmin(BaseModelAdmin):
                 try:
                     field = opts.get_field(path_part)
                 except FieldDoesNotExist:
-                    # Use valid query lookups.
-                    if prev_field and prev_field.get_lookup(path_part):
+                    # Check both lookups and field transforms
+                    # (e.g. __year, __month)
+                    if prev_field and (
+                        path_part in ("iexact", "istartswith")
+                        or prev_field.get_lookup(path_part)
+                        or prev_field.get_transform(path_part)
+                    ):
+                        # PostgreSQL fails on iexact/istartswith
+                        # for non-text fields.
+                        if path_part in ("iexact", "istartswith") and not isinstance(
+                            prev_field, (models.CharField, models.TextField)
+                        ):
+                            return (
+                                field_name.rsplit(LOOKUP_SEP, 1)[0] + "__exact",
+                                prev_field,
+                            )
+
                         if path_part == "exact" and not isinstance(
                             prev_field, (models.CharField, models.TextField)
                         ):
-                            # Use prev_field to validate the search term.
                             return field_name, prev_field
                         return field_name, None
+                    raise
                 else:
                     prev_field = field
-                    if hasattr(field, "path_infos"):
-                        # Update opts to follow the relation.
+                    if hasattr(field, "path_infos") and field.path_infos:
                         opts = field.path_infos[-1].to_opts
-            # Otherwise, use the field with icontains.
-            return "%s__icontains" % field_name, None
+
+            # If a prefix like '=' or '^' was used, check if
+            # the final field is non-text
+            if prefix in ("__iexact", "__istartswith") and not isinstance(
+                prev_field, (models.CharField, models.TextField)
+            ):
+                prefix = "__exact"
+
+            return "%s%s" % (field_name, prefix), None
 
         may_have_duplicates = False
         search_fields = self.get_search_fields(request)
