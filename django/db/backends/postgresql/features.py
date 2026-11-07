@@ -30,6 +30,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_transactions = True
     can_introspect_materialized_views = True
     can_distinct_on_fields = True
+    supports_same_table_select_as_update = True
     can_rollback_ddl = True
     schema_editor_uses_clientside_param_binding = True
     supports_combined_alters = True
