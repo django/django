@@ -143,6 +143,19 @@ class BaseTests:
         storing = self.stored_messages_count(storage, response)
         self.assertEqual(storing, 1)
 
+    def test_clear(self):
+        storage = self.get_existing_storage()
+        storage.add(constants.INFO, "Test message 3")
+        self.assertGreater(len(storage), 0)
+        storage.clear()
+        self.assertEqual(len(storage), 0)
+        self.assertTrue(storage.used)
+        self.assertFalse(storage.added_new)
+        response = self.get_response()
+        storage.update(response)
+        storing = self.stored_messages_count(storage, response)
+        self.assertEqual(storing, 0)
+
     @override_settings(MESSAGE_LEVEL=constants.DEBUG)
     def test_full_request_response_cycle(self):
         """

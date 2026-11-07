@@ -235,6 +235,21 @@ For instance, you can fetch all the messages to return them in a
 instance of the configured storage backend.
 
 
+Clearing messages
+-----------------
+
+.. function:: clear_messages(request)
+
+To explicitly remove all messages from the message storage on a request, call::
+
+    from django.contrib import messages
+
+    messages.clear_messages(request)
+
+This is particularly useful in automated testing or view logic where messages
+need to be cleared before processing subsequent steps or rendering.
+
+
 The ``Message`` class
 ---------------------
 
