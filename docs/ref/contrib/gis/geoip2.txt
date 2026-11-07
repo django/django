@@ -69,7 +69,7 @@ Here is an example of its usage:
 API Reference
 =============
 
-.. class:: GeoIP2(path=None, cache=0, country=None, city=None)
+.. class:: GeoIP2(path=None, cache=0, country=None, city=None, supported_types=None)
 
 The ``GeoIP`` object does not require any parameters to use the default
 settings. However, at the very least the :setting:`GEOIP_PATH` setting
@@ -99,7 +99,16 @@ Keyword Arguments    Description
 ``city``             The name of the GeoIP city data file. Defaults to
                      ``GeoLite2-City.mmdb``. Setting this keyword overrides
                      the :setting:`GEOIP_CITY` setting.
+
+``supported_types``  An iterable of allowed database edition names. Defaults
+                     to :attr:`~GeoIP2.SUPPORTED_DATABASE_TYPES`.
 ===================  =======================================================
+
+.. versionchanged:: 6.2
+
+    The ``supported_types`` parameter and ``SUPPORTED_DATABASE_TYPES``
+    class attribute were added. Support for ``DBIP-City`` and ``DBIP-Country``
+    was added.
 
 Methods
 =======
@@ -146,6 +155,25 @@ Returns a coordinate tuple of (latitude, longitude),
 
 Returns a :class:`~django.contrib.gis.geos.Point` object corresponding to the
 query.
+
+Attributes
+==========
+
+.. attribute:: GeoIP2.SUPPORTED_DATABASE_TYPES
+
+    A set of supported database edition names:
+
+    * ``'DBIP-City'``
+    * ``'DBIP-City-Lite'``
+    * ``'DBIP-Country'``
+    * ``'DBIP-Country-Lite'``
+    * ``'GeoIP2-City'``
+    * ``'GeoIP2-Country'``
+    * ``'GeoLite2-City'``
+    * ``'GeoLite2-Country'``
+
+    Subclasses of :class:`GeoIP2` can override or extend this attribute to
+    support custom database editions.
 
 Settings
 ========

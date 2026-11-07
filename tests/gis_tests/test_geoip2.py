@@ -11,7 +11,11 @@ from django.test import SimpleTestCase, override_settings
 if HAS_GEOIP2:
     import geoip2
 
-    from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
+    from django.contrib.gis.geoip2 import (
+        SUPPORTED_DATABASE_TYPES,
+        GeoIP2,
+        GeoIP2Exception,
+    )
 
 
 def build_geoip_path(*parts):
@@ -244,3 +248,46 @@ class ErrorTest(SimpleTestCase):
         with self.settings(GEOIP_PATH=build_geoip_path("GeoLite2-ASN-Test.mmdb")):
             with self.assertRaisesMessage(GeoIP2Exception, msg):
                 GeoIP2()
+
+    def test_default_supported_types(self):
+        self.assertIn("DBIP-City", GeoIP2.SUPPORTED_DATABASE_TYPES)
+        self.assertIn("DBIP-Country", GeoIP2.SUPPORTED_DATABASE_TYPES)
+        self.assertIs(SUPPORTED_DATABASE_TYPES, GeoIP2.SUPPORTED_DATABASE_TYPES)
+
+    @mock.patch("geoip2.database.Reader")
+    def test_custom_supported_types_instance(self, MockReader):
+        MockReader.return_value.metadata.return_value.database_type = (
+            "Geoacumen-Country"
+        )
+        # Allowed via instance parameter.
+        g = GeoIP2(
+            path=build_geoip_path("GeoLite2-Country-Test.mmdb"),
+            supported_types=["Geoacumen-Country"],
+        )
+        self.assertIn("Geoacumen-Country", g.supported_types)
+
+        # Rejected when not in supported_types.
+        msg = "Unable to handle database edition: Geoacumen-Country"
+        with self.assertRaisesMessage(GeoIP2Exception, msg):
+            GeoIP2(
+                path=build_geoip_path("GeoLite2-Country-Test.mmdb"),
+                supported_types=["DBIP-Country"],
+            )
+
+    @mock.patch("geoip2.database.Reader")
+    def test_subclass_supported_database_types(self, MockReader):
+        class CustomGeoIP2(GeoIP2):
+            SUPPORTED_DATABASE_TYPES = GeoIP2.SUPPORTED_DATABASE_TYPES | {
+                "Geoacumen-Country"
+            }
+
+        MockReader.return_value.metadata.return_value.database_type = (
+            "Geoacumen-Country"
+        )
+        g = CustomGeoIP2(path=build_geoip_path("GeoLite2-Country-Test.mmdb"))
+        self.assertIn("Geoacumen-Country", g.supported_types)
+
+        # Base GeoIP2 still rejects it.
+        msg = "Unable to handle database edition: Geoacumen-Country"
+        with self.assertRaisesMessage(GeoIP2Exception, msg):
+            GeoIP2(path=build_geoip_path("GeoLite2-Country-Test.mmdb"))
