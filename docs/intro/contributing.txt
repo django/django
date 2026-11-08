@@ -160,6 +160,17 @@ terminal window.
 
         ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate
 
+    For PowerShell users, it may be required to enable the ``Activate.ps1``
+    script by setting the execution policy for the user. You can do this by
+    issuing the following PowerShell command:
+
+    .. code-block:: powershell
+
+        PS C:\> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+    See `About Execution Policies
+    <https://go.microsoft.com/fwlink/?LinkID=135170>`_ for more information.
+
 The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
 install through ``pip`` while this name is displayed will be installed in that
