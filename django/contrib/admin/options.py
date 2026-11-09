@@ -61,7 +61,7 @@ from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.decorators import method_decorator
 from django.utils.deprecation import (
     RemovedInDjango2028Warning,
@@ -424,6 +424,75 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                 },
                 current_app=self.admin_site.name,
             )
+
+    def get_index_url(self, request=None):
+        return self.admin_site.get_index_url(request=request)
+
+    def get_app_list_url(self, request=None):
+        return self.admin_site.get_app_list_url(self.opts.app_label, request=request)
+
+    def get_changelist_url(self, request=None, **kwargs):
+        try:
+            return reverse(
+                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
+
+    def get_add_url(self, request=None, **kwargs):
+        try:
+            return reverse(
+                "admin:%s_%s_add" % (self.opts.app_label, self.opts.model_name),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
+
+    def get_change_url(self, object_id, request=None, **kwargs):
+        if object_id is None or object_id == "":
+            return ""
+        object_id = getattr(object_id, "pk", object_id)
+        if object_id is None or object_id == "":
+            return ""
+        try:
+            return reverse(
+                "admin:%s_%s_change" % (self.opts.app_label, self.opts.model_name),
+                args=(quote(object_id),),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
+
+    def get_delete_url(self, object_id, request=None, **kwargs):
+        if object_id is None or object_id == "":
+            return ""
+        object_id = getattr(object_id, "pk", object_id)
+        if object_id is None or object_id == "":
+            return ""
+        try:
+            return reverse(
+                "admin:%s_%s_delete" % (self.opts.app_label, self.opts.model_name),
+                args=(quote(object_id),),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
+
+    def get_history_url(self, object_id, request=None, **kwargs):
+        if object_id is None or object_id == "":
+            return ""
+        object_id = getattr(object_id, "pk", object_id)
+        if object_id is None or object_id == "":
+            return ""
+        try:
+            return reverse(
+                "admin:%s_%s_history" % (self.opts.app_label, self.opts.model_name),
+                args=(quote(object_id),),
+                current_app=self.admin_site.name,
+            )
+        except NoReverseMatch:
+            return ""
 
     def get_empty_value_display(self):
         """
@@ -1639,6 +1708,22 @@ class ModelAdmin(BaseModelAdmin):
                                     popup_response["optgroup"] = str(optgroup_label)
                                     break
 
+            if (
+                "_continue" in request.POST
+                or "_saveasnew" in request.POST
+                or "_addanother" in request.POST
+            ):
+                post_url_continue = (
+                    self.get_change_url(obj.pk, request=request)
+                    if "_continue" in request.POST or "_saveasnew" in request.POST
+                    else self.get_add_url(request=request)
+                )
+                popup_response["new_value"] = str(value)
+                popup_response["url"] = add_preserved_filters(
+                    {"preserved_filters": preserved_filters, "opts": opts},
+                    post_url_continue,
+                )
+
             popup_response_data = json.dumps(popup_response)
             return TemplateResponse(
                 request,
@@ -1665,7 +1750,7 @@ class ModelAdmin(BaseModelAdmin):
                 msg += " " + _("You may edit it again below.")
             self.message_user(request, format_html(msg, **msg_dict), messages.SUCCESS)
             if post_url_continue is None:
-                post_url_continue = obj_url
+                post_url_continue = self.get_change_url(obj.pk, request=request)
             post_url_continue = add_preserved_filters(
                 {
                     "preserved_filters": preserved_filters,
@@ -1685,7 +1770,7 @@ class ModelAdmin(BaseModelAdmin):
                 **msg_dict,
             )
             self.message_user(request, msg, messages.SUCCESS)
-            redirect_url = request.path
+            redirect_url = self.get_add_url(request=request)
             redirect_url = add_preserved_filters(
                 {
                     "preserved_filters": preserved_filters,
@@ -1708,20 +1793,32 @@ class ModelAdmin(BaseModelAdmin):
         Determine the HttpResponse for the change_view stage.
         """
 
-        if IS_POPUP_VAR in request.POST:
+        if "_popup" in request.POST:
             opts = obj._meta
             to_field = request.POST.get(TO_FIELD_VAR)
-            attr = str(to_field) if to_field else opts.pk.attname
-            value = request.resolver_match.kwargs["object_id"]
-            new_value = obj.serializable_value(attr)
-            popup_response_data = json.dumps(
-                {
-                    "action": "change",
-                    "value": str(value),
-                    "obj": str(obj),
-                    "new_value": str(new_value),
-                }
-            )
+            attr = str(to_field) if to_field else obj._meta.pk.attname
+            value = obj.serializable_value(attr)
+            popup_response = {
+                "action": "change",
+                "value": str(value),
+                "obj": str(obj),
+            }
+            if (
+                "_continue" in request.POST
+                or "_saveasnew" in request.POST
+                or "_addanother" in request.POST
+            ):
+                preserved_filters = self.get_preserved_filters(request)
+                post_url_continue = (
+                    self.get_change_url(obj.pk, request=request)
+                    if "_continue" in request.POST or "_saveasnew" in request.POST
+                    else self.get_add_url(request=request)
+                )
+                popup_response["new_value"] = str(value)
+                popup_response["url"] = add_preserved_filters(
+                    {"preserved_filters": preserved_filters, "opts": opts},
+                    post_url_continue,
+                )
             return TemplateResponse(
                 request,
                 self.popup_response_template
@@ -1732,7 +1829,7 @@ class ModelAdmin(BaseModelAdmin):
                     "admin/popup_response.html",
                 ],
                 {
-                    "popup_response_data": popup_response_data,
+                    "popup_response_data": json.dumps(popup_response),
                 },
             )
 
@@ -1740,11 +1837,12 @@ class ModelAdmin(BaseModelAdmin):
         preserved_filters = self.get_preserved_filters(request)
         preserved_qsl = self._get_preserved_qsl(request, preserved_filters)
 
-        obj_display = display_for_value(str(obj), EMPTY_VALUE_STRING)
         msg_dict = {
             "name": opts.verbose_name,
             "obj": format_html(
-                '<a href="{}">{}</a>', urlquote(request.path), obj_display
+                '<a href="{}">{}</a>',
+                urlquote(request.path),
+                display_for_value(str(obj), EMPTY_VALUE_STRING),
             ),
         }
         if "_continue" in request.POST:
@@ -1767,6 +1865,32 @@ class ModelAdmin(BaseModelAdmin):
             )
             return HttpResponseRedirect(redirect_url)
 
+        elif "_saveasnew" in request.POST:
+            obj_url = self.get_change_url(obj.pk, request=request)
+            msg = format_html(
+                _(
+                    "The {name} “{obj}” was added successfully. You may edit it again "
+                    "below."
+                ),
+                name=opts.verbose_name,
+                obj=format_html(
+                    '<a href="{}">{}</a>',
+                    urlquote(obj_url),
+                    display_for_value(str(obj), EMPTY_VALUE_STRING),
+                ),
+            )
+            self.message_user(request, msg, messages.SUCCESS)
+            redirect_url = self.get_change_url(obj.pk, request=request)
+            redirect_url = add_preserved_filters(
+                {
+                    "preserved_filters": preserved_filters,
+                    "preserved_qsl": preserved_qsl,
+                    "opts": opts,
+                },
+                redirect_url,
+            )
+            return HttpResponseRedirect(redirect_url)
+
         elif "_addanother" in request.POST:
             msg = format_html(
                 _(
@@ -1776,10 +1900,7 @@ class ModelAdmin(BaseModelAdmin):
                 **msg_dict,
             )
             self.message_user(request, msg, messages.SUCCESS)
-            redirect_url = reverse(
-                "admin:%s_%s_add" % (opts.app_label, opts.model_name),
-                current_app=self.admin_site.name,
-            )
+            redirect_url = self.get_add_url(request=request)
             redirect_url = add_preserved_filters(
                 {
                     "preserved_filters": preserved_filters,
@@ -1799,16 +1920,13 @@ class ModelAdmin(BaseModelAdmin):
 
     def _response_post_save(self, request, obj):
         if self.has_view_or_change_permission(request):
-            post_url = reverse(
-                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
-                current_app=self.admin_site.name,
-            )
+            post_url = self.get_changelist_url(request=request)
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters(
                 {"preserved_filters": preserved_filters, "opts": self.opts}, post_url
             )
         else:
-            post_url = reverse("admin:index", current_app=self.admin_site.name)
+            post_url = self.get_index_url(request=request)
         return HttpResponseRedirect(post_url)
 
     def response_post_save_add(self, request, obj):
@@ -1956,16 +2074,13 @@ class ModelAdmin(BaseModelAdmin):
         )
 
         if self.has_change_permission(request, None):
-            post_url = reverse(
-                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
-                current_app=self.admin_site.name,
-            )
+            post_url = self.get_changelist_url(request=request)
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters(
                 {"preserved_filters": preserved_filters, "opts": self.opts}, post_url
             )
         else:
-            post_url = reverse("admin:index", current_app=self.admin_site.name)
+            post_url = self.get_index_url(request=request)
         return HttpResponseRedirect(post_url)
 
     def render_delete_form(self, request, context):
@@ -1976,6 +2091,7 @@ class ModelAdmin(BaseModelAdmin):
             to_field_var=TO_FIELD_VAR,
             is_popup_var=IS_POPUP_VAR,
             media=self.media,
+            model_admin=self,
         )
 
         return TemplateResponse(
@@ -2054,7 +2170,7 @@ class ModelAdmin(BaseModelAdmin):
             "key": unquote(object_id),
         }
         self.message_user(request, msg, messages.WARNING)
-        url = reverse("admin:index", current_app=self.admin_site.name)
+        url = self.get_index_url(request=request)
         return HttpResponseRedirect(url)
 
     @csrf_protect_m
@@ -2225,6 +2341,7 @@ class ModelAdmin(BaseModelAdmin):
             "inline_admin_formsets": inline_formsets,
             "errors": helpers.AdminErrorList(form, formsets),
             "preserved_filters": self.get_preserved_filters(request),
+            "model_admin": self,
         }
 
         # Hide the "Save" and "Save and continue" buttons if "Save as New" was
@@ -2570,6 +2687,7 @@ class ModelAdmin(BaseModelAdmin):
             "preserved_filters": self.get_preserved_filters(request),
             "is_popup": IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET,
             "to_field": to_field,
+            "model_admin": self,
             **(extra_context or {}),
         }
 
@@ -2620,6 +2738,7 @@ class ModelAdmin(BaseModelAdmin):
             "object": obj,
             "opts": self.opts,
             "preserved_filters": self.get_preserved_filters(request),
+            "model_admin": self,
             **(extra_context or {}),
         }
 
