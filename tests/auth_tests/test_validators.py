@@ -411,3 +411,21 @@ class UsernameValidatorsTests(SimpleTestCase):
             with self.subTest(invalid=invalid):
                 with self.assertRaises(ValidationError):
                     v(invalid)
+
+    def test_equality(self):
+        self.assertEqual(
+            validators.ASCIIUsernameValidator(),
+            validators.ASCIIUsernameValidator(),
+        )
+        self.assertEqual(
+            validators.UnicodeUsernameValidator(),
+            validators.UnicodeUsernameValidator(),
+        )
+        self.assertNotEqual(
+            validators.ASCIIUsernameValidator(),
+            validators.UnicodeUsernameValidator(),
+        )
+        self.assertEqual(
+            validators.ASCIIUsernameValidator(),
+            mock.ANY,
+        )
