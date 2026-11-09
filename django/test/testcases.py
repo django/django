@@ -101,10 +101,10 @@ def assert_and_parse_html(self, html, user_msg, msg):
 
 
 class _AssertNumQueriesContext(CaptureQueriesContext):
-    def __init__(self, test_case, num, connection):
+    def __init__(self, test_case, num, connection, clear_caches=False):
         self.test_case = test_case
         self.num = num
-        super().__init__(connection)
+        super().__init__(connection, clear_caches=clear_caches)
 
     def __exit__(self, exc_type, exc_value, traceback):
         super().__exit__(exc_type, exc_value, traceback)
@@ -1301,10 +1301,18 @@ class TransactionTestCase(SimpleTestCase):
             )
         return self.assertEqual(list(items), values, msg=msg)
 
-    def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
+    def assertNumQueries(
+        self,
+        num,
+        func=None,
+        *args,
+        using=DEFAULT_DB_ALIAS,
+        clear_caches=False,
+        **kwargs,
+    ):
         conn = connections[using]
 
-        context = _AssertNumQueriesContext(self, num, conn)
+        context = _AssertNumQueriesContext(self, num, conn, clear_caches=clear_caches)
         if func is None:
             return context
 
