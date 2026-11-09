@@ -192,6 +192,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     prepopulated_fields = {}
     formfield_overrides = {}
     readonly_fields = ()
+    readonly_formfield_overrides = {}
     ordering = None
     sortable_by = None
     view_on_site = True
@@ -209,6 +210,17 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         for k, v in self.formfield_overrides.items():
             overrides.setdefault(k, {}).update(v)
         self.formfield_overrides = overrides
+
+    def get_readonly_widget(self, db_field):
+        """
+        Hook for specifying the widget used to render db_field when it's
+        displayed as read-only. Return None to use the default rendering.
+        """
+        for klass in db_field.__class__.mro():
+            if klass in self.readonly_formfield_overrides:
+                widget = self.readonly_formfield_overrides[klass].get("widget")
+                return widget() if isinstance(widget, type) else widget
+        return None
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """
