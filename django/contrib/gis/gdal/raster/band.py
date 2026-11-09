@@ -204,7 +204,12 @@ class GDALBand(GDALRasterBase):
             raise ValueError("Size is larger than raster.")
 
         # Create ctypes type array generator
-        ctypes_array = GDAL_TO_CTYPES[self.datatype()] * (shape[0] * shape[1])
+        datatype = self.datatype()
+        if datatype == 15:
+            raise NotImplementedError(
+                "16 bit floating point (GDT_Float16) is not yet supported."
+            )
+        ctypes_array = GDAL_TO_CTYPES[datatype] * (shape[0] * shape[1])
 
         if data is None:
             # Set read mode
