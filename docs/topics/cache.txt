@@ -648,6 +648,31 @@ are cached separately. This middleware expects that a HEAD request is answered
 with the same response headers as the corresponding GET request; in which case
 it can return a cached GET response for HEAD request.
 
+.. warning::
+
+    As described in :ref:`using-vary-headers` below, the cache middleware
+    caches a separate version of a page for each combination of values of the
+    request headers named in the response's ``Vary`` header, and several of
+    Django's features add ``Vary: Cookie`` to the response. For example, this
+    happens whenever the :doc:`session </topics/http/sessions>` is accessed
+    (including on any page that displays content specific to the logged-in
+    user) and whenever a page uses a :doc:`CSRF token </ref/csrf>` (that is,
+    most pages containing forms).
+
+    Since cookies such as the session ID and the CSRF token differ for every
+    visitor -- as do any cookies set on your domain by third-party scripts,
+    such as analytics -- ``Vary: Cookie`` effectively turns the per-site cache
+    into a per-visitor cache for those pages. This can dramatically reduce the
+    cache hit ratio and increase the size of the cache. In addition, responses
+    that both set a cookie and vary on ``Cookie`` aren't cached at all.
+
+    Therefore, the per-site cache is most effective for sites that serve
+    mostly cookie-independent pages to anonymous users. If most of your pages
+    use sessions or CSRF tokens, consider caching only selected views with
+    `the per-view cache`_, or caching the cookie-independent parts of your
+    templates with :ref:`template fragment caching
+    <template-fragment-caching>`.
+
 Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in
 each :class:`~django.http.HttpResponse` which affect :ref:`downstream caches
 <downstream-caches>`:
@@ -782,6 +807,8 @@ Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
     ]
 
 .. templatetag:: cache
+
+.. _template-fragment-caching:
 
 Template fragment caching
 =========================
