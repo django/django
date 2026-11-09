@@ -276,6 +276,18 @@ class ContentTypesTests(TestCase):
         ct_fetched = ContentType.objects.get_for_id(ct.pk)
         self.assertIsNone(ct_fetched.model_class())
 
+    def test_missing_model_get_object_for_this_type(self):
+        ct = ContentType.objects.create(app_label="contenttypes", model="OldModel")
+        msg = "App 'contenttypes' doesn't have a 'OldModel' model."
+        with self.assertRaisesMessage(LookupError, msg):
+            ct.get_object_for_this_type(pk=1)
+
+    def test_missing_model_get_all_objects_for_this_type(self):
+        ct = ContentType.objects.create(app_label="contenttypes", model="OldModel")
+        msg = "App 'contenttypes' doesn't have a 'OldModel' model."
+        with self.assertRaisesMessage(LookupError, msg):
+            ct.get_all_objects_for_this_type(pk=1)
+
     def test_missing_model_with_existing_model_name(self):
         """
         Displaying content types in admin (or anywhere) doesn't break on
