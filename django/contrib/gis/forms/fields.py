@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.core.exceptions import ValidationError
@@ -59,7 +60,7 @@ class GeometryField(forms.Field):
                     value = GEOSGeometry(
                         value, max_geom_collections=self.max_geom_collections
                     )
-                except (GEOSException, ValueError, TypeError):
+                except (GEOSException, GDALException, ValueError, TypeError):
                     value = None
             if value is None:
                 raise ValidationError(

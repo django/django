@@ -249,6 +249,22 @@ class GeometryFieldTest(SimpleTestCase):
                 with self.assertRaises(ValidationError):
                     fld.to_python(geo_input)
 
+    def test_to_python_invalid_geojson_widget_without_deserialize(self):
+        # A widget without deserialize() (e.g. TextInput) uses to_python's
+        # fallback, where GDAL rejects the invalid GeoJSON.
+        fld = forms.GeometryField(widget=forms.TextInput)
+        for geo_input in (
+            "{}",
+            '{"type": "Foo"}',
+            '{"type": "Point"}',
+            '{"type": "Point", "coordinates": "x"}',
+        ):
+            with (
+                self.subTest(geo_input=geo_input),
+                self.assertRaisesMessage(ValidationError, "Invalid geometry value."),
+            ):
+                fld.clean(geo_input)
+
     def test_to_python_different_map_srid(self):
         f = forms.GeometryField(widget=OpenLayersWidget)
         json = '{ "type": "Point", "coordinates": [ 5.0, 23.0 ] }'
