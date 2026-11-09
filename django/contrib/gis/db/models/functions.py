@@ -429,7 +429,7 @@ class GeometryType(GeoFuncMixin, Transform):
     lookup_name = "geom_type"
 
     def as_oracle(self, compiler, connection, **extra_context):
-        lhs, params = compiler.compile(self.lhs)
+        lhs, params = self.process_lhs(compiler, connection)
         sql = (
             "(SELECT DECODE("
             f"SDO_GEOMETRY.GET_GTYPE({lhs}),"
