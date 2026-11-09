@@ -5,6 +5,7 @@ Tests for F() query expression syntax.
 import uuid
 
 from django.db import models
+from django.db.models.functions import ExtractHour, Now
 
 
 class Manager(models.Model):
@@ -122,3 +123,8 @@ class JSONFieldModel(models.Model):
 
     class Meta:
         required_db_features = {"supports_json_field"}
+
+
+class SQLiteTimezoneEmulationModel(models.Model):
+    other_field = models.CharField(max_length=100, db_default="default_val")
+    created_hour = models.IntegerField(db_default=ExtractHour(Now()))

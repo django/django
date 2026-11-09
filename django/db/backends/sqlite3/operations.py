@@ -26,6 +26,7 @@ DATETIME_FIELDS = (models.DateField, models.DateTimeField, models.TimeField)
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "django.db.backends.sqlite3.compiler"
     cast_char_field_without_max_length = "text"
     cast_data_types = {
         "DateField": "TEXT",
