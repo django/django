@@ -790,6 +790,9 @@ class QuerySet(AltersData):
 
     def _prepare_for_bulk_create(self, objs):
         objs_with_pk, objs_without_pk = [], []
+        db_generated_pk = any(
+            field.db_returning for field in self.model._meta.pk_fields
+        )
         for obj in objs:
             obj._prepare_related_fields_for_save(operation_name="bulk_create")
             if isinstance(obj.pk, DatabaseDefault):
@@ -798,7 +801,9 @@ class QuerySet(AltersData):
                 objs_with_pk.append(obj)
             else:
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
-                if obj._is_pk_set():
+                # A primary key that the database doesn't generate is set by
+                # Field.pre_save() (e.g. auto_now_add) when inserting.
+                if obj._is_pk_set() or not db_generated_pk:
                     objs_with_pk.append(obj)
                 else:
                     objs_without_pk.append(obj)
