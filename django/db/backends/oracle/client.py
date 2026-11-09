@@ -1,4 +1,5 @@
 import shutil
+import subprocess
 
 from django.db.backends.base.client import BaseDatabaseClient
 
@@ -25,3 +26,11 @@ class DatabaseClient(BaseDatabaseClient):
             args = [wrapper_path, *args]
         args.extend(parameters)
         return args, None
+
+    def runshell(self, parameters):
+        try:
+            super().runshell(parameters)
+        except subprocess.CalledProcessError as exc:
+            # SQL*Plus arguments contain credentials; omit them.
+            exc.cmd = [self.executable_name]
+            raise
