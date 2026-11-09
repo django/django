@@ -15,6 +15,7 @@ from django.tasks.base import TASK_MAX_PRIORITY, TASK_MIN_PRIORITY, Task
 from django.tasks.exceptions import (
     InvalidTask,
     InvalidTaskBackend,
+    TaskDoesNotExist,
     TaskResultDoesNotExist,
     TaskResultMismatch,
 )
@@ -279,12 +280,24 @@ class TaskTestCase(SimpleTestCase):
     def test_unpickle_arbitrary_string(self):
         kwargs = {"func": "does.not.exist.fake_task"}
         msg = "Expected 'does.not.exist.fake_task' to point to a Task instance."
+        with self.assertRaisesMessage(TaskDoesNotExist, msg):
+            Task._reconstruct(kwargs)
+
+    def test_unpickle_arbitrary_string_compat_value_error(self):
+        kwargs = {"func": "does.not.exist.fake_task"}
+        msg = "Expected 'does.not.exist.fake_task' to point to a Task instance."
         with self.assertRaisesMessage(ValueError, msg):
             Task._reconstruct(kwargs)
 
     def test_unpickle_non_task_object(self):
         kwargs = {"func": "builtins.any"}
-        msg = "Expected 'builtins.any' to point to a Task instance."
+        msg = "Task function not found."
+        with self.assertRaisesMessage(InvalidTask, msg):
+            Task._reconstruct(kwargs)
+
+    def test_unpickle_non_task_object_compat_value_error(self):
+        kwargs = {"func": "builtins.any"}
+        msg = "Task function not found."
         with self.assertRaisesMessage(ValueError, msg):
             Task._reconstruct(kwargs)
 
