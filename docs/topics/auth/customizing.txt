@@ -621,6 +621,19 @@ password resets. You must then provide some key implementation details:
             model, but should *not* contain the ``USERNAME_FIELD`` or
             ``password`` as these fields will always be prompted for.
 
+        .. note::
+
+            If ``REQUIRED_FIELDS`` contains a
+            :class:`~django.db.models.ForeignKey`, the
+            :djadmin:`createsuperuser` prompt will ask for the value of the
+            :attr:`~django.db.models.ForeignKey.to_field` (the
+            :attr:`~django.db.models.Field.primary_key` by default) of an
+            existing instance. You must define a custom manager with a
+            ``create_superuser()`` that resolves this raw value into the
+            required model instance. See
+            :meth:`~models.CustomUserManager.create_superuser` for an
+            example.
+
     .. attribute:: is_active
 
         A boolean attribute that indicates whether the user is considered
@@ -790,7 +803,29 @@ methods:
 For a :class:`~.ForeignKey` in :attr:`.USERNAME_FIELD` or
 :attr:`.REQUIRED_FIELDS`, these methods receive the value of the
 :attr:`~.ForeignKey.to_field` (the :attr:`~django.db.models.Field.primary_key`
-by default) of an existing instance.
+by default) of an existing instance. This is the raw value, not a model
+instance, so you must look up the instance yourself. For example, if your user
+model has a ``ForeignKey`` to a ``Country`` model in ``REQUIRED_FIELDS``::
+
+    class MyUserManager(BaseUserManager):
+        def create_user(self, email, country, password=None):
+            # country is the raw to_field value, not a Country instance. Here,
+            # for example, it could be an ISO code used as the primary key.
+            country = Country.objects.get(pk=country)
+            user = self.model(email=email, country=country)
+            user.set_password(password)
+            user.save(using=self._db)
+            return user
+
+        def create_superuser(self, email, country, password=None):
+            user = self.create_user(email, country, password=password)
+            user.is_staff = True
+            user.is_superuser = True
+            user.save(using=self._db)
+            return user
+
+If the raw value is passed to the model unchanged, assigning it to the
+``ForeignKey`` raises a ``ValueError``.
 
 :class:`~django.contrib.auth.models.BaseUserManager` provides the following
 utility methods:
