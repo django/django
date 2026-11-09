@@ -42,7 +42,10 @@ class ExternalCRSBlocker:
 
     @classmethod
     def check(cls, value):
-        value_dict = json.loads(value)
+        try:
+            value_dict = json.loads(value)
+        except RecursionError:
+            raise ValueError("GeoJSON input is nested too deeply.")
         if not isinstance(value_dict, dict):
             raise ValueError("GeoJSON geometry must be an object.")
 

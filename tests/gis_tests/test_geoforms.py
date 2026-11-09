@@ -1,4 +1,6 @@
+import json
 import re
+from unittest import mock
 
 from django.contrib.gis import forms
 from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
@@ -94,6 +96,20 @@ class GeometryFieldTest(SimpleTestCase):
             with (
                 self.subTest(label=label),
                 self.assertRaisesMessage(SuspiciousOperation, msg),
+            ):
+                fld.clean(payload)
+
+    def test_geojson_deeply_nested(self):
+        # json.loads() raises RecursionError, rather than JSONDecodeError,
+        # when the nesting exceeds the interpreter's recursion limit. Whether
+        # a given depth hits the limit depends on the build's stack size, so
+        # mock it.
+        payload = '{"type": "Point", "coordinates": [[[]]]}'
+        for fld in forms.GeometryField(), forms.GeometryField(widget=forms.TextInput):
+            with (
+                self.subTest(widget=type(fld.widget).__name__),
+                mock.patch.object(json, "loads", side_effect=RecursionError),
+                self.assertRaisesMessage(ValidationError, "Invalid geometry value."),
             ):
                 fld.clean(payload)
 

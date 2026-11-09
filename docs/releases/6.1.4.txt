@@ -9,4 +9,6 @@ Django 6.1.4 fixes several bugs in 6.1.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 6.1.3 where a deeply nested GeoJSON value
+  crashed :class:`~django.contrib.gis.forms.GeometryField` instead of raising
+  a ``ValidationError`` (:ticket:`37491`).
