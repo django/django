@@ -69,7 +69,7 @@ class Deserializer(PythonDeserializer):
         try:
             objects = json.loads(stream_or_string)
         except Exception as exc:
-            raise DeserializationError() from exc
+            raise DeserializationError(exc) from exc
         super().__init__(objects, **options)
 
     def _handle_object(self, obj):
