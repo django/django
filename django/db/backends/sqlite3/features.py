@@ -52,6 +52,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         # The django_format_dtdelta() function doesn't properly handle mixed
         # Date/DateTime fields and timedeltas.
         "expressions.tests.FTimeDeltaTests.test_mixed_comparisons1",
+        # SQLite doesn't support StdDev/Variance in window functions.
+        "expressions_window.tests.WindowFunctionTests.test_window_stddev",
+        "expressions_window.tests.WindowFunctionTests.test_window_variance",
+        "expressions_window.tests.WindowFunctionTests.test_stddev_filter",
+        "expressions_window.tests.WindowFunctionTests.test_variance_filter",
     }
     insert_test_table_with_defaults = 'INSERT INTO {} ("null") VALUES (1)'
     supports_default_keyword_in_insert = False
