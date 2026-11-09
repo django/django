@@ -3041,6 +3041,20 @@ class NegatedExpressionTests(TestCase):
             [("Example Inc.", True, False), ("Foobar Ltd.", True, False)],
         )
 
+    def test_order_by_full_condition(self):
+        full = ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField())
+        self.assertSequenceEqual(
+            Company.objects.order_by(~full, "name"),
+            [self.eu_company, self.non_eu_company],
+        )
+
+    def test_order_by_empty_condition(self):
+        empty = ExpressionWrapper(Q(pk__in=[]), output_field=BooleanField())
+        self.assertSequenceEqual(
+            Company.objects.order_by(~empty, "-name"),
+            [self.non_eu_company, self.eu_company],
+        )
+
 
 class OrderByTests(SimpleTestCase):
     def test_equal(self):
