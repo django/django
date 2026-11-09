@@ -552,6 +552,11 @@ Miscellaneous
   recomputing it, and accessing one on an instance without a ``__dict__``
   raises ``TypeError`` instead of ``AttributeError``.
 
+* ``django.http.multipartparser.MultiPartParser`` now treats a boundary
+  as a delimiter only at the start of a line, as required by
+  :rfc:`RFC 2046 <2046#section-5.1.1>`. A boundary appearing in the middle of
+  a line is now part of the field or file data instead of starting a new part.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2

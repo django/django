@@ -1158,6 +1158,65 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaisesMessage(MultiPartParserError, msg):
             request.POST
 
+    def test_multipart_boundary_not_at_start_of_line(self):
+        # RFC 2046 section 5.1.1: a boundary is only a delimiter at the start
+        # of a line, otherwise it's part of the data.
+        value = f'foo--{BOUNDARY}\r\nContent-Disposition: form-data; name="b"'
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="a"',
+                    "",
+                    value,
+                    f"--{BOUNDARY}--",
+                    "",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(request.POST, {"a": [value]})
+
+    def test_multipart_file_boundary_not_at_start_of_line(self):
+        content = f"a--{BOUNDARY}b--{BOUNDARY}\r\n-{BOUNDARY}--{BOUNDARY}".encode()
+        body = "\r\n".join(
+            [
+                f"--{BOUNDARY}",
+                'Content-Disposition: form-data; name="file"; filename="test.txt"',
+                "Content-Type: text/plain",
+                "",
+                "",
+            ]
+        ).encode()
+        body += content + f"\r\n--{BOUNDARY}--\r\n".encode()
+
+        class SmallChunksUploadHandler(MemoryFileUploadHandler):
+            def __init__(self, chunk_size):
+                super().__init__()
+                self.chunk_size = chunk_size
+
+        # The boundary can be split across chunks.
+        for chunk_size in [1, 2, 3, 7, len(BOUNDARY), 64 * 2**10]:
+            with self.subTest(chunk_size=chunk_size):
+                parser = MultiPartParser(
+                    {
+                        "CONTENT_TYPE": MULTIPART_CONTENT,
+                        "CONTENT_LENGTH": len(body),
+                    },
+                    BytesIO(body),
+                    [SmallChunksUploadHandler(chunk_size)],
+                )
+                post, files = parser.parse()
+                self.assertEqual(post, {})
+                self.assertEqual(files["file"].read(), content)
+
     def test_multipart_with_header_fields_too_large(self):
         payload = FakePayload(
             "\r\n".join(
