@@ -710,6 +710,59 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string("template", {})
         self.assertEqual(output, "no")
 
+    # Filter exceptions (refs #17664)
+
+    @setup(
+        {
+            "template": (
+                "{% if missing|default:missing or True %}yes{% else %}no{% endif %}"
+            )
+        }
+    )
+    def test_if_filter_argument_missing_with_or_true(self):
+        # A failed lookup in a filter *argument* used to escape as far as the
+        # `or` operator, which catches everything and returns False -- so this
+        # rendered "no", even though anything `or True` is truthy.
+        output = self.engine.render_to_string("template", {})
+        self.assertEqual(output, "yes")
+
+    @setup(
+        {
+            "template": (
+                "{% if True or missing|default:missing %}yes{% else %}no{% endif %}"
+            )
+        }
+    )
+    def test_if_filter_argument_missing_with_true_or(self):
+        # The same expression with the operands swapped already rendered
+        # "yes", because `or` short-circuits before evaluating the filter.
+        output = self.engine.render_to_string("template", {})
+        self.assertEqual(output, "yes")
+
+    @setup({"template": "{% if missing|default:missing %}yes{% else %}no{% endif %}"})
+    def test_if_filter_argument_missing_alone(self):
+        # On its own the expression is falsey, which is unchanged.
+        output = self.engine.render_to_string("template", {})
+        self.assertEqual(output, "no")
+
+    @setup(
+        {
+            "template": (
+                "{% if missing|default:missing and True %}yes{% else %}no{% endif %}"
+            )
+        }
+    )
+    def test_if_filter_argument_missing_with_and(self):
+        output = self.engine.render_to_string("template", {})
+        self.assertEqual(output, "no")
+
+    @setup(
+        {"template": "{% if not missing|default:missing %}yes{% else %}no{% endif %}"}
+    )
+    def test_if_filter_argument_missing_with_not(self):
+        output = self.engine.render_to_string("template", {})
+        self.assertEqual(output, "yes")
+
 
 class IfNodeTests(SimpleTestCase):
     def test_repr(self):
