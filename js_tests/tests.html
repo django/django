@@ -83,6 +83,44 @@
             </div>
         </div>
     </script>
+    <script type="text/html" id="tabular-formset-with-autocomplete">
+      <input id="id_auto-TOTAL_FORMS" value="3">
+      <input id="id_auto-MAX_NUM_FORMS" value="">
+      <table class="inline">
+          <tr id="auto-0" class="form-row has_original">
+              <td class="field-test_field">
+                  <select id="id_auto-0-fk" class="admin-autocomplete"
+                      data-app-label="myapp" data-model-name="mymodel"
+                      data-field-name="fk"></select>
+              </td>
+              <td class="delete"><input type="checkbox" /></td>
+          </tr>
+          <tr id="auto-1" class="form-row">
+              <td class="field-test_field">
+                  <select id="id_auto-1-fk" class="admin-autocomplete"
+                      data-app-label="myapp" data-model-name="mymodel"
+                      data-field-name="fk"></select>
+              </td>
+              <td class="delete"></td>
+          </tr>
+          <tr id="auto-2" class="form-row">
+              <td class="field-test_field">
+                  <select id="id_auto-2-fk" class="admin-autocomplete"
+                      data-app-label="myapp" data-model-name="mymodel"
+                      data-field-name="fk"></select>
+              </td>
+              <td class="delete"></td>
+          </tr>
+          <tr id="auto-empty" class="form-row empty-form">
+              <td class="field-test_field">
+                  <select id="id_auto-__prefix__-fk" class="admin-autocomplete"
+                      data-app-label="myapp" data-model-name="mymodel"
+                      data-field-name="fk"></select>
+              </td>
+              <td class="delete"></td>
+          </tr>
+      </table>
+  </script>
     <script type="text/html" id="nav-sidebar-filter">
       <nav class="sticky" id="nav-sidebar">
         <input type="search" id="nav-filter"
@@ -114,6 +152,7 @@
 
     <script src='../django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.min.js'></script>
     <script src='../django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js'></script>
+    <script src='../django/contrib/admin/static/admin/js/vendor/select2/select2.full.js'></script>
     <script src='../django/contrib/admin/static/admin/js/jquery.init.js'></script>
     <script src='./admin/jsi18n-mocks.test.js'></script>
 
@@ -138,6 +177,9 @@
 
     <script src='../django/contrib/admin/static/admin/js/SelectFilter2.js' data-cover></script>
     <script src='./admin/SelectFilter2.test.js'></script>
+
+    <script src='../django/contrib/admin/static/admin/js/autocomplete.js'></script>
+    <script src='./admin/autocomplete.test.js'></script>
 
     <script src='../django/contrib/admin/static/admin/js/inlines.js' data-cover></script>
     <script src='./admin/inlines.test.js'></script>
