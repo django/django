@@ -151,6 +151,22 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         self.assertSequenceEqual(self.book2.authors.all(), [self.author1])
 
+    def test_foreignkey_reverse_incompatible_queryset_model(self):
+        FavoriteAuthors.objects.create(
+            author=self.author1,
+            likes_author=self.author2,
+        )
+        queryset = Author.objects.prefetch_related(
+            Prefetch("addresses", queryset=FavoriteAuthors.objects.all())
+        )
+
+        msg = (
+            'Expected a QuerySet of "prefetch_related.AuthorAddress", but got a '
+            'QuerySet of "prefetch_related.FavoriteAuthors".'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            list(queryset)
+
     def test_onetoone_reverse_no_match(self):
         # Regression for #17439
         with self.assertNumQueries(2):
