@@ -21,6 +21,7 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.db import (
+    DEFAULT_DB_ALIAS,
     DJANGO_VERSION_PICKLE_KEY,
     DatabaseError,
     connection,
@@ -1813,7 +1814,7 @@ class Model(AltersData, metaclass=ModelBase):
             # If there are field name clashes, hide consequent column name
             # clashes.
             if not clash_errors:
-                errors.extend(cls._check_column_name_clashes())
+                errors.extend(cls._check_column_name_clashes(databases))
             errors += [
                 *cls._check_unique_together(),
                 *cls._check_indexes(databases),
@@ -2093,28 +2094,37 @@ class Model(AltersData, metaclass=ModelBase):
         return errors
 
     @classmethod
-    def _check_column_name_clashes(cls):
+    def _check_column_name_clashes(cls, databases=None):
         # Store a list of column names which have already been used by other
         # fields.
-        used_column_names = []
         errors = []
+        db_aliases = databases or [DEFAULT_DB_ALIAS]
 
-        for f in cls._meta.local_fields:
-            column_name = f.column
+        for db in db_aliases:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            used_column_names = []
 
-            # Ensure the column name is not already in use.
-            if column_name and column_name in used_column_names:
-                errors.append(
-                    checks.Error(
-                        "Field '%s' has column name '%s' that is used by "
-                        "another field." % (f.name, column_name),
-                        hint="Specify a 'db_column' for the field.",
-                        obj=cls,
-                        id="models.E007",
-                    )
+            for f in cls._meta.local_fields:
+                column_name = f.column
+                quoted_column_name = (
+                    connection.ops.quote_name(column_name) if column_name else None
                 )
-            else:
-                used_column_names.append(column_name)
+
+                # Ensure the column name is not already in use.
+                if quoted_column_name and quoted_column_name in used_column_names:
+                    errors.append(
+                        checks.Error(
+                            "Field '%s' has column name '%s' that is used by "
+                            "another field." % (f.name, column_name),
+                            hint="Specify a 'db_column' for the field.",
+                            obj=cls,
+                            id="models.E007",
+                        )
+                    )
+                else:
+                    used_column_names.append(quoted_column_name)
 
         return errors
 
