@@ -179,7 +179,7 @@ def get_deleted_objects(objs, request, admin_site):
             # If the model is not registered,
             # check if the user has delete permissions for the model.
             p = get_permission_codename("delete", opts)
-            if not request.user.has_perm(f"{opts.app_label}.{p}", obj):
+            if not request.user.has_perm(f"{opts.app_label}.{p}"):
                 perms_needed.add(opts.verbose_name)
 
             return no_edit_link

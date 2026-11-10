@@ -205,11 +205,6 @@ class AdminActionsTest(TestCase):
         )
         self.assertNotContains(response, "Because")
 
-    @override_settings(
-        AUTHENTICATION_BACKENDS=[
-            "admin_views.custombackend.ObjectLevelPermissionBackend",
-        ]
-    )
     def test_delete_action_unregistered_model_no_permission(self):
         """
         The delete action displays models not registered in the admin in the
@@ -272,11 +267,6 @@ class AdminActionsTest(TestCase):
         self.client.post(reverse("admin:admin_views_persona_changelist"), confirm_data)
         self.assertEqual(Persona.objects.count(), 1)
 
-    @override_settings(
-        AUTHENTICATION_BACKENDS=[
-            "admin_views.custombackend.ObjectLevelPermissionBackend",
-        ]
-    )
     def test_delete_action_unregistered_proxy_model_with_permission(self):
         """
         The delete action succeeds when the user has the required permissions
