@@ -8,12 +8,15 @@ without a solution.
 
 .. _trivial-change:
 
-Typo fixes and trivial documentation changes
-============================================
+Trivial changes
+===============
 
-If you've contributed to Django before and just want to fix a really trivial
-issue, for example changing a word in the documentation, the preferred way to
-provide the patch is using GitHub pull requests without a Trac ticket. If you
+We consider typo fixes, minor wording changes, and comment-only corrections to
+be trivial changes. These changes alone don't warrant adding your name to the
+:source:`AUTHORS` file.
+
+If you've contributed to Django before and wish to fix a trivial issue, the
+preferred way is to submit a GitHub pull request without a Trac ticket. If you
 haven't contributed before, a minor rewording or pure typo fix is generally not
 suitable as a first contribution, but may be included as part of a more
 substantial patch for an accepted ticket.
@@ -467,7 +470,8 @@ All tickets
 
 * Is the pull request a single squashed commit with a message that follows our
   :ref:`commit message format <committing-guidelines>`?
-* Are you the patch author and a new contributor? Please add yourself to the
+* Are you the patch author and a new contributor? If your contribution goes
+  beyond :ref:`trivial changes <trivial-change>`, please add yourself to the
   :source:`AUTHORS` file. At your option, submit a
   `Contributor License Agreement`_.
 * Does this have an accepted ticket on Trac? All contributions require a ticket
