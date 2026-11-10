@@ -4,8 +4,9 @@ Error checking functions for GEOS ctypes prototype functions.
 
 from ctypes import c_void_p, string_at
 
-from django.contrib.gis.geos.error import GEOSException
+from django.contrib.gis.geos.error import GEOSException, GEOSLibraryError
 from django.contrib.gis.geos.libgeos import GEOSFuncFactory
+from django.contrib.gis.geos.prototypes.threadsafe import thread_context
 
 # Getting the `free` routine used to free the memory allocated for
 # string pointers returned by GEOS.
@@ -16,6 +17,12 @@ free.argtypes = [c_void_p]
 def last_arg_byref(args):
     "Return the last C argument's value by reference."
     return args[-1]._obj.value
+
+
+def _get_geos_error():
+    message = thread_context.last_error
+    thread_context.last_error = None
+    return GEOSLibraryError(message) if message else None
 
 
 def check_dbl(result, func, cargs):
@@ -35,7 +42,7 @@ def check_geom(result, func, cargs):
         raise GEOSException(
             'Error encountered checking Geometry returned from GEOS C function "%s".'
             % func.__name__
-        )
+        ) from _get_geos_error()
     return result
 
 
@@ -44,7 +51,7 @@ def check_minus_one(result, func, cargs):
     if result == -1:
         raise GEOSException(
             'Error encountered in GEOS C function "%s".' % func.__name__
-        )
+        ) from _get_geos_error()
     else:
         return result
 
@@ -58,7 +65,7 @@ def check_predicate(result, func, cargs):
     else:
         raise GEOSException(
             'Error encountered on GEOS C predicate function "%s".' % func.__name__
-        )
+        ) from _get_geos_error()
 
 
 def check_sized_string(result, func, cargs):
@@ -70,7 +77,7 @@ def check_sized_string(result, func, cargs):
     if not result:
         raise GEOSException(
             'Invalid string pointer returned by GEOS C function "%s"' % func.__name__
-        )
+        ) from _get_geos_error()
     # A c_size_t object is passed in by reference for the second
     # argument on these routines, and its needed to determine the
     # correct size.
@@ -90,7 +97,7 @@ def check_string(result, func, cargs):
         raise GEOSException(
             'Error encountered checking string return value in GEOS C function "%s".'
             % func.__name__
-        )
+        ) from _get_geos_error()
     # Getting the string value at the pointer address.
     s = string_at(result)
     # Freeing the memory allocated within GEOS
