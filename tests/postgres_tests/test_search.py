@@ -6,8 +6,10 @@ All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
 
+from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import F, Value
+from django.db.models.functions import Cast, Coalesce
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import Character, Line, LineSavedSearch, Scene
@@ -20,6 +22,7 @@ try:
         SearchQuery,
         SearchRank,
         SearchVector,
+        SearchVectorField,
         quote_lexeme,
     )
 except ImportError:
@@ -368,11 +371,114 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
             searched, [self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck]
         )
 
-    def test_vector_combined_mismatch(self):
-        msg = (
-            "SearchVector can only be combined with other SearchVector "
-            "instances, got NoneType."
+    def test_vector_add_field(self):
+        Line.objects.update(dialogue_search_vector=SearchVector("dialogue", weight="A"))
+        expressions = [
+            F("dialogue_search_vector"),
+            Cast("dialogue_search_vector", SearchVectorField()),
+            Coalesce("dialogue_search_vector", SearchVector(Value(""))),
+        ]
+        for expression in expressions:
+            with self.subTest(expression=expression):
+                queryset = Line.objects.annotate(
+                    search=SearchVector("character__name", weight="B") + expression,
+                )
+                self.assertSequenceEqual(
+                    queryset.filter(search="elbows minstrel"), [self.verse1]
+                )
+                self.assertSequenceEqual(
+                    queryset.filter(search=SearchQuery("witch:A", search_type="raw")),
+                    [self.crowd],
+                )
+                self.assertSequenceEqual(
+                    queryset.filter(search=SearchQuery("witch:B", search_type="raw")),
+                    [self.witch],
+                )
+                self.assertSequenceEqual(
+                    queryset.filter(
+                        search=SearchQuery("kneecaps split", search_type="phrase")
+                    ),
+                    [self.verse1],
+                )
+
+    def test_vector_add_field_multi(self):
+        Line.objects.update(dialogue_search_vector=SearchVector("dialogue"))
+        queryset = Line.objects.annotate(
+            search=(
+                SearchVector("scene__setting")
+                + SearchVector("character__name")
+                + F("dialogue_search_vector")
+                + SearchVector(Value("extra"))
+            ),
         )
+        self.assertSequenceEqual(
+            queryset.filter(search="elbows minstrel forest extra"), [self.verse1]
+        )
+
+    def test_vector_add_annotation(self):
+        queryset = Line.objects.annotate(
+            dialogue_vector=SearchVector("dialogue"),
+            search=SearchVector("character__name") + F("dialogue_vector"),
+        )
+        self.assertSequenceEqual(
+            queryset.filter(search="elbows minstrel"), [self.verse1]
+        )
+
+    def test_vector_add_field_config(self):
+        Line.objects.update(
+            dialogue_search_vector=SearchVector("dialogue", config="french")
+        )
+        queryset = Line.objects.annotate(
+            search=(
+                SearchVector("character__name", config="french")
+                + F("dialogue_search_vector")
+            ),
+        )
+        self.assertSequenceEqual(queryset.filter(search="cadeaux"), [self.french])
+
+    def test_vector_add_field_update(self):
+        Line.objects.update(dialogue_search_vector=SearchVector("dialogue"))
+        Line.objects.update(
+            dialogue_search_vector=(
+                SearchVector(Value("extra")) + F("dialogue_search_vector")
+            ),
+        )
+        self.assertSequenceEqual(
+            Line.objects.filter(dialogue_search_vector="elbows extra"), [self.verse1]
+        )
+
+    def test_vector_add_null_field(self):
+        queryset = Line.objects.annotate(
+            search=SearchVector("character__name") + F("dialogue_search_vector"),
+        )
+        self.assertSequenceEqual(queryset.filter(search="Minstrel"), [])
+        queryset = Line.objects.annotate(
+            search=SearchVector("character__name")
+            + Coalesce("dialogue_search_vector", SearchVector(Value(""))),
+        )
+        self.assertCountEqual(queryset.filter(search="Minstrel"), self.verses)
+
+    def test_vector_add_incompatible_expression(self):
+        tests = [
+            (Value(1), "IntegerField"),
+            (F("id"), "BigAutoField"),
+            (F("dialogue"), "TextField"),
+        ]
+        for expression, field_type in tests:
+            with self.subTest(expression=expression):
+                msg = (
+                    "Cannot infer type of '||' expression involving these types: "
+                    f"SearchVectorField, {field_type}. You must set output_field."
+                )
+                with self.assertRaisesMessage(FieldError, msg):
+                    list(
+                        Line.objects.annotate(
+                            search=SearchVector("character__name") + expression,
+                        ).values("search")
+                    )
+
+    def test_vector_combined_mismatch(self):
+        msg = "SearchVector can only be combined with other expressions, got NoneType."
         with self.assertRaisesMessage(TypeError, msg):
             Line.objects.filter(dialogue__search=None + SearchVector("character__name"))
 
