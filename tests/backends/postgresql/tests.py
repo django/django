@@ -1,5 +1,6 @@
 import copy
 import unittest
+import uuid
 from io import StringIO
 from unittest import mock
 
@@ -310,9 +311,34 @@ class Tests(TestCase):
 
     @unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
     def test_connect_pool_with_assume_role(self):
-        with connection.cursor() as cursor:
+        role = f"DjangoMixedCase-{uuid.uuid4().hex}"
+        quote_name = connection.ops.quote_name
+
+        setup_connection = no_pool_connection(alias="default_pool_setup")
+        self.addCleanup(setup_connection.close)
+        setup_connection.set_autocommit(True)
+
+        with setup_connection.cursor() as cursor:
             cursor.execute("SELECT session_user")
-            role = cursor.fetchone()[0]
+            session_user = cursor.fetchone()[0]
+            try:
+                cursor.execute(f"CREATE ROLE {quote_name(role)}")
+            except errors.InsufficientPrivilege:
+                self.skipTest("Database user cannot create roles.")
+
+        def drop_role():
+            with setup_connection.cursor() as cursor:
+                cursor.execute(f"DROP ROLE IF EXISTS {quote_name(role)}")
+
+        self.addCleanup(drop_role)
+
+        try:
+            with setup_connection.cursor() as cursor:
+                cursor.execute(
+                    f"GRANT {quote_name(role)} TO {quote_name(session_user)}"
+                )
+        except errors.InsufficientPrivilege:
+            self.skipTest("Database user cannot grant roles.")
 
         new_connection = no_pool_connection(alias="default_pool")
         new_connection.settings_dict["CONN_MAX_AGE"] = 0
