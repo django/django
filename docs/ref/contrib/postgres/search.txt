@@ -360,6 +360,31 @@ if it were an annotated ``SearchVector``:
     >>> Entry.objects.filter(search_vector="cheese")
     <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]>
 
+A ``SearchVector`` can also be combined with an expression whose
+``output_field`` is a ``SearchVectorField``, such as an :class:`F()
+<django.db.models.F>` reference to a stored vector:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F
+    >>> Entry.objects.annotate(
+    ...     search=SearchVector("blog__tagline") + F("search_vector"),
+    ... ).filter(search="Cheese")
+    <QuerySet [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]>
+
+This uses the stored vector directly, preserving its weights and positions.
+If the stored vector is ``NULL``, the combined vector is also ``NULL``. Use
+:class:`~django.db.models.functions.Coalesce` to substitute an empty vector
+when needed:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import Value
+    >>> from django.db.models.functions import Coalesce
+    >>> vector = SearchVector("blog__tagline") + Coalesce(
+    ...     "search_vector", SearchVector(Value(""))
+    ... )
+
 .. _PostgreSQL documentation: https://www.postgresql.org/docs/current/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
 
 Using ``GeneratedField``
