@@ -2221,6 +2221,19 @@ class ModelMultipleChoiceFieldTests(TestCase):
             ],
         )
 
+    def test_model_multiple_choice_sliced_queryset(self):
+        f = forms.ModelMultipleChoiceField(
+            Category.objects.order_by("pk")[:2], required=False
+        )
+        self.assertEqual(
+            list(f.choices),
+            [(self.c1.pk, "Entertainment"), (self.c2.pk, "It's a test")],
+        )
+        self.assertIsInstance(f.clean([]), EmptyQuerySet)
+        msg = "ModelMultipleChoiceField does not support sliced querysets."
+        with self.assertRaisesMessage(TypeError, msg):
+            f.clean([self.c1.pk])
+
     def test_model_multiple_choice_number_of_queries(self):
         """
         ModelMultipleChoiceField does O(1) queries instead of O(n) (#10156).

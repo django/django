@@ -1395,7 +1395,9 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
 
         A ``QuerySet`` of model objects from which the choices for the field
         are derived and which is used to validate the user's selection. It's
-        evaluated when the form is rendered.
+        evaluated when the form is rendered. :ref:`Sliced querysets
+        <limiting-querysets>` aren't supported since they can't be filtered to
+        validate the user's selection.
 
     ``ModelChoiceField`` also takes several optional arguments:
 
