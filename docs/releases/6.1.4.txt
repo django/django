@@ -9,4 +9,6 @@ Django 6.1.4 fixes several bugs in 6.1.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.2 where ``QuerySet.count()`` and
+  ``QuerySet.aggregate()`` could crash when ``values()`` selected only
+  aggregate annotations (:ticket:`37473`).
