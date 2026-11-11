@@ -9,4 +9,6 @@ Django 6.1.4 fixes several bugs in 6.1.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 5.2 that caused a crash when evaluating a
+  combined query using ``values()`` and ordered by a non-selected field after
+  evaluating a clone of the same queryset (:ticket:`37474`).
