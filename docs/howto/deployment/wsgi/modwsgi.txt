@@ -21,6 +21,32 @@ configuration documentation`_.
 .. _official mod_wsgi documentation: https://modwsgi.readthedocs.io/
 .. _installation and configuration documentation: https://modwsgi.readthedocs.io/en/develop/installation.html
 
+Installing ``mod_wsgi`` using pip
+=================================
+
+The recommended way to install and use ``mod_wsgi`` is to install it as a
+Python package into your Python installation or virtual environment using pip.
+This installs the ``mod_wsgi-express`` command-line tool, which makes it easy
+to start a minimal working web server without needing to configure Apache
+manually.
+
+.. code-block:: shell
+
+    python -m pip install mod_wsgi
+
+To start a minimal working example, run ``mod_wsgi-express`` and pass it the
+path to your project's WSGI file:
+
+.. code-block:: shell
+
+    mod_wsgi-express start-server mysite/wsgi.py
+
+This will start an Apache web server running on port 8000. You can now visit
+your site at ``http://localhost:8000/``.
+
+For advanced usage, such as changing the port or running in daemon mode, see
+the `official mod_wsgi documentation`_.
+
 Basic configuration
 ===================
 
