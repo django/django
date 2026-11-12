@@ -126,11 +126,10 @@ Understanding and using the ``salt`` argument
 ---------------------------------------------
 
 For each purpose that you use signing, you should use a unique ``salt``
-argument, a different secret or both. If no secret is passed as the first
-argument, it defaults to your :setting:`SECRET_KEY`.
+argument. The signer still uses your :setting:`SECRET_KEY` by default.
 
 Using a salt will seed the signing hash function with both the salt and
-your secret:
+the key:
 
 .. code-block:: pycon
 
@@ -181,7 +180,7 @@ There are multiple issues with this:
 2. It lacks context. We are signing the string ``"20"`` which is ambiguous in
    meaning. You might also sell car insurance, and an attacker would be able to
    take this signed value that was intended for home insurance and re-use it to
-   get cheap car insurance. Your application should evaluate that the signed
+   get cheap car insurance. Your application should check that the signed
    value is limited to the particular purpose.
 
 3. There is no scoping to the user. The user could take this signed value and
@@ -195,9 +194,9 @@ The answers to these problems are:
 - Use a more specific salt.
 
 - Instead of signing simple values without context, sign complex objects that
-  express more completely what you want to sign - “we offer the user with email
+  express more completely what you want to sign - "we offer the user with email
   address ``user@example.com`` home insurance for 123 Main St, for the price of
-  20 dollars a month, valid until 2027-05-01”:
+  20 dollars a month, valid until 2027-05-01":
 
   .. code-block:: pycon
 
