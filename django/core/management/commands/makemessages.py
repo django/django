@@ -2,7 +2,9 @@ import glob
 import locale
 import os
 import re
+import shutil
 import sys
+import tempfile
 from functools import cached_property, total_ordering
 from itertools import dropwhile
 from pathlib import Path
@@ -196,6 +198,41 @@ def write_pot_file(potfile, msgs):
         fp.write(msgs)
 
 
+def _parse_msgids(content):
+    """
+    Return the set of msgid values in a .po/.pot file, joining multi-line
+    string literals. Used only to summarise what a dry run would change.
+    """
+    msgids = set()
+    current = None
+    for line in content.splitlines():
+        match = re.match(r'msgid\s+"(.*)"\s*$', line)
+        if match:
+            if current is not None:
+                msgids.add(current)
+            current = match.group(1)
+            continue
+        match = re.match(r'^"(.*)"\s*$', line)
+        if match and current is not None:
+            current += match.group(1)
+            continue
+        if current is not None:
+            msgids.add(current)
+            current = None
+    if current is not None:
+        msgids.add(current)
+    msgids.discard("")
+    return msgids
+
+
+def _strip_pot_creation_date(content):
+    """Remove the POT-Creation-Date header line so a dry-run comparison
+    is not fooled by the timestamp msgmerge rewrites on every run."""
+    return re.sub(
+        r'^"POT-Creation-Date:.*\n', "", content, flags=re.MULTILINE
+    )
+
+
 class Command(BaseCommand):
     help = (
         "Runs over the entire source tree of the current directory and pulls out all "
@@ -314,6 +351,15 @@ class Command(BaseCommand):
             action="store_true",
             help="Keep .pot file after making messages. Useful when debugging.",
         )
+        parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help=(
+                "Report which message files would change without writing "
+                "anything. Exits with a non-zero status if any catalog "
+                "would be created or updated."
+            ),
+        )
 
     def handle(self, *args, **options):
         locale = options["locale"]
@@ -349,6 +395,8 @@ class Command(BaseCommand):
 
         self.no_obsolete = options["no_obsolete"]
         self.keep_pot = options["keep_pot"]
+        self.dry_run = options["dry_run"]
+        self.dry_run_changed = []
 
         if self.domain not in ("django", "djangojs"):
             raise CommandError(
@@ -475,6 +523,13 @@ class Command(BaseCommand):
         finally:
             if not self.keep_pot:
                 self.remove_potfiles()
+
+        if self.dry_run and self.dry_run_changed:
+            raise CommandError(
+                "Translation catalogs would change for locale(s): %s. "
+                "Run makemessages without --dry-run to update them."
+                % ", ".join(self.dry_run_changed)
+            )
 
     @cached_property
     def gettext_version(self):
@@ -720,8 +775,13 @@ class Command(BaseCommand):
         Use msgmerge and msgattrib GNU gettext utilities.
         """
         basedir = os.path.join(os.path.dirname(potfile), locale, "LC_MESSAGES")
-        os.makedirs(basedir, exist_ok=True)
         pofile = os.path.join(basedir, "%s.po" % self.domain)
+
+        if getattr(self, "dry_run", False):
+            self._dry_run_po_file(potfile, locale, pofile)
+            return
+
+        os.makedirs(basedir, exist_ok=True)
 
         if os.path.exists(pofile):
             args = ["msgmerge", *self.msgmerge_options, pofile, potfile]
@@ -756,6 +816,79 @@ class Command(BaseCommand):
                     )
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
+
+    def _dry_run_po_file(self, potfile, locale, pofile):
+        """
+        Report what `write_po_file` would change for `locale` without
+        writing anything. Appends `locale` to `self.dry_run_changed`
+        when the catalog would be created or updated.
+        """
+        if not hasattr(self, "dry_run_changed"):
+            self.dry_run_changed = []
+        if os.path.exists(pofile):
+            # Run the exact merge `write_po_file` would run, but on a
+            # throwaway copy of the .po file: `msgmerge -o` formats its
+            # output differently from `msgmerge --update` (it inserts a
+            # blank line after the header entry), so comparing `-o` output
+            # to the file on disk would report a change on every run.
+            old_msgs = normalize_eols(Path(pofile).read_text(encoding="utf-8"))
+            with tempfile.TemporaryDirectory() as tmpdir:
+                tmp_po = os.path.join(tmpdir, "%s.po" % self.domain)
+                shutil.copyfile(pofile, tmp_po)
+                args = ["msgmerge", *self.msgmerge_options, tmp_po, potfile]
+                _, errors, status = popen_wrapper(args)
+                if errors:
+                    if status != STATUS_OK:
+                        raise CommandError(
+                            "errors happened while running msgmerge\n%s"
+                            % errors
+                        )
+                    elif self.verbosity > 0:
+                        self.stdout.write(errors)
+                merged_msgs = normalize_eols(
+                    Path(tmp_po).read_text(encoding="utf-8")
+                )
+                merged_msgs = merged_msgs.replace(
+                    "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n"
+                    % self.domain,
+                    "",
+                )
+                if self.no_obsolete:
+                    args = [
+                        "msgattrib",
+                        *self.msgattrib_options,
+                        "-o",
+                        tmp_po,
+                        tmp_po,
+                    ]
+                    _, errors, status = popen_wrapper(args)
+                    if errors:
+                        if status != STATUS_OK:
+                            raise CommandError(
+                                "errors happened while running msgattrib\n%s"
+                                % errors
+                            )
+                        elif self.verbosity > 0:
+                            self.stdout.write(errors)
+                    merged_msgs = normalize_eols(
+                        Path(tmp_po).read_text(encoding="utf-8")
+                    )
+            # msgmerge rewrites POT-Creation-Date on every run; ignore it
+            # or a dry run would report a change even when nothing did.
+            if _strip_pot_creation_date(
+                merged_msgs
+            ) == _strip_pot_creation_date(old_msgs):
+                self.stdout.write("locale %s is up to date" % locale)
+                return
+            added = _parse_msgids(merged_msgs) - _parse_msgids(old_msgs)
+            removed = _parse_msgids(old_msgs) - _parse_msgids(merged_msgs)
+            self.stdout.write(
+                "locale %s would change: %d new, %d removed"
+                % (locale, len(added), len(removed))
+            )
+        else:
+            self.stdout.write("locale %s would create %s" % (locale, pofile))
+        self.dry_run_changed.append(locale)
 
     def copy_plural_forms(self, msgs, locale):
         """

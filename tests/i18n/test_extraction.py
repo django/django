@@ -601,6 +601,40 @@ class BasicExtractorTests(ExtractorTests):
             po_contents = fp.read()
             self.assertMsgStr("Größe", po_contents)
 
+    def test_makemessages_dry_run_up_to_date(self):
+        """--dry-run writes nothing and exits cleanly (#26803)."""
+        output, po_contents = self._run_makemessages()
+        po_mtime = os.path.getmtime(self.PO_FILE)
+        out = StringIO()
+        management.call_command(
+            "makemessages", locale=[LOCALE], verbosity=0, stdout=out,
+            dry_run=True,
+        )
+        self.assertIn("is up to date", out.getvalue())
+        self.assertEqual(po_mtime, os.path.getmtime(self.PO_FILE))
+        with open(self.PO_FILE) as fp:
+            self.assertEqual(po_contents, fp.read())
+
+    def test_makemessages_dry_run_would_change(self):
+        """--dry-run reports a change and exits non-zero (#26803)."""
+        output, po_contents = self._run_makemessages()
+        # Add a new translatable string so the catalog would change.
+        with open(os.path.join(self.test_dir, "__init__.py"), "a") as fp:
+            fp.write('\ndummy_dry_run = _("New dry-run string")\n')
+        po_mtime = os.path.getmtime(self.PO_FILE)
+        out = StringIO()
+        with self.assertRaisesMessage(
+            CommandError, "would change for locale(s): de"
+        ):
+            management.call_command(
+                "makemessages", locale=[LOCALE], verbosity=0, stdout=out,
+                dry_run=True,
+            )
+        self.assertIn("would change", out.getvalue())
+        self.assertEqual(po_mtime, os.path.getmtime(self.PO_FILE))
+        with open(self.PO_FILE) as fp:
+            self.assertEqual(po_contents, fp.read())
+
     def test_pot_charset_header_is_utf8(self):
         """Content-Type: ... charset=CHARSET is replaced with charset=UTF-8"""
         msgs = (
