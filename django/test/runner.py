@@ -987,6 +987,22 @@ class DiscoverRunner:
             with self.load_with_patterns():
                 tests = self.test_loader.loadTestsFromName(label)
             if tests.countTestCases():
+                test_cases = list(iter_test_cases(tests))
+                get_test_variations = getattr(
+                    type(test_cases[0]), "get_test_variations", None
+                )
+                if get_test_variations is not None:
+                    # A module label may already contain the browser-specific
+                    # subclasses created by PlaywrightTestCaseMeta. Only expand
+                    # browser variations when the loaded suite contains a single
+                    # original test class; otherwise, preserve the already
+                    # discovered browser variants.
+                    if len({type(test_case) for test_case in test_cases}) == 1:
+                        tests = self.test_suite(
+                            test_class(test._testMethodName)
+                            for test in test_cases
+                            for test_class in get_test_variations()
+                        )
                 return tests
         # Try discovery if "label" is a package or directory.
         is_importable, is_package = try_importing(label)
