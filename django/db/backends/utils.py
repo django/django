@@ -199,9 +199,11 @@ def split_tzname_delta(tzname):
     for sign in ["+", "-"]:
         if sign in tzname:
             name, offset = tzname.rsplit(sign, 1)
-            if offset and parse_time(offset):
+            if offset and (parsed := parse_time(offset)):
                 if ":" not in offset:
-                    offset = f"{offset}:00"
+                    # Offsets without a colon may be "HH" or "HHMM", e.g. the
+                    # name of get_fixed_timezone(-300) is "-0500".
+                    offset = parsed.strftime("%H:%M")
                 return name, sign, offset
     return tzname, None, None
 
