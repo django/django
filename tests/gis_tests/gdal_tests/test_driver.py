@@ -60,6 +60,17 @@ class DriverTest(unittest.TestCase):
             dr = Driver(alias)
             self.assertEqual(full_name, str(dr))
 
+    def test_from_index(self):
+        # These indices vary by build.
+        self.assertTrue(
+            any(Driver(i).name == "MEM" for i in range(Driver.driver_count()))
+        )
+
+    def test_type_error(self):
+        msg = "Unrecognized input type for GDAL/OGR Driver: <class 'list'>"
+        with self.assertRaisesRegex(GDALException, msg):
+            Driver([])
+
     @mock.patch("django.contrib.gis.gdal.driver.capi.get_driver_count")
     @mock.patch("django.contrib.gis.gdal.driver.capi.register_all")
     def test_registered(self, reg, count):

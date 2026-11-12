@@ -9,6 +9,7 @@ from django.contrib.gis.db.models.lookups import (
     RasterBandTransform,
 )
 from django.contrib.gis.gdal import GDALRaster
+from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
@@ -159,6 +160,15 @@ class RasterFieldTest(TransactionTestCase):
         ]
         for val, exp in zip(r.rast.geotransform, expected):
             self.assertAlmostEqual(exp, val)
+
+    def test_instantiate_raster_driver_from_index(self):
+        rast = json.loads(JSON_RASTER)
+        # Update driver to the index for MEM (varies by build).
+        rast["driver"] = next(
+            i for i in range(Driver.driver_count()) if Driver(i).name == "MEM"
+        )
+        r = RasterModel.objects.create(rast=rast)
+        self.assertEqual(r.rast.driver.name, "MEM")
 
     def test_verbose_name_arg(self):
         """
