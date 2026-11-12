@@ -314,8 +314,8 @@ Templates can live anywhere on your filesystem that Django can access. (Django
 runs as whatever user your server runs.) However, keeping your templates within
 the project is a good convention to follow.
 
-Open your settings file (:file:`mysite/settings.py`, remember) and add a
-:setting:`DIRS <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting:
+Open your settings file (:file:`mysite/settings.py`, remember) and make note
+of the :setting:`DIRS <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting:
 
 .. code-block:: python
     :caption: ``mysite/settings.py``
