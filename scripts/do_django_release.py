@@ -155,8 +155,10 @@ def main():
     assert (
         pgp_key_url
     ), "Missing PGP_KEY_URL: Set this env var to your PGP public key URL."
-    assert dest_folder and os.path.exists(
-        dest_folder
+    assert (
+        (dest_folder := os.getenv("DEST_FOLDER"))
+        and (dest_folder := os.path.expanduser(dest_folder))
+        and os.path.exists(dest_folder)
     ), "Missing DEST_FOLDER: Set this env var to the path to place the artifacts."
 
     # Ensure the working directory is clean.
