@@ -607,7 +607,10 @@ class BasicExtractorTests(ExtractorTests):
         po_mtime = os.path.getmtime(self.PO_FILE)
         out = StringIO()
         management.call_command(
-            "makemessages", locale=[LOCALE], verbosity=0, stdout=out,
+            "makemessages",
+            locale=[LOCALE],
+            verbosity=0,
+            stdout=out,
             dry_run=True,
         )
         self.assertIn("is up to date", out.getvalue())
@@ -623,11 +626,12 @@ class BasicExtractorTests(ExtractorTests):
             fp.write('\ndummy_dry_run = _("New dry-run string")\n')
         po_mtime = os.path.getmtime(self.PO_FILE)
         out = StringIO()
-        with self.assertRaisesMessage(
-            CommandError, "would change for locale(s): de"
-        ):
+        with self.assertRaisesMessage(CommandError, "would change for locale(s): de"):
             management.call_command(
-                "makemessages", locale=[LOCALE], verbosity=0, stdout=out,
+                "makemessages",
+                locale=[LOCALE],
+                verbosity=0,
+                stdout=out,
                 dry_run=True,
             )
         self.assertIn("would change", out.getvalue())

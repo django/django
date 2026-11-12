@@ -228,9 +228,7 @@ def _parse_msgids(content):
 def _strip_pot_creation_date(content):
     """Remove the POT-Creation-Date header line so a dry-run comparison
     is not fooled by the timestamp msgmerge rewrites on every run."""
-    return re.sub(
-        r'^"POT-Creation-Date:.*\n', "", content, flags=re.MULTILINE
-    )
+    return re.sub(r'^"POT-Creation-Date:.*\n', "", content, flags=re.MULTILINE)
 
 
 class Command(BaseCommand):
@@ -840,17 +838,13 @@ class Command(BaseCommand):
                 if errors:
                     if status != STATUS_OK:
                         raise CommandError(
-                            "errors happened while running msgmerge\n%s"
-                            % errors
+                            "errors happened while running msgmerge\n%s" % errors
                         )
                     elif self.verbosity > 0:
                         self.stdout.write(errors)
-                merged_msgs = normalize_eols(
-                    Path(tmp_po).read_text(encoding="utf-8")
-                )
+                merged_msgs = normalize_eols(Path(tmp_po).read_text(encoding="utf-8"))
                 merged_msgs = merged_msgs.replace(
-                    "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n"
-                    % self.domain,
+                    "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % self.domain,
                     "",
                 )
                 if self.no_obsolete:
@@ -865,8 +859,7 @@ class Command(BaseCommand):
                     if errors:
                         if status != STATUS_OK:
                             raise CommandError(
-                                "errors happened while running msgattrib\n%s"
-                                % errors
+                                "errors happened while running msgattrib\n%s" % errors
                             )
                         elif self.verbosity > 0:
                             self.stdout.write(errors)
@@ -875,9 +868,9 @@ class Command(BaseCommand):
                     )
             # msgmerge rewrites POT-Creation-Date on every run; ignore it
             # or a dry run would report a change even when nothing did.
-            if _strip_pot_creation_date(
-                merged_msgs
-            ) == _strip_pot_creation_date(old_msgs):
+            if _strip_pot_creation_date(merged_msgs) == _strip_pot_creation_date(
+                old_msgs
+            ):
                 self.stdout.write("locale %s is up to date" % locale)
                 return
             added = _parse_msgids(merged_msgs) - _parse_msgids(old_msgs)
