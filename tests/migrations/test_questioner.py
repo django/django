@@ -3,6 +3,7 @@ from io import StringIO
 from unittest import mock
 
 from django.core.management.base import OutputWrapper
+from django.db import models
 from django.db.migrations.questioner import (
     InteractiveMigrationQuestioner,
     MigrationQuestioner,
@@ -10,6 +11,7 @@ from django.db.migrations.questioner import (
 from django.db.models import NOT_PROVIDED
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
+from django.utils import timezone
 
 
 class QuestionerTests(SimpleTestCase):
@@ -34,6 +36,18 @@ class QuestionerTests(SimpleTestCase):
         )
         question = questioner.ask_not_null_alteration("field_name", "model_name")
         self.assertEqual(question, NOT_PROVIDED)
+
+    @mock.patch("builtins.input", side_effect=["1", "0", "exit"])
+    def test_ask_not_null_alteration_invalid_default(self, mock):
+        prompt = OutputWrapper(StringIO())
+        questioner = InteractiveMigrationQuestioner(prompt_output=prompt)
+        with self.assertRaises(SystemExit):
+            questioner.ask_not_null_alteration(
+                "field_name", "model_name", field=models.DateTimeField()
+            )
+        self.assertIn(
+            "'0' is not a valid value for this DateTimeField:", prompt.getvalue()
+        )
 
 
 class QuestionerHelperMethodsTests(SimpleTestCase):
@@ -82,6 +96,49 @@ class QuestionerHelperMethodsTests(SimpleTestCase):
             "AttributeError: module 'datetime' has no attribute 'dat'",
             self.prompt.getvalue(),
         )
+
+    @mock.patch("builtins.input", side_effect=["0", "exit"])
+    def test_questioner_default_invalid_for_field_type_error(self, mock_input):
+        with self.assertRaises(SystemExit):
+            self.questioner._ask_default(field=models.DateTimeField())
+        # The TypeError message varies between Python versions.
+        self.assertIn(
+            "'0' is not a valid value for this DateTimeField:\n  fromisoformat",
+            self.prompt.getvalue(),
+        )
+
+    @mock.patch("builtins.input", side_effect=["'abc'", "exit"])
+    def test_questioner_default_invalid_for_field_validation_error(self, mock_input):
+        with self.assertRaises(SystemExit):
+            self.questioner._ask_default(field=models.IntegerField())
+        self.assertIn(
+            "\"'abc'\" is not a valid value for this IntegerField:\n"
+            "  “abc” value must be an integer.",
+            self.prompt.getvalue(),
+        )
+
+    @mock.patch("builtins.input", side_effect=["0", "datetime.datetime(2000, 1, 1)"])
+    def test_questioner_default_invalid_for_field_then_valid(self, mock_input):
+        value = self.questioner._ask_default(field=models.DateTimeField())
+        self.assertEqual(value, datetime.datetime(2000, 1, 1))
+        self.assertIn(
+            "'0' is not a valid value for this DateTimeField:",
+            self.prompt.getvalue(),
+        )
+
+    @mock.patch("builtins.input", return_value="")
+    def test_questioner_default_callable_not_validated(self, mock_input):
+        value = self.questioner._ask_default(
+            default="timezone.now", field=models.DateTimeField()
+        )
+        self.assertIs(value, timezone.now)
+
+    @mock.patch("builtins.input", return_value="1")
+    def test_questioner_default_relation_not_validated(self, mock_input):
+        # The related model of an unbound field can't be resolved.
+        field = models.ForeignKey("migrations.Author", models.CASCADE)
+        value = self.questioner._ask_default(field=field)
+        self.assertEqual(value, 1)
 
     @mock.patch("builtins.input", side_effect=[KeyboardInterrupt()])
     def test_questioner_no_default_keyboard_interrupt(self, mock_input):
