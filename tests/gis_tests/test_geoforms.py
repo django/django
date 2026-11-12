@@ -1,4 +1,6 @@
+import json
 import re
+from unittest import mock
 
 from django.contrib.gis import forms
 from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
@@ -96,6 +98,25 @@ class GeometryFieldTest(SimpleTestCase):
                 self.assertRaisesMessage(SuspiciousOperation, msg),
             ):
                 fld.clean(payload)
+
+    def test_geojson_deeply_nested(self):
+        payload = '{"type": "Point", "coordinates": [[[]]]}'
+        fld = forms.GeometryField()
+        with (
+            mock.patch.object(json, "loads", side_effect=RecursionError),
+            self.assertRaisesMessage(ValidationError, "Invalid geometry value."),
+        ):
+            fld.clean(payload)
+
+    def test_geojson_deeply_nested_text_input(self):
+        # Test widget without deserialize() method (ticket-37492).
+        payload = '{"type": "Point", "coordinates": [[[]]]}'
+        fld = forms.GeometryField(widget=forms.TextInput)
+        with (
+            mock.patch.object(json, "loads", side_effect=RecursionError),
+            self.assertRaisesMessage(ValidationError, "Invalid geometry value."),
+        ):
+            fld.clean(payload)
 
     def test_geojson_comments(self):
         """GDAL allows comments in JSON; GeoDjango does not."""

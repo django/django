@@ -13,3 +13,7 @@ Bugfixes
   detect mixed ``on_delete`` variants for models with a
   :class:`~django.contrib.contenttypes.fields.GenericRelation`
   (:ticket:`37471`).
+
+* Fixed a regression in Django 6.1.3 where a deeply nested GeoJSON value
+  crashed :class:`~django.contrib.gis.forms.GeometryField` form field instead
+  of raising a ``ValidationError`` (:ticket:`37491`).
