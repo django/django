@@ -208,8 +208,10 @@ It is possible to specify a custom template for rendering a list filter::
     class FilterWithCustomTemplate(admin.SimpleListFilter):
         template = "custom_template.html"
 
-See the default template provided by Django (``admin/filter.html``) for a
-concrete example.
+See the default template provided by Django
+(:sourcefile:`admin/filter.html
+<django/contrib/admin/templates/admin/filter.html>`)
+for a concrete example.
 
 .. _facet-filters:
 
