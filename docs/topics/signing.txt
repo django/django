@@ -191,8 +191,6 @@ The answers to these problems are:
 - Use :class:`~TimestampSigner`, or build an expiration timestamp into the
   value that you sign, which you check later.
 
-- Use a more specific salt.
-
 - Instead of signing simple values without context, sign complex objects that
   express more completely what you want to sign - "we offer the user with email
   address ``user@example.com`` home insurance for 123 Main St, for the price of
@@ -212,7 +210,7 @@ The answers to these problems are:
       ...     }
       ... )
 
-- Make sure you use or check each part of the value returned after calling
+  Make sure you use or check each part of the value returned after calling
   ``unsign``, rather than assuming it matches what you expect.
 
 - Redesign the workflow to store the values in the database and give the user
