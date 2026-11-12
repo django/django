@@ -168,6 +168,9 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         "dwithin": PostGISOperator(func="ST_DWithin", geography=True, raster=BILATERAL),
     }
 
+    # Aggregates that don't support the order_by argument.
+    disallowed_aggregates_order_by = ()
+
     unsupported_functions = set()
 
     select = "%s" if is_psycopg3 else "%s::bytea"
