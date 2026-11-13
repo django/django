@@ -3020,6 +3020,41 @@ class NegatedExpressionTests(TestCase):
             [("Example Inc.", False), ("Foobar Ltd.", True)],
         )
 
+    def test_filter_empty_condition(self):
+        empty = ExpressionWrapper(Q(pk__in=[]), output_field=BooleanField())
+        self.assertCountEqual(
+            Company.objects.filter(~empty),
+            [self.eu_company, self.non_eu_company],
+        )
+
+    def test_filter_full_condition(self):
+        full = ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField())
+        self.assertSequenceEqual(Company.objects.filter(~full), [])
+
+    def test_values_empty_and_full_conditions(self):
+        empty = ExpressionWrapper(Q(pk__in=[]), output_field=BooleanField())
+        full = ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField())
+        self.assertSequenceEqual(
+            Company.objects.annotate(not_empty=~empty, not_full=~full)
+            .values_list("name", "not_empty", "not_full")
+            .order_by("name"),
+            [("Example Inc.", True, False), ("Foobar Ltd.", True, False)],
+        )
+
+    def test_order_by_full_condition(self):
+        full = ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField())
+        self.assertSequenceEqual(
+            Company.objects.order_by(~full, "name"),
+            [self.eu_company, self.non_eu_company],
+        )
+
+    def test_order_by_empty_condition(self):
+        empty = ExpressionWrapper(Q(pk__in=[]), output_field=BooleanField())
+        self.assertSequenceEqual(
+            Company.objects.order_by(~empty, "-name"),
+            [self.non_eu_company, self.eu_company],
+        )
+
 
 class OrderByTests(SimpleTestCase):
     def test_equal(self):
