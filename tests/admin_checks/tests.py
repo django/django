@@ -530,6 +530,118 @@ class SystemChecksTestCase(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_exclude_in_fields(self):
+        """
+        A field in both 'fields' and 'exclude' is removed from the form but
+        still rendered, which crashes the add and change views (#19710).
+        """
+
+        class ExcludedFieldsAdmin(admin.ModelAdmin):
+            fields = ("name", ("subtitle", "price"))
+            exclude = ("subtitle", "price")
+
+        errors = ExcludedFieldsAdmin(Book, AdminSite()).check()
+        expected = [
+            checks.Error(
+                "The value of 'subtitle' cannot be in both 'fields' and 'exclude'.",
+                obj=ExcludedFieldsAdmin,
+                id="admin.E042",
+            ),
+            checks.Error(
+                "The value of 'price' cannot be in both 'fields' and 'exclude'.",
+                obj=ExcludedFieldsAdmin,
+                id="admin.E042",
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_exclude_in_fieldsets(self):
+        class ExcludedFieldsAdmin(admin.ModelAdmin):
+            fieldsets = [
+                (None, {"fields": ("name",)}),
+                ("Details", {"fields": (("subtitle", "price"),)}),
+            ]
+            exclude = ("price",)
+
+        errors = ExcludedFieldsAdmin(Book, AdminSite()).check()
+        expected = [
+            checks.Error(
+                "The value of 'price' cannot be in both 'fieldsets' and 'exclude'.",
+                obj=ExcludedFieldsAdmin,
+                id="admin.E042",
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_exclude_in_fieldsets_readonly_field(self):
+        """
+        A read-only field is rendered outside the form, so it may be in both
+        'fieldsets' and 'exclude'.
+        """
+
+        class ExcludedFieldsAdmin(admin.ModelAdmin):
+            fieldsets = [(None, {"fields": ("name", "price")})]
+            exclude = ("price",)
+            readonly_fields = ("price",)
+
+        errors = ExcludedFieldsAdmin(Book, AdminSite()).check()
+        self.assertEqual(errors, [])
+
+    def test_exclude_in_fieldsets_declared_form_field(self):
+        """
+        A field declared on the form is always included in it, so it may be in
+        both 'fieldsets' and 'exclude'.
+        """
+
+        class BookForm(forms.ModelForm):
+            price = forms.FloatField()
+
+        class ExcludedFieldsAdmin(admin.ModelAdmin):
+            form = BookForm
+            fieldsets = [(None, {"fields": ("name", "price")})]
+            exclude = ("price",)
+
+        errors = ExcludedFieldsAdmin(Book, AdminSite()).check()
+        self.assertEqual(errors, [])
+
+    def test_exclude_in_fields_invalid_fields(self):
+        """
+        The conflict check is skipped when 'fields' is invalid.
+        """
+
+        class ExcludedFieldsAdmin(admin.ModelAdmin):
+            fields = "name"
+            exclude = ("name",)
+
+        errors = ExcludedFieldsAdmin(Book, AdminSite()).check()
+        expected = [
+            checks.Error(
+                "The value of 'fields' must be a list or tuple.",
+                obj=ExcludedFieldsAdmin,
+                id="admin.E004",
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_exclude_in_fieldsets_of_inline(self):
+        class SongInline(admin.StackedInline):
+            model = Song
+            fieldsets = [(None, {"fields": ("title", "album")})]
+            exclude = ("title",)
+
+        class AlbumAdmin(admin.ModelAdmin):
+            inlines = [SongInline]
+
+        errors = AlbumAdmin(Album, AdminSite()).check()
+        expected = [
+            checks.Error(
+                "The value of 'title' cannot be in both 'fieldsets' and 'exclude'.",
+                obj=SongInline,
+                id="admin.E042",
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
     def test_valid_generic_inline_model_admin(self):
         """
         Regression test for #22034 - check that generic inlines don't look for
