@@ -23,7 +23,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         "CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(on_delete_db)"
         "s%(deferrable)s"
     )
-    sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
+    sql_delete_table_cascade = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
 
     def quote_value(self, value):
@@ -47,9 +47,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             self._drop_identity(model._meta.db_table, field.column)
         super().remove_field(model, field)
 
-    def delete_model(self, model):
+    def delete_model(self, model, *, cascade=False):
         # Run superclass action
-        super().delete_model(model)
+        super().delete_model(model, cascade=cascade)
         # Clean up manually created sequence.
         self.execute(
             """
