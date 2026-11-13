@@ -1,0 +1,19 @@
+{% load i18n %}
+<details data-filter-title="{{ title }}" open>
+  <summary>
+    {% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}
+  </summary>
+  <form method="get" action="{{ spec.request.path }}">
+    {% for key, value in spec.extra_parameters %}
+      <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endfor %}
+    {{ spec.form_field }}
+    {% if spec.include_empty_choice %}
+      <label>
+        <input type="checkbox" name="{{ spec.lookup_kwarg_isnull }}" value="True"{% if spec.lookup_val_isnull %} checked{% endif %}>
+        {{ spec.empty_value_display }}
+      </label>
+    {% endif %}
+    <button type="submit">{% translate "Apply" %}</button>
+  </form>
+</details>
