@@ -5,9 +5,11 @@ from django.core.exceptions import (
     FieldError,
     FieldFetchBlocked,
     MultipleObjectsReturned,
+    SynchronousOnlyOperation,
 )
 from django.db import IntegrityError, models, transaction
 from django.db.models import FETCH_PEERS, FETCH_RAISE
+from django.db.models.fetch_modes import ASYNC_UNSAFE_FETCH_MSG
 from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
@@ -953,6 +955,18 @@ class ManyToOneTests(TestCase):
             a.reporter
         self.assertIsNone(cm.exception.__cause__)
         self.assertTrue(cm.exception.__suppress_context__)
+
+    async def test_fetch_mode_async_forward(self):
+        a = await Article.objects.aget(pk=self.a.pk)
+        msg = ASYNC_UNSAFE_FETCH_MSG.format(model="Article", field="reporter")
+        with self.assertRaisesMessage(SynchronousOnlyOperation, msg):
+            a.reporter
+
+    async def test_fetch_mode_async_forward_fetch_peers(self):
+        a = await Article.objects.fetch_mode(FETCH_PEERS).aget(pk=self.a.pk)
+        msg = ASYNC_UNSAFE_FETCH_MSG.format(model="Article", field="reporter")
+        with self.assertRaisesMessage(SynchronousOnlyOperation, msg):
+            a.reporter
 
     def test_fetch_mode_copied_forward_fetching_one(self):
         a1 = Article.objects.fetch_mode(FETCH_PEERS).get()
