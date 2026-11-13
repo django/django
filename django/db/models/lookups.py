@@ -502,6 +502,7 @@ class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
 @Field.register_lookup
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = "in"
+    rhs_contains_none = False
 
     def get_prep_lookup(self):
         from django.db.models.sql.query import Query  # avoid circular import
@@ -517,6 +518,20 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             if not self.rhs.has_select_fields:
                 self.rhs.clear_select_clause()
                 self.rhs.add_fields(["pk"])
+        else:
+            if self.rhs_is_direct_value():
+                try:
+                    # Remove None from the list as NULL is never equal
+                    # to anything.
+                    rhs = OrderedSet(self.rhs)
+                    if None in rhs:
+                        self.rhs_contains_none = True
+                        rhs.discard(None)
+                except TypeError:  # Unhashable items in self.rhs
+                    rhs = [r for r in self.rhs if r is not None]
+
+                self.rhs = rhs
+
         return super().get_prep_lookup()
 
     def process_rhs(self, compiler, connection):
@@ -528,19 +543,12 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             )
 
         if self.rhs_is_direct_value():
-            # Remove None from the list as NULL is never equal to anything.
-            try:
-                rhs = OrderedSet(self.rhs)
-                rhs.discard(None)
-            except TypeError:  # Unhashable items in self.rhs
-                rhs = [r for r in self.rhs if r is not None]
-
-            if not rhs:
+            if not self.rhs:
                 raise EmptyResultSet
 
             # rhs should be an iterable; use batch_process_rhs() to
             # prepare/transform those values.
-            sqls, sqls_params = self.batch_process_rhs(compiler, connection, rhs)
+            sqls, sqls_params = self.batch_process_rhs(compiler, connection, self.rhs)
             placeholder = "(" + ", ".join(sqls) + ")"
             return (placeholder, sqls_params)
         return super().process_rhs(compiler, connection)

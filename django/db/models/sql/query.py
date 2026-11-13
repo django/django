@@ -13,7 +13,7 @@ import functools
 import sys
 import warnings
 from collections import Counter, namedtuple
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -1632,6 +1632,22 @@ class Query(BaseExpression):
             require_outer = (
                 condition.rhs is False if current_negated else condition.rhs is True
             )
+        elif lookup_type == "in":
+            require_outer = (
+                not condition.rhs_contains_none
+                if current_negated
+                else condition.rhs_contains_none
+            )
+            lookup_class = targets[0].get_lookup("isnull")
+            col = self._get_col(targets[0], join_info.targets[0], alias)
+            if condition.rhs_contains_none:
+                if condition.rhs == []:
+                    clause = WhereNode([lookup_class(col, True)], connector=AND)
+                else:
+                    clause.add(lookup_class(col, True), OR)
+            elif current_negated and require_outer:
+                clause.add(lookup_class(col, False), AND)
+
         elif current_negated and condition.rhs is not None:
             require_outer = True
             # The condition added below will be SQL like this:
@@ -1649,17 +1665,7 @@ class Query(BaseExpression):
             ):
                 lookup_class = targets[0].get_lookup("isnull")
                 col = self._get_col(targets[0], join_info.targets[0], alias)
-                # Use OR + IS NULL when RHS `in` values include None.
-                if (
-                    lookup_type == "in"
-                    # Check containers (not strings or bytes).
-                    and isinstance(condition.rhs, Iterable)
-                    and not isinstance(condition.rhs, (str, bytes))
-                    and any(v is None for v in condition.rhs)
-                ):
-                    clause.add(lookup_class(col, True), OR)
-                else:
-                    clause.add(lookup_class(col, False), AND)
+                clause.add(lookup_class(col, False), AND)
             # If someval is a nullable column, someval IS NOT NULL is
             # added.
             if isinstance(value, Col) and self.is_nullable(value.target):
