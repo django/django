@@ -1,7 +1,9 @@
 import json
 import warnings
 
+from django.contrib import admin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
+from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -9,7 +11,7 @@ from django.core import mail
 from django.db import connection
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils.deprecation import RemovedInDjango2028Warning
@@ -22,7 +24,9 @@ from .models import (
     Answer,
     Book,
     ExternalSubscriber,
+    FooAccountProxy,
     ModelAction,
+    Persona,
     Question,
     Subscriber,
     UnchangeableObject,
@@ -200,6 +204,131 @@ class AdminActionsTest(TestCase):
             "protected related objects.",
         )
         self.assertNotContains(response, "Because")
+
+    def test_delete_action_unregistered_model_no_permission(self):
+        """
+        The delete action displays models not registered in the admin in the
+        "permissions needed" list if the user lacks the specific permission.
+        """
+        site = admin.AdminSite(name="test_admin")
+        p = Persona.objects.create(name="Jerlo")
+        FooAccountProxy.objects.create(persona=p)
+        user = User.objects.create_user(
+            username="staff", password="password", is_staff=True
+        )
+        request = RequestFactory().get("/")
+        request.user = user
+
+        _, _, perms_needed, _ = get_deleted_objects(
+            FooAccountProxy.objects.all(),
+            request,
+            site,
+        )
+
+        self.assertIn(FooAccountProxy._meta.verbose_name, perms_needed)
+
+        # Grant the proxy model's actual delete permission.
+        content_type = ContentType.objects.get_for_model(
+            FooAccountProxy,
+            for_concrete_model=False,
+        )
+        permission = Permission.objects.get(
+            content_type=content_type,
+            codename="delete_fooaccountproxy",
+        )
+        user.user_permissions.add(permission)
+        request.user = User.objects.get(pk=user.pk)
+        # The permission should now be recognized.
+        _, _, perms_needed, _ = get_deleted_objects(
+            FooAccountProxy.objects.all(),
+            request,
+            site,
+        )
+        self.assertNotIn(FooAccountProxy._meta.verbose_name, perms_needed)
+        # (Missing Permission: Account)
+        perms = Permission.objects.filter(
+            codename__in=["view_persona", "change_persona", "delete_persona"]
+        )
+        user.user_permissions.add(*perms)
+        self.client.force_login(user)
+        selected_data = {"action": "delete_selected", "_selected_action": [p.pk]}
+        response = self.client.post(
+            reverse("admin:admin_views_persona_changelist"), selected_data
+        )
+        self.assertContains(
+            response, "permission to delete the following types of objects"
+        )
+        self.assertContains(response, "account")
+        confirm_data = {
+            "action": "delete_selected",
+            "_selected_action": [p.pk],
+            "post": "yes",
+        }
+        self.client.post(reverse("admin:admin_views_persona_changelist"), confirm_data)
+        self.assertEqual(Persona.objects.count(), 1)
+
+    def test_delete_action_unregistered_proxy_model_with_permission(self):
+        """
+        The delete action succeeds when the user has the required permissions
+        for both the primary model and unregistered proxy/related models.
+        """
+        site = admin.AdminSite(name="test_admin")
+        p = Persona.objects.create(name="Jerlo")
+        FooAccountProxy.objects.create(persona=p)
+        user = User.objects.create_user(
+            username="staff", password="password", is_staff=True
+        )
+        request = RequestFactory().get("/")
+        request.user = user
+
+        _, _, perms_needed, _ = get_deleted_objects(
+            FooAccountProxy.objects.all(),
+            request,
+            site,
+        )
+
+        self.assertIn(FooAccountProxy._meta.verbose_name, perms_needed)
+
+        # Grant the proxy model's actual delete permission.
+        content_type = ContentType.objects.get_for_model(
+            FooAccountProxy,
+            for_concrete_model=False,
+        )
+        permission = Permission.objects.get(
+            content_type=content_type,
+            codename="delete_fooaccountproxy",
+        )
+        user.user_permissions.add(permission)
+        request.user = User.objects.get(pk=user.pk)
+        # The permission should now be recognized.
+        _, _, perms_needed, _ = get_deleted_objects(
+            FooAccountProxy.objects.all(),
+            request,
+            site,
+        )
+        self.assertNotIn(FooAccountProxy._meta.verbose_name, perms_needed)
+
+        perms = Permission.objects.filter(
+            codename__in=[
+                "view_persona",
+                "view_account",
+                "delete_account",
+                "change_persona",
+                "delete_persona",
+                "delete_fooaccount",
+                "delete_baraccount",
+            ]
+        )
+        user.user_permissions.add(*perms)
+        user = User.objects.get(pk=user.pk)
+        self.client.force_login(user)
+        confirm_data = {
+            "action": "delete_selected",
+            "_selected_action": [p.pk],
+            "post": "yes",
+        }
+        self.client.post(reverse("admin:admin_views_persona_changelist"), confirm_data)
+        self.assertEqual(Persona.objects.count(), 0)
 
     def test_model_admin_default_delete_action_no_change_url(self):
         """
