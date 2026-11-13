@@ -220,9 +220,11 @@ class SessionBase:
     def _validate_session_key(self, key):
         """
         Key must be truthy and at least 8 characters long. 8 characters is an
-        arbitrary lower bound for some minimal key security.
+        arbitrary lower bound for some minimal key security. Null characters
+        are rejected because some databases, such as PostgreSQL, can't store
+        them.
         """
-        return key and len(key) >= 8
+        return key and len(key) >= 8 and "\x00" not in key
 
     def _get_session_key(self):
         return self.__session_key
