@@ -172,9 +172,19 @@ class Polygon(GEOSGeometry):
     @property
     def tuple(self):
         "Get the tuple for each ring in this Polygon."
-        return tuple(self[i].tuple for i in range(len(self)))
+        return self._tuple_from_ptr(self.ptr)
 
     coords = tuple
+
+    @staticmethod
+    def _tuple_from_ptr(ptr):
+        "Return a tuple version of the geometry directly from ring pointers."
+        extring = LinearRing._tuple_from_ptr(capi.get_extring(ptr))
+        intrings = (
+            LinearRing._tuple_from_ptr(capi.get_intring(ptr, i))
+            for i in range(capi.get_nrings(ptr))
+        )
+        return (extring, *intrings)
 
     @property
     def kml(self):

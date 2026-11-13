@@ -146,6 +146,11 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
     coords = tuple
 
+    @staticmethod
+    def _tuple_from_ptr(ptr):
+        "Return a tuple version of the geometry directly from a GEOS pointer."
+        return GEOSCoordSeq(capi.get_cs(ptr), z=capi.geos_hasz(ptr)).tuple
+
     def _listarr(self, func):
         """
         Return a sequence (list) corresponding with the given function.
