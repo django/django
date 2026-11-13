@@ -55,6 +55,63 @@ class LogEntryManager(models.Manager):
 
 
 class LogEntry(models.Model):
+    def get_change_message(self):
+        """
+        Return a string describing the changes.
+        """
+        if self.change_message:
+            try:
+                change_message = json.loads(self.change_message)
+            except json.JSONDecodeError:
+                return self.change_message
+            
+            messages = []
+            for entry in change_message:
+                if "added" in entry:
+                    sub = entry["added"]
+                    if sub:
+                        text = gettext("Added “%(object)s” (%(name)s).") % {
+                            "name": sub["name"],
+                            "object": sub["object"],
+                        }
+                    else:
+                        text = gettext("Added.")
+                    messages.append(text)
+
+                elif "changed" in entry:
+                    sub = entry["changed"]
+                    # Translate field labels with fallback to uncapitalized version for gettext matching
+                    translated_fields = []
+                    for field in sub.get("fields", []):
+                        translated = gettext(field)
+                        if translated == field:
+                            # Fallback to lowercased/uncapitalized version if exact capitalized lookup missed
+                            lower_field = field[0].lower() + field[1:] if field else field
+                            translated = gettext(lower_field)
+                        translated_fields.append(translated)
+
+                    fields = gettext(", ").join(translated_fields)
+                    if "name" in sub:
+                        text = gettext("Changed %(fields)s for %(name)s “%(object)s”.").format(
+                            fields=fields,
+                            name=sub["name"],
+                            object=sub["object"],
+                        )
+                    else:
+                        text = gettext("Changed %(fields)s.").format(fields=fields)
+                    messages.append(text)
+
+                elif "deleted" in entry:
+                    sub = entry["deleted"]
+                    text = gettext("Deleted %(name)s “%(object)s”.").format(
+                        name=sub["name"],
+                        object=sub["object"],
+                    )
+                    messages.append(text)
+            return " ".join(messages)
+        return self.change_message
+
+
     action_time = models.DateTimeField(
         _("action time"),
         default=timezone.now,
