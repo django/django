@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.messages.storage import default_storage
 from django.middleware import MiddlewareMixin
+from django.utils.cache import patch_vary_headers
 
 
 class MessageMiddleware(MiddlewareMixin):
@@ -25,4 +26,6 @@ class MessageMiddleware(MiddlewareMixin):
             unstored_messages = request._messages.update(response)
             if unstored_messages and settings.DEBUG:
                 raise ValueError("Not all temporary messages could be stored.")
+            if getattr(request, "_messages_cookie_read", False):
+                patch_vary_headers(response, ("Cookie",))
         return response

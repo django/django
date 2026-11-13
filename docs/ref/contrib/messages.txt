@@ -69,6 +69,12 @@ Django provides three built-in storage classes in
     to prevent manipulation) to persist notifications across requests. Old
     messages are dropped if the cookie data size would exceed 2048 bytes.
 
+    When :class:`~django.contrib.messages.middleware.MessageMiddleware`
+    processes a response after this storage has loaded messages, it adds
+    ``Cookie`` to the response's ``Vary`` header. Caches must distinguish
+    requests with different cookie values even when the messages cookie is
+    absent from one of them.
+
 .. class:: storage.fallback.FallbackStorage
 
     This class first uses ``CookieStorage``, and falls back to using
