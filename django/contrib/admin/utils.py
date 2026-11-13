@@ -395,6 +395,8 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
 
             if hasattr(attr, "short_description"):
                 label = attr.short_description
+            elif hasattr(attr, "verbose_name") and attr.verbose_name != attr.name:
+                label = attr.verbose_name
             elif (
                 isinstance(attr, property)
                 and hasattr(attr, "fget")
