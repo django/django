@@ -2429,6 +2429,16 @@ class CacheUtils(SimpleTestCase):
             get_cache_key(query_request, method="QUERY"),
         )
 
+    def test_query_header_registry_separate_from_get(self):
+        """
+        The headers learned from a GET response aren't used for a QUERY
+        request to the same URL, regardless of the method argument.
+        """
+        learn_cache_key(self.factory.get(self.path), HttpResponse())
+        query_request = self.factory.query(self.path)
+        self.assertIsNone(get_cache_key(query_request))
+        self.assertIsNone(get_cache_key(query_request, method="QUERY"))
+
     def test_cache_key_varies_by_url(self):
         """
         get_cache_key keys differ by fully-qualified URL instead of path

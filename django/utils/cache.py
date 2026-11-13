@@ -379,14 +379,14 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     return _i18n_cache_key_suffix(request, cache_key)
 
 
-def _generate_cache_header_key(key_prefix, request, method="GET"):
+def _generate_cache_header_key(key_prefix, request):
     """Return a cache key for the header cache."""
     url = md5(request.build_absolute_uri().encode("ascii"), usedforsecurity=False)
     cache_key = "views.decorators.cache.cache_header.%s.%s" % (
         key_prefix,
         url.hexdigest(),
     )
-    if method == "QUERY":
+    if request.method == "QUERY":
         # QUERY responses may vary on other headers than GET and HEAD
         # responses for the same URL, so they keep their own header list.
         cache_key += ".QUERY"
@@ -405,7 +405,7 @@ def get_cache_key(request, key_prefix=None, method="GET", cache=None):
     """
     if key_prefix is None:
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-    cache_key = _generate_cache_header_key(key_prefix, request, method)
+    cache_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     headerlist = cache.get(cache_key)
@@ -432,7 +432,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
     if cache_timeout is None:
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
-    cache_key = _generate_cache_header_key(key_prefix, request, request.method)
+    cache_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     if response.has_header("Vary"):

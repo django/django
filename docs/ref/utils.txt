@@ -115,6 +115,14 @@ need to distinguish caches by the ``Accept-language`` header.
     If there is no headerlist stored, the page needs to be rebuilt, so this
     function returns ``None``.
 
+    For a ``QUERY`` request (:rfc:`10008`), pass ``method='QUERY'``. The cache
+    key then also incorporates the request body and its ``Content-Type`` and
+    ``Content-Encoding``.
+
+    .. versionchanged:: 6.2
+
+        Support for ``QUERY`` requests was added.
+
 .. function:: learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None)
 
     Learns what headers to take into account for some request path from the
@@ -128,6 +136,13 @@ need to distinguish caches by the ``Accept-language`` header.
     cache as the pages themselves. If the cache ages some data out of the
     cache, this means that we have to build the response once to get at the
     Vary header and so at the list of headers to use for the cache key.
+
+    The headers learned from ``QUERY`` responses are stored separately from
+    those learned from ``GET`` and ``HEAD`` responses for the same path.
+
+    .. versionchanged:: 6.2
+
+        Support for ``QUERY`` requests was added.
 
 ``django.utils.dateparse``
 ==========================

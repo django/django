@@ -190,8 +190,7 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
 
         # QUERY responses are keyed on their own (the request content is
         # part of the key), so they don't share GET's cache entries.
-        lookup_method = "QUERY" if request.method == "QUERY" else "GET"
-        # try and get the cached GET (or QUERY) response
+        lookup_method = "GET" if request.method in ("GET", "HEAD") else request.method
         cache_key = get_cache_key(
             request, self.key_prefix, lookup_method, cache=self.cache
         )
