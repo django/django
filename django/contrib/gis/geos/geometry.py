@@ -71,6 +71,10 @@ class GEOSGeometryBase(GEOSBase):
             GEOSCoordSeq(capi.get_cs(self.ptr), self.hasz) if self.has_cs else None
         )
 
+    @staticmethod
+    def _tuple_from_ptr(ptr):
+        return GEOSCoordSeq(capi.get_cs(ptr), z=capi.geos_hasz(ptr)).tuple
+
     def __copy__(self):
         """
         Return a clone because the copy of a GEOSGeometry may contain an
