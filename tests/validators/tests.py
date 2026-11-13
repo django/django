@@ -521,6 +521,29 @@ TEST_DATA = [
         Decimal("1.0"),
         None,
     ),
+    # Large values are not rounded to floats.
+    (StepValueValidator(2), 2**53 + 1, ValidationError),
+    (StepValueValidator(2), 2**53 + 2, None),
+    (StepValueValidator(2, offset=1), 2**53 + 1, None),
+    (StepValueValidator(2, offset=1), 2**53 + 2, ValidationError),
+    (StepValueValidator(3), 10**400, ValidationError),
+    (StepValueValidator(3), 10**400 + 2, None),
+    (StepValueValidator(Decimal("0.1")), Decimal("1e400"), None),
+    (StepValueValidator(Decimal("0.01")), Decimal("12345678901234567.01"), None),
+    (
+        StepValueValidator(Decimal("0.01")),
+        Decimal("12345678901234567.015"),
+        ValidationError,
+    ),
+    (
+        StepValueValidator(Decimal("0.01"), offset=Decimal("0.005")),
+        Decimal("1000000000000000.015"),
+        None,
+    ),
+    (StepValueValidator(Decimal("0.5")), 10**400, None),
+    (StepValueValidator(2), Decimal("1e400"), None),
+    # Values too large to check are rejected.
+    (StepValueValidator(Decimal("0.1")), Decimal("1e1000000000"), ValidationError),
     (URLValidator(EXTENDED_SCHEMES), "file://localhost/path", None),
     (URLValidator(EXTENDED_SCHEMES), "git://example.com/", None),
     (
