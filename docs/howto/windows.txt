@@ -83,6 +83,19 @@ The virtual environment will be activated and you'll see "(project-name)" next
 to the command prompt to designate that. Each time you start a new command
 prompt, you'll need to activate the environment again.
 
+.. admonition:: For PowerShell users
+
+    It may be required to enable the ``Activate.ps1`` script by setting the
+    execution policy for the user. You can do this by issuing the
+    following PowerShell command:
+
+    .. code-block:: powershell
+
+        PS C:\> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+    See `About Execution Policies
+    <https://go.microsoft.com/fwlink/?LinkID=135170>`_ for more information.
+
 Install Django
 ==============
 
