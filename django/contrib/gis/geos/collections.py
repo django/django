@@ -92,9 +92,29 @@ class GeometryCollection(GEOSGeometry):
     @property
     def tuple(self):
         "Return a tuple of all the coordinates in this Geometry Collection"
-        return tuple(g.tuple for g in self)
+        return self._tuple_from_ptr(self.ptr)
 
     coords = tuple
+
+    @classmethod
+    def _tuple_from_ptr(cls, ptr):
+        if cls._typeid == 7:
+            geometry_classes = cls._get_geos_classes()
+
+            def get_tuple(child):
+                child_class = geometry_classes[capi.geos_typeid(child)]
+                return child_class._tuple_from_ptr(child)
+
+        else:
+            child_class = cls._allowed
+            if isinstance(child_class, tuple):
+                # LineString and LinearRing share the same _tuple_from_ptr
+                # implementation.
+                child_class = child_class[0]
+            get_tuple = child_class._tuple_from_ptr
+        return tuple(
+            get_tuple(capi.get_geomn(ptr, i)) for i in range(capi.get_num_geoms(ptr))
+        )
 
 
 # MultiPoint, MultiLineString, and MultiPolygon class definitions.
