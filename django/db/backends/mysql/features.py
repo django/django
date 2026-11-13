@@ -246,3 +246,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (11, 7)
         return False
+
+    @cached_property
+    def supports_same_table_select_as_update(self):
+        # MariaDB 10.3.2+ allows a subquery to read from the table being
+        # updated. MySQL rejects it with error 1093 ("You can't specify target
+        # table for update in FROM clause").
+        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
+            10,
+            3,
+            2,
+        )
