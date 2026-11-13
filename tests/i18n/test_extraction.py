@@ -364,6 +364,48 @@ class BasicExtractorTests(ExtractorTests):
             self.PO_FILE, "Get my line number", "templates", "test.html"
         )
 
+    def test_multiline_tags(self):
+        management.call_command("makemessages", locale=[LOCALE], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE) as fp:
+            po_contents = fp.read()
+        # Message contexts following other arguments on a previous line.
+        self.assertIn(
+            'msgctxt "Multiline translate context"\n'
+            'msgid "Translatable literal #10a"',
+            po_contents,
+        )
+        self.assertIn(
+            'msgctxt "Multiline blocktranslate context"\n'
+            'msgid "Translatable literal #10c %(a)s"',
+            po_contents,
+        )
+        self.assertIn(
+            'msgctxt "Multiline plural context"\n'
+            'msgid "Translatable literal #10e-singular"\n'
+            'msgid_plural "Translatable literal #10e-plural"',
+            po_contents,
+        )
+        self.assertMsgId("Translatable literal #10g", po_contents)
+        self.assertIn(
+            "#. Translators: Translator comment in multiline comment tags",
+            po_contents,
+        )
+        # Line numbers of the literals following a multiline tag.
+        for literal in [
+            "Translatable literal #10a",
+            "Translatable literal #10b",
+            "Translatable literal #10d",
+            "Translatable literal #10f",
+            "Translatable literal #10h",
+            "Translatable literal #10i",
+            "Translatable literal #10j",
+        ]:
+            with self.subTest(literal=literal):
+                self.assertLocationCommentPresent(
+                    self.PO_FILE, literal, "templates", "test.html"
+                )
+
     def test_extraction_error(self):
         msg = (
             "Translation blocks must not include other block tags: blocktranslate "
@@ -472,7 +514,7 @@ class BasicExtractorTests(ExtractorTests):
             management.call_command(
                 "makemessages", locale=[LOCALE], extensions=["thtml"], verbosity=0
             )
-            self.assertEqual(len(ws), 3)
+            self.assertEqual(len(ws), 4)
             for w in ws:
                 self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
             self.assertRegex(
@@ -491,6 +533,12 @@ class BasicExtractorTests(ExtractorTests):
                 str(ws[2].message),
                 r"The translator-targeted comment 'Translators: ignored i18n "
                 r"comment #4' \(file templates[/\\]comments.thtml, line 8\) "
+                r"was ignored, because it wasn't the last item on the line\.",
+            )
+            self.assertRegex(
+                str(ws[3].message),
+                r"The translator-targeted comment 'Translators: ignored i18n "
+                r"comment #10' \(file templates[/\\]comments.thtml, line 14\) "
                 r"was ignored, because it wasn't the last item on the line\.",
             )
         # Now test .po file contents
@@ -529,6 +577,10 @@ class BasicExtractorTests(ExtractorTests):
             self.assertRegex(po_contents, r"#\..+Translators: valid i18n comment #8")
             self.assertRegex(po_contents, r"#\..+Translators: valid i18n comment #9")
             self.assertMsgId("Translatable literal #9j", po_contents)
+
+            # A multiline tag on the same line as the comment.
+            self.assertNotIn("ignored i18n comment #10", po_contents)
+            self.assertMsgId("Translatable literal #9k", po_contents)
 
     def test_makemessages_find_files(self):
         """
