@@ -84,6 +84,14 @@ continued here.{% endcomment %}
 {% translate "Translatable literal with context wrapped in double quotes" context "Context wrapped in double quotes" as var %}
 {% blocktranslate context 'Special blocktranslate context wrapped in single quotes' %}Translatable literal with context wrapped in single quotes{% endblocktranslate %}
 {% blocktranslate context "Special blocktranslate context wrapped in double quotes" %}Translatable literal with context wrapped in double quotes{% endblocktranslate %}
+{% translate
+    "Translatable literal #7d"
+    context "Special trans context #4"
+%}
+{% blocktranslate
+    with a=1
+    context "Special blocktranslate context #5"
+%}Translatable literal #8e {{ a }}{% endblocktranslate %}
 
 {# Backwards compatibility tests #}
 {% blocktrans %}blocktrans text{% endblocktrans %}

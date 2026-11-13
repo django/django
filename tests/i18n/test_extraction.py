@@ -22,7 +22,7 @@ from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils._os import symlinks_supported
-from django.utils.translation import TranslatorCommentWarning
+from django.utils.translation import TranslatorCommentWarning, templatize
 
 from .utils import POFileAssertionMixin, RunInTmpDirMixin, copytree
 
@@ -414,6 +414,8 @@ class BasicExtractorTests(ExtractorTests):
             self.assertMsgId("Translatable literal #7b", po_contents)
             self.assertIn('msgctxt "Special trans context #3"', po_contents)
             self.assertMsgId("Translatable literal #7c", po_contents)
+            self.assertIn('msgctxt "Special trans context #4"', po_contents)
+            self.assertMsgId("Translatable literal #7d", po_contents)
 
             # {% translate %} with a filter
             for (
@@ -437,6 +439,8 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn("Translatable literal #8c-plural", po_contents)
             self.assertIn('msgctxt "Special blocktranslate context #4"', po_contents)
             self.assertMsgId("Translatable literal #8d %(a)s", po_contents)
+            self.assertIn('msgctxt "Special blocktranslate context #5"', po_contents)
+            self.assertMsgId("Translatable literal #8e %(a)s", po_contents)
 
             # {% trans %} and {% blocktrans %}
             self.assertMsgId("trans text", po_contents)
@@ -1183,3 +1187,106 @@ class UnchangedPoExtractionTests(ExtractorTests):
             "This is a hitherto undiscovered translatable string.",
             po_contents,
         )
+
+
+class TemplatizeTests(SimpleTestCase):
+    def test_multiline_translate_context(self):
+        template = """Line 1
+{% translate
+    "Translatable literal #1"
+    context "Special trans context #1"
+%}
+Line 6
+{% translate "After literal" %}"""
+        res = templatize(template)
+        self.assertIn(
+            "pgettext(u'Special trans context #1', u'Translatable literal #1')",
+            res,
+        )
+        self.assertEqual(res.count("\n"), template.count("\n"))
+        self.assertIn("gettext(u'After literal')", res.splitlines()[6])
+
+    def test_multiline_translate_context_single_quotes(self):
+        template = """{% translate
+    "Literal with single quote context"
+    context 'single quote context'
+%}"""
+        res = templatize(template)
+        self.assertIn(
+            "pgettext(u'single quote context', u'Literal with single quote context')",
+            res,
+        )
+
+    def test_multiline_translate_context_with_asvar(self):
+        template = """{% translate "Translatable literal"
+    as myvar
+    context "variable context"
+%}"""
+        res = templatize(template)
+        self.assertIn(
+            "pgettext(u'variable context', u'Translatable literal')",
+            res,
+        )
+
+    def test_multiline_blocktranslate_context(self):
+        template = """Line 1
+{% blocktranslate
+    with name=user.name
+    context "Special blocktranslate context #1"
+%}
+Hello {{ name }}
+{% endblocktranslate %}
+Line 8
+{% translate "After block" %}"""
+        res = templatize(template)
+        self.assertIn(
+            "pgettext(u'Special blocktranslate context #1', u'\\nHello %(name)s\\n')",
+            res,
+        )
+        self.assertEqual(res.count("\n"), template.count("\n"))
+        self.assertIn("gettext(u'After block')", res.splitlines()[8])
+
+    def test_multiline_blocktranslate_plural_context(self):
+        template = """Line 1
+{% blocktranslate
+    count counter=count
+    context "Special plural context #1"
+%}
+{{ counter }} apple
+{%
+    plural
+%}
+{{ counter }} apples
+{%
+    endblocktranslate
+%}
+Line 14
+{% translate "After plural" %}"""
+        res = templatize(template)
+        self.assertIn(
+            "npgettext(u'Special plural context #1', u'\\n%(counter)s apple\\n', "
+            "u'\\n%(counter)s apples\\n',count)",
+            res,
+        )
+        self.assertEqual(res.count("\n"), template.count("\n"))
+        self.assertIn("gettext(u'After plural')", res.splitlines()[14])
+
+    def test_multiline_translator_comments(self):
+        template = """{# Translators: Contextual greeting #}
+{% blocktranslate
+    with name=user.name
+    context "greeting"
+%}
+Hello {{ name }}
+{% endblocktranslate %}
+{# Translators: Single line comment #}
+{% translate
+    "World"
+    context "location"
+%}"""
+        res = templatize(template)
+        self.assertIn("# Translators: Contextual greeting", res)
+        self.assertIn("pgettext(u'greeting', u'\\nHello %(name)s\\n')", res)
+        self.assertIn("# Translators: Single line comment", res)
+        self.assertIn("pgettext(u'location', u'World')", res)
+        self.assertEqual(res.count("\n"), template.count("\n"))

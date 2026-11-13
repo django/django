@@ -1,3 +1,4 @@
+import re
 import warnings
 from io import StringIO
 
@@ -19,17 +20,22 @@ def blankout(src, char):
     return dot_re.sub(char, src)
 
 
-context_re = _lazy_re_compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
+context_re = _lazy_re_compile(
+    r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""", re.DOTALL
+)
 inline_re = _lazy_re_compile(
     # Match the trans/translate 'some text' part.
     r"""^\s*trans(?:late)?\s+((?:"[^"]*?")|(?:'[^']*?'))"""
     # Match and ignore optional filters
     r"""(?:\s*\|\s*[^\s:]+(?::(?:[^\s'":]+|(?:"[^"]*?")|(?:'[^']*?')))?)*"""
     # Match the optional context part
-    r"""(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*"""
+    r"""(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*""",
+    re.DOTALL,
 )
 block_re = _lazy_re_compile(
-    r"""^\s*blocktrans(?:late)?(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)"""
+    r"""^\s*blocktrans(?:late)?"""
+    r"""(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""",
+    re.DOTALL,
 )
 endblock_re = _lazy_re_compile(r"""^\s*endblocktrans(?:late)?$""")
 plural_re = _lazy_re_compile(r"""^\s*plural$""")
@@ -55,6 +61,13 @@ def templatize(src, origin=None):
     comment_lineno_cache = None
     # Adding the u prefix allows gettext to recognize the string (#26093).
     raw_prefix = "u"
+    block_tag_newlines = 0
+
+    def token_newlines(token):
+        raw = getattr(token, "raw_contents", None)
+        if raw is not None:
+            return raw.count("\n")
+        return token.contents.count("\n")
 
     def join_tokens(tokens, trim=False):
         message = "".join(tokens)
@@ -64,7 +77,10 @@ def templatize(src, origin=None):
 
     for t in Lexer(src).tokenize():
         if incomment:
-            if t.token_type == TokenType.BLOCK and t.contents == "endcomment":
+            if (
+                t.token_type == TokenType.BLOCK
+                and t.contents.split()[0] == "endcomment"
+            ):
                 content = "".join(comment)
                 translators_comment_start = None
                 for lineno, line in enumerate(content.splitlines(True)):
@@ -80,6 +96,7 @@ def templatize(src, origin=None):
                         out.write(" #\n")
                 incomment = False
                 comment = []
+                out.write("\n" * token_newlines(t))
             else:
                 comment.append(t.contents)
         elif intrans:
@@ -127,6 +144,8 @@ def templatize(src, origin=None):
                             )
                         for part in singular:
                             out.write(blankout(part, "S"))
+                    nl = block_tag_newlines + token_newlines(t)
+                    out.write("\n" * nl)
                     message_context = None
                     intrans = False
                     inplural = False
@@ -134,6 +153,7 @@ def templatize(src, origin=None):
                     plural = []
                 elif pluralmatch:
                     inplural = True
+                    block_tag_newlines += token_newlines(t)
                 else:
                     filemsg = ""
                     if origin:
@@ -157,7 +177,7 @@ def templatize(src, origin=None):
             # Handle comment tokens (`{# ... #}`) plus other constructs on
             # the same line:
             if comment_lineno_cache is not None:
-                cur_lineno = t.lineno + t.contents.count("\n")
+                cur_lineno = t.lineno + token_newlines(t)
                 if comment_lineno_cache == cur_lineno:
                     if t.token_type != TokenType.COMMENT:
                         for c in lineno_comment_map[comment_lineno_cache]:
@@ -204,6 +224,7 @@ def templatize(src, origin=None):
                         message_context = None
                     else:
                         out.write(" gettext({p}{!r}) ".format(g, p=raw_prefix))
+                    out.write("\n" * token_newlines(t))
                 elif bmatch:
                     for fmatch in constant_re.findall(t.contents):
                         out.write(" _(%s) " % fmatch)
@@ -220,13 +241,19 @@ def templatize(src, origin=None):
                     trimmed = "trimmed" in t.split_contents()
                     singular = []
                     plural = []
+                    block_tag_newlines = token_newlines(t)
                 elif cmatches:
                     for cmatch in cmatches:
                         out.write(" _(%s) " % cmatch)
+                    out.write("\n" * token_newlines(t))
                 elif t.contents == "comment":
                     incomment = True
+                    out.write("\n" * token_newlines(t))
                 else:
                     out.write(blankout(t.contents, "B"))
+                    # blankout() already preserves newlines in contents.
+                    nl = token_newlines(t) - t.contents.count("\n")
+                    out.write("\n" * nl)
             elif t.token_type == TokenType.VAR:
                 parts = t.contents.split("|")
                 cmatch = constant_re.match(parts[0])
@@ -237,6 +264,8 @@ def templatize(src, origin=None):
                         out.write(" %s " % p.split(":", 1)[1])
                     else:
                         out.write(blankout(p, "F"))
+                nl = token_newlines(t) - t.contents.count("\n")
+                out.write("\n" * nl)
             elif t.token_type == TokenType.COMMENT:
                 if t.contents.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
                     lineno_comment_map.setdefault(t.lineno, []).append(t.contents)
