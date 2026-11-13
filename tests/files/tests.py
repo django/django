@@ -18,7 +18,7 @@ from django.core.files.uploadedfile import (
     TemporaryUploadedFile,
     UploadedFile,
 )
-from django.test import override_settings
+from django.test import SimpleTestCase, override_settings
 
 try:
     from PIL import Image, features
@@ -424,7 +424,7 @@ class GetImageDimensionsTests(unittest.TestCase):
         self.assertEqual(size, (540, 405))
 
 
-class FileMoveSafeTests(unittest.TestCase):
+class FileMoveSafeTests(SimpleTestCase):
     def test_file_move_overwrite(self):
         handle_a, self.file_a = tempfile.mkstemp()
         handle_b, self.file_b = tempfile.mkstemp()
@@ -519,6 +519,51 @@ class FileMoveSafeTests(unittest.TestCase):
             content = f.read()
 
         self.assertEqual(content, b"content")
+
+    def test_file_move_dest_exists_unoverwritten(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(temp_dir.cleanup)
+        src = Path(temp_dir.name) / "src.txt"
+        src.write_text("file to move")
+        dest = Path(temp_dir.name) / "dest.txt"
+        dest.write_text("existing destination")
+
+        msg = f"Destination file {dest} exists and allow_overwrite is False."
+        with self.assertRaisesMessage(FileExistsError, msg):
+            file_move_safe(src, dest, allow_overwrite=False)
+
+        self.assertEqual(dest.read_text(), "existing destination")
+        self.assertTrue(src.exists())
+
+    def test_file_move_os_link_fallback(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(temp_dir.cleanup)
+        src = Path(temp_dir.name) / "src.txt"
+        src.write_text("file to move")
+        dest = Path(temp_dir.name) / "dest.txt"
+
+        with mock.patch("django.core.files.move.os.link", side_effect=OSError()):
+            file_move_safe(src, dest, allow_overwrite=False)
+
+        self.assertEqual(dest.read_text(), "file to move")
+        self.assertFalse(src.exists())
+
+    def test_file_move_os_link_fallback_dest_exists(self):
+        temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(temp_dir.cleanup)
+        src = Path(temp_dir.name) / "src.txt"
+        src.write_text("file to move")
+        dest = Path(temp_dir.name) / "dest.txt"
+        dest.write_text("existing destination")
+
+        with (
+            mock.patch("django.core.files.move.os.link", side_effect=OSError()),
+            self.assertRaises(FileExistsError),
+        ):
+            file_move_safe(src, dest, allow_overwrite=False)
+
+        self.assertEqual(dest.read_text(), "existing destination")
+        self.assertTrue(src.exists())
 
 
 class SpooledTempTests(unittest.TestCase):
