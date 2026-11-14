@@ -16,16 +16,23 @@ html .console-block {
     --tab-focus-outline: var(--bs-focus-ring-width) solid
         var(--bs-focus-ring-color);
 
-    /* Adapt pydata-sphinx-theme's code blocks for console tabs. */
+    /* Adapt pydata-sphinx-theme's code blocks for console tabs:
+     * - Remove top right radius so tab border connects to panel border.
+     * - Remove top margin so tabs hug code block.
+     * - Relocate bottom margin (1em) from code block to tab container,
+     *   so focus ring wraps tab panel only (not margin).
+     */
     section {
         div.highlight,
         div.highlight-console,
         div.highlight-doscon,
         pre {
-            margin-block-start: 0;
+            margin-block: 0;
             border-start-end-radius: 0;
         }
     }
+
+    margin-block-end: 1em;
 }
 
 /* Keep Read the Docs' preview widgets from covering header and footer. */
