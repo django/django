@@ -493,6 +493,14 @@ class BasicExpressionsTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             RemoteEmployee.objects.update(adjusted_salary=F("salary") * 5)
 
+    def test_update_set_inherited_field_from_child(self):
+        # Converse of test_update_inherited_field_value / #30044.
+        # Updating a parent-table field with F() to a child-only field also
+        # requires a join and must raise the same FieldError (#33091).
+        msg = "Joined field references are not permitted in this query"
+        with self.assertRaisesMessage(FieldError, msg):
+            RemoteEmployee.objects.update(salary=F("adjusted_salary") / 5)
+
     def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do
         # not yet exist in the database
