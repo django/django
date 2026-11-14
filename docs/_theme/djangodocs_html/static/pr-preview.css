@@ -1,0 +1,9 @@
+/* Keep Read the Docs' preview widgets from covering header and footer. This
+ * CSS file is only included in PR preview builds.
+ */
+.bd-header {
+    padding-block-start: 2rem;
+}
+.bd-footer {
+    padding-block-end: 6rem;
+}
