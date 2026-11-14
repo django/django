@@ -2646,6 +2646,83 @@ class OperationTests(OperationTestBase):
             any("ALTER" in query["sql"] for query in ctx.captured_queries), False
         )
 
+    def test_add_field_foreignobject_noop(self):
+        app_label = "test_adflfo_noop"
+        project_state = self.set_up_test_model(app_label)
+        project_state = self.apply_operations(
+            app_label,
+            project_state,
+            [
+                migrations.CreateModel(
+                    "Rider",
+                    fields=[
+                        ("pony_id", models.IntegerField()),
+                    ],
+                ),
+            ],
+        )
+        operation = migrations.AddField(
+            "Rider",
+            "pony",
+            models.ForeignObject(
+                f"{app_label}.Pony",
+                models.CASCADE,
+                from_fields=("pony_id",),
+                to_fields=("id",),
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            with CaptureQueriesContext(connection) as ctx:
+                operation.database_forwards(app_label, editor, project_state, new_state)
+            self.assertEqual(ctx.captured_queries, [])
+            with CaptureQueriesContext(connection) as ctx:
+                operation.database_backwards(
+                    app_label, editor, new_state, project_state
+                )
+            self.assertEqual(ctx.captured_queries, [])
+
+    def test_remove_field_foreignobject_noop(self):
+        app_label = "test_rmflfo_noop"
+        project_state = self.set_up_test_model(app_label)
+        project_state = self.apply_operations(
+            app_label,
+            project_state,
+            [
+                migrations.CreateModel(
+                    "Rider",
+                    fields=[
+                        ("pony_id", models.IntegerField()),
+                        (
+                            "pony",
+                            models.ForeignObject(
+                                f"{app_label}.Pony",
+                                models.CASCADE,
+                                from_fields=("pony_id",),
+                                to_fields=("id",),
+                            ),
+                        ),
+                    ],
+                ),
+            ],
+        )
+        operation = migrations.RemoveField(
+            "Rider",
+            "pony",
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            with CaptureQueriesContext(connection) as ctx:
+                operation.database_forwards(app_label, editor, project_state, new_state)
+            self.assertEqual(ctx.captured_queries, [])
+            with CaptureQueriesContext(connection) as ctx:
+                operation.database_backwards(
+                    app_label, editor, new_state, project_state
+                )
+            self.assertEqual(ctx.captured_queries, [])
+
     @skipUnlessDBFeature("supports_comments")
     def test_alter_model_table_comment(self):
         app_label = "test_almotaco"
