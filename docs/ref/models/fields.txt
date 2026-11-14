@@ -1419,7 +1419,8 @@ following optional arguments:
     Name of a model field which is auto-populated with the width of the image
     each time an image object is set.
 
-Requires the :pypi:`pillow` library.
+Requires the :pypi:`pillow` library. The :optional-dependency:`images` extra
+installs it.
 
 :class:`ImageField` instances are created in your database as ``varchar``
 columns with a default max length of 100 characters. As with other fields, you

@@ -1,3 +1,4 @@
+# Deprecated: use pyproject.toml. Kept for Jenkins and the conda env files.
 aiosmtpd >= 1.4.5
 asgiref >= 3.13
 argon2-cffi >= 23.1.0
@@ -11,7 +12,7 @@ Pillow >= 10.1.0
 # pylibmc/libmemcached can't be built on Windows.
 pylibmc; sys_platform != 'win32'
 pymemcache >= 3.4.0
-pywatchman; sys_platform != 'win32'
+pywatchman >= 1.2.0; sys_platform != 'win32'
 PyYAML >= 6.0.2
 redis >= 5.1.0
 playwright >= 1.65.0

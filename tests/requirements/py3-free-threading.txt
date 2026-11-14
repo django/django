@@ -1,3 +1,4 @@
+# Deprecated: use pyproject.toml. Kept for Jenkins and the conda env files.
 # Subset of py3.txt for the free-threaded CI jobs, limited to packages that
 # are pure Python or publish free-threaded (cp3XXt) wheels. pylibmc and
 # pywatchman are omitted: they don't support free-threading and re-enable the

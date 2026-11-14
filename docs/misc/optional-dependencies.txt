@@ -1,0 +1,207 @@
+=====================
+Optional dependencies
+=====================
+
+Some Django features need extra Python packages. Install them with Django
+using pip extras:
+
+.. console::
+
+    $ python -m pip install "django[postgresql,redis]"
+
+Where Django requires a minimum version of a package, the extra sets it. Some
+packages also need libraries from your operating system. These are listed in
+the *System requirements* column.
+
+Databases
+=========
+
+.. list-table::
+    :header-rows: 1
+    :widths: 20 35 25 20
+
+    * - Extra
+      - Enables
+      - Installs
+      - System requirements
+    * - .. optional-dependency:: mysql
+
+        ``mysql``
+      - The :ref:`MySQL database backend <mysql-notes>`.
+      - :pypi:`mysqlclient` 2.2.1+
+      - On Linux and macOS, MySQL or MariaDB client development libraries and
+        a C compiler.
+    * - .. optional-dependency:: oracle
+
+        ``oracle``
+      - The :ref:`Oracle database backend <oracle-notes>`.
+      - :pypi:`oracledb` 4.0.2+
+      - None.
+    * - .. optional-dependency:: postgresql
+
+        ``postgresql``
+      - The :ref:`PostgreSQL database backend <postgresql-notes>`.
+      - :pypi:`psycopg` 3.1.12+
+      - ``libpq``. See :ref:`optional-dependencies-psycopg`.
+    * - .. optional-dependency:: postgresql-pool
+
+        ``postgresql-pool``
+      - The PostgreSQL backend with :ref:`connection pooling
+        <postgresql-pool>`.
+      - :pypi:`psycopg` 3.1.12+ and :pypi:`psycopg-pool` 3.2.0+
+      - ``libpq``. See :ref:`optional-dependencies-psycopg`.
+
+.. _optional-dependencies-psycopg:
+
+Choosing a ``psycopg`` implementation
+-------------------------------------
+
+The ``postgresql`` and ``postgresql-pool`` extras install the pure Python
+version of ``psycopg``. It needs the ``libpq`` client library on your system.
+To use another implementation, add it to the install command:
+
+* ``psycopg[binary]`` includes ``libpq`` and needs no system libraries. It is
+  not available for free-threaded Python or PyPy.
+* ``psycopg[c]`` is built against your system ``libpq``. The psycopg project
+  recommends it for production.
+
+.. console::
+
+    $ python -m pip install "django[postgresql]" "psycopg[binary]"
+
+See the `psycopg installation documentation
+<https://www.psycopg.org/psycopg3/docs/basic/install.html>`_ for details.
+
+Caches
+======
+
+.. list-table::
+    :header-rows: 1
+    :widths: 20 35 25 20
+
+    * - Extra
+      - Enables
+      - Installs
+      - System requirements
+    * - .. optional-dependency:: pylibmc
+
+        ``pylibmc``
+      - The :ref:`pylibmc memcached backend <memcached>`.
+      - :pypi:`pylibmc` (not available on Windows)
+      - ``libmemcached``, if no wheel is available for your platform.
+    * - .. optional-dependency:: pymemcache
+
+        ``pymemcache``
+      - The :ref:`pymemcache memcached backend <memcached>`.
+      - :pypi:`pymemcache` 3.4.0+
+      - None.
+    * - .. optional-dependency:: redis
+
+        ``redis``
+      - The :ref:`Redis cache backend <redis>`.
+      - :pypi:`redis` 5.1.0+
+      - None.
+
+GeoDjango
+=========
+
+.. list-table::
+    :header-rows: 1
+    :widths: 20 35 25 20
+
+    * - Extra
+      - Enables
+      - Installs
+      - System requirements
+    * - .. optional-dependency:: geoip
+
+        ``geoip``
+      - :doc:`GeoIP2 geolocation </ref/contrib/gis/geoip2>`.
+      - :pypi:`geoip2` 4.8.0+
+      - None.
+    * - .. optional-dependency:: gis
+
+        ``gis``
+      - All :doc:`GeoDjango </ref/contrib/gis/index>` features, including
+        GeoIP2.
+      - :pypi:`geoip2` 4.8.0+ and :pypi:`numpy` 1.26.0+
+      - GEOS, GDAL, and PROJ. See :doc:`/ref/contrib/gis/install/geolibs`.
+
+Password hashers
+================
+
+.. list-table::
+    :header-rows: 1
+    :widths: 20 35 25 20
+
+    * - Extra
+      - Enables
+      - Installs
+      - System requirements
+    * - .. optional-dependency:: argon2
+
+        ``argon2``
+      - The :ref:`Argon2 password hasher <argon2_usage>`.
+      - :pypi:`argon2-cffi` 23.1.0+
+      - None.
+    * - .. optional-dependency:: bcrypt
+
+        ``bcrypt``
+      - The :ref:`bcrypt password hasher <bcrypt_usage>`.
+      - :pypi:`bcrypt` 4.1.1+
+      - None.
+
+Other features
+==============
+
+.. list-table::
+    :header-rows: 1
+    :widths: 20 35 25 20
+
+    * - Extra
+      - Enables
+      - Installs
+      - System requirements
+    * - .. optional-dependency:: admindocs
+
+        ``admindocs``
+      - The :doc:`admindocs </ref/contrib/admin/admindocs>` application.
+      - :pypi:`docutils` 0.22+
+      - None.
+    * - .. optional-dependency:: colorama
+
+        ``colorama``
+      - :ref:`Colored terminal output <syntax-coloring>` on Windows.
+      - :pypi:`colorama` 0.4.6+ (Windows only)
+      - None.
+    * - .. optional-dependency:: images
+
+        ``images``
+      - :class:`~django.db.models.ImageField` and image validation.
+      - :pypi:`Pillow` 10.1.0+
+      - None.
+    * - .. optional-dependency:: jinja2
+
+        ``jinja2``
+      - The :class:`~django.template.backends.jinja2.Jinja2` template
+        backend.
+      - :pypi:`Jinja2` 2.11.0+
+      - None.
+    * - .. optional-dependency:: pywatchman
+
+        ``pywatchman``
+      - Faster auto-reloading for :cli:`runserver`.
+      - :pypi:`pywatchman` 1.2.0+ (not available on Windows)
+      - The `Watchman <https://facebook.github.io/watchman/>`_ service.
+    * - .. optional-dependency:: test-parallel
+
+        ``test-parallel``
+      - :option:`Parallel test execution <test --parallel>`.
+      - :pypi:`tblib` 3.0.0+
+      - None.
+    * - .. optional-dependency:: yaml
+
+        ``yaml``
+      - The :ref:`YAML serializer <serialization-formats>`.
+      - :pypi:`PyYAML` 6.0.2+
+      - None.

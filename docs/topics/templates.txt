@@ -604,11 +604,12 @@ applications. This generic name was kept for backwards-compatibility.
 
 .. class:: Jinja2
 
-Requires Jinja2_ to be installed:
+Requires Jinja2_ to be installed. The :optional-dependency:`jinja2` extra
+installs it:
 
 .. console::
 
-    $ python -m pip install Jinja2
+    $ python -m pip install "django[jinja2]"
 
 Set :setting:`BACKEND <TEMPLATES-BACKEND>` to
 ``'django.template.backends.jinja2.Jinja2'`` to configure a Jinja2_ engine.

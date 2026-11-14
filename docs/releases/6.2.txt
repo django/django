@@ -118,6 +118,14 @@ and ``RemovedInDjango71Warning`` becomes ``RemovedInDjango2029Warning``.
 interface </ref/django-admin>`. ``django-admin`` remains available as an
 alias. Both names provide the same functionality.
 
+Optional dependencies as pip extras
+-----------------------------------
+
+Django's optional dependencies can now be installed with pip extras, for
+example ``python -m pip install "django[postgresql,redis]"``. Each extra
+installs the packages that one feature needs. See
+:doc:`/misc/optional-dependencies` for the full list.
+
 Minor features
 --------------
 
