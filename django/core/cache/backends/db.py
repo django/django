@@ -132,7 +132,11 @@ class DatabaseCache(BaseDatabaseCache):
                 tz = UTC if settings.USE_TZ else None
                 exp = datetime.fromtimestamp(timeout, tz=tz)
             exp = exp.replace(microsecond=0)
-            if self._cull_probability and random.random() <= self._cull_probability:
+            if (
+                self._max_entries is not None
+                and self._cull_probability
+                and random.random() <= self._cull_probability
+            ):
                 cursor.execute("SELECT COUNT(*) FROM %s" % table)
                 num = cursor.fetchone()[0]
                 if num > self._max_entries:
