@@ -244,3 +244,25 @@ class ErrorTest(SimpleTestCase):
         with self.settings(GEOIP_PATH=build_geoip_path("GeoLite2-ASN-Test.mmdb")):
             with self.assertRaisesMessage(GeoIP2Exception, msg):
                 GeoIP2()
+
+    def test_default_supported_types(self):
+        self.assertIn("DBIP-City", GeoIP2.SUPPORTED_DATABASE_TYPES)
+        self.assertIn("DBIP-Country", GeoIP2.SUPPORTED_DATABASE_TYPES)
+
+    @mock.patch("geoip2.database.Reader")
+    def test_subclass_supported_database_types(self, MockReader):
+        class CustomGeoIP2(GeoIP2):
+            SUPPORTED_DATABASE_TYPES = GeoIP2.SUPPORTED_DATABASE_TYPES | {
+                "Geoacumen-Country"
+            }
+
+        MockReader.return_value.metadata.return_value.database_type = (
+            "Geoacumen-Country"
+        )
+        g = CustomGeoIP2(path=build_geoip_path("GeoLite2-Country-Test.mmdb"))
+        self.assertIn("Geoacumen-Country", g.SUPPORTED_DATABASE_TYPES)
+
+        # Base GeoIP2 still rejects it.
+        msg = "Unable to handle database edition: Geoacumen-Country"
+        with self.assertRaisesMessage(GeoIP2Exception, msg):
+            GeoIP2(path=build_geoip_path("GeoLite2-Country-Test.mmdb"))

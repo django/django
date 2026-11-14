@@ -101,6 +101,10 @@ Keyword Arguments    Description
                      the :setting:`GEOIP_CITY` setting.
 ===================  =======================================================
 
+.. versionchanged:: 6.2
+
+    Support for ``DBIP-City`` and ``DBIP-Country`` was added.
+
 Methods
 =======
 
