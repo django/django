@@ -2,10 +2,22 @@ import datetime
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.http import Http404
+from django.test import (
+    RequestFactory,
+    TestCase,
+    override_settings,
+    skipUnlessDBFeature,
+)
 from django.test.utils import requires_tz_support
 
 from .models import Artist, Author, Book, BookSigning, Page
+from .views import (
+    BookDayArchive,
+    BookMonthArchive,
+    BookWeekArchive,
+    BookYearArchive,
+)
 
 
 def _make_books(n, base_date):
@@ -856,12 +868,41 @@ class DateDetailViewTests(TestDataMixin, TestCase):
             "/dates/books/9999/",
             "/dates/books/9999/12/",
             "/dates/books/9999/week/52/",
+            "/dates/books/9999/dec/31/allow_empty/",
+            "/dates/booksignings/9999/dec/31/",
         ]
         for url in urls:
             with self.subTest(url=url):
                 res = self.client.get(url)
                 self.assertEqual(res.status_code, 404)
                 self.assertEqual(res.context["exception"], "Date out of range")
+
+    def test_previous_date_out_of_range(self):
+        # The <int:year> path converter strips leading zeros (e.g. "0001"), so
+        # call the views directly.
+        request = RequestFactory().get("/")
+        tests = [
+            (BookYearArchive, {"year": "0001"}),
+            (BookMonthArchive, {"year": "0001", "month": "jan"}),
+            (BookWeekArchive, {"year": "0001", "week": "1"}),
+            (BookDayArchive, {"year": "0001", "month": "jan", "day": "01"}),
+        ]
+        for view_class, kwargs in tests:
+            with self.subTest(view=view_class.__name__):
+                view = view_class.as_view(allow_empty=True)
+                with self.assertRaisesMessage(Http404, "Date out of range"):
+                    view(request, **kwargs)
+        # With weeks starting on Sunday, the previous week of week 1 of year 1
+        # contains 0001-01-01 and starts before datetime.date.min.
+        for day in (1, 7):
+            Book.objects.create(
+                name="Year one",
+                slug="year-one",
+                pages=1,
+                pubdate=datetime.date(1, 1, day),
+            )
+        with self.assertRaisesMessage(Http404, "Date out of range"):
+            BookWeekArchive.as_view()(request, year="0001", week="1")
 
     def test_invalid_url(self):
         msg = (
