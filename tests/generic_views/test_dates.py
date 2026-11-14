@@ -856,6 +856,11 @@ class DateDetailViewTests(TestDataMixin, TestCase):
             "/dates/books/9999/",
             "/dates/books/9999/12/",
             "/dates/books/9999/week/52/",
+            "/dates/books/9999/dec/31/allow_empty/",
+            "/dates/books/str_year/0001/allow_empty/",
+            "/dates/books/str_year/0001/jan/allow_empty/",
+            "/dates/books/str_year/0001/week/1/allow_empty/",
+            "/dates/books/str_year/0001/jan/01/allow_empty/",
         ]
         for url in urls:
             with self.subTest(url=url):

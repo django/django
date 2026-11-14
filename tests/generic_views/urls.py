@@ -373,6 +373,22 @@ urlpatterns = [
         "dates/booksignings/<int:year>/<month>/<int:day>/<int:pk>/",
         views.BookSigningDetail.as_view(),
     ),
+    path(
+        "dates/books/str_year/<year>/allow_empty/",
+        views.BookYearArchive.as_view(allow_empty=True),
+    ),
+    path(
+        "dates/books/str_year/<year>/<month>/allow_empty/",
+        views.BookMonthArchive.as_view(allow_empty=True),
+    ),
+    path(
+        "dates/books/str_year/<year>/week/<int:week>/allow_empty/",
+        views.BookWeekArchive.as_view(allow_empty=True),
+    ),
+    path(
+        "dates/books/str_year/<year>/<month>/<int:day>/allow_empty/",
+        views.BookDayArchive.as_view(allow_empty=True),
+    ),
     # Useful for testing redirects
     path("accounts/login/", auth_views.LoginView.as_view()),
     path("BaseDateListViewTest/", dates.BaseDateListView.as_view()),
