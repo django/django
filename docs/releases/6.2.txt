@@ -142,6 +142,12 @@ Minor features
 
 * ...
 
+:mod:`django.contrib.humanize`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The :tfilter:`naturaltime` template filter now accepts a ``depth``
+  argument to control the number of adjacent time units returned.
+
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
