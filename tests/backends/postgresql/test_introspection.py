@@ -42,3 +42,32 @@ class DatabaseSequenceTests(TestCase):
                     }
                 ],
             )
+
+
+@unittest.skipUnless(connection.vendor == "postgresql", "Test only for PostgreSQL")
+class TableListTests(TestCase):
+    def test_get_table_list_for_names(self):
+        with connection.cursor() as cursor:
+            table_list = connection.introspection.get_table_list_for_names(
+                cursor, {Person._meta.db_table, "backends_nonexistent"}
+            )
+        self.assertEqual([table.name for table in table_list], [Person._meta.db_table])
+
+    def test_table_names_only_tables_search_path(self):
+        """Tables in schemas that aren't in the search path are excluded."""
+        with connection.cursor() as cursor:
+            cursor.execute("CREATE SCHEMA backends_hidden")
+            cursor.execute("CREATE TABLE backends_hidden.backends_hidden (id int)")
+            self.assertEqual(
+                connection.introspection.table_names(
+                    cursor, only_tables=["backends_hidden"]
+                ),
+                [],
+            )
+            cursor.execute("SET LOCAL search_path TO backends_hidden, public")
+            self.assertEqual(
+                connection.introspection.table_names(
+                    cursor, only_tables=["backends_hidden"]
+                ),
+                ["backends_hidden"],
+            )

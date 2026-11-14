@@ -39,14 +39,16 @@ class MigrationTestBase(TransactionTestCase):
             return connections[using].introspection.get_table_description(cursor, table)
 
     def assertTableExists(self, table, using="default"):
-        with connections[using].cursor() as cursor:
-            self.assertIn(table, connections[using].introspection.table_names(cursor))
+        self.assertIn(
+            table,
+            connections[using].introspection.table_names(only_tables=[table]),
+        )
 
     def assertTableNotExists(self, table, using="default"):
-        with connections[using].cursor() as cursor:
-            self.assertNotIn(
-                table, connections[using].introspection.table_names(cursor)
-            )
+        self.assertNotIn(
+            table,
+            connections[using].introspection.table_names(only_tables=[table]),
+        )
 
     def assertColumnExists(self, table, column, using="default"):
         self.assertIn(

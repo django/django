@@ -3,7 +3,6 @@ from django.db import migrations, router
 
 from .exceptions import InvalidMigrationPlan
 from .loader import MigrationLoader
-from .recorder import MigrationRecorder
 from .state import ProjectState
 
 
@@ -16,7 +15,7 @@ class MigrationExecutor:
     def __init__(self, connection, progress_callback=None):
         self.connection = connection
         self.loader = MigrationLoader(self.connection)
-        self.recorder = MigrationRecorder(self.connection)
+        self.recorder = self.loader.recorder
         self.progress_callback = progress_callback
 
     def migration_plan(self, targets, clean_start=False):

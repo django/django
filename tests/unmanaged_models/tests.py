@@ -46,7 +46,7 @@ class ManyToManyUnmanagedTests(TestCase):
         created.
         """
         table = Unmanaged2._meta.get_field("mm").m2m_db_table()
-        tables = connection.introspection.table_names()
+        tables = connection.introspection.table_names(only_tables=[table])
         self.assertNotIn(
             table, tables, "Table '%s' should not exist, but it does." % table
         )
@@ -57,5 +57,5 @@ class ManyToManyUnmanagedTests(TestCase):
         be created.
         """
         table = Managed1._meta.get_field("mm").m2m_db_table()
-        tables = connection.introspection.table_names()
+        tables = connection.introspection.table_names(only_tables=[table])
         self.assertIn(table, tables, "Table '%s' does not exist." % table)
