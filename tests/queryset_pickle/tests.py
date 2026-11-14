@@ -2,7 +2,7 @@ import datetime
 import pickle
 
 import django
-from django.db import models
+from django.db import connection, models
 from django.test import TestCase
 
 from .models import (
@@ -50,7 +50,8 @@ class PickleabilityTestCase(TestCase):
         self.assert_pickles(Happening.objects.filter(number2=1))
 
     def test_filter_reverse_fk(self):
-        self.assert_pickles(Group.objects.filter(event=1))
+        event_id = connection.ops.get_hardcoded_pk(1)
+        self.assert_pickles(Group.objects.filter(event=event_id))
 
     def test_doesnotexist_exception(self):
         # Ticket #17776
@@ -93,7 +94,7 @@ class PickleabilityTestCase(TestCase):
         """
         A model not defined on module level is picklable.
         """
-        original = Container.SomeModel(pk=1)
+        original = Container.SomeModel(pk=connection.ops.get_hardcoded_pk(1))
         dumped = pickle.dumps(original)
         reloaded = pickle.loads(dumped)
         self.assertEqual(original, reloaded)
@@ -172,7 +173,8 @@ class PickleabilityTestCase(TestCase):
             models.Prefetch("event_set", queryset=Event.objects.order_by("id"))
         )
         groups2 = pickle.loads(pickle.dumps(groups))
-        self.assertSequenceEqual(groups2.filter(id__gte=0), [g])
+        zero = connection.ops.get_hardcoded_pk(0)
+        self.assertSequenceEqual(groups2.filter(id__gte=zero), [g])
 
     def test_pickle_prefetch_queryset_not_evaluated(self):
         Group.objects.create(name="foo")
@@ -323,7 +325,7 @@ class PickleabilityTestCase(TestCase):
     def test_filter_deferred(self):
         qs = Happening.objects.all()
         qs._defer_next_filter = True
-        qs = qs.filter(id=0)
+        qs = qs.filter(id=connection.ops.get_hardcoded_pk(0))
         self.assert_pickles(qs)
 
     def test_missing_django_version_unpickling(self):

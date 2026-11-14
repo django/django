@@ -418,7 +418,7 @@ class PartialIndexTests(TransactionTestCase):
             index = Index(
                 name="recent_article_idx",
                 fields=["id"],
-                condition=Q(pk__gt=1),
+                condition=Q(pk__gt=connection.ops.get_hardcoded_pk(1)),
             )
             self.assertIn(
                 "WHERE %s" % editor.quote_name("id"),

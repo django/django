@@ -465,8 +465,9 @@ class CaseExpressionTests(TestCase):
         self.assertIs(qs.get(integer=1).test, True)
 
     def test_case_reuse(self):
+        pk = connection.ops.get_hardcoded_pk
         SOME_CASE = Case(
-            When(pk=0, then=Value("0")),
+            When(pk=pk(0), then=Value("0")),
             default=Value("1"),
         )
         self.assertQuerySetEqual(
@@ -1357,10 +1358,11 @@ class CaseExpressionTests(TestCase):
         #    would remove o from the results. So, in effect we are testing that
         #    we are promoting the fk_rel join to a left outer join here.
         # 2. The default value of 3 is generated for the case expression.
+        pk = connection.ops.get_hardcoded_pk
         self.assertQuerySetEqual(
             CaseTestModel.objects.filter(pk=o.pk).annotate(
                 foo=Case(
-                    When(fk_rel__pk=1, then=2),
+                    When(fk_rel__pk=pk(1), then=2),
                     default=3,
                 ),
             ),
@@ -1387,14 +1389,15 @@ class CaseExpressionTests(TestCase):
         #    would remove o from the results. So, in effect we are testing that
         #    we are promoting the fk_rel join to a left outer join here.
         # 2. The default value of 3 is generated for the case expression.
+        pk = connection.ops.get_hardcoded_pk
         self.assertQuerySetEqual(
             CaseTestModel.objects.filter(pk=o.pk).annotate(
                 foo=Case(
-                    When(fk_rel__pk=1, then=2),
+                    When(fk_rel__pk=pk(1), then=2),
                     default=3,
                 ),
                 bar=Case(
-                    When(fk_rel__pk=1, then=4),
+                    When(fk_rel__pk=pk(1), then=4),
                     default=5,
                 ),
             ),

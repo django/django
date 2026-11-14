@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db import connection
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
@@ -169,7 +170,7 @@ class OneAuthorUpdate(generic.UpdateView):
     fields = "__all__"
 
     def get_object(self):
-        return Author.objects.get(pk=1)
+        return Author.objects.get(pk=connection.ops.get_hardcoded_pk(1))
 
 
 class SpecializedAuthorUpdate(generic.UpdateView):

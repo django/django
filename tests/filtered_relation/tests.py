@@ -107,9 +107,10 @@ class FilteredRelationTests(TestCase):
         )
 
     def test_select_related_with_empty_relation(self):
+        nonexistent_pk = connection.ops.get_nonexistent_pk(-1)
         qs = (
             Author.objects.annotate(
-                book_join=FilteredRelation("book", condition=Q(pk=-1)),
+                book_join=FilteredRelation("book", condition=Q(pk=nonexistent_pk)),
             )
             .select_related("book_join")
             .order_by("pk")
