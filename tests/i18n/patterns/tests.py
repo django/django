@@ -186,6 +186,15 @@ class URLTranslationTests(URLTestCaseBase):
                 translate_url("/en/account/register-as-path/", "nl"),
                 "/nl/profiel/registreren-als-pad/",
             )
+            # Unnamed patterns, including one in a namespaced include.
+            self.assertEqual(
+                translate_url("/en/register-as-path/", "nl"),
+                "/nl/registreren-als-pad/",
+            )
+            self.assertEqual(
+                translate_url("/en/account/users/", "nl"),
+                "/nl/profiel/gebruikers/",
+            )
             self.assertEqual(translation.get_language(), "en")
             # re_path() URL with parameters.
             self.assertEqual(
