@@ -6,7 +6,8 @@ import operator
 from functools import cached_property, reduce
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
-from django.db.models.expressions import Case, When
+from django.db.models.expressions import Case, Expression, When
+from django.db.models.fields import BooleanField
 from django.db.models.functions import Mod
 from django.db.models.lookups import Exact
 from django.utils import tree
@@ -318,6 +319,92 @@ class WhereNode(tree.Node):
                 yield from child.leaves()
             else:
                 yield child
+
+    def join_or_subquery_leaves(self):
+        """
+        Yield the JoinOrSubquery children that can be replaced with their
+        subquery without changing the result, i.e. not under XOR or NOT.
+        """
+        if self.connector == XOR or self.negated:
+            return
+        for child in self.children:
+            if isinstance(child, WhereNode):
+                yield from child.join_or_subquery_leaves()
+            elif isinstance(child, JoinOrSubquery):
+                yield child
+
+    def replace_join_or_subquery(self, replacements):
+        """
+        Return a copy of the node with the JoinOrSubquery children whose id()
+        is in replacements replaced. Unlike replace_expressions(), match by
+        identity since distinct filters can compare equal.
+        """
+        clone = self.create(connector=self.connector, negated=self.negated)
+        clone.resolved = self.resolved
+        clone.children = [
+            (
+                child.replace_join_or_subquery(replacements)
+                if isinstance(child, WhereNode)
+                else replacements.get(id(child), child)
+            )
+            for child in self.children
+        ]
+        return clone
+
+
+class JoinOrSubquery(Expression):
+    """
+    A filter on a multi-valued relationship added after an aggregation.
+
+    It compiles to its join-based condition. SQLCompiler replaces it with the
+    equivalent pk__in subquery, and releases the joins, when no other clause
+    references them.
+    """
+
+    output_field = BooleanField()
+
+    def __init__(self, condition, subquery_condition, refcounts):
+        super().__init__()
+        self.condition = condition
+        self.subquery_condition = subquery_condition
+        self.refcounts = refcounts
+
+    def get_source_expressions(self):
+        return [self.condition, self.subquery_condition]
+
+    def set_source_expressions(self, exprs):
+        self.condition, self.subquery_condition = exprs
+
+    def restricted_subquery_condition(self, lookups, alias):
+        """
+        Return subquery_condition with lookups, which filter the outer query's
+        base table alias, also applied in the subquery so that it doesn't
+        select rows that the outer query excludes.
+        """
+        if not lookups:
+            return self.subquery_condition
+        (lookup,) = self.subquery_condition.children
+        subquery = lookup.rhs.clone()
+        subquery_alias = subquery.get_initial_alias()
+        for outer_lookup in lookups:
+            subquery.where.add(
+                outer_lookup.relabeled_clone({alias: subquery_alias}), AND
+            )
+        return WhereNode([lookup.__class__(lookup.lhs, subquery)])
+
+    def get_group_by_cols(self):
+        return self.condition.get_group_by_cols()
+
+    def relabeled_clone(self, change_map):
+        clone = super().relabeled_clone(change_map)
+        clone.refcounts = {
+            change_map.get(alias, alias): count
+            for alias, count in self.refcounts.items()
+        }
+        return clone
+
+    def as_sql(self, compiler, connection):
+        return compiler.compile(self.condition)
 
 
 class NothingNode:
