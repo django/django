@@ -1160,7 +1160,7 @@ class's ``clean`` method::
 Also note that by the time you reach this step, individual model instances
 have already been created for each ``Form``. Modifying a value in
 ``form.cleaned_data`` is not sufficient to affect the saved value. If you wish
-to modify a value in ``ModelFormSet.clean()`` you must modify
+to modify a value in ``BaseModelFormSet.clean()`` you must modify
 ``form.instance``::
 
     from django.forms import BaseModelFormSet
