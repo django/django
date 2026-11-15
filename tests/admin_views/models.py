@@ -47,6 +47,7 @@ class Article(models.Model):
         Section, models.SET_NULL, null=True, blank=True, related_name="+"
     )
 
+    @admin.display(ordering="title")
     def __str__(self):
         return self.title
 
@@ -1208,6 +1209,6 @@ class CamelCaseRelatedModel(models.Model):
     )
 
 
-# RemovedInDjango70Warning: When the deprecation ends, remove.
+# RemovedInDjango2028Warning: When the deprecation ends, remove.
 class ModelAction(models.Model):
     pass

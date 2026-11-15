@@ -10,7 +10,7 @@ Bugfixes
 ========
 
 * Fixed a regression in Django 2.1 that caused the incorrect quoting of
-  database user password when using :djadmin:`dbshell` on Oracle
+  database user password when using :cli:`dbshell` on Oracle
   (:ticket:`30307`).
 
 * Added compatibility for ``psycopg2`` 2.8 (:ticket:`30331`).
@@ -26,7 +26,7 @@ Bugfixes
 * Fixed a regression in Django 2.2 that caused a single instance fast-delete
   to not set the primary key to ``None`` (:ticket:`30330`).
 
-* Prevented :djadmin:`makemigrations` from generating infinite migrations for
+* Prevented :cli:`makemigrations` from generating infinite migrations for
   check constraints and partial indexes when ``condition`` contains
   a :class:`~python:range` object (:ticket:`30350`).
 
@@ -66,7 +66,7 @@ Bugfixes
   example, when a permission had been created manually or a model had been
   migrated from concrete to proxy (:ticket:`30351`).
 
-* Fixed a regression in Django 2.2 that caused a crash of :djadmin:`runserver`
+* Fixed a regression in Django 2.2 that caused a crash of :cli:`runserver`
   when URLConf modules raised exceptions (:ticket:`30323`).
 
 * Fixed a regression in Django 2.2 where changes were not reliably detected by

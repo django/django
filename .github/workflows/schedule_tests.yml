@@ -19,7 +19,7 @@ jobs:
           - '3.12'
           - '3.13'
           - '3.14'
-          - '3.15-dev'
+          - '3.15'
     name: Windows, SQLite, Python ${{ matrix.python-version }}
     timeout-minutes: 60
     continue-on-error: true
@@ -34,6 +34,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install gettext
+        shell: pwsh
+        run: |
+          choco install gettext --no-progress -y
+          "$env:ProgramFiles\gettext-iconv\bin" >> $env:GITHUB_PATH
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
@@ -52,7 +57,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
           cache: 'pip'
       - name: Install system packages
         run: |
@@ -91,9 +96,19 @@ jobs:
       - run: npm install
       - run: npm test
 
-  selenium-sqlite:
+  playwright-sqlite:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - browser: chromium
+            name: Chromium
+          - browser: firefox
+            name: Firefox
+          - browser: webkit
+            name: WebKit
     runs-on: ubuntu-latest
-    name: Selenium tests, SQLite
+    name: Playwright tests, SQLite, ${{ matrix.name }}
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -103,7 +118,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install system packages
@@ -113,18 +128,20 @@ jobs:
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -e .
-      - name: Run Selenium tests
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps ${{ matrix.browser }}
+      - name: Run Playwright tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 1
+          python -Wall runtests.py --verbosity 2 --noinput --playwright=${{ matrix.browser }} --settings=test_sqlite --parallel 1
 
-  selenium-postgresql:
+  playwright-postgresql:
     runs-on: ubuntu-latest
-    name: Selenium tests, PostgreSQL
+    name: Playwright tests, PostgreSQL, Chromium
     timeout-minutes: 60
     services:
       postgres:
-        image: postgres:15-alpine
+        image: postgres:16-alpine
         env:
           POSTGRES_DB: django
           POSTGRES_USER: user
@@ -144,7 +161,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install system packages
@@ -154,18 +171,20 @@ jobs:
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
       - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps chromium
       - name: Create PostgreSQL settings file
         run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py
-      - name: Run Selenium tests
+      - name: Run Playwright tests
         working-directory: ./tests/
         run: |
-          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 1
+          python -Wall runtests.py --verbosity 2 --noinput --playwright=chromium --settings=test_postgres --parallel 1
 
   postgresql:
     strategy:
       fail-fast: false
       matrix:
-        version: [16, 17, 18]
+        version: [17, 18]
         server_side_bindings: [0, 1]
     runs-on: ubuntu-latest
     name: PostgreSQL Versions
@@ -194,7 +213,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
       - name: Install system packages

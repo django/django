@@ -22,8 +22,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-06-01 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 06:49+0000\n"
 "Last-Translator: Illia Volochii <illia.volochii@gmail.com>, "
 "2019,2021-2023,2025-2026\n"
 "Language-Team: Ukrainian (http://app.transifex.com/django/django/language/"
@@ -532,6 +532,9 @@ msgstr "%(model_name)s з таким %(field_labels)s вже існує."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Порушено обмеження \"%(name)s\"."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Значення %(value)r не є дозволеним вибором."
@@ -705,6 +708,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Необроблені двійкові дані"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -918,6 +925,12 @@ msgstr "Так"
 
 msgid "No"
 msgstr "Ні"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
 
 msgctxt "Task"
 msgid "Ready"

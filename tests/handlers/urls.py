@@ -11,6 +11,7 @@ urlpatterns = [
     path("async_streaming/", views.async_streaming),
     path("in_transaction/", views.in_transaction),
     path("not_in_transaction/", views.not_in_transaction),
+    path("not_in_transaction_async/", views.not_in_transaction_async),
     path("not_in_transaction_using_none/", views.not_in_transaction_using_none),
     path("not_in_transaction_using_text/", views.not_in_transaction_using_text),
     path("bad_request/", views.bad_request),

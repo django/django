@@ -141,63 +141,79 @@ def rename_permissions_after_model_rename(
     # django.contrib.auth is NOT installed.
     try:
         Permission = apps.get_model("auth", "Permission")
+        ContentType = apps.get_model("contenttypes", "ContentType")
     except LookupError:
         return
-    if not router.allow_migrate_model(using, Permission):
-        return
-
     db = using or router.db_for_write(Permission)
+    if not router.allow_migrate_model(db, Permission):
+        return
 
     app_label = app_config.label
 
     # Collect (from_model, to_model) pairs
-    renames = [
-        (op.new_name, op.old_name) if backward else (op.old_name, op.new_name)
-        for migration, backward in (plan or [])
-        for op in migration.operations
-        if isinstance(op, migrations.RenameModel)
-        and migration.app_label == app_config.label
-    ]
+    renames = []
+    for migration, backward in plan or []:
+        if migration.app_label != app_label:
+            continue
+        operations = migration.operations
+        if backward:
+            operations = reversed(operations)
+        for op in operations:
+            if not isinstance(op, migrations.RenameModel):
+                continue
+            if backward:
+                renames.append((op.new_name, op.old_name))
+            else:
+                renames.append((op.old_name, op.new_name))
 
     if not renames:
         return
 
+    # Collapse chains of renames (e.g. A -> B -> C) into one rename per model
+    # (A -> C). post_migrate runs after every RenameContentType operation, so
+    # each content type is already stored under the model's final name.
+    original_names = {}
+    for old_name, new_name in renames:
+        old_name, new_name = old_name.lower(), new_name.lower()
+        original_names[new_name] = original_names.pop(old_name, old_name)
+    # Final model names as written in the migrations, for the permission names.
+    final_names = {new_name.lower(): new_name for _, new_name in renames}
+
+    content_types = (
+        ContentType.objects.using(db)
+        .filter(app_label=app_label, model__in=original_names.keys())
+        .prefetch_related("permission_set")
+    )
+    perms_by_model = {
+        ct.model: {perm.codename: perm for perm in ct.permission_set.all()}
+        for ct in content_types
+    }
+
     planned = []
     conflicts = []
 
-    for old_name, new_name in renames:
-        old_suffix = f"_{old_name.lower()}"
-        new_suffix = f"_{new_name.lower()}"
+    for new_name, old_name in original_names.items():
+        codenames = perms_by_model.get(new_name)
+        if codenames is None:
+            # Perhaps RenameContentType aborted due to a conflict?
+            continue
 
-        actions, verbose_name_raw = _get_permission_metadata(apps, app_label, new_name)
-        perms = Permission.objects.using(db).filter(
-            content_type__app_label=app_label,
-            codename__in=[f"{action}{old_suffix}" for action in actions],
+        actions, verbose_name_raw = _get_permission_metadata(
+            apps, app_label, final_names[new_name]
         )
+        for action in actions:
+            old_codename = f"{action}_{old_name}"
+            new_codename = f"{action}_{new_name}"
+            new_name_str = f"Can {action} {verbose_name_raw}"
 
-        for perm in perms:
-            for action in actions:
-                if not perm.codename.startswith(action + "_"):
-                    continue
+            perm = codenames.get(old_codename)
+            if perm is None:
+                continue
+            if codenames.get(new_codename, perm) is not perm:
+                conflicts.append((perm.pk, old_codename, new_codename))
+                continue
 
-                old_codename = perm.codename
-                new_codename = f"{action}{new_suffix}"
-                new_name_str = f"Can {action} {verbose_name_raw}"
-
-                planned.append((perm, old_codename, new_codename, new_name_str))
-
-    existing = {
-        p.codename
-        for p in Permission.objects.using(db).filter(
-            content_type__app_label=app_label,
-            codename__in=[new for _, _, new, _ in planned],
-        )
-    }
-
-    # Look for conflicts
-    for perm, old, new, _ in planned:
-        if new in existing and perm.codename != new:
-            conflicts.append((perm.pk, old, new))
+            planned.append((perm, old_codename, new_codename, new_name_str))
 
     # Raise error if conflicts found
     if conflicts:

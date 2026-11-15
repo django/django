@@ -8,7 +8,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Masaya, 2023
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2012-2018,2021,2023,2025
+# Shinya Okano <tokibito@gmail.com>, 2012-2018,2021,2023,2025-2026
 # TANIGUCHI Taichi, 2022
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 # Takuya N <takninnovationresearch@gmail.com>, 2020
@@ -19,10 +19,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2025-03-19 11:30-0500\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>, "
-"2012-2018,2021,2023,2025\n"
+"2012-2018,2021,2023,2025-2026\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -192,8 +192,13 @@ msgstr ""
 "複数選択するときには Control キーを押したまま選択してください。Mac は "
 "Command キーを使ってください"
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "アクション用にこのオブジェクトを選択 - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -252,13 +257,13 @@ msgstr "%s を変更"
 msgid "View %s"
 msgstr "%sを表示"
 
-msgid "Database error"
-msgstr "データベースエラー"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s 個の %(name)s を変更しました。"
+
+msgid "Database error"
+msgstr "データベースエラー"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -282,6 +287,16 @@ msgstr "変更履歴: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
 
 #, python-format
 msgid ""
@@ -332,14 +347,8 @@ msgstr ""
 "エラーが発生しました。サイト管理者にメールで報告されたので、修正されるまでし"
 "ばらくお待ちください。"
 
-msgid "Run the selected action"
-msgstr "選択された操作を実行"
-
-msgid "Go"
+msgid "Run"
 msgstr "実行"
-
-msgid "Click here to select the objects across all pages"
-msgstr "全ページの項目を選択するにはここをクリック"
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -350,10 +359,6 @@ msgstr "選択を解除"
 
 msgid "Breadcrumbs"
 msgstr "パンくずリスト"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s アプリケーション内のモデル"
 
 msgid "Model name"
 msgstr "モデル名"
@@ -443,6 +448,9 @@ msgstr "件数を表示"
 msgid "Clear all filters"
 msgstr "全てのフィルターを解除"
 
+msgid "Save"
+msgstr "保存"
+
 msgid "Remove from sorting"
 msgstr "ソート条件から外します"
 
@@ -463,30 +471,34 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "テーマを切り替え (現在のテーマ: ダーク)"
 
 #, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
+msgid "Filter by %(field_name)s"
 msgstr ""
-"%(object_name)s '%(escaped_object)s' の削除時に関連づけられたオブジェクトも削"
-"除しようとしましたが、あなたのアカウントには以下のタイプのオブジェクトを削除"
-"するパーミッションがありません:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"%(object_name)s \"%(escaped_object)s\" の削除時に関連づけられたオブジェクトも"
+"削除しようとしましたが、あなたのアカウントには以下のタイプのオブジェクトを削"
+"除するパーミッションがありません:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"%(object_name)s '%(escaped_object)s' を削除するには以下の保護された関連オブ"
+"%(object_name)s \"%(escaped_object)s\" を削除するには以下の保護された関連オブ"
 "ジェクトを削除することになります:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"%(object_name)s \"%(escaped_object)s\"を削除しますか？ 関連づけられている以下"
-"のオブジェクトも全て削除されます:"
+"%(object_name)s \"%(escaped_object)s\" を削除しますか？ 関連づけられている以"
+"下のオブジェクトも全て削除されます:"
 
 msgid "Objects"
 msgstr "オブジェクト"
@@ -593,6 +605,10 @@ msgstr "ユーザー"
 msgid "Action"
 msgstr "操作"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr "%(name)sエントリーのページ"
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "エントリー"
@@ -604,14 +620,19 @@ msgstr ""
 "このオブジェクトには変更履歴がありません。おそらくこの管理サイトで追加したも"
 "のではありません。"
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr "%(name)s のページ"
+
 msgid "Show all"
 msgstr "全件表示"
 
-msgid "Save"
-msgstr "保存"
-
 msgid "Popup closing…"
 msgstr "ポップアップを閉じています..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr "%(name)sの検索"
 
 msgid "Search"
 msgstr "検索"
@@ -655,6 +676,9 @@ msgstr "選択された %(model)s を削除"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "選択された %(model)s を表示"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "ご利用ありがとうございました。"

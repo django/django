@@ -1,4 +1,4 @@
-from ctypes import byref, c_int
+from ctypes import byref, c_float, c_int
 from datetime import date, datetime, time
 
 from django.contrib.gis.gdal.base import GDALBase
@@ -73,8 +73,9 @@ class Field(GDALBase):
         "Retrieve the Field's value as a tuple of date & time components."
         if not self.is_set:
             return None
-        yy, mm, dd, hh, mn, ss, tz = [c_int() for i in range(7)]
-        status = capi.get_field_as_datetime(
+        yy, mm, dd, hh, mn, tz = [c_int() for _ in range(6)]
+        ss = c_float()
+        status = capi.get_field_as_datetime_x(
             self._feat.ptr,
             self._index,
             byref(yy),
@@ -192,7 +193,17 @@ class OFTDateTime(Field):
         #  100=GMT, 104=GMT+1, 80=GMT-5, etc.
         try:
             yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
-            return datetime(yy.value, mm.value, dd.value, hh.value, mn.value, ss.value)
+            seconds = int(ss.value)
+            milliseconds = int(round((ss.value - seconds) * 1000))
+            return datetime(
+                yy.value,
+                mm.value,
+                dd.value,
+                hh.value,
+                mn.value,
+                seconds,
+                milliseconds * 1000,
+            )
         except (TypeError, ValueError, GDALException):
             return None
 
@@ -203,8 +214,10 @@ class OFTTime(Field):
         "Return a Python `time` object for this OFTTime field."
         try:
             yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
-            return time(hh.value, mn.value, ss.value)
-        except (ValueError, GDALException):
+            seconds = int(ss.value)
+            milliseconds = int(round((ss.value - seconds) * 1000))
+            return time(hh.value, mn.value, seconds, milliseconds * 1000)
+        except (TypeError, ValueError, GDALException):
             return None
 
 

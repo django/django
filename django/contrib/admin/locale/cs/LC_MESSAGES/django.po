@@ -6,6 +6,7 @@
 # Jiří Podhorecký <jirka.p@volny.cz>, 2024
 # Jiří Podhorecký <jirka.p@volny.cz>, 2022
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
+# J Nezbeda, 2026
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2013-2014
 # Vláďa Macek <macek@sandbox.cz>, 2015-2020,2022
@@ -14,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 07:05+0000\n"
-"Last-Translator: Jan Papež <honyczek@centrum.cz>, 2024\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
+"Last-Translator: J Nezbeda, 2026\n"
 "Language-Team: Czech (http://app.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,8 +38,8 @@ msgstr "Úspěšně odstraněno: %(count)d %(items)s."
 msgid "Cannot delete %(name)s"
 msgstr "Nelze smazat %(name)s"
 
-msgid "Are you sure?"
-msgstr "Jste si jisti?"
+msgid "Delete multiple objects"
+msgstr "Odstranit vybrané položky"
 
 msgid "Administration"
 msgstr "Správa"
@@ -186,8 +187,13 @@ msgstr ""
 "Výběr více než jedné položky je možný přidržením klávesy \"Control\", na "
 "Macu \"Command\"."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Vyberte tento objekt pro akci - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -252,9 +258,6 @@ msgstr "%s: změnit"
 msgid "View %s"
 msgstr "Zobrazit %s"
 
-msgid "Database error"
-msgstr "Chyba databáze"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -262,6 +265,9 @@ msgstr[0] "Položka %(name)s byla úspěšně změněna."
 msgstr[1] "%(count)s položky %(name)s byly úspěšně změněny."
 msgstr[2] "%(count)s položek %(name)s bylo úspěšně změněno."
 msgstr[3] "%(count)s položek %(name)s bylo úspěšně změněno."
+
+msgid "Database error"
+msgstr "Chyba databáze"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -275,6 +281,9 @@ msgstr[3] "Vybráno všech %(total_count)s položek."
 msgid "0 of %(cnt)s selected"
 msgstr "Vybraných je 0 položek z celkem %(cnt)s."
 
+msgid "Delete"
+msgstr "Odstranit"
+
 #, python-format
 msgid "Change history: %s"
 msgstr "Historie změn: %s"
@@ -285,6 +294,19 @@ msgstr "Historie změn: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s: %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #, python-format
 msgid ""
@@ -335,14 +357,8 @@ msgstr ""
 "V systému došlo k chybě. Byla e-mailem nahlášena správcům, kteří by ji měli "
 "v krátké době opravit. Děkujeme za trpělivost."
 
-msgid "Run the selected action"
-msgstr "Provést vybranou operaci"
-
-msgid "Go"
-msgstr "Provést"
-
-msgid "Click here to select the objects across all pages"
-msgstr "Klepnutím zde vyberete položky ze všech stránek."
+msgid "Run"
+msgstr "Spustit"
 
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
@@ -354,9 +370,14 @@ msgstr "Zrušit výběr"
 msgid "Breadcrumbs"
 msgstr "Drobečky"
 
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modely v aplikaci %(name)s"
+msgid "Model name"
+msgstr "Název modelu"
+
+msgid "Add link"
+msgstr "Přidat odkaz"
+
+msgid "Change or view list link"
+msgstr "Změnit nebo zobrazit seznam odkazů"
 
 msgid "Add"
 msgstr "Přidat"
@@ -367,15 +388,11 @@ msgstr "Zobrazit"
 msgid "You don’t have permission to view or edit anything."
 msgstr "Nemáte oprávnění k zobrazení ani úpravám."
 
-msgid ""
-"First, enter a username and password. Then, you’ll be able to edit more user "
-"options."
+msgid "After you’ve created a user, you’ll be able to edit more user options."
 msgstr ""
-"Nejdříve zadejte uživatelské jméno a heslo. Poté budete moci upravovat více "
-"uživatelských nastavení."
 
-msgid "Enter a username and password."
-msgstr "Zadejte uživatelské jméno a heslo."
+msgid "Error:"
+msgstr "Chyba:"
 
 msgid "Change password"
 msgstr "Změnit heslo"
@@ -444,6 +461,9 @@ msgstr "Zobrazit počty"
 msgid "Clear all filters"
 msgstr "Zrušit všechny filtry"
 
+msgid "Save"
+msgstr "Uložit"
+
 msgid "Remove from sorting"
 msgstr "Přestat řadit"
 
@@ -463,34 +483,28 @@ msgstr "Přepnout motiv (aktuální motiv: světlý)"
 msgid "Toggle theme (current theme: dark)"
 msgstr "Přepnout motiv (aktuální motiv: tmavý)"
 
-msgid "Delete"
-msgstr "Odstranit"
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Odstranění položky \"%(escaped_object)s\" typu %(object_name)s by vyústilo v "
-"odstranění souvisejících položek. Nemáte však oprávnění k odstranění položek "
-"následujících typů:"
 
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"Deleting the %(object_name)s “%(escaped_object)s” would require deleting the "
 "following protected related objects:"
 msgstr ""
-"Odstranění položky '%(escaped_object)s' typu %(object_name)s by vyžadovalo "
-"odstranění souvisejících chráněných položek:"
 
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"Are you sure you want to delete the %(object_name)s “%(escaped_object)s”? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Opravdu má být odstraněna položka \"%(escaped_object)s\" typu "
-"%(object_name)s? Následující související položky budou všechny odstraněny:"
 
 msgid "Objects"
 msgstr "Objekty"
@@ -500,9 +514,6 @@ msgstr "Ano, jsem si jist(a)"
 
 msgid "No, take me back"
 msgstr "Ne, beru zpět"
-
-msgid "Delete multiple objects"
-msgstr "Odstranit vybrané položky"
 
 #, python-format
 msgid ""
@@ -578,8 +589,8 @@ msgstr ""
 "Jste přihlášeni jako uživatel %(username)s, ale k této stránce nemáte "
 "oprávnění. Chcete se přihlásit k jinému účtu?"
 
-msgid "Forgotten your password or username?"
-msgstr "Zapomněli jste heslo nebo uživatelské jméno?"
+msgid "Forgotten your login credentials?"
+msgstr "Zapomenuté přihlašovací údaje?"
 
 msgid "Toggle navigation"
 msgstr "Přehodit navigaci"
@@ -602,6 +613,10 @@ msgstr "Uživatel"
 msgid "Action"
 msgstr "Operace"
 
+#, python-format
+msgid "Pagination %(name)s entries"
+msgstr ""
+
 msgid "entry"
 msgid_plural "entries"
 msgstr[0] "položka"
@@ -616,14 +631,19 @@ msgstr ""
 "Tato položka nemá historii změn. Pravděpodobně nebyla přidána tímto "
 "administračním rozhraním."
 
+#, python-format
+msgid "Pagination %(name)s"
+msgstr ""
+
 msgid "Show all"
 msgstr "Zobrazit vše"
 
-msgid "Save"
-msgstr "Uložit"
-
 msgid "Popup closing…"
 msgstr "Vyskakovací okno se zavírá..."
+
+#, python-format
+msgid "Search %(name)s"
+msgstr ""
 
 msgid "Search"
 msgstr "Hledat"
@@ -670,6 +690,9 @@ msgstr "Odstranit vybrané položky typu %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Zobrazení vybraných %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Děkujeme za dnešní čas strávený s tímto neobyčejným webem."
@@ -746,8 +769,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Přejděte na následující stránku a zadejte nové heslo:"
 
-msgid "Your username, in case you’ve forgotten:"
-msgstr "Pro jistotu vaše uživatelské jméno:"
+msgid "In case you’ve forgotten, you are:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "Děkujeme za používání našeho webu!"

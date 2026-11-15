@@ -1,5 +1,6 @@
 import json
 import uuid
+from unittest import mock
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import (
@@ -28,6 +29,14 @@ class JSONFieldTest(SimpleTestCase):
         field = JSONField()
         with self.assertRaisesMessage(ValidationError, "Enter a valid JSON."):
             field.clean("{some badly formed: json}")
+
+    def test_invalid_deeply_nested(self):
+        field = JSONField()
+        # json.loads() raises RecursionError when the nesting is too deep for
+        # the available stack.
+        with mock.patch.object(json, "loads", side_effect=RecursionError):
+            with self.assertRaisesMessage(ValidationError, "Enter a valid JSON."):
+                field.clean("[[[]]]")
 
     def test_prepare_value(self):
         field = JSONField()
@@ -140,3 +149,12 @@ class JSONFieldTest(SimpleTestCase):
         form = JSONForm({"name": "xy", "json_field": '{"foo"}'})
         self.assertEqual(form.errors["json_field"], ["Enter a valid JSON."])
         self.assertIn("{&quot;foo&quot;}</textarea>", form.as_p())
+
+    def test_redisplay_deeply_nested_input(self):
+        class JSONForm(Form):
+            json_field = JSONField()
+
+        form = JSONForm({"json_field": "[[[]]]"})
+        with mock.patch.object(json, "loads", side_effect=RecursionError):
+            self.assertEqual(form.errors["json_field"], ["Enter a valid JSON."])
+            self.assertIn("[[[]]]</textarea>", form.as_p())

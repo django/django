@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-06-01 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
 "Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2022-2026\n"
 "Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
@@ -183,8 +183,13 @@ msgstr "Puudub"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Hoia all “Control” või “Command” Macil, et valida rohkem kui üks."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Vali toiminguks käesolev objekt - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -244,14 +249,14 @@ msgstr "Muuda %s"
 msgid "View %s"
 msgstr "Vaata %s"
 
-msgid "Database error"
-msgstr "Andmebaasi viga"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s muutmine õnnestus."
 msgstr[1] "%(count)s %(name)s muutmine õnnestus."
+
+msgid "Database error"
+msgstr "Andmebaasi viga"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -276,6 +281,17 @@ msgstr "Muudatuste ajalugu: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -329,9 +345,6 @@ msgstr ""
 msgid "Run"
 msgstr "Käivita"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Kliki siin, et märgistada objektid üle kõigi lehekülgede"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Märgista kõik %(total_count)s %(module_name)s"
@@ -341,10 +354,6 @@ msgstr "Tühjenda valik"
 
 msgid "Breadcrumbs"
 msgstr "Lingirivi"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Rakenduse %(name)s moodulid"
 
 msgid "Model name"
 msgstr "Mudeli nimi"
@@ -454,6 +463,10 @@ msgstr "Teema lülitamine (hetkel: hele)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Teema lülitamine (hetkel: tume)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -652,6 +665,9 @@ msgstr "Kustuta valitud %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Vaata valitud %(model)s"
+
+msgid "Logout"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Tänan, et veetsite aega meie lehel."

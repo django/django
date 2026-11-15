@@ -1,8 +1,9 @@
 import glob
+import locale
 import os
 import re
 import sys
-from functools import total_ordering
+from functools import cached_property, total_ordering
 from itertools import dropwhile
 from pathlib import Path
 
@@ -18,7 +19,6 @@ from django.core.management.utils import (
     popen_wrapper,
 )
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
-from django.utils.functional import cached_property
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import get_text_list
 from django.utils.translation import templatize
@@ -440,11 +440,17 @@ class Command(BaseCommand):
                     if match:
                         locale_parts = match.groupdict()
                         language = locale_parts["language"].lower()
-                        territory = (
-                            locale_parts["territory"][:2].upper()
-                            + locale_parts["territory"][2:]
+                        territory, x, private = locale_parts["territory"].partition(
+                            "-x-"
                         )
-                        proposed_locale = f"{language}_{territory}"
+                        # Two-letter subtags are region codes (e.g. GB), which
+                        # are uppercased. Others, such as scripts (e.g. Hans),
+                        # are title-cased.
+                        if len(territory) == 2:
+                            territory = territory.upper()
+                        else:
+                            territory = territory.title()
+                        proposed_locale = f"{language}_{territory}" + x + private
                     else:
                         # It could be a language in uppercase
                         proposed_locale = locale.lower()
@@ -663,8 +669,14 @@ class Command(BaseCommand):
             return
 
         input_files = [bf.work_path for bf in build_files]
-        with NamedTemporaryFile(mode="w+") as input_files_list:
-            input_files_list.write("\n".join(input_files))
+        # xgettext opens the listed paths as raw bytes, which Windows reads
+        # in the ANSI code page regardless of Python's UTF-8 mode.
+        if os.name == "nt":
+            files_list = "\n".join(input_files).encode(locale.getencoding())
+        else:
+            files_list = b"\n".join(os.fsencode(path) for path in input_files)
+        with NamedTemporaryFile(mode="w+b") as input_files_list:
+            input_files_list.write(files_list)
             input_files_list.flush()
             args.extend(["--files-from", input_files_list.name])
             args.extend(self.xgettext_options)

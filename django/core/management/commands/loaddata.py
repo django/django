@@ -6,6 +6,7 @@ import sys
 import warnings
 import zipfile
 from itertools import product
+from pathlib import PurePath
 
 from django.apps import apps
 from django.conf import settings
@@ -22,7 +23,6 @@ from django.db import (
     router,
     transaction,
 )
-from django.utils.functional import cached_property
 
 try:
     import bz2
@@ -109,7 +109,7 @@ class Command(BaseCommand):
         if transaction.get_autocommit(self.using):
             connections[self.using].close()
 
-    @cached_property
+    @functools.cached_property
     def compression_formats(self):
         """A dict mapping format names to (open function, mode arg) tuples."""
         # Forcing binary mode may be revisited after dropping Python 2 support
@@ -352,7 +352,7 @@ class Command(BaseCommand):
 
         return fixture_files
 
-    @cached_property
+    @functools.cached_property
     def fixture_dirs(self):
         """
         Return a list of fixture directories.
@@ -394,7 +394,10 @@ class Command(BaseCommand):
                 )
             return READ_STDIN, self.format, "stdin"
 
-        parts = fixture_name.rsplit(".", 2)
+        fixture_path = PurePath(fixture_name)
+        suffixes = fixture_path.suffixes
+        name = str(fixture_path).removesuffix("".join(suffixes))
+        parts = [name, *(suffix.removeprefix(".") for suffix in suffixes)]
 
         if len(parts) > 1 and parts[-1] in self.compression_formats:
             cmp_fmt = parts[-1]

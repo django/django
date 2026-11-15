@@ -49,6 +49,11 @@ class AlbumAdmin(admin.ModelAdmin):
 
 
 class SchoolAdmin(admin.ModelAdmin):
+    fields = (
+        "students",
+        "alumni",
+        "name",
+    )
     filter_vertical = ("students",)
     filter_horizontal = ("alumni",)
 

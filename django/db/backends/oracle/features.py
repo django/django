@@ -1,6 +1,7 @@
+from functools import cached_property
+
 from django.db import DatabaseError, InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -31,6 +32,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_deferrable_unique_constraints = True
     truncates_names = True
     supports_comments = True
+    supports_independent_comment_alteration = True
     supports_tablespaces = True
     supports_sequence_reset = False
     can_introspect_materialized_views = True
@@ -147,6 +149,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if (21,) <= self.connection.oracle_version < (23,):
+            skips.update(
+                {
+                    "Raises ORA-24826 on Oracle 21c: value LOB no longer available": {
+                        "db_functions.json.test_json_object.JSONObjectTests."
+                        "test_order_by_key",
+                        "db_functions.json.test_json_object.JSONObjectTests."
+                        "test_order_by_nested_key",
+                    },
+                },
+            )
         if self.connection.is_pool:
             skips.update(
                 {
@@ -234,6 +247,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_uuid4_function(self):
         return self.connection.oracle_version >= (23, 9)
+
+    @cached_property
+    def supports_uuid4_function_in_default(self):
+        return self.connection.oracle_version >= (23, 26, 2)
 
     @cached_property
     def supports_stored_generated_columns(self):

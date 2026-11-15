@@ -1,6 +1,7 @@
 import warnings
 from contextlib import ContextDecorator, contextmanager
 from functools import wraps
+from inspect import iscoroutinefunction
 
 from django.db import (
     DEFAULT_DB_ALIAS,
@@ -9,7 +10,7 @@ from django.db import (
     ProgrammingError,
     connections,
 )
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.warnings import django_file_prefixes
 
 
@@ -52,7 +53,7 @@ def rollback(using=None):
 def savepoint(using=None):
     warnings.warn(
         "savepoint() is deprecated. Use savepoint_create() instead.",
-        category=RemovedInDjango70Warning,
+        category=RemovedInDjango2028Warning,
         skip_file_prefixes=django_file_prefixes(),
     )
     return savepoint_create(using=using)
@@ -342,9 +343,17 @@ def _non_atomic_requests(view, using):
     except AttributeError:
         databases = {using}
 
-    @wraps(view)
-    def wrapper(*args, **kwargs):
-        return view(*args, **kwargs)
+    if iscoroutinefunction(view):
+
+        @wraps(view)
+        async def wrapper(*args, **kwargs):
+            return await view(*args, **kwargs)
+
+    else:
+
+        @wraps(view)
+        def wrapper(*args, **kwargs):
+            return view(*args, **kwargs)
 
     wrapper._non_atomic_requests = databases
     return wrapper

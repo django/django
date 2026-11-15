@@ -1,10 +1,10 @@
-# RemovedInDjango70Warning: this entire file.
+# RemovedInDjango2028Warning: this entire file.
 # Mailers-related deprecation warnings and helpers used in multiple places.
 # (In a separate file to avoid circular import problems.)
 import warnings
 
 from django.conf import DEPRECATED_EMAIL_SETTINGS, settings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.warnings import django_file_prefixes
 
 FAIL_SILENTLY_ARG_WARNING = (
@@ -20,7 +20,7 @@ CONNECTION_ARG_WARNING = (
     "with a MAILERS alias."
 )
 NO_DEFAULT_MAILER_WARNING = (
-    "Django 7.0 will not have a default mailer. Configure "
+    "Django 2028 will not have a default mailer. Configure "
     "settings.MAILERS to avoid errors when sending email."
 )
 
@@ -44,13 +44,13 @@ def warn_about_default_mailers_if_needed():
     if not hasattr(settings, "MAILERS"):
         # If a warning about migrating to MAILERS was not already
         # issued on startup (for a deprecated email setting), warn defining
-        # MAILERS will be required for sending email in Django 7.0.
+        # MAILERS will be required for sending email in Django 2028.
         if not any(
             hasattr(settings, name) and settings.is_overridden(name)
             for name in DEPRECATED_EMAIL_SETTINGS
         ):
             warnings.warn(
                 NO_DEFAULT_MAILER_WARNING,
-                RemovedInDjango70Warning,
+                RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )

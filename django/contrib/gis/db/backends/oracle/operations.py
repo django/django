@@ -9,6 +9,7 @@ the WKT constructors.
 """
 
 import re
+from functools import cached_property
 
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import BaseSpatialOperations
@@ -18,7 +19,6 @@ from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.db.backends.oracle.operations import DatabaseOperations
-from django.utils.functional import cached_property
 
 DEFAULT_TOLERANCE = "0.05"
 
@@ -244,7 +244,10 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
         def converter(value, expression, connection):
             if value is not None:
-                geom = GEOSGeometryBase(read(memoryview(value.read())), geom_class)
+                geom = GEOSGeometryBase(
+                    read(memoryview(value.read()), max_geom_collections=None),
+                    geom_class,
+                )
                 if srid:
                     geom.srid = srid
                 return geom

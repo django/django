@@ -14,17 +14,14 @@ class SafeMakeDirsTests(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory()
         self.base = tmp.name
         self.addCleanup(tmp.cleanup)
+        # `umask()` returns the current mask, so it'll be restored on cleanup.
+        self.addCleanup(os.umask, os.umask(0o022))
 
     def assertDirMode(self, path, expected):
         self.assertIs(os.path.isdir(path), True)
         if sys.platform == "win32":
             # Windows partially supports chmod: dirs always end up with 0o777.
             expected = 0o777
-
-        # These tests assume a typical process umask (0o022 or similar): they
-        # create directories with modes like 0o755 and 0o700, which don't have
-        # group/world write bits, so a typical umask doesn't change the final
-        # permissions. On unexpected failures, check whether umask has changed.
         self.assertEqual(stat.S_IMODE(os.stat(path).st_mode), expected)
 
     def test_creates_directory_hierarchy_with_permissions(self):
@@ -100,34 +97,46 @@ class SafeMakeDirsTests(unittest.TestCase):
         self.assertDirMode(os.path.normpath(path), 0o755)
         self.assertIs(os.path.isdir(os.path.join(self.base, "a", "c")), True)
 
-    def test_permissions_unaffected_by_process_umask(self):
+    def test_permissions_restricted_by_process_umask(self):
         path = os.path.join(self.base, "a", "b", "c")
         # `umask()` returns the current mask, so it'll be restored on cleanup.
         self.addCleanup(os.umask, os.umask(0o077))
 
         safe_makedirs(path, mode=0o755)
 
-        self.assertDirMode(os.path.join(self.base, "a"), 0o755)
-        self.assertDirMode(os.path.join(self.base, "a", "b"), 0o755)
-        self.assertDirMode(path, 0o755)
+        expected = 0o700
+        self.assertDirMode(os.path.join(self.base, "a"), expected)
+        self.assertDirMode(os.path.join(self.base, "a", "b"), expected)
+        self.assertDirMode(path, expected)
 
-    def test_permissions_correct_despite_concurrent_umask_change(self):
+    def test_permissions_unchanged_with_zero_umask(self):
         path = os.path.join(self.base, "a", "b", "c")
-        original_mkdir = os.mkdir
         # `umask()` returns the current mask, so it'll be restored on cleanup.
         self.addCleanup(os.umask, os.umask(0o000))
 
-        def mkdir_changing_umask(p, mode):
-            # Simulate a concurrent thread changing the process umask.
-            os.umask(0o077)
-            original_mkdir(p, mode)
+        mode = 0o750
+        safe_makedirs(path, mode=mode)
 
-        with unittest.mock.patch("os.mkdir", side_effect=mkdir_changing_umask):
-            safe_makedirs(path, mode=0o755)
+        self.assertDirMode(os.path.join(self.base, "a"), mode)
+        self.assertDirMode(os.path.join(self.base, "a", "b"), mode)
+        self.assertDirMode(path, mode)
 
-        self.assertDirMode(os.path.join(self.base, "a"), 0o755)
-        self.assertDirMode(os.path.join(self.base, "a", "b"), 0o755)
-        self.assertDirMode(path, 0o755)
+    @unittest.skipIf(
+        sys.platform == "win32", "Windows only partially supports umasks and chmod."
+    )
+    def test_process_umask_unchanged(self):
+        path = os.path.join(self.base, "a", "b", "c")
+        umask = 0o027
+        # `umask()` returns the current mask, so it'll be restored on cleanup.
+        self.addCleanup(os.umask, os.umask(umask))
+
+        safe_makedirs(path, mode=0o755)
+
+        # `umask()` can only be read by setting it.
+        self.assertEqual(os.umask(umask), umask)
+        self.assertDirMode(os.path.join(self.base, "a"), 0o750)
+        self.assertDirMode(os.path.join(self.base, "a", "b"), 0o750)
+        self.assertDirMode(path, 0o750)
 
     def test_race_condition_exist_ok_false(self):
         path = os.path.join(self.base, "a", "b")

@@ -7,7 +7,7 @@ import uuid
 import warnings
 from base64 import b64decode, b64encode
 from collections.abc import Iterable
-from functools import partialmethod, total_ordering
+from functools import cached_property, partialmethod, total_ordering
 
 from django import forms
 from django.apps import apps
@@ -32,9 +32,9 @@ from django.utils.dateparse import (
     parse_duration,
     parse_time,
 )
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.duration import duration_string
-from django.utils.functional import Promise, cached_property
+from django.utils.functional import Promise
 from django.utils.ipv6 import MAX_IPV6_ADDRESS_LENGTH, clean_ipv6_address
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
@@ -42,7 +42,7 @@ from django.utils.warnings import django_file_prefixes
 
 __all__ = [
     "AutoField",
-    # RemovedInDjango70Warning
+    # RemovedInDjango2028Warning
     "BLANK_CHOICE_DASH",
     "BLANK_CHOICE_LABEL",
     "BigAutoField",
@@ -86,7 +86,7 @@ class NOT_PROVIDED:
     pass
 
 
-# RemovedInDjango70Warning: From Django 6.1, the values to use for "blank"
+# RemovedInDjango2028Warning: From Django 6.1, the values to use for "blank"
 # in SelectFields will be defined by the below BLANK_CHOICE_LABEL constant.
 # Will be appended to the start of most "choices" lists.
 # BLANK_CHOICE_DASH is still available as a constant in Django 6.1.
@@ -192,7 +192,7 @@ class Field(RegisterLookupMixin):
     description = property(_description)
 
     def __init_subclass__(cls, **kwargs):
-        # RemovedInDjango70Warning: When the deprecation ends, remove
+        # RemovedInDjango2028Warning: When the deprecation ends, remove
         # completely.
         # Allow for both `get_placeholder` and `get_placeholder_sql` to
         # be declared to ease the deprecation process for third-party apps.
@@ -203,7 +203,7 @@ class Field(RegisterLookupMixin):
                 "Field.get_placeholder is deprecated in favor of get_placeholder_sql. "
                 f"Define {cls.__module__}.{cls.__qualname__}.get_placeholder_sql "
                 "to return both SQL and parameters instead.",
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
 
@@ -2366,14 +2366,7 @@ class GenericIPAddressField(Field):
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)
-        if value is None:
-            return None
-        if value and ":" in value:
-            try:
-                return clean_ipv6_address(value, self.unpack_ipv4)
-            except exceptions.ValidationError:
-                pass
-        return str(value)
+        return self.to_python(value)
 
     def formfield(self, **kwargs):
         return super().formfield(

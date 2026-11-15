@@ -8,7 +8,7 @@ from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.db.backends.base.creation import TEST_DATABASE_PREFIX, BaseDatabaseCreation
 from django.test import SimpleTestCase, TransactionTestCase
 from django.test.utils import override_settings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from ..models import (
     CircularA,
@@ -184,7 +184,7 @@ class TestDbCreationTests(SimpleTestCase):
         )
         try:
             with (
-                self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx,
+                self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx,
                 mock.patch.object(creation, "_create_test_db"),
             ):
                 creation.create_test_db(verbosity=0, serialize=True)
@@ -197,7 +197,7 @@ class TestDbCreationTests(SimpleTestCase):
         serialize_db_to_string.reset_mock()
         try:
             with (
-                self.assertWarnsMessage(RemovedInDjango70Warning, msg) as ctx,
+                self.assertWarnsMessage(RemovedInDjango2028Warning, msg) as ctx,
                 mock.patch.object(creation, "_create_test_db"),
             ):
                 creation.create_test_db(verbosity=0, serialize=False)

@@ -1,10 +1,10 @@
 import operator
 import sqlite3
+from functools import cached_property
 
 from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import OperationalError
-from django.utils.functional import cached_property
 from django.utils.version import PY314
 
 from .base import Database
@@ -172,3 +172,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     can_introspect_json_field = property(operator.attrgetter("supports_json_field"))
     has_json_object_function = property(operator.attrgetter("supports_json_field"))
+    supports_uuid4_function_in_default = property(
+        operator.attrgetter("supports_uuid4_function")
+    )

@@ -498,7 +498,7 @@ class DebugViewTests(SimpleTestCase):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(response, "Oh dear, an error occurred!", status_code=500)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_settings(MAILERS={})
     def test_works_with_mailers_defined(self):
         with self.assertLogs("django.request", "ERROR"):
@@ -766,6 +766,129 @@ class ExceptionReporterTests(SimpleTestCase):
             "<script>alert(1);</script>",
             text,
         )
+
+    def test_exception_group(self):
+        request = self.rf.get("/test_view")
+        try:
+            raise ExceptionGroup(
+                "Oops group",
+                [RuntimeError("Oops 1"), ValueError("Oops 2"), ValueError("Oops 3")],
+            )
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertInHTML("<h1>ExceptionGroup at /test_view</h1>", html)
+        self.assertIn(
+            '<pre class="exception_value">Oops group (3 sub-exceptions)</pre>', html
+        )
+        self.assertIn('<th scope="row">Exception Type:</th>', html)
+        self.assertIn('<th scope="row">Exception Value:</th>', html)
+        self.assertInHTML(
+            """
+            <td id="exception_group">
+                <ul>
+                    <li>
+                        <pre>ExceptionGroup: Oops group (3 sub-exceptions)</pre>
+                        <ul>
+                            <li><pre>RuntimeError: Oops 1</pre></li>
+                            <li><pre>ValueError: Oops 2</pre></li>
+                            <li><pre>ValueError: Oops 3</pre></li>
+                        </ul>
+                    </li>
+                </ul>
+            </td>
+            """,
+            html,
+            count=1,
+        )
+        self.assertIn("Exception Group Tree:", html)
+
+    def test_nested_exception_group(self):
+        request = self.rf.get("/test_view")
+        try:
+            raise ExceptionGroup(
+                "Outer Oops group",
+                [
+                    RuntimeError("Outer Oops"),
+                    ExceptionGroup(
+                        "Inner Oops group",
+                        [
+                            ValueError("<em>Inner Oops 1</em>"),
+                            ValueError("Inner Oops 2"),
+                            ValueError("Inner Oops 3"),
+                        ],
+                    ),
+                ],
+            )
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+
+        html = reporter.get_traceback_html()
+        self.assertInHTML("<h1>ExceptionGroup at /test_view</h1>", html)
+        self.assertIn(
+            '<pre class="exception_value">Outer Oops group (2 sub-exceptions)</pre>',
+            html,
+        )
+        self.assertIn('<th scope="row">Exception Type:</th>', html)
+        self.assertIn('<th scope="row">Exception Value:</th>', html)
+        inner_html = """
+        <li>
+            <pre>ExceptionGroup: Inner Oops group (3 sub-exceptions)</pre>
+            <ul>
+                <li><pre>ValueError: &lt;em&gt;Inner Oops 1&lt;/em&gt;</pre></li>
+                <li><pre>ValueError: Inner Oops 2</pre></li>
+                <li><pre>ValueError: Inner Oops 3</pre></li>
+            </ul>
+        </li>
+        """
+        self.assertInHTML(
+            f"""
+            <td id="exception_group">
+                <ul>
+                    <li>
+                        <pre>ExceptionGroup: Outer Oops group (2 sub-exceptions)</pre>
+                        <ul>
+                            <li><pre>RuntimeError: Outer Oops</pre></li>
+                            {inner_html}
+                        </ul>
+                    </li>
+                </ul>
+            </td>
+            """,
+            html,
+            count=1,
+        )
+        self.assertIn("Exception Group Tree:", html)
+
+        text = reporter.get_traceback_text()
+        self.assertIn(
+            "Exception Group Tree:\n"
+            "ExceptionGroup: Outer Oops group (2 sub-exceptions)\n"
+            "    RuntimeError: Outer Oops\n"
+            "    ExceptionGroup: Inner Oops group (3 sub-exceptions)\n"
+            "        ValueError: <em>Inner Oops 1</em>\n"
+            "        ValueError: Inner Oops 2\n"
+            "        ValueError: Inner Oops 3\n",
+            text,
+        )
+
+    def test_exception_without_group_tree(self):
+        request = self.rf.get("/test_view/")
+        try:
+            raise RuntimeError("Oops")
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertInHTML("<h1>RuntimeError at /test_view/</h1>", html)
+        self.assertNotIn("Exception Group Tree:", html)
+        self.assertNotIn('<td id="exception_group">', html)
+
+        text = reporter.get_traceback_text()
+        self.assertNotIn("Exception Group Tree:", text)
 
     def test_mid_stack_exception_without_traceback(self):
         try:
@@ -1119,7 +1242,7 @@ class ExceptionReporterTests(SimpleTestCase):
     def test_too_large_values_handling(self):
         "Large values should not create a large HTML."
         large = 256 * 1024
-        repr_of_str_adds = len(repr(""))
+        repr_len = large + len(repr(""))
         try:
 
             class LargeOutput:
@@ -1134,7 +1257,7 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
         self.assertIn(
-            "&lt;trimmed %d bytes string&gt;" % (large + repr_of_str_adds,), html
+            "&lt;trimmed %d chars out of %d&gt;" % (repr_len - 4096, repr_len), html
         )
 
     def test_encoding_error(self):

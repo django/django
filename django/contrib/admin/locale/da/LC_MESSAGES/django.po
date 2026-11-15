@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025
+# Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025-2026
 # Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2020-2025
 # Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2013,2015-2020
 # Finn Gruwier Larsen, 2011
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <erik.wognsen@gmail.com>, 2025-2026\n"
 "Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -182,8 +182,13 @@ msgstr "Ingen"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Hold “Ctrl”, eller “Æbletasten” på Mac, nede for at vælge mere end én."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Vælg dette objekt for en handling - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr "Appen \"%s\" kunne ikke findes."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -245,14 +250,14 @@ msgstr "Ret %s"
 msgid "View %s"
 msgstr "Vis %s"
 
-msgid "Database error"
-msgstr "Databasefejl"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s blev ændret."
 msgstr[1] "%(count)s %(name)s blev ændret."
+
+msgid "Database error"
+msgstr "Databasefejl"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -277,6 +282,17 @@ msgstr "Ændringshistorik: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] "…og %(count)d objekt mere."
+msgstr[1] "…og %(count)d objekter mere."
 
 #, python-format
 msgid ""
@@ -330,9 +346,6 @@ msgstr ""
 msgid "Run"
 msgstr "Kør"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Klik her for at vælge objekter på tværs af alle sider"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Vælg alle %(total_count)s  %(module_name)s "
@@ -342,10 +355,6 @@ msgstr "Ryd valg"
 
 msgid "Breadcrumbs"
 msgstr "Sti"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modeller i applikationen %(name)s"
 
 msgid "Model name"
 msgstr "Modelnavn"
@@ -458,6 +467,10 @@ msgstr "Skift tema (nuværende tema: lyst)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Skift tema (nuværende tema: mørkt)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr "Filtrer efter %(field_name)s"
 
 #, python-format
 msgid ""
@@ -665,6 +678,9 @@ msgstr "Slet valgte %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Vis valgte %(model)s"
+
+msgid "Logout"
+msgstr "Logud"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Tak for den kvalitetstid du brugte på websitet i dag."

@@ -1,0 +1,26 @@
+{
+    "type": "GeometryCollection",
+    "geometries": [
+        {
+            "type": "GeometryCollection",
+            "geometries": [
+                {
+                    "type": "GeometryCollection",
+                    "geometries": [
+                        {
+                            "type": "Point",
+                            "coordinates": [0, 0],
+                            "crs": {
+                                "type": "link",
+                                "properties": {
+                                    "href": "http://[invalid]/deep-without-ancestor-crs",
+                                    "type": "proj4"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

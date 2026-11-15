@@ -12,7 +12,7 @@ from django.db.models.lookups import (
     PostgresOperatorLookup,
     Transform,
 )
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.translation import gettext_lazy as _
 from django.utils.warnings import django_file_prefixes
 
@@ -291,6 +291,26 @@ class HasKeyOrArrayIndex(HasKey):
     def compile_json_path_final_key(self, connection, key_transform):
         return connection.ops.compile_json_path([key_transform], include_root=False)
 
+    def as_oracle(self, compiler, connection):
+        min_value, max_value = connection.ops.integer_field_range("IntegerField")
+        keys = [self.rhs]
+        previous = self.lhs
+        while isinstance(previous, KeyTransform):
+            keys.append(previous.key_name)
+            previous = previous.lhs
+        for key in keys:
+            try:
+                index = int(key)
+            except ValueError:
+                continue
+            if not (min_value <= index <= max_value):
+                # Oracle's JSON path parser cannot lex an array subscript
+                # this long ("ORA-40597: Array subscript too long"). An
+                # index this large can never exist in any real array, so
+                # the key/index can never be present.
+                return "(1=0)", ()
+        return super().as_oracle(compiler, connection)
+
 
 class CaseInsensitiveMixin:
     """
@@ -314,7 +334,7 @@ class CaseInsensitiveMixin:
 
 
 class JSONExact(lookups.Exact):
-    # RemovedInDjango70Warning: When the deprecation period is over, remove
+    # RemovedInDjango2028Warning: When the deprecation period is over, remove
     # the following line.
     can_use_none_as_rhs = True
 
@@ -324,13 +344,13 @@ class JSONExact(lookups.Exact):
                 "Using None as the right-hand side of an exact lookup on JSONField to "
                 "mean JSON scalar 'null' is deprecated. Use JSONNull() instead (or use "
                 "the __isnull lookup if you meant SQL NULL).",
-                RemovedInDjango70Warning,
+                RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
 
         rhs, rhs_params = super().process_rhs(compiler, connection)
 
-        # RemovedInDjango70Warning: When the deprecation period is over, remove
+        # RemovedInDjango2028Warning: When the deprecation ends, remove
         # The following if-block entirely.
         # Treat None lookup values as null.
         if rhs == "%s" and (*rhs_params,) == (None,):
@@ -409,11 +429,26 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
             sql,
             param,
         )
-        if not connection.features.has_native_json_field and (
-            not hasattr(param, "as_sql") or isinstance(param, expressions.Value)
+        is_value = isinstance(param, expressions.Value)
+        if (
+            not connection.features.has_native_json_field
+            and (not hasattr(param, "as_sql") or is_value)
+            # A non-JSON Value(None) compiles to a literal NULL with no params,
+            # so there is nothing to encode or wrap.
+            and not (
+                is_value
+                and param.value is None
+                and not isinstance(param._output_field_or_none, JSONField)
+            )
         ):
+            if is_value and not isinstance(param._output_field_or_none, JSONField):
+                output_field = param._output_field_or_none
+                value = param.value
+                if output_field is not None:
+                    value = output_field.get_prep_value(value)
+                params = [connection.ops.adapt_json_value(value, None)]
             if connection.vendor == "oracle":
-                value = param.value if hasattr(param, "value") else json.loads(param)
+                value = param.value if is_value else json.loads(param)
                 sql = "%s(JSON_OBJECT('value' VALUE %%s FORMAT JSON), '$.value')"
                 if isinstance(value, (list, dict)):
                     sql %= "JSON_QUERY"
@@ -433,6 +468,13 @@ class JSONIn(ProcessJSONLHSMixin, lookups.In):
         if isinstance(self.lhs, KeyTransform):
             return sql, params
         if connection.vendor == "mysql":
+            if connection.mysql_is_mariadb:
+                # lookup_cast() has applied JSON_UNQUOTE() to the lhs, so
+                # build the extract-then-unquote order from the raw column.
+                sql, params = compiler.compile(self.lhs)
+                sql, params = self._process_as_mysql(sql, params, connection)
+                sql = "JSON_UNQUOTE(%s)" % sql
+                return sql, params
             return self._process_as_mysql(sql, params, connection)
         elif connection.vendor == "oracle":
             return self._process_as_oracle(sql, params, connection)
@@ -498,6 +540,18 @@ class KeyTransform(ProcessJSONLHSMixin, Transform):
 
     def as_oracle(self, compiler, connection):
         lhs, params, key_transforms = self.preprocess_lhs(compiler, connection)
+        min_value, max_value = connection.ops.integer_field_range("IntegerField")
+        for key_transform in key_transforms:
+            try:
+                index = int(key_transform)
+            except ValueError:
+                continue
+            if not (min_value <= index <= max_value):
+                # Oracle's JSON path parser cannot lex an array subscript
+                # this long ("ORA-40597: Array subscript too long"). Treat
+                # it as a non-matching index, the same as Oracle itself
+                # treats an in-bounds-length but out-of-bounds index.
+                return "NULL", params
         return self._process_as_oracle(lhs, params, connection, key_transforms)
 
     def as_postgresql(self, compiler, connection):
@@ -507,6 +561,11 @@ class KeyTransform(ProcessJSONLHSMixin, Transform):
             return sql, (*params, key_transforms)
         try:
             lookup = int(self.key_name)
+            min_value, max_value = connection.ops.integer_field_range("IntegerField")
+            if not (min_value <= lookup <= max_value):
+                # No int4 overload of the operator can be bound to a value
+                # this large. Treat it as a non-matching index.
+                return "(%s %s NULL::integer)" % (lhs, self.postgres_operator), params
         except ValueError:
             lookup = self.key_name
         return "(%s %s %%s)" % (lhs, self.postgres_operator), (*params, lookup)
@@ -599,7 +658,7 @@ class KeyTransformIn(JSONIn):
 
 
 class KeyTransformExact(JSONExact):
-    # RemovedInDjango70Warning: When deprecation period ends, uncomment the
+    # RemovedInDjango2028Warning: When deprecation period ends, uncomment the
     # flag below.
     # can_use_none_as_rhs = True
 

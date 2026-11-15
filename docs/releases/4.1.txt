@@ -303,12 +303,12 @@ Management Commands
 * The new :option:`migrate --prune` option allows deleting nonexistent
   migrations from the ``django_migrations`` table.
 
-* Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
-  :djadmin:`optimizemigration`, :djadmin:`makemigrations`, and
-  :djadmin:`squashmigrations` are now formatted using the ``black`` command if
+* Python files created by :cli:`startproject`, :cli:`startapp`,
+  :cli:`optimizemigration`, :cli:`makemigrations`, and
+  :cli:`squashmigrations` are now formatted using the ``black`` command if
   it is present on your ``PATH``.
 
-* The new :djadmin:`optimizemigration` command allows optimizing operations for
+* The new :cli:`optimizemigration` command allows optimizing operations for
   a migration.
 
 Migrations
@@ -597,7 +597,7 @@ Miscellaneous
   crash with mixed types. You will need to explicitly set the ``output_field``
   in such cases.
 
-* The :djadmin:`makemessages` command no longer changes ``.po`` files when up
+* The :cli:`makemessages` command no longer changes ``.po`` files when up
   to date. In older versions, ``POT-Creation-Date`` was always updated.
 
 .. _deprecated-features-4.1:
@@ -654,7 +654,7 @@ Miscellaneous
   in :attr:`.ExclusionConstraint.expressions`. To use it, you need to add
   ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
 
-  After making this change, :djadmin:`makemigrations` will generate a new
+  After making this change, :cli:`makemigrations` will generate a new
   migration with two operations: ``RemoveConstraint`` and ``AddConstraint``.
   Since this change has no effect on the database schema,
   the :class:`~django.db.migrations.operations.SeparateDatabaseAndState`

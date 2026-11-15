@@ -1,4 +1,5 @@
 import inspect
+from functools import cached_property
 from importlib import import_module
 from inspect import cleandoc
 from pathlib import Path
@@ -17,9 +18,9 @@ from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf
 from django.urls.utils import extract_views_from_urlpatterns, simplify_regex
+from django.utils import functional
 from django.utils._os import safe_join
 from django.utils.decorators import method_decorator
-from django.utils.functional import cached_property
 from django.utils.inspect import (
     func_accepts_kwargs,
     func_accepts_var_args,
@@ -310,8 +311,12 @@ class ModelDetailView(BaseAdminDocsView):
         methods = []
         # Gather model methods.
         for func_name, func in model.__dict__.items():
+            # Django's cached_property isn't a subclass of
+            # functools.cached_property.
+            # RemovedInDjango2029Warning: When the deprecation ends, remove
+            # functional.cached_property.
             if inspect.isfunction(func) or isinstance(
-                func, (cached_property, property)
+                func, (cached_property, functional.cached_property, property)
             ):
                 try:
                     for exclude in MODEL_METHODS_EXCLUDE:
@@ -328,7 +333,11 @@ class ModelDetailView(BaseAdminDocsView):
                 # Show properties, cached_properties, and methods without
                 # arguments as fields. Otherwise, show as a 'method with
                 # arguments'.
-                if isinstance(func, (cached_property, property)):
+                # RemovedInDjango2029Warning: When the deprecation ends,
+                # remove functional.cached_property.
+                if isinstance(
+                    func, (cached_property, functional.cached_property, property)
+                ):
                     fields.append(
                         {
                             "name": func_name,

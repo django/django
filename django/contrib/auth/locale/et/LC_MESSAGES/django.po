@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2026-06-01 08:09+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 08:09+0000\n"
 "Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2023-2026\n"
 "Language-Team: Estonian (http://app.transifex.com/django/django/language/"
 "et/)\n"
@@ -61,12 +61,6 @@ msgstr "salasõna"
 
 msgid "last login"
 msgstr "viimane sisenemine"
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Lubamatu parooli formaat või tundmatu räsialgoritm."
-
-msgid "No password set."
-msgstr "Parool on määramata."
 
 msgid "Reset password"
 msgstr "Lähtesta parool"
@@ -297,6 +291,12 @@ msgstr "Salasõna ei tohi koosneda ainult numbritest."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Uue salasõna loomine saidil %(site_name)s"
+
+msgid "No password set."
+msgstr "Parool on määramata."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Lubamatu parooli formaat või tundmatu räsialgoritm."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

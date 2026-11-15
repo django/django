@@ -497,9 +497,9 @@ Miscellaneous
 
 * Please don't put your name in the code you contribute. Our policy is to
   keep contributors' names in the ``AUTHORS`` file distributed with Django
-  -- not scattered throughout the codebase itself. Feel free to include a
-  change to the ``AUTHORS`` file in your patch if you make more than a
-  single trivial change.
+  -- not scattered throughout the codebase itself. Feel free to add yourself to
+  the :source:`AUTHORS` file if your contributions go beyond
+  :ref:`trivial changes <trivial-change>`.
 
 JavaScript style
 ================

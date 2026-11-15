@@ -1,7 +1,7 @@
 import operator
+from functools import cached_property
 
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -236,6 +236,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (11, 7)
         return False
+
+    supports_uuid4_function_in_default = property(
+        operator.attrgetter("supports_uuid4_function")
+    )
 
     @cached_property
     def supports_uuid7_function(self):

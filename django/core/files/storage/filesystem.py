@@ -1,5 +1,6 @@
 import os
 from datetime import UTC, datetime
+from functools import cached_property
 from urllib.parse import urljoin
 
 from django.conf import settings
@@ -9,7 +10,6 @@ from django.core.signals import setting_changed
 from django.utils._os import safe_join, safe_makedirs
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import filepath_to_uri
-from django.utils.functional import cached_property
 
 from .base import Storage
 from .mixins import StorageSettingsMixin
@@ -72,9 +72,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
         directory = os.path.dirname(full_path)
         try:
             if self.directory_permissions_mode is not None:
-                # Workaround because os.makedirs() doesn't apply the "mode"
-                # argument to intermediate-level directories.
-                # https://github.com/python/cpython/issues/86533
+                # Apply the mode to intermediate-level directories too.
                 safe_makedirs(directory, self.directory_permissions_mode, exist_ok=True)
             else:
                 os.makedirs(directory, exist_ok=True)

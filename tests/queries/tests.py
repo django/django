@@ -14,7 +14,7 @@ from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     FK1,
@@ -2014,11 +2014,11 @@ class SelectRelatedTests(TestCase):
         # infinitely if you forgot to specify "depth". Now we set an arbitrary
         # default upper bound.
         self.assertSequenceEqual(X.objects.all(), [])
-        # RemovedInDjango70Warning: when the deprecation ends, remove this test
-        # case.
+        # RemovedInDjango2028Warning: when the deprecation ends, remove this
+        # test case.
         with ignore_warnings(
-            category=RemovedInDjango70Warning,
-            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            category=RemovedInDjango2028Warning,
+            message="Calling select_related() with no arguments is deprecated.",
         ):
             self.assertSequenceEqual(X.objects.select_related(), [])
 
@@ -2539,19 +2539,19 @@ class QuerySetBitwiseOperationTests(TestCase):
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_or_with_rhs_slice(self):
         qs1 = Classroom.objects.filter(has_blackboard=True)
-        qs2 = Classroom.objects.filter(has_blackboard=False)[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=False).order_by("pk")[:1]
         self.assertCountEqual(qs1 | qs2, [self.room_1, self.room_2, self.room_3])
 
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_or_with_lhs_slice(self):
-        qs1 = Classroom.objects.filter(has_blackboard=True)[:1]
+        qs1 = Classroom.objects.filter(has_blackboard=True).order_by("pk")[:1]
         qs2 = Classroom.objects.filter(has_blackboard=False)
         self.assertCountEqual(qs1 | qs2, [self.room_1, self.room_2, self.room_4])
 
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_or_with_both_slice(self):
-        qs1 = Classroom.objects.filter(has_blackboard=False)[:1]
-        qs2 = Classroom.objects.filter(has_blackboard=True)[:1]
+        qs1 = Classroom.objects.filter(has_blackboard=False).order_by("pk")[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=True).order_by("pk")[:1]
         self.assertCountEqual(qs1 | qs2, [self.room_1, self.room_2])
 
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
@@ -2563,19 +2563,19 @@ class QuerySetBitwiseOperationTests(TestCase):
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_xor_with_rhs_slice(self):
         qs1 = Classroom.objects.filter(has_blackboard=True)
-        qs2 = Classroom.objects.filter(has_blackboard=False)[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=False).order_by("pk")[:1]
         self.assertCountEqual(qs1 ^ qs2, [self.room_1, self.room_2, self.room_3])
 
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_xor_with_lhs_slice(self):
-        qs1 = Classroom.objects.filter(has_blackboard=True)[:1]
+        qs1 = Classroom.objects.filter(has_blackboard=True).order_by("pk")[:1]
         qs2 = Classroom.objects.filter(has_blackboard=False)
         self.assertCountEqual(qs1 ^ qs2, [self.room_1, self.room_2, self.room_4])
 
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
     def test_xor_with_both_slice(self):
-        qs1 = Classroom.objects.filter(has_blackboard=False)[:1]
-        qs2 = Classroom.objects.filter(has_blackboard=True)[:1]
+        qs1 = Classroom.objects.filter(has_blackboard=False).order_by("pk")[:1]
+        qs2 = Classroom.objects.filter(has_blackboard=True).order_by("pk")[:1]
         self.assertCountEqual(qs1 ^ qs2, [self.room_1, self.room_2])
 
     @skipUnlessDBFeature("allow_sliced_subqueries_with_in")
@@ -3752,6 +3752,40 @@ class NullJoinPromotionOrTest(TestCase):
         qs = ModelA.objects.filter(~~Q(b__name__isnull=False))
         self.assertEqual(str(qs.query).count("INNER JOIN"), 1)
         self.assertEqual(list(qs), [self.a2])
+
+    def test_xor_promotion(self):
+        fk1 = FK1.objects.create(f1="match", f2="value")
+        with_relation = BaseA.objects.create(a=fk1)
+        without_relation = BaseA.objects.create()
+
+        queryset = BaseA.objects.filter(
+            Q(a__f1__isnull=False) ^ Q(pk=without_relation.pk)
+        ).order_by("pk")
+        self.assertEqual(str(queryset.query).count(" LEFT OUTER JOIN "), 1)
+        self.assertSequenceEqual(queryset, [with_relation, without_relation])
+
+        queryset = BaseA.objects.filter(Q(a__f1="match") ^ Q(a__f2="other")).order_by(
+            "pk"
+        )
+        self.assertEqual(str(queryset.query).count(" INNER JOIN "), 1)
+        self.assertSequenceEqual(queryset, [with_relation])
+
+    def test_negated_xor_promotion(self):
+        fk1 = FK1.objects.create(f1="match", f2="value")
+        with_relation = BaseA.objects.create(a=fk1)
+        without_relation = BaseA.objects.create()
+
+        queryset = BaseA.objects.filter(
+            ~(Q(a__f1__isnull=True) ^ Q(pk=without_relation.pk))
+        ).order_by("pk")
+        self.assertEqual(str(queryset.query).count(" LEFT OUTER JOIN "), 1)
+        self.assertSequenceEqual(queryset, [with_relation, without_relation])
+
+        queryset = BaseA.objects.filter(
+            ~(~Q(a__f1__isnull=False) ^ Q(pk=without_relation.pk))
+        ).order_by("pk")
+        self.assertEqual(str(queryset.query).count(" LEFT OUTER JOIN "), 1)
+        self.assertSequenceEqual(queryset, [with_relation, without_relation])
 
     def test_null_join_demotion(self):
         qs = ModelA.objects.filter(Q(b__name__isnull=False) & Q(b__name__isnull=True))

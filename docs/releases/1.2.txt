@@ -292,7 +292,7 @@ objects whose primary key value may not be predictable or known.
 Fast failure for tests
 ----------------------
 
-Both the :djadmin:`test` subcommand of ``django-admin.py`` and the
+Both the :cli:`test` subcommand of ``django-admin.py`` and the
 ``runtests.py`` script used to run Django's own test suite now support a
 ``--failfast`` option. When specified, this option causes the test runner to
 exit after encountering a failure instead of continuing with the test run. In

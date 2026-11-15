@@ -292,6 +292,45 @@ class OperationTests(OperationTestCase):
         )
         self.assertSpatialIndexNotExists("gis_neighborhood", "geom")
 
+    @skipUnlessDBFeature("can_alter_geometry_field", "supports_raster")
+    def test_alter_raster_field_add_spatial_index(self):
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.alter_gis_model(
+            migrations.AddField,
+            "Neighborhood",
+            "heatmap",
+            fields.RasterField,
+            field_class_kwargs={"spatial_index": False},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "heatmap", raster=True)
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "heatmap",
+            fields.RasterField,
+            field_class_kwargs={"spatial_index": True},
+        )
+        self.assertSpatialIndexExists("gis_neighborhood", "heatmap", raster=True)
+
+    @skipUnlessDBFeature("can_alter_geometry_field", "supports_raster")
+    def test_alter_raster_field_remove_spatial_index(self):
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        self.assertSpatialIndexExists("gis_neighborhood", "rast", raster=True)
+
+        self.alter_gis_model(
+            migrations.AlterField,
+            "Neighborhood",
+            "rast",
+            fields.RasterField,
+            field_class_kwargs={"spatial_index": False},
+        )
+        self.assertSpatialIndexNotExists("gis_neighborhood", "rast", raster=True)
+
     @skipUnlessDBFeature("can_alter_geometry_field")
     @skipUnless(connection.vendor == "mysql", "MySQL specific test")
     def test_alter_field_nullable_with_spatial_index(self):

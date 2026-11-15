@@ -36,7 +36,7 @@ def handle_extensions(extensions):
     Organize multiple extensions that are separated with commas or passed by
     using --extension/-e multiple times.
 
-    For example: running 'django-admin makemessages -e js,txt -e xhtml -a'
+    For example: running 'django makemessages -e js,txt -e xhtml -a'
     would result in an extension list: ['.js', '.txt', '.xhtml']
 
     >>> handle_extensions(['.html', 'html,js,py,py,py,.py', 'py,.py'])

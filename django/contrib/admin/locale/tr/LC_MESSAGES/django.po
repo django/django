@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2025
+# BouRock, 2015-2026
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
-"Last-Translator: BouRock, 2015-2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
+"Last-Translator: BouRock, 2015-2026\n"
 "Language-Team: Turkish (http://app.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -186,8 +186,13 @@ msgid "Hold down “Control”, or “Command” on a Mac, to select more than o
 msgstr ""
 "Birden fazla seçmek için “Ctrl” veya Mac’teki “Command” tuşuna basılı tutun."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Bir eylem için bu nesneyi seç - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr "\"%s\" uygulaması bulunamadı."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -252,14 +257,14 @@ msgstr "%s değiştir"
 msgid "View %s"
 msgstr "%s göster"
 
-msgid "Database error"
-msgstr "Veritabanı hatası"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s adet %(name)s başarılı olarak değiştirildi."
 msgstr[1] "%(count)s adet %(name)s başarılı olarak değiştirildi."
+
+msgid "Database error"
+msgstr "Veritabanı hatası"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -284,6 +289,17 @@ msgstr "Değişiklik geçmişi: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] "…ve %(count)d nesne daha."
+msgstr[1] "…ve %(count)d nesne daha."
 
 #, python-format
 msgid ""
@@ -337,9 +353,6 @@ msgstr ""
 msgid "Run"
 msgstr "Çalıştır"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Tüm sayfalardaki nesneleri seçmek için buraya tıklayın"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Tüm %(total_count)s %(module_name)s nesnelerini seç"
@@ -349,10 +362,6 @@ msgstr "Seçimi temizle"
 
 msgid "Breadcrumbs"
 msgstr "İçerik haritaları"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s uygulamasındaki modeller"
 
 msgid "Model name"
 msgstr "Model adı"
@@ -466,6 +475,10 @@ msgstr "Temayı değiştir (şu anki tema: açık)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Temayı değiştir (şu anki tema: koyu)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr "%(field_name)s göre süz"
 
 #, python-format
 msgid ""
@@ -673,6 +686,9 @@ msgstr "Seçilen %(model)s sil"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Seçilen %(model)s görüntüle"
+
+msgid "Logout"
+msgstr "Oturumu kapat"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Bugün web sitesine ayırdığınız kaliteli zaman için teşekkür ederiz."

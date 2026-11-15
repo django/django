@@ -80,10 +80,11 @@ Django's system checks are organized using the following tags:
 * ``commands``: Checks custom management commands related configuration.
 * ``database``: Checks database-related configuration issues. Database checks
   are not run by default because they do more than only static code analysis as
-  most regular checks do. They are only run by the :djadmin:`migrate` command
+  most regular checks do. They are only run by the :cli:`migrate` command
   or if you specify configured database aliases using the ``--database`` option
-  when calling the :djadmin:`check` command.
+  when calling the :cli:`check` command.
 * ``files``: Checks files related configuration.
+* ``gis``: Checks :mod:`django.contrib.gis` configuration.
 * ``mail``: Checks email related configuration.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
@@ -95,6 +96,10 @@ Django's system checks are organized using the following tags:
 * ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
+
+.. versionchanged:: 5.2.19
+
+  The ``gis`` tag was added.
 
 Core system checks
 ==================
@@ -234,7 +239,8 @@ Model fields
   ``GeneratedField``\s.
 * **fields.E223**: ``GeneratedField.output_field`` has errors: ...
 * **fields.W224**: ``GeneratedField.output_field`` has warnings: ...
-* **fields.W225**: ``null`` has no effect on ``GeneratedField``.
+* **fields.W225**: ``null`` has no effect on ``GeneratedField``. *This check
+  is removed in Django 6.1.2.*
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
@@ -322,7 +328,8 @@ Related fields
 * **fields.E322**: Field specifies ``on_delete=DB_SET_DEFAULT``, but has no
   ``db_default`` value.
 * **fields.E323**: Field specifies database/Python-level on_delete variant, but
-  referenced model uses python/database-level variant.
+  referenced/auto-created intermediary model uses python/database-level
+  variant.
 * **fields.E324**: ``<database>`` does not support
   ``<database delete option>``.
 * **fields.E330**: ``ManyToManyField``\s cannot be unique.
@@ -953,6 +960,15 @@ The following checks are performed when a model contains a
 * **contenttypes.E005**: Model names must be at most 100 characters.
 * **contenttypes.E006**: ``<field>`` cannot use the database-level
   ``on_delete`` variant.
+
+``gis``
+-------
+
+The following checks are performed when using :mod:`django.contrib.gis`:
+
+* **gis.W001**: The installed version of GDAL does not allow blocking file and
+  network access. Upgrade to GDAL 3.9 or higher to receive protection against
+  malicious spatial references.
 
 ``postgres``
 ------------

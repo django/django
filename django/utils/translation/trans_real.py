@@ -31,9 +31,10 @@ _default = None
 # magic gettext number to separate context from message
 CONTEXT_SEPARATOR = "\x04"
 
-# Maximum number of characters that will be parsed from the Accept-Language
-# header or cookie to prevent possible denial of service or memory exhaustion
-# attacks. About 10x longer than the longest value shown on MDN’s
+# Maximum length of a language code that will be processed, to prevent possible
+# denial of service or memory exhaustion attacks. Language codes are taken from
+# the Accept-Language header, the language cookie, the URL path prefix, or the
+# set_language() view. 500 is about 10x the longest value shown on MDN's
 # Accept-Language page.
 LANGUAGE_CODE_MAX_LENGTH = 500
 
@@ -65,9 +66,9 @@ def reset_cache(*, setting, **kwargs):
     languages should no longer be accepted.
     """
     if setting in ("LANGUAGES", "LANGUAGE_CODE"):
-        check_for_language.cache_clear()
+        translation_catalog_exists.cache_clear()
         get_languages.cache_clear()
-        get_supported_language_variant.cache_clear()
+        _get_supported_language_variant.cache_clear()
 
 
 class TranslationCatalog:
@@ -462,19 +463,29 @@ def all_locale_paths():
     return [globalpath, *settings.LOCALE_PATHS, *app_paths]
 
 
-@functools.lru_cache(maxsize=1000)
 def check_for_language(lang_code):
     """
     Check whether there is a global language file for the given language
     code. This is used to decide whether a user-provided language is
     available.
 
-    lru_cache should have a maxsize to prevent from memory exhaustion attacks,
-    as the provided language codes are taken from the HTTP request. See also
+    Reject over-length codes before the cached lookup so that oversized,
+    attacker-controlled values are not retained as cache keys.
+    """
+    if lang_code is None or len(lang_code) > LANGUAGE_CODE_MAX_LENGTH:
+        return False
+    return translation_catalog_exists(lang_code)
+
+
+@functools.lru_cache(maxsize=1000)
+def translation_catalog_exists(lang_code):
+    """Return whether a translation catalog exists for the given language code.
+
+    lru_cache should have a maxsize to prevent memory exhaustion attacks. See:
     <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
     # First, a quick check to make sure lang_code is well-formed (#21458)
-    if lang_code is None or not language_code_re.search(lang_code):
+    if not language_code_re.search(lang_code):
         return False
     return any(
         gettext_module.find("django", path, [to_locale(lang_code)]) is not None
@@ -492,6 +503,31 @@ def get_languages():
 
 
 @functools.lru_cache(maxsize=1000)
+def _get_supported_language_variant(lang_code, strict=False):
+    # If 'zh-hant-tw' is not supported, try special fallback or subsequent
+    # language codes i.e. 'zh-hant' and 'zh'.
+    possible_lang_codes = [lang_code]
+    try:
+        possible_lang_codes.extend(LANG_INFO[lang_code]["fallback"])
+    except KeyError:
+        pass
+    i = None
+    while (i := lang_code.rfind("-", 0, i)) > -1:
+        possible_lang_codes.append(lang_code[:i])
+    generic_lang_code = possible_lang_codes[-1]
+    supported_lang_codes = get_languages()
+
+    for code in possible_lang_codes:
+        if code.lower() in supported_lang_codes and check_for_language(code):
+            return code
+    if not strict:
+        # if fr-fr is not supported, try fr-ca.
+        for supported_code in supported_lang_codes:
+            if supported_code.startswith(generic_lang_code + "-"):
+                return supported_code
+    raise LookupError(lang_code)
+
+
 def get_supported_language_variant(lang_code, strict=False):
     """
     Return the language code that's listed in supported languages, possibly
@@ -502,45 +538,17 @@ def get_supported_language_variant(lang_code, strict=False):
 
     The language code is truncated to a maximum length to avoid potential
     denial of service attacks.
-
-    lru_cache should have a maxsize to prevent from memory exhaustion attacks,
-    as the provided language codes are taken from the HTTP request. See also
-    <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
     if lang_code:
-        # Truncate the language code to a maximum length to avoid potential
-        # denial of service attacks.
-        if len(lang_code) > LANGUAGE_CODE_MAX_LENGTH:
-            if (
-                not strict
-                and (index := lang_code.rfind("-", 0, LANGUAGE_CODE_MAX_LENGTH)) > 0
-            ):
-                # There is a generic variant under the maximum length accepted
-                # length.
-                lang_code = lang_code[:index]
-            else:
-                raise LookupError(lang_code)
-        # If 'zh-hant-tw' is not supported, try special fallback or subsequent
-        # language codes i.e. 'zh-hant' and 'zh'.
-        possible_lang_codes = [lang_code]
-        try:
-            possible_lang_codes.extend(LANG_INFO[lang_code]["fallback"])
-        except KeyError:
-            pass
-        i = None
-        while (i := lang_code.rfind("-", 0, i)) > -1:
-            possible_lang_codes.append(lang_code[:i])
-        generic_lang_code = possible_lang_codes[-1]
-        supported_lang_codes = get_languages()
-
-        for code in possible_lang_codes:
-            if code.lower() in supported_lang_codes and check_for_language(code):
-                return code
-        if not strict:
-            # if fr-fr is not supported, try fr-ca.
-            for supported_code in supported_lang_codes:
-                if supported_code.startswith(generic_lang_code + "-"):
-                    return supported_code
+        if len(lang_code) <= LANGUAGE_CODE_MAX_LENGTH:
+            return _get_supported_language_variant(lang_code, strict=strict)
+        if (
+            not strict
+            and (index := lang_code.rfind("-", 0, LANGUAGE_CODE_MAX_LENGTH)) > 0
+        ):
+            # There is a generic variant under the maximum accepted length.
+            lang_code = lang_code[:index]
+            return _get_supported_language_variant(lang_code, strict=strict)
     raise LookupError(lang_code)
 
 

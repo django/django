@@ -2,7 +2,9 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Karolis Ryselis <karolis@esperonus.com>, 2026
 # lauris <lauris@runbox.com>, 2011
+# Mārtiņš Šulcs <shulcsm@gmail.com>, 2024
 # Matas Dailyda <matas@dailyda.com>, 2015-2017
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
@@ -11,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-11-16 08:45+0000\n"
-"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
-"Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 08:09+0000\n"
+"Last-Translator: Karolis Ryselis <karolis@esperonus.com>, 2026\n"
+"Language-Team: Lithuanian (http://app.transifex.com/django/django/language/"
 "lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,12 +39,22 @@ msgstr "Svarbios datos"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Įrašas %(name)s su pirminiu raktu %(key)r neegzistuoja."
 
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Pateikti nesuderinami formos duomenys. Bandykite dar kartą."
+
 msgid "Password changed successfully."
 msgstr "Slaptažodis pakeistas sėkmingai."
+
+msgid "Password-based authentication was disabled."
+msgstr "Autentifikacija slaptažodžiu išjungta,"
 
 #, python-format
 msgid "Change password: %s"
 msgstr "Pakeisti slaptažodį: %s"
+
+#, python-format
+msgid "Set password: %s"
+msgstr "Sukurti slaptažodį: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autentifikacija ir įgaliojimai"
@@ -53,13 +65,13 @@ msgstr "slaptažodis"
 msgid "last login"
 msgstr "paskutinį kartą prisijungęs"
 
-msgid "No password set."
-msgstr "Slaptažodis nenustatytas"
+msgid "Reset password"
+msgstr "Atkurti slaptažodį"
 
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Neteisingas slaptažodžio formatas arba nežinomas maišos algoritmas."
+msgid "Set password"
+msgstr "Sukurti slaptažodį"
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Slaptažodžio laukai nesutapo"
 
 msgid "Password"
@@ -72,12 +84,30 @@ msgid "Enter the same password as before, for verification."
 msgstr "Patikrinimui įveskite tokį patį slaptažodį, kaip anksčiau."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"{}\">this form</a>."
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
 msgstr ""
-"Neužkoduoti slaptažodžiai nėra saugomi, todėl galimybės pasižiūrėti šio "
-"vartotojo slaptažodį nėra, bet galite slaptažodį pakeisti naudodamiesi <a "
-"href=\"{}\">šia forma</a>."
+"Nurodo, ar naudotojas gali autentifikuotis naudodamas slaptažodį. Jei ši "
+"parinktis išjungta, naudotojas vis tiek gali autentifikuotis naudodamas "
+"kitus autentifikavimo būdus, pvz., vieningąjį prisijungimą (SSO) arba LDAP."
+
+msgid "Password-based authentication"
+msgstr "Autentifikaciją slaptažodžiu"
+
+msgid "Enabled"
+msgstr "Įjungta"
+
+msgid "Disabled"
+msgstr "Išjungta"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see the user’s password."
+msgstr ""
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -104,9 +134,6 @@ msgstr "Blogai įvestas senas slaptažodis. Bandykite dar kartą."
 
 msgid "Old password"
 msgstr "Senas slaptažodis"
-
-msgid "Password (again)"
-msgstr "Slaptažodis (dar kartą)"
 
 msgid "algorithm"
 msgstr "algoritmas"
@@ -140,6 +167,9 @@ msgstr "darbo faktorius"
 
 msgid "checksum"
 msgstr "kontrolinė suma"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "vardas"
@@ -229,24 +259,13 @@ msgid "users"
 msgstr "vartotojai"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
+"This password is too short. It must contain at least %d characters."
 msgstr[0] ""
-"Šis slaptažodis yra per trumpas. Jį turi sudaryti bent %(min_length)d "
-"simbolis."
 msgstr[1] ""
-"Šis slaptažodis yra per trumpas. Jį turi sudaryti bent %(min_length)d "
-"simboliai."
 msgstr[2] ""
-"Šis slaptažodis yra per trumpas. Jį turi sudaryti bent %(min_length)d "
-"simbolių."
 msgstr[3] ""
-"Šis slaptažodis yra per trumpas. Jį turi sudaryti bent %(min_length)d "
-"simbolių."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -260,7 +279,7 @@ msgstr[3] "Jūsų slaptažodį turi sudaryti bent %(min_length)d simbolių."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Slaptažodis pernelyg panašus į %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 "Jūsų slaptažodis negali būti pernelyg panašus į kitą jūsų asmeninę "
 "informaciją."
@@ -268,25 +287,31 @@ msgstr ""
 msgid "This password is too common."
 msgstr "Šis slaptažodis yra per dažnai pasitaikantis."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Jūsų slaptažodis negali būti dažnai naudojamu slaptažodžiu."
 
 msgid "This password is entirely numeric."
 msgstr "Šis slaptažodis sudarytas tik iš skaitmenų."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Jūsų slaptažodis negali būti sudarytas tik iš skaitmenų."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Slaptažodis atkurtas ant %(site_name)s"
 
+msgid "No password set."
+msgstr "Slaptažodis nenustatytas"
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Neteisingas slaptažodžio formatas arba nežinomas maišos algoritmas."
+
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Įveskite korektišką vartotojo vardą. Ši reikšmė gali turėti tik angliško "
-"alfabeto raides, skaičius  ir @/./+/-/_ simbolius."
+"Įveskite korektišką vartotojo vardą. Ši reikšmė gali turėti tik raides, "
+"skaičius ir @/./+/-/_ simbolius."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

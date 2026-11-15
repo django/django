@@ -66,6 +66,7 @@ class RelatedIn(In):
                         -1
                     ]
                     self.rhs = [target_field.get_prep_value(v) for v in self.rhs]
+                    self.prepare_rhs = False
             elif not getattr(self.rhs, "has_select_fields", True) and not getattr(
                 self.lhs.field.target_field, "primary_key", False
             ):

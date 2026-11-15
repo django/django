@@ -1,4 +1,5 @@
 import os
+from functools import cached_property
 from unittest.mock import patch
 
 import django
@@ -14,7 +15,6 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.utils import extend_sys_path, isolate_apps
-from django.utils.functional import cached_property
 
 from .models import SoAlternative, TotallyNormal, new_apps
 from .one_config_app.apps import OneConfig

@@ -46,7 +46,11 @@ release at once. For each feature release, use the latest patch release (e.g.
 for 2.1, use 2.1.15).
 
 The same incremental upgrade approach is recommended when upgrading from one
-LTS to the next.
+LTS to the next, e.g. from 5.2 LTS to 6.2 LTS.
+
+Starting with Django 2028, every feature release has :ref:`long-term support
+<annual-supported-versions>`, with three years of security and data loss fixes,
+so there is no LTS release to wait for before upgrading.
 
 Dependencies
 ============

@@ -2,7 +2,7 @@
 How to install Django on Windows
 ================================
 
-This document will guide you through installing Python 3.14 and Django on
+This document will guide you through installing Python 3.15 and Django on
 Windows. It also provides instructions for setting up a virtual environment,
 which makes it easier to work on Python projects. This is meant as a beginner's
 guide for users working on Django projects and does not reflect how Django
@@ -18,7 +18,7 @@ Install Python
 ==============
 
 Django is a Python web framework, thus requiring Python to be installed on your
-machine. At the time of writing, Python 3.14 is the latest version.
+machine. At the time of writing, Python 3.15 is the latest version.
 
 To install Python on your machine go to https://www.python.org/downloads/. The
 website should offer you a download button for the latest Python version.
@@ -77,7 +77,7 @@ and set up the virtual environment. To activate the environment, run:
 
 .. code-block:: doscon
 
-    ...\> project-name\Scripts\activate.bat
+    ...\> project-name\Scripts\activate
 
 The virtual environment will be activated and you'll see "(project-name)" next
 to the command prompt to designate that. Each time you start a new command
@@ -98,7 +98,7 @@ the following command:
 This will download and install the latest Django release.
 
 After the installation has completed, you can verify your Django installation
-by executing ``django-admin --version`` in the command prompt.
+by executing ``django --version`` in the command prompt.
 
 See :ref:`database-installation` for information on database installation
 with Django.
@@ -123,7 +123,7 @@ See :ref:`syntax-coloring` for more information on color settings.
 Common pitfalls
 ===============
 
-* If ``django-admin`` only displays the help text no matter what arguments
+* If ``django`` only displays the help text no matter what arguments
   it is given, there is probably a problem with the file association in
   Windows. Check if there is more than one environment variable set for
   running Python scripts in ``PATH``. This usually occurs when there is more

@@ -31,8 +31,6 @@ elif os.name == "nt":
         "gdal307",
         "gdal306",
         "gdal305",
-        "gdal304",
-        "gdal303",
     ]
 elif os.name == "posix":
     # *NIX library names.
@@ -48,8 +46,6 @@ elif os.name == "posix":
         "gdal3.7.0",
         "gdal3.6.0",
         "gdal3.5.0",
-        "gdal3.4.0",
-        "gdal3.3.0",
     ]
 else:
     raise ImproperlyConfigured('GDAL is unsupported on OS "%s".' % os.name)

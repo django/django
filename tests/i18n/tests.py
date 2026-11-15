@@ -59,7 +59,10 @@ from django.utils.translation.reloader import (
     translation_file_changed,
     watch_for_translation_changes,
 )
-from django.utils.translation.trans_real import LANGUAGE_CODE_MAX_LENGTH
+from django.utils.translation.trans_real import (
+    LANGUAGE_CODE_MAX_LENGTH,
+    translation_catalog_exists,
+)
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
@@ -1771,6 +1774,45 @@ class MiscTests(SimpleTestCase):
             g("en-" * 167, strict=True)
         self.assertEqual(g("en-" * 30000), "en")  # catastrophic test
 
+    def test_get_supported_language_variant_strict_long_lang_code_not_cached(self):
+        g = trans_real.get_supported_language_variant
+        g_cached = trans_real._get_supported_language_variant
+        self.addCleanup(g_cached.cache_clear)
+
+        for lang_code in (
+            "e" * 501,
+            "en-" * 167,  # Length 501 which is LANGUAGE_CODE_MAX_LENGTH + 1.
+            "en-" * 30000,
+        ):
+            g_cached.cache_clear()
+            with self.subTest(length=len(lang_code)):
+                with self.assertRaises(LookupError):
+                    g(lang_code, strict=True)
+
+                cache_info = g_cached.cache_info()
+                self.assertEqual(cache_info.currsize, 0)
+                self.assertEqual(cache_info.misses, 0)
+
+    def test_get_supported_language_variant_truncated_cache_key(self):
+        g = trans_real.get_supported_language_variant
+        g_cached = trans_real._get_supported_language_variant
+        self.addCleanup(g_cached.cache_clear)
+        g_cached.cache_clear()
+
+        long_code = "en-" * 167  # Length 501.
+        truncated_code = "en-" * 165 + "en"  # Length 497.
+        catastrophic_long_code = "en-" * 3000
+
+        for hits, code in enumerate(
+            [long_code, truncated_code, catastrophic_long_code]
+        ):
+            with self.subTest(code_length=len(code)):
+                self.assertEqual(g(code), "en")
+                cache_info = g_cached.cache_info()
+                self.assertEqual(cache_info.currsize, 1)
+                self.assertEqual(cache_info.hits, hits)
+                self.assertEqual(cache_info.misses, 1)
+
     def test_get_supported_language_variant_null(self):
         g = trans_null.get_supported_language_variant
         self.assertEqual(g(settings.LANGUAGE_CODE), settings.LANGUAGE_CODE)
@@ -2080,6 +2122,25 @@ class CountrySpecificLanguageTests(SimpleTestCase):
         self.assertFalse(check_for_language("tr-TR.UTF-8"))
         self.assertFalse(check_for_language("tr-TR.UTF8"))
         self.assertFalse(check_for_language("de-DE.utf-8"))
+
+    def test_check_for_language_lang_code_max_length(self):
+        self.addCleanup(translation_catalog_exists.cache_clear)
+
+        # Overly long codes are rejected before the cached lookup, so they are
+        # not retained as cache keys, potentially consuming too much memory.
+        # Codes at the maximum length can reach the cached lookup.
+        for length, cache_size in [
+            (LANGUAGE_CODE_MAX_LENGTH - 1, 1),
+            (LANGUAGE_CODE_MAX_LENGTH, 1),
+            (LANGUAGE_CODE_MAX_LENGTH + 1, 0),
+        ]:
+            translation_catalog_exists.cache_clear()
+            with self.subTest(length=length):
+                self.assertIs(check_for_language("a" * length), False)
+                self.assertEqual(
+                    translation_catalog_exists.cache_info().currsize,
+                    cache_size,
+                )
 
     def test_check_for_language_null(self):
         self.assertIs(trans_null.check_for_language("en"), True)

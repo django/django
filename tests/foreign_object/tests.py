@@ -494,8 +494,8 @@ class MultiColumnFKTests(TestCase):
         # Test model initialization with active_translation field.
         a3 = Article(id=a3.id, pub_date=a3.pub_date, active_translation=at3_en)
         a3.save()
-        self.assertEqual(
-            list(Article.objects.filter(active_translation__abstract=None)), [a1, a3]
+        self.assertCountEqual(
+            Article.objects.filter(active_translation__abstract=None), [a1, a3]
         )
         self.assertEqual(
             list(
@@ -508,8 +508,8 @@ class MultiColumnFKTests(TestCase):
         )
 
         with translation.override("en"):
-            self.assertEqual(
-                list(Article.objects.filter(active_translation__abstract=None)),
+            self.assertCountEqual(
+                Article.objects.filter(active_translation__abstract=None),
                 [a1, a2],
             )
 

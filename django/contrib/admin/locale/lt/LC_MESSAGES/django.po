@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-06-01 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
 "Last-Translator: Karolis Ryselis <karolis@esperonus.com>, 2025-2026\n"
 "Language-Team: Lithuanian (http://app.transifex.com/django/django/language/"
 "lt/)\n"
@@ -186,8 +186,13 @@ msgstr ""
 "Jei norite pasirinkti daugiau nei vieną, laikykite nuspaudę „Control“ arba, "
 "jei naudojate Mac, „Command“ mygtuką."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Parinkti šį objektą veiksmui - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr "Programėlė „%s“ nerasta."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -249,9 +254,6 @@ msgstr "Pakeisti %s"
 msgid "View %s"
 msgstr "Peržiūrėti %s"
 
-msgid "Database error"
-msgstr "Duomenų bazės klaida"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -259,6 +261,9 @@ msgstr[0] "%(count)s %(name)s sėkmingai pakeistas."
 msgstr[1] "%(count)s %(name)s sėkmingai pakeisti."
 msgstr[2] "%(count)s %(name)s "
 msgstr[3] "%(count)s %(name)s "
+
+msgid "Database error"
+msgstr "Duomenų bazės klaida"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -285,6 +290,19 @@ msgstr "Pakeitimų istorija: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] "...ir dar %(count)d objektas."
+msgstr[1] "...ir dar %(count)d objektai."
+msgstr[2] "...ir dar %(count)d objekto."
+msgstr[3] "...ir dar %(count)d objektų."
 
 #, python-format
 msgid ""
@@ -338,9 +356,6 @@ msgstr ""
 msgid "Run"
 msgstr "Vykdyti"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Spauskite čia norėdami pasirinkti visus įrašus"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Pasirinkti visus %(total_count)s %(module_name)s"
@@ -350,10 +365,6 @@ msgstr "Atstatyti į pradinę būseną"
 
 msgid "Breadcrumbs"
 msgstr "Navigacija"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s aplikacijos modeliai"
 
 msgid "Model name"
 msgstr "Modelio pavadinimas"
@@ -467,6 +478,10 @@ msgstr "Perjungti temą (dabartinė tema: šviesi)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Perjungti temą (dabartinė tema: tamsi)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr "Filtruoti pagal lauką %(field_name)s"
 
 #, python-format
 msgid ""
@@ -676,6 +691,9 @@ msgstr "Pašalinti pasirinktus %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Peržiūrėti pasirinktus %(model)s"
+
+msgid "Logout"
+msgstr "Atsijungti"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Ačiū, kad šiandien skyrėte laiko apsilankyti mūsų svetainėje."

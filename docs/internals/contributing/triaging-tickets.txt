@@ -245,11 +245,22 @@ easier to find.
 Severity
 --------
 
-The *severity* attribute is used to identify blockers, that is, issues that
-should get fixed before releasing the next version of Django. Typically those
-issues are bugs causing regressions from earlier versions or potentially
-causing severe data losses. This attribute is quite rarely used and the vast
-majority of tickets have a severity of "Normal".
+The *severity* attribute is used to prioritize tickets. Categories include:
+
+* Release blocker
+    For issues that should be fixed before releasing the next version of
+    Django. Typically these are bugs causing regressions from earlier versions
+    or potentially causing severe data loss.
+
+* Normal
+    For the vast majority of tickets.
+
+* Low
+    For tickets whose resolution would have minimal benefit, such as edge cases
+    unlikely to affect real-world applications or very minor enhancements.
+    These tickets should receive less reviewer time and attention. They may be
+    closed as "wontfix" if the expected benefit does not justify the
+    implementation or maintenance cost.
 
 Version
 -------

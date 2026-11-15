@@ -102,6 +102,7 @@ counterintuitive
 criticals
 cron
 crontab
+crs
 cryptographic
 cryptographically
 csrfmiddlewaretoken
@@ -179,6 +180,7 @@ formfield
 formset
 formsets
 formtools
+frictionless
 Frysian
 geo
 Geoff
@@ -393,7 +395,7 @@ queryset
 querysets
 querystring
 queueing
-Quickstart
+quickstart
 quoteless
 Radziej
 rasters

@@ -29,6 +29,7 @@ class CommonMiddleware(MiddlewareMixin):
           overriding the response_redirect_class attribute.
     """
 
+    async_capable = False
     response_redirect_class = HttpResponsePermanentRedirect
 
     def process_request(self, request):
@@ -78,12 +79,18 @@ class CommonMiddleware(MiddlewareMixin):
         Return the full path of the request with a trailing slash appended.
 
         Raise a RuntimeError if settings.DEBUG is True and request.method is
-        DELETE, POST, PUT, or PATCH.
+        DELETE, POST, PUT, PATCH, or QUERY.
         """
         new_path = request.get_full_path(force_append_slash=True)
         # Prevent construction of scheme relative urls.
         new_path = escape_leading_slashes(new_path)
-        if settings.DEBUG and request.method in ("DELETE", "POST", "PUT", "PATCH"):
+        if settings.DEBUG and request.method in (
+            "DELETE",
+            "POST",
+            "PUT",
+            "PATCH",
+            "QUERY",
+        ):
             raise RuntimeError(
                 "You called this URL via %(method)s, but the URL doesn't end "
                 "in a slash and you have APPEND_SLASH set. Django can't "
@@ -118,6 +125,7 @@ class CommonMiddleware(MiddlewareMixin):
 
 
 class BrokenLinkEmailsMiddleware(MiddlewareMixin):
+    async_capable = False
     # Set to override the mail.mailers alias used for sending the email.
     using = None
 
@@ -147,7 +155,7 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
         return response
 
     def send_mail(self, subject, message, *args, **kwargs):
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if not mailers._is_configured:
             mail_managers(subject, message, *args, fail_silently=True, **kwargs)
             return

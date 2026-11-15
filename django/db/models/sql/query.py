@@ -42,16 +42,15 @@ from django.db.models.query_utils import (
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
-from django.db.models.sql.where import AND, OR, ExtraWhere, NothingNode, WhereNode
-from django.utils.deprecation import RemovedInDjango70Warning
-from django.utils.functional import cached_property
+from django.db.models.sql.where import AND, OR, XOR, ExtraWhere, NothingNode, WhereNode
+from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
 from django.utils.warnings import django_file_prefixes
 
 __all__ = ["Query", "RawQuery"]
 
-# RemovedInDjango70Warning: When the deprecation ends, replace with:
+# RemovedInDjango2028Warning: When the deprecation ends, replace with:
 # Quotation marks ('"`[]), whitespace characters, control characters,
 # semicolons, percent signs, hashes, or inline SQL comments are
 # forbidden in column aliases.
@@ -338,7 +337,7 @@ class Query(BaseExpression):
         elif len(self.annotation_select) == 1:
             return next(iter(self.annotation_select.values())).output_field
 
-    @cached_property
+    @functools.cached_property
     def base_table(self):
         for alias in self.alias_map:
             return alias
@@ -1220,18 +1219,18 @@ class Query(BaseExpression):
         return alias or seen[None]
 
     def check_alias(self, alias):
-        # RemovedInDjango70Warning: When the deprecation ends, remove.
+        # RemovedInDjango2028Warning: When the deprecation ends, remove.
         if "%" in alias:
             warnings.warn(
                 "Using percent signs in a column alias is deprecated.",
-                category=RemovedInDjango70Warning,
+                category=RemovedInDjango2028Warning,
                 skip_file_prefixes=django_file_prefixes(),
             )
         if FORBIDDEN_ALIAS_PATTERN.search(alias):
             raise ValueError(
                 "Column aliases cannot contain whitespace characters, hashes, "
-                # RemovedInDjango70Warning: When the deprecation ends, replace
-                # with:
+                # RemovedInDjango2028Warning: When the deprecation ends,
+                # replace with:
                 # "control characters, quotation marks, semicolons, percent "
                 # "signs, or SQL comments."
                 "control characters, quotation marks, semicolons, or SQL comments."
@@ -1485,6 +1484,17 @@ class Query(BaseExpression):
                 "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
+    def get_names_to_join(self, expr):
+        """
+        Helper method for the resolution of expressions that could either be an
+        annotation alias (including FilteredRelation) or a field lookup.
+        """
+        return (
+            [expr]
+            if (expr in self._filtered_relations or expr in self.annotations)
+            else expr.split(LOOKUP_SEP)
+        )
+
     def build_filter(
         self,
         filter_expr,
@@ -1614,47 +1624,47 @@ class Query(BaseExpression):
         lookup_type = condition.lookup_name
         clause = WhereNode([condition], connector=AND)
 
-        require_outer = (
-            lookup_type == "isnull" and condition.rhs is True and not current_negated
-        )
-        if (
-            current_negated
-            and (lookup_type != "isnull" or condition.rhs is False)
-            and condition.rhs is not None
-        ):
+        require_outer = False
+        if lookup_type == "isnull":
+            # Both `NOT (field IS NOT NULL)` and `field IS NULL` require an
+            # OUTER JOIN to effectively include related `NULL` values.
+            # Otherwise an INNER JOIN can be used as it excludes them.
+            require_outer = (
+                condition.rhs is False if current_negated else condition.rhs is True
+            )
+        elif current_negated and condition.rhs is not None:
             require_outer = True
-            if lookup_type != "isnull":
-                # The condition added here will be SQL like this:
-                # NOT (col IS NOT NULL), where the first NOT is added in
-                # upper layers of code. The reason for addition is that if col
-                # is null, then col != someval will result in SQL "unknown"
-                # which isn't the same as in Python. The Python None handling
-                # is wanted, and it can be gotten by
-                # (col IS NULL OR col != someval)
-                #   <=>
-                # NOT (col IS NOT NULL AND col = someval).
+            # The condition added below will be SQL like this:
+            # `NOT (col IS NOT NULL)`, where the first NOT is added in
+            # upper layers of code. The reason for addition is that if col
+            # `IS NULL`, then `col != someval` will result in SQL "unknown"
+            # which isn't the same as in Python. The Python None handling
+            # is wanted, and it can be achieved by
+            # `(col != someval OR col IS NULL)` which is equivalent to
+            # `NOT (col = someval AND col IS NOT NULL)`. The second form is
+            # required here as the condition is negated per `current_negated`.
+            if (
+                self.is_nullable(targets[0])
+                or self.alias_map[join_list[-1]].join_type == LOUTER
+            ):
+                lookup_class = targets[0].get_lookup("isnull")
+                col = self._get_col(targets[0], join_info.targets[0], alias)
+                # Use OR + IS NULL when RHS `in` values include None.
                 if (
-                    self.is_nullable(targets[0])
-                    or self.alias_map[join_list[-1]].join_type == LOUTER
+                    lookup_type == "in"
+                    # Check containers (not strings or bytes).
+                    and isinstance(condition.rhs, Iterable)
+                    and not isinstance(condition.rhs, (str, bytes))
+                    and any(v is None for v in condition.rhs)
                 ):
-                    lookup_class = targets[0].get_lookup("isnull")
-                    col = self._get_col(targets[0], join_info.targets[0], alias)
-                    # Use OR + IS NULL when RHS `in` values include None.
-                    if (
-                        lookup_type == "in"
-                        # Check containers (not strings or bytes).
-                        and isinstance(condition.rhs, Iterable)
-                        and not isinstance(condition.rhs, (str, bytes))
-                        and any(v is None for v in condition.rhs)
-                    ):
-                        clause.add(lookup_class(col, True), OR)
-                    else:
-                        clause.add(lookup_class(col, False), AND)
-                # If someval is a nullable column, someval IS NOT NULL is
-                # added.
-                if isinstance(value, Col) and self.is_nullable(value.target):
-                    lookup_class = value.target.get_lookup("isnull")
-                    clause.add(lookup_class(value, False), AND)
+                    clause.add(lookup_class(col, True), OR)
+                else:
+                    clause.add(lookup_class(col, False), AND)
+            # If someval is a nullable column, someval IS NOT NULL is
+            # added.
+            if isinstance(value, Col) and self.is_nullable(value.target):
+                lookup_class = value.target.get_lookup("isnull")
+                clause.add(lookup_class(value, False), AND)
         return clause, used_joins if not require_outer else ()
 
     def add_filter(self, filter_lhs, filter_rhs):
@@ -1800,8 +1810,8 @@ class Query(BaseExpression):
                     raise FieldDoesNotExist
                 field = opts.get_field(name)
             except FieldDoesNotExist:
-                if name in self.annotation_select:
-                    field = self.annotation_select[name].output_field
+                if name in self.annotations:
+                    field = self.annotations[name].output_field
                 elif name in self._filtered_relations and pos == 0:
                     filtered_relation = self._filtered_relations[name]
                     if LOOKUP_SEP in filtered_relation.relation_name:
@@ -2276,10 +2286,11 @@ class Query(BaseExpression):
         try:
             cols = []
             for name in field_names:
+                names_to_join = self.get_names_to_join(name)
                 # Join promotion note - we must not remove any rows here, so
                 # if there is no existing joins, use outer join.
                 join_info = self.setup_joins(
-                    name.split(LOOKUP_SEP), opts, alias, allow_many=allow_m2m
+                    names_to_join, opts, alias, allow_many=allow_m2m
                 )
                 targets, final_alias, joins = self.trim_joins(
                     join_info.targets,
@@ -2343,9 +2354,10 @@ class Query(BaseExpression):
                     continue
                 if self.extra and item in self.extra:
                     continue
+                names_to_join = self.get_names_to_join(item)
                 # names_to_path() validates the lookup. A descriptive
                 # FieldError will be raise if it's not.
-                self.names_to_path(item.split(LOOKUP_SEP), self.model._meta)
+                self.names_to_path(names_to_join, self.model._meta)
             elif not hasattr(item, "resolve_expression"):
                 errors.append(item)
             if getattr(item, "contains_aggregate", False):
@@ -2608,21 +2620,29 @@ class Query(BaseExpression):
                     if extra := self.extra_select.get(f):
                         extra_names.append(f)
                         selected[f] = RawSQL(*extra)
-                    elif f in self.annotation_select:
+                    # Check exact aliases before considering transforms like
+                    # "published__year", since an alias can contain LOOKUP_SEP.
+                    elif (alias := f) in self.annotations or (
+                        (alias := f.split(LOOKUP_SEP, 1)[0]) in self.annotations
+                    ):
+                        if alias not in self.annotation_select:
+                            if self.annotation_select:
+                                raise FieldError(
+                                    f"Cannot select the '{alias}' alias. It was "
+                                    f"excluded by a previous values() or "
+                                    f"values_list() call. Include '{alias}' in "
+                                    f"that call to select it."
+                                )
+                            else:
+                                raise FieldError(
+                                    f"Cannot select the '{alias}' alias. Use "
+                                    f"annotate() to promote it."
+                                )
+                        if f not in self.annotations:
+                            # Resolve transforms.
+                            self.annotations[f] = self.resolve_ref(f)
                         annotation_names.append(f)
                         selected[f] = f
-                    elif f in self.annotations:
-                        if self.annotation_select:
-                            raise FieldError(
-                                f"Cannot select the '{f}' alias. It was excluded "
-                                f"by a previous values() or values_list() call. "
-                                f"Include '{f}' in that call to select it."
-                            )
-                        else:
-                            raise FieldError(
-                                f"Cannot select the '{f}' alias. Use annotate() "
-                                f"to promote it."
-                            )
                     else:
                         # Call `names_to_path` to ensure a FieldError including
                         # annotations about to be masked as valid choices if
@@ -2815,13 +2835,24 @@ class JoinPromoter:
     def __init__(self, connector, num_children, negated):
         self.connector = connector
         self.negated = negated
-        if self.negated:
-            if connector == AND:
+        if connector == AND:
+            if negated:
                 self.effective_connector = OR
             else:
                 self.effective_connector = AND
-        else:
-            self.effective_connector = self.connector
+        elif connector == OR:
+            if negated:
+                self.effective_connector = AND
+            else:
+                self.effective_connector = OR
+        elif connector == XOR:
+            # Non-negated XOR follows OR's join promotion rules.
+            # Negated XOR promotes joins to LOUTER because an INNER JOIN
+            # could remove matching rows too early.
+            if negated:
+                self.effective_connector = XOR
+            else:
+                self.effective_connector = OR
         self.num_children = num_children
         # Maps of table alias to how many times it is seen as required for
         # inner and/or outer joins.
@@ -2852,6 +2883,9 @@ class JoinPromoter:
         # The effective_connector is used so that NOT (a AND b) is treated
         # similarly to (a OR b) for join promotion.
         for table, votes in self.votes.items():
+            if self.effective_connector == XOR:
+                to_promote.add(table)
+                continue
             # We must use outer joins in OR case when the join isn't contained
             # in all of the joins. Otherwise the INNER JOIN itself could remove
             # valid results. Consider the case where a model with rel_a and

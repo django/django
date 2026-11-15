@@ -24,6 +24,6 @@ This issue was introduced by the :bpo:`43882` fix.
 Bugfixes
 ========
 
-* Prevented, following a regression in Django 3.2.1, :djadmin:`makemigrations`
+* Prevented, following a regression in Django 3.2.1, :cli:`makemigrations`
   from generating infinite migrations for a model with ``Meta.ordering``
   contained ``OrderBy`` expressions (:ticket:`32714`).

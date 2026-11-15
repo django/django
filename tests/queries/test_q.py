@@ -1,4 +1,6 @@
 from datetime import datetime
+from functools import partial
+from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.db import connection
@@ -21,6 +23,7 @@ from django.db.models.lookups import (
 )
 from django.db.models.sql.where import NothingNode
 from django.test import SimpleTestCase, TestCase
+from django.utils.text import trim_value
 
 from .models import Tag
 
@@ -396,3 +399,39 @@ class QCheckTests(TestCase):
 
         # We must leave the connection in a usable state (#35712).
         self.assertTrue(connection.is_usable())
+
+    def missing_column(self, name):
+        # SQLite treats unknown double-quoted identifiers as string literals.
+        if connection.vendor == "sqlite":
+            return f"[{name}]"
+        return connection.ops.quote_name(name)
+
+    def test_database_error_logged_escaped(self):
+        column = self.missing_column("price\nother")
+        q = Q(RawSQL(f"{column} > %s", params=(20,), output_field=BooleanField()))
+        prefix = f"Got a database error calling check() on {q!r}: "
+        with self.assertLogs("django.db.models", "WARNING") as cm:
+            self.assertIs(q.check({"price": 10}), True)
+        message = cm.records[0].getMessage()
+        self.assertIs(message.startswith(prefix), True)
+        # Some backends upper-case quoted identifiers in error messages.
+        error = message.removeprefix(prefix).lower()
+        # MySQL error messages are already escaped before being logged.
+        self.assertRegex(error, r"price\\+nother")
+        self.assertNotIn("\n", error)
+
+    def test_database_error_logged_trimmed(self):
+        column = self.missing_column("price")
+        q = Q(RawSQL(f"{column} > %s", params=(20,), output_field=BooleanField()))
+        prefix = f"Got a database error calling check() on {q!r}: "
+        # Lower the trim limit, since database error messages are short.
+        with (
+            mock.patch(
+                "django.db.models.query_utils.trim_value",
+                partial(trim_value, limit=10),
+            ),
+            self.assertLogs("django.db.models", "WARNING") as cm,
+        ):
+            self.assertIs(q.check({"price": 10}), True)
+        error = cm.records[0].getMessage().removeprefix(prefix)
+        self.assertRegex(error, r"^.{10}… <trimmed \d+ chars out of \d+>$")

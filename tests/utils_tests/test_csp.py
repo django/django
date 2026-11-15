@@ -135,6 +135,37 @@ class CSPBuildPolicyTest(SimpleTestCase):
         policy = {"default-src": []}
         self.assertPolicyEqual(build_policy(policy), "")
 
+    def test_config_with_nonce_only_directive_without_nonce(self):
+        """
+        A directive whose only source is CSP.NONCE emits 'none' when the
+        nonce was never generated, so the policy fails closed.
+        """
+        policy = {
+            "default-src": [CSP.SELF],
+            "script-src": [CSP.NONCE],
+        }
+        self.assertPolicyEqual(
+            build_policy(policy), "default-src 'self'; script-src 'none'"
+        )
+
+    def test_config_with_nonce_only_directive_as_string(self):
+        policy = {"script-src": CSP.NONCE}
+        self.assertPolicyEqual(build_policy(policy), "script-src 'none'")
+
+    def test_config_with_nonce_only_directive_with_nonce(self):
+        policy = {"script-src": [CSP.NONCE]}
+        self.assertPolicyEqual(
+            build_policy(policy, nonce="abc123"), "script-src 'nonce-abc123'"
+        )
+
+    def test_config_with_mixed_directive_without_nonce(self):
+        """
+        Directives with sources other than CSP.NONCE still have the unused
+        nonce sentinel removed without emitting 'none'.
+        """
+        policy = {"default-src": [CSP.SELF, CSP.NONCE]}
+        self.assertPolicyEqual(build_policy(policy), "default-src 'self'")
+
 
 class LazyNonceTests(SimpleTestCase):
     def test_generates_on_usage(self):

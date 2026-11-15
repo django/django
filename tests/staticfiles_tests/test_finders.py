@@ -9,6 +9,20 @@ from .cases import StaticFilesTestCase
 from .settings import TEST_ROOT
 
 
+class TestBaseFinder(SimpleTestCase):
+    def test_find(self):
+        finder = finders.BaseFinder()
+        msg = "subclasses of BaseFinder must provide a find() method"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            finder.find("file.txt")
+
+    def test_list(self):
+        finder = finders.BaseFinder()
+        msg = "subclasses of BaseFinder must provide a list() method"
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            finder.list(None)
+
+
 class TestFinders:
     """
     Base finder test mixin.

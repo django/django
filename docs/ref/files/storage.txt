@@ -76,7 +76,13 @@ The ``FileSystemStorage`` class
     .. attribute:: directory_permissions_mode
 
         The file system permissions that the directory will receive when it is
-        saved. Defaults to :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
+        saved, combined with the process's umask value as with Python's
+        :func:`os.mkdir`. Defaults to
+        :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
+
+        .. versionchanged:: 6.2
+
+            The mode is now combined with the process's umask value.
 
     .. attribute:: allow_overwrite
 

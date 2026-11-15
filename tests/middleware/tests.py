@@ -114,8 +114,8 @@ class CommonMiddlewareTest(SimpleTestCase):
     def test_append_slash_no_redirect_in_DEBUG(self):
         """
         While in debug mode, an exception is raised with a warning
-        when a failed attempt is made to DELETE, POST, PUT, or PATCH to an URL
-        which would normally be redirected to a slashed version.
+        when a failed attempt is made to DELETE, POST, PUT, PATCH, or QUERY to
+        an URL which would normally be redirected to a slashed version.
         """
         msg = "maintaining %s data. Change your form to point to testserver/slash/"
         request = self.rf.get("/slash")
@@ -131,6 +131,9 @@ class CommonMiddlewareTest(SimpleTestCase):
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
             CommonMiddleware(get_response_404)(request)
         request = self.rf.delete("/slash")
+        with self.assertRaisesMessage(RuntimeError, msg % request.method):
+            CommonMiddleware(get_response_404)(request)
+        request = self.rf.query("/slash")
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
             CommonMiddleware(get_response_404)(request)
 
@@ -503,7 +506,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         BrokenLinkEmailsMiddleware(self.get_response)(self.req)
         self.assertEqual(len(mail.outbox), 1)
 
-    # RemovedInDjango70Warning.
+    # RemovedInDjango2028Warning.
     @override_deprecated_email_settings(
         EMAIL_BACKEND="mail.custombackend.FailingEmailBackend"
     )
@@ -794,6 +797,17 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         request = self.request_factory.head("/")
         conditional_get_response = ConditionalGetMiddleware(get_200_response)(request)
         self.assertNotIn("ETag", conditional_get_response)
+
+
+class ConditionalQueryMiddlewareTest(ConditionalGetMiddlewareTest):
+    """
+    ConditionalGetMiddleware handles a QUERY request (RFC 10008) the same way
+    as a GET request.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.req = self.request_factory.query("/")
 
 
 class XFrameOptionsMiddlewareTest(SimpleTestCase):

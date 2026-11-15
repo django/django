@@ -2,6 +2,7 @@ import datetime
 import re
 from datetime import date
 from decimal import Decimal
+from unittest import mock
 
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
@@ -159,6 +160,48 @@ class DeletionTests(TestCase):
         self.assertEqual(Poem.objects.get(pk=poem.pk).name, "foo")
         self.assertEqual(poet.poem_set.count(), 1)
         self.assertFalse(Poem.objects.filter(pk=poem.pk + 1).exists())
+
+    def test_deletion_not_allowed_outside_formset_queryset(self):
+        OwnerProfileFormSet = inlineformset_factory(
+            Owner, OwnerProfile, can_delete=True, fields="__all__"
+        )
+        place = Place.objects.create(name="Sal's Place", city="Cairo")
+        owner = Owner.objects.create(name="Sal", place=place)
+        profile = OwnerProfile.objects.create(owner=owner, age=42)
+        limited_qs = OwnerProfile.objects.exclude(pk=profile.pk)
+        data = {
+            "ownerprofile-TOTAL_FORMS": "1",
+            "ownerprofile-INITIAL_FORMS": "1",
+            "ownerprofile-MAX_NUM_FORMS": "0",
+            "ownerprofile-0-owner": str(profile.pk),  # Not in `limited_qs`.
+            "ownerprofile-0-age": str(profile.age),
+            "ownerprofile-0-DELETE": "on",
+        }
+        formset = OwnerProfileFormSet(data, instance=owner, queryset=limited_qs)
+        self.assertIs(formset.is_valid(), True)
+        formset.save()
+        # The deletion is not allowed.
+        self.assertIs(OwnerProfile.objects.filter(pk=profile.pk).exists(), True)
+
+    def test_deletion_not_allowed_outside_formset_queryset_editable_pk(self):
+        CustomPrimaryKeyFormSet = modelformset_factory(
+            CustomPrimaryKey, can_delete=True, fields="__all__"
+        )
+        obj = CustomPrimaryKey.objects.create(my_pk="pk", some_field="data")
+        limited_qs = CustomPrimaryKey.objects.exclude(pk=obj.pk)
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0-my_pk": obj.pk,  # Not in `limited_qs`.
+            "form-0-some_field": obj.some_field,
+            "form-0-DELETE": "on",
+        }
+        formset = CustomPrimaryKeyFormSet(data, queryset=limited_qs)
+        self.assertIs(formset.is_valid(), True)
+        formset.save()
+        # The deletion is not allowed.
+        self.assertIs(CustomPrimaryKey.objects.filter(pk=obj.pk).exists(), True)
 
 
 class ModelFormsetTest(TestCase):
@@ -1988,6 +2031,58 @@ class ModelFormsetTest(TestCase):
         # created.
         self.assertSequenceEqual(Author.objects.all(), [author, other_author])
 
+    def test_overridden_add_prefix(self):
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+            def add_prefix(self, field_name):
+                return f"{self.prefix}.{field_name}" if self.prefix else field_name
+
+        author = Author.objects.create(name="Charles Baudelaire")
+        AuthorFormSet = modelformset_factory(Author, form=AuthorForm)
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0.id": str(author.pk),
+            "form-0.name": "Charles P. Baudelaire",
+        }
+        formset = AuthorFormSet(data, queryset=Author.objects.all())
+
+        self.assertIs(formset.is_valid(), True)
+        self.assertEqual(formset.forms[0].instance, author)
+        formset.save()
+        author.refresh_from_db()
+        self.assertEqual(author.name, "Charles P. Baudelaire")
+
+    def test_form_initialized_once_with_default_add_prefix(self):
+        initialization = mock.Mock()
+
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = "__all__"
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                initialization()
+
+        author = Author.objects.create(name="Charles Baudelaire")
+        AuthorFormSet = modelformset_factory(Author, form=AuthorForm)
+        formset = AuthorFormSet(
+            {
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "1",
+                "form-0-id": str(author.pk),
+            },
+            queryset=Author.objects.all(),
+        )
+
+        self.assertEqual(formset.forms[0].instance, author)
+        initialization.assert_called_once_with()
+
     def test_validation_without_id(self):
         AuthorFormSet = modelformset_factory(Author, fields="__all__")
         data = {
@@ -2136,6 +2231,23 @@ class ModelFormsetTest(TestCase):
         self.assertIs(formset.is_valid(), True)
         formset.save()
         self.assertCountEqual(Author.objects.all(), [charles, walt])
+
+    def test_edit_only_editable_pk(self):
+        CustomPrimaryKeyFormSet = modelformset_factory(
+            CustomPrimaryKey, fields="__all__"
+        )
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "0",
+            "form-0-my_pk": "forged",
+            "form-0-some_field": "value",
+        }
+        formset = CustomPrimaryKeyFormSet(data)
+        self.assertIs(formset.is_valid(), True)
+        formset.save()
+        with self.assertRaises(CustomPrimaryKey.DoesNotExist):
+            CustomPrimaryKey.objects.get(pk="forged")
 
     def test_edit_only_formset_factory_with_basemodelformset(self):
         charles = Author.objects.create(name="Charles Baudelaire")

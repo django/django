@@ -1,7 +1,12 @@
+import binascii
+import re
+import struct
 import threading
 from ctypes import POINTER, Structure, byref, c_byte, c_char_p, c_int, c_size_t
+from dataclasses import dataclass
 
 from django.contrib.gis.geos.base import GEOSBase
+from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.libgeos import (
     GEOM_PTR,
     GEOSFuncFactory,
@@ -15,6 +20,7 @@ from django.contrib.gis.geos.prototypes.errcheck import (
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
 from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
+from django.utils.regex_helper import _lazy_re_compile
 
 
 # ### The WKB/WKT Reader/Writer structures and pointers ###
@@ -145,6 +151,57 @@ class IOBase(GEOSBase):
 
 # ### Base WKB/WKT Reading and Writing objects ###
 
+# Sits just under PostGIS's effective ceiling: liblwgeom's LW_PARSER_MAX_DEPTH
+# is 200 and counts the leaf geometry, so PostGIS rejects at 199 nested
+# collections. 198 keeps Django's guard below that (and far below the GEOS
+# segfault threshold) so it rejects before any backend supporting nested
+# geometries does. (Oracle and MariaDB don't support nesting.)
+MAX_GEOM_COLLECTIONS = 198
+
+# GEOS accepts any amount of whitespace around the optional dimension marker,
+# so the separators must be \s*, not \s? or \s+. The root variants also allow
+# leading whitespace, which GEOS skips before the geometry type.
+_WKT_COLLECTION_START_RE = _lazy_re_compile(
+    r"\bGEOMETRYCOLLECTION(?:\s*(?:ZM|Z|M))?\s*\(",
+    re.IGNORECASE,
+)
+_WKT_COLLECTION_START_BYTES_RE = _lazy_re_compile(
+    rb"\bGEOMETRYCOLLECTION(?:\s*(?:ZM|Z|M))?\s*\(",
+    re.IGNORECASE,
+)
+_WKT_COLLECTION_ROOT_RE = _lazy_re_compile(
+    r"\s*\bGEOMETRYCOLLECTION(?:\s*(?:ZM|Z|M))?\s*\(",
+    re.IGNORECASE,
+)
+_WKT_COLLECTION_ROOT_BYTES_RE = _lazy_re_compile(
+    rb"\s*\bGEOMETRYCOLLECTION(?:\s*(?:ZM|Z|M))?\s*\(",
+    re.IGNORECASE,
+)
+
+# Geometry types containing child WKB geometries and the normalized types GEOS
+# accepts for those children. GeometryCollections accept any geometry type.
+_WKB_CHILD_TYPES = {
+    4: frozenset({1}),  # MultiPoint.
+    5: frozenset({2}),  # MultiLineString.
+    6: frozenset({3}),  # MultiPolygon.
+    7: None,  # GeometryCollection.
+    9: frozenset({2, 8}),  # CompoundCurve.
+    10: frozenset({2, 8, 9}),  # CurvePolygon.
+    11: frozenset({2, 8, 9}),  # MultiCurve.
+    12: frozenset({3, 10}),  # MultiSurface.
+}
+
+_INVALID_WKB_MESSAGE = "Invalid WKB input."
+_UINT32_SIZE = struct.calcsize("=I")
+_COORD_SIZE = struct.calcsize("=d")
+
+
+@dataclass(slots=True)
+class _WKBFrame:
+    remaining_geometries: int
+    expected_types: frozenset[int] | None
+    collection_depth: int
+
 
 # Non-public WKB/WKT reader classes for internal use because
 # their `read` methods return _pointers_ instead of GEOSGeometry
@@ -154,9 +211,48 @@ class _WKTReader(IOBase):
     ptr_type = WKT_READ_PTR
     destructor = wkt_reader_destroy
 
-    def read(self, wkt):
+    def limit(self, wkt, max_geom_collections):
+        if max_geom_collections is None:
+            return
+        if isinstance(wkt, str):
+            pattern = _WKT_COLLECTION_START_RE
+            root_pattern = _WKT_COLLECTION_ROOT_RE
+            open_paren = "("
+            close_paren = ")"
+        else:
+            pattern = _WKT_COLLECTION_START_BYTES_RE
+            root_pattern = _WKT_COLLECTION_ROOT_BYTES_RE
+            open_paren = ord("(")
+            close_paren = ord(")")
+        if root_pattern.match(wkt) is None:
+            # Fast path: If the beginning does not match GEOMETRYCOLLECTION(,
+            # then GEOS rejects early (no need to limit):
+            # GEOS_ERROR: countered : 'GEOMETRYCOLLECTION'
+            return
+        collection_starts = {match.end() - 1 for match in pattern.finditer(wkt)}
+        # Nesting depth can't exceed the total number of collections, so if the
+        # total is already within the limit, there is nothing to walk.
+        if len(collection_starts) <= max_geom_collections:
+            return
+        collection_depth = 0
+        parentheses = []
+        for index, char in enumerate(wkt):
+            if char == open_paren:
+                is_collection = index in collection_starts
+                parentheses.append(is_collection)
+                if is_collection:
+                    collection_depth += 1
+            elif char == close_paren and parentheses:
+                if parentheses.pop():
+                    collection_depth -= 1
+            if collection_depth > max_geom_collections:
+                msg = "WKT contains too many possible GeometryCollections."
+                raise ValueError(msg)
+
+    def read(self, wkt, max_geom_collections=MAX_GEOM_COLLECTIONS):
         if not isinstance(wkt, (bytes, str)):
             raise TypeError(f"'wkt' must be bytes or str (got {wkt!r} instead).")
+        self.limit(wkt, max_geom_collections)
         return wkt_reader_read(self.ptr, force_bytes(wkt))
 
 
@@ -165,20 +261,114 @@ class _WKBReader(IOBase):
     ptr_type = WKB_READ_PTR
     destructor = wkb_reader_destroy
 
-    def read(self, wkb):
+    def limit(self, wkb, max_geom_collections):
+        if max_geom_collections is None:
+            return
+
+        offset = 0
+        depth_stack = [
+            _WKBFrame(remaining_geometries=1, expected_types=None, collection_depth=0)
+        ]
+
+        def read_uint32(byte_order):
+            nonlocal offset
+            if offset + _UINT32_SIZE > len(wkb):
+                raise GEOSException(_INVALID_WKB_MESSAGE)
+            value = int.from_bytes(wkb[offset : offset + _UINT32_SIZE], byte_order)
+            offset += _UINT32_SIZE
+            return value
+
+        def skip(length):
+            nonlocal offset
+            if length > len(wkb) - offset:
+                raise GEOSException(_INVALID_WKB_MESSAGE)
+            offset += length
+
+        while depth_stack:
+            frame = depth_stack[-1]
+            if frame.remaining_geometries == 0:
+                depth_stack.pop()
+                continue
+
+            frame.remaining_geometries -= 1
+            expected_types = frame.expected_types
+            collection_depth = frame.collection_depth
+            # Reject an incomplete header before reading its byte-order marker.
+            if offset + _UINT32_SIZE + 1 > len(wkb):
+                raise GEOSException(_INVALID_WKB_MESSAGE)
+
+            byte_order_marker = wkb[offset]
+            offset += 1
+            if byte_order_marker == 0:
+                byte_order = "big"
+            elif byte_order_marker == 1:
+                byte_order = "little"
+            else:
+                raise GEOSException(_INVALID_WKB_MESSAGE)
+
+            type_code = read_uint32(byte_order)
+            # Match GEOS WKBReader's geometry-type normalization.
+            geometry_type = (type_code & 0xFFFF) % 1000
+            if expected_types is not None and geometry_type not in expected_types:
+                raise GEOSException(_INVALID_WKB_MESSAGE)
+
+            iso_type_range = (type_code & 0xFFFF) // 1000
+            has_z = bool(type_code & 0x80000000) or iso_type_range in (1, 3)
+            has_m = bool(type_code & 0x40000000) or iso_type_range in (2, 3)
+            dimensions = 2 + has_z + has_m
+            if type_code & 0x20000000:  # EWKB SRID flag.
+                skip(_UINT32_SIZE)
+
+            if geometry_type == 7:
+                collection_depth += 1
+                if collection_depth > max_geom_collections:
+                    msg = "WKB contains too many possible GeometryCollections."
+                    raise ValueError(msg)
+
+            if geometry_type == 1:  # Point.
+                skip(dimensions * _COORD_SIZE)
+            elif geometry_type in (2, 8):  # LineString or CircularString.
+                num_points = read_uint32(byte_order)
+                coordinate_size = dimensions * _COORD_SIZE
+                skip(num_points * coordinate_size)
+            elif geometry_type == 3:  # Polygon.
+                num_rings = read_uint32(byte_order)
+                coordinate_size = dimensions * _COORD_SIZE
+                for _ in range(num_rings):
+                    num_points = read_uint32(byte_order)
+                    skip(num_points * coordinate_size)
+            elif geometry_type in _WKB_CHILD_TYPES:
+                if num_geometries := read_uint32(byte_order):
+                    depth_stack.append(
+                        _WKBFrame(
+                            remaining_geometries=num_geometries,
+                            expected_types=_WKB_CHILD_TYPES[geometry_type],
+                            collection_depth=collection_depth,
+                        )
+                    )
+            else:
+                raise GEOSException(_INVALID_WKB_MESSAGE)
+
+    def read(self, wkb, max_geom_collections=MAX_GEOM_COLLECTIONS):
         "Return a _pointer_ to C GEOS Geometry object from the given WKB."
         if isinstance(wkb, memoryview):
-            wkb_s = bytes(wkb)
-            return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
-        elif isinstance(wkb, bytes):
-            return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
-        elif isinstance(wkb, str):
-            wkb_s = wkb.encode()
-            return wkb_reader_read_hex(self.ptr, wkb_s, len(wkb_s))
+            wkb = bytes(wkb)
+        elif isinstance(wkb, (bytes, str)):
+            try:
+                wkb = binascii.unhexlify(wkb)
+            except (binascii.Error, ValueError):
+                raise GEOSException(_INVALID_WKB_MESSAGE) from None
         else:
             raise TypeError(
                 f"'wkb' must be bytes, str or memoryview (got {wkb!r} instead)."
             )
+
+        # Validate the WKB structure and limit geometry collections before
+        # handing input to recursive GEOS readers. This should become
+        # unnecessary when GEOS 3.15.0 is the minimum supported version. See:
+        # https://github.com/libgeos/geos/commit/8b8b3da7a3d9fb8953ff60bc49aa0320d51ae45c
+        self.limit(wkb, max_geom_collections)
+        return wkb_reader_read(self.ptr, wkb, len(wkb))
 
 
 def default_trim_value():

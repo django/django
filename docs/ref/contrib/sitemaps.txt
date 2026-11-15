@@ -364,8 +364,6 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using
         ),
     ]
 
-.. _URLconf: ../url_dispatch/
-
 Sitemap for static views
 ========================
 

@@ -10,7 +10,7 @@ from django.db.models import (
     QuerySet,
     prefetch_related_objects,
 )
-from django.db.models.fetch_modes import RAISE
+from django.db.models.fetch_modes import FETCH_RAISE
 from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import (
@@ -137,7 +137,9 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         )
 
     def test_fetch_mode_raise(self):
-        authors = list(Author.objects.fetch_mode(RAISE).prefetch_related("first_book"))
+        authors = list(
+            Author.objects.fetch_mode(FETCH_RAISE).prefetch_related("first_book")
+        )
         authors[0].first_book  # No exception, already loaded
 
     def test_foreignkey_reverse(self):
@@ -1127,6 +1129,23 @@ class CustomPrefetchTests(TestCase):
             with self.assertNumQueries(0):
                 self.assertEqual(person.cached_all_houses, all_houses)
 
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
+    def test_to_attr_django_cached_property(self):
+        with self.assertNumQueries(2):
+            persons = list(
+                Person.objects.prefetch_related(
+                    Prefetch(
+                        "houses",
+                        House.objects.all(),
+                        to_attr="django_cached_all_houses",
+                    ),
+                )
+            )
+        for person in persons:
+            all_houses = list(House.objects.filter(occupants=person))
+            with self.assertNumQueries(0):
+                self.assertEqual(person.django_cached_all_houses, all_houses)
+
     def test_filter_deferred(self):
         """
         Related filtering of prefetched querysets is deferred until necessary.
@@ -1744,6 +1763,38 @@ class MultiDbTests(TestCase):
                 for b in B.prefetch_related(prefetch)
             )
         self.assertEqual(books, "Poems ()\n" "Sense and Sensibility ()\n")
+
+    def test_forward_fk_prefetch_custom_queryset_uses_parent_database(self):
+        book1 = Book.objects.using("default").create(title="Dive into Python")
+        Author.objects.using("default").create(name="Mark", first_book=book1)
+        book2 = Book.objects.using("other").create(title="Dive into Rust")
+        Author.objects.using("other").create(name="Mark", first_book=book2)
+
+        author = (
+            Author.objects.using("other")
+            .prefetch_related(Prefetch("first_book", queryset=Book.objects.all()))
+            .get(name="Mark")
+        )
+
+        self.assertEqual(author._state.db, "other")
+        self.assertEqual(author.first_book._state.db, "other")
+        self.assertEqual(author.first_book.title, "Dive into Rust")
+
+    def test_reverse_o2o_prefetch_custom_queryset_uses_parent_database(self):
+        BookWithYear.objects.using("default").create(title="Poems", published_year=2000)
+        BookWithYear.objects.using("other").create(title="Poems", published_year=2001)
+
+        book = (
+            Book.objects.using("other")
+            .prefetch_related(
+                Prefetch("bookwithyear", queryset=BookWithYear.objects.all())
+            )
+            .get(title="Poems")
+        )
+
+        self.assertEqual(book._state.db, "other")
+        self.assertEqual(book.bookwithyear._state.db, "other")
+        self.assertEqual(book.bookwithyear.published_year, 2001)
 
 
 class Ticket19607Tests(TestCase):

@@ -14,7 +14,7 @@ from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import PROHIBITED_FILTER_KWARGS, Q
 from django.utils.deconstruct import deconstructible
-from django.utils.functional import cached_property, classproperty
+from django.utils.functional import classproperty
 from django.utils.hashable import make_hashable
 from django.utils.inspect import signature
 
@@ -250,26 +250,26 @@ class BaseExpression:
         """
         raise NotImplementedError("Subclasses must implement as_sql()")
 
-    @cached_property
+    @functools.cached_property
     def contains_aggregate(self):
         return any(
             expr and expr.contains_aggregate for expr in self.get_source_expressions()
         )
 
-    @cached_property
+    @functools.cached_property
     def contains_over_clause(self):
         return any(
             expr and expr.contains_over_clause for expr in self.get_source_expressions()
         )
 
-    @cached_property
+    @functools.cached_property
     def contains_column_references(self):
         return any(
             expr and expr.contains_column_references
             for expr in self.get_source_expressions()
         )
 
-    @cached_property
+    @functools.cached_property
     def contains_subquery(self):
         return any(
             expr and (getattr(expr, "subquery", False) or expr.contains_subquery)
@@ -322,7 +322,7 @@ class BaseExpression:
     def field(self):
         return self.output_field
 
-    @cached_property
+    @functools.cached_property
     def output_field(self):
         """Return the output type of this expressions."""
         output_field = self._resolve_output_field()
@@ -377,7 +377,7 @@ class BaseExpression:
     def _convert_value_noop(value, expression, connection):
         return value
 
-    @cached_property
+    @functools.cached_property
     def convert_value(self):
         """
         Expressions provide their own converters because users have the option
@@ -537,7 +537,7 @@ class Expression(BaseExpression, Combinable):
             return type(value)
         return make_hashable(value)
 
-    @cached_property
+    @functools.cached_property
     def identity(self):
         args, kwargs = self._constructor_args
         signature = self._constructor_signature.bind_partial(self, *args, **kwargs)
@@ -807,7 +807,7 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
                 return TemporalSubtraction(resolved.lhs, resolved.rhs)
         return resolved
 
-    @cached_property
+    @functools.cached_property
     def allowed_default(self):
         return self.lhs.allowed_default and self.rhs.allowed_default
 
@@ -1139,7 +1139,7 @@ class Func(SQLiteNumericMixin, Expression):
         copy.extra = self.extra.copy()
         return copy
 
-    @cached_property
+    @functools.cached_property
     def allowed_default(self):
         return all(expression.allowed_default for expression in self.source_expressions)
 
@@ -1708,7 +1708,7 @@ class When(Expression):
             cols.extend(source.get_group_by_cols())
         return cols
 
-    @cached_property
+    @functools.cached_property
     def allowed_default(self):
         return self.condition.allowed_default and self.result.allowed_default
 
@@ -1806,7 +1806,7 @@ class Case(SQLiteNumericMixin, Expression):
             return self.default.get_group_by_cols()
         return super().get_group_by_cols()
 
-    @cached_property
+    @functools.cached_property
     def allowed_default(self):
         return self.default.allowed_default and all(
             case_.allowed_default for case_ in self.cases

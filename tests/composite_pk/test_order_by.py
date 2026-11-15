@@ -70,3 +70,9 @@ class CompositePKOrderByTests(TestCase):
             Comment.objects.order_by("-pk"),
             Comment.objects.order_by(F("pk").desc(nulls_last=True)),
         )
+
+    def test_alias_totally_ordered(self):
+        self.assertIs(
+            Comment.objects.alias(my_pk=F("pk")).order_by("my_pk").totally_ordered,
+            True,
+        )

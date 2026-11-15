@@ -152,13 +152,13 @@ class Media:
 
     @staticmethod
     def _normalize_js(js):
-        return [Script(path) if isinstance(path, str) else path for path in js]
+        return [(path if hasattr(path, "__html__") else Script(path)) for path in js]
 
     @staticmethod
     def _normalize_css(css):
         return {
             medium: [
-                Stylesheet(path, media=medium) if isinstance(path, str) else path
+                (path if hasattr(path, "__html__") else Stylesheet(path, media=medium))
                 for path in paths
             ]
             for medium, paths in css.items()
@@ -646,6 +646,7 @@ class ClearableFileInput(FileInput):
 
 class Textarea(Widget):
     template_name = "django/forms/widgets/textarea.html"
+    input_type = "textarea"
 
     def __init__(self, attrs=None):
         # Use slightly better defaults than HTML's 20x2 box

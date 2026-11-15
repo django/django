@@ -293,7 +293,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_contains(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             RangesModel.objects.filter(ints__contains=8),
             [self.objs[0], self.objs[1]],
         )
@@ -319,18 +319,18 @@ class TestQuerying(PostgreSQLTestCase):
             (15, [decimals[1], decimals[3]]),
         ]:
             with self.subTest(decimal_contains=contains):
-                self.assertSequenceEqual(
+                self.assertCountEqual(
                     RangesModel.objects.filter(decimals__contains=contains), objs
                 )
 
     def test_contained_by(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             RangesModel.objects.filter(ints__contained_by=NumericRange(0, 20)),
             [self.objs[0], self.objs[1], self.objs[3]],
         )
 
     def test_overlap(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             RangesModel.objects.filter(ints__overlap=NumericRange(3, 8)),
             [self.objs[0], self.objs[1]],
         )
@@ -354,13 +354,13 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_not_gt(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             RangesModel.objects.filter(ints__not_gt=NumericRange(5, 10)),
             [self.objs[0], self.objs[2]],
         )
 
     def test_adjacent_to(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             RangesModel.objects.filter(ints__adjacent_to=NumericRange(0, 5)),
             [self.objs[1], self.objs[2]],
         )
@@ -378,7 +378,7 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
     def test_startswith_chaining(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             RangesModel.objects.filter(ints__startswith__gte=0),
             [self.objs[0], self.objs[1]],
         )
@@ -404,7 +404,7 @@ class TestQuerying(PostgreSQLTestCase):
         ]
         for lookup, filter_arg, excepted_result in tests:
             with self.subTest(lookup=lookup, filter_arg=filter_arg):
-                self.assertSequenceEqual(
+                self.assertCountEqual(
                     RangesModel.objects.filter(**{"decimals__%s" % lookup: filter_arg}),
                     excepted_result,
                 )
@@ -516,7 +516,7 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
         objs = SmallAutoFieldModel.objects.bulk_create(
             [SmallAutoFieldModel() for i in range(1, 5)]
         )
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             SmallAutoFieldModel.objects.filter(
                 id__contained_by=NumericRange(objs[1].pk, objs[3].pk),
             ),
@@ -527,7 +527,7 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
         objs = RangeLookupsModel.objects.bulk_create(
             [RangeLookupsModel() for i in range(1, 5)]
         )
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             RangeLookupsModel.objects.filter(
                 id__contained_by=NumericRange(objs[1].pk, objs[3].pk),
             ),
@@ -538,7 +538,7 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
         objs = BigAutoFieldModel.objects.bulk_create(
             [BigAutoFieldModel() for i in range(1, 5)]
         )
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             BigAutoFieldModel.objects.filter(
                 id__contained_by=NumericRange(objs[1].pk, objs[3].pk),
             ),

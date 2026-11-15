@@ -68,6 +68,18 @@ class Book(models.Model):
 class Pet(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(Person, models.CASCADE)
+    owner_first_name = models.CharField(
+        max_length=150, null=True, blank=True, default=None
+    )
+    related_user = models.ForeignObject(
+        User,
+        on_delete=models.CASCADE,
+        from_fields=("name", "owner_first_name"),
+        to_fields=("username", "first_name"),
+        related_name="related_pets",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         ordering = ("name",)

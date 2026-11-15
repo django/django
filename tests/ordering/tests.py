@@ -726,6 +726,37 @@ class TotallyOrderedTests(SimpleTestCase):
         self.assertIs(BarcodedArticle.objects.order_by("rank").totally_ordered, False)
         self.assertIs(BarcodedArticle.objects.order_by("barcode").totally_ordered, True)
 
+    def test_alias(self):
+        self.assertIs(
+            Author.objects.alias(my_pk=F("pk")).order_by("my_pk").totally_ordered, True
+        )
+        self.assertIs(
+            Author.objects.alias(my_pk=F("name")).order_by("my_pk").totally_ordered,
+            False,
+        )
+
+    def test_alias_relation(self):
+        self.assertIs(
+            Author.objects.alias(my_editor=F("editor__pk"))
+            .order_by("my_editor")
+            .totally_ordered,
+            False,
+        )
+
+    def test_alias_self_relation(self):
+        self.assertIs(
+            BarcodedArticle.objects.alias(my_unique_rank=F("unique_rank"))
+            .order_by("my_unique_rank")
+            .totally_ordered,
+            True,
+        )
+        self.assertIs(
+            BarcodedArticle.objects.alias(parent_unique_rank=F("parent__unique_rank"))
+            .order_by("parent_unique_rank")
+            .totally_ordered,
+            False,
+        )
+
     def test_totally_ordered_none(self):
         qs = Author.objects.order_by().none()
         self.assertIs(qs.totally_ordered, False)

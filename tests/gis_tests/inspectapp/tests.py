@@ -2,7 +2,7 @@ import os
 import re
 from io import StringIO
 
-from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
+from django.contrib.gis.gdal import Driver, GDALException
 from django.contrib.gis.utils.ogrinspect import ogrinspect
 from django.core.management import call_command
 from django.db import connection, connections
@@ -142,26 +142,17 @@ class OGRInspectTest(SimpleTestCase):
             )
         )
 
-        # The ordering of model fields might vary depending on several factors
-        # (version of GDAL, etc.).
-        if connection.vendor == "sqlite" and GDAL_VERSION < (3, 4):
-            # SpatiaLite introspection is somewhat lacking on GDAL < 3.4
-            # (#29461).
-            self.assertIn("    f_decimal = models.CharField(max_length=0)", model_def)
-        else:
-            self.assertIn(
-                "    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)",
-                model_def,
-            )
+        # The ordering of model fields might vary depending on several factors.
+        self.assertIn(
+            "    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)",
+            model_def,
+        )
         self.assertIn("    f_int = models.IntegerField()", model_def)
         if not connection.ops.mariadb:
             # Probably a bug between GDAL and MariaDB on time fields.
             self.assertIn("    f_datetime = models.DateTimeField()", model_def)
             self.assertIn("    f_time = models.TimeField()", model_def)
-        if connection.vendor == "sqlite" and GDAL_VERSION < (3, 4):
-            self.assertIn("    f_float = models.CharField(max_length=0)", model_def)
-        else:
-            self.assertIn("    f_float = models.FloatField()", model_def)
+        self.assertIn("    f_float = models.FloatField()", model_def)
         max_length = 0 if connection.vendor == "sqlite" else 10
         self.assertIn(
             "    f_char = models.CharField(max_length=%s)" % max_length, model_def

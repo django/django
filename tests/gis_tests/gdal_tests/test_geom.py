@@ -1,5 +1,6 @@
 import json
 import pickle
+from pathlib import Path
 
 from django.contrib.gis.gdal import (
     CoordTransform,
@@ -10,6 +11,7 @@ from django.contrib.gis.gdal import (
 )
 from django.contrib.gis.gdal.geometries import CircularString, CurvePolygon
 from django.contrib.gis.geos import GEOSException
+from django.core.exceptions import SuspiciousOperation
 from django.template import Context
 from django.template.engine import Engine
 from django.test import SimpleTestCase
@@ -129,6 +131,65 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             '{"type": "Point", "coordinates": [ 100.0, 0.0 ], "other": "<test>"}'
         )
         self.assertIsInstance(geom, OGRGeometry)
+
+    def test_json_named_crs(self):
+        """Even though obsolete, a CRS can be specified by name in GeoJSON."""
+        value = (
+            Path(__file__).parent.parent / "data" / "legacy_crs" / "named_crs.geojson"
+        ).read_text()
+        geom = OGRGeometry.from_json(value)
+        self.assertIsInstance(geom, OGRGeometry)
+
+    def test_json_null_crs(self):
+        value = json.dumps({"type": "Point", "coordinates": [0, 0], "crs": None})
+        geom = OGRGeometry.from_json(value)
+        self.assertIsNone(geom.srid)
+
+    def test_malformed_crs_values_raise_valueerror(self):
+        for value in (None, False, 0, 1.5, "Point", [], [{}]):
+            msg = "GeoJSON geometry must be an object."
+            with (
+                self.subTest(geometry=value),
+                self.assertRaisesMessage(ValueError, msg),
+            ):
+                OGRGeometry.from_json(json.dumps(value))
+
+        for crs in (False, 0, 1.5, "link", [], ["link"]):
+            payload = json.dumps({"type": "Point", "coordinates": [0, 0], "crs": crs})
+            with (
+                self.subTest(crs=crs),
+                self.assertRaisesMessage(ValueError, "GeoJSON CRS must be an object."),
+            ):
+                OGRGeometry.from_json(payload)
+
+        for name in (None, False, 0, 1.5, []):
+            crs = {"type": "name", "properties": {"name": name}}
+            payload = json.dumps({"type": "Point", "coordinates": [0, 0], "crs": crs})
+            msg = "GeoJSON CRS name must be a string."
+            with (
+                self.subTest(crs=crs),
+                self.assertRaisesMessage(ValueError, msg),
+            ):
+                OGRGeometry.from_json(payload)
+
+    def test_null_char_in_crs_value_raises_valueerror(self):
+        crs = {"type": "name", "properties": {"name": "hasnull\x00"}}
+        payload = json.dumps({"type": "Point", "coordinates": [0, 0], "crs": crs})
+        msg = "GeoJSON CRS name must not contain null characters."
+        with self.assertRaisesMessage(ValueError, msg):
+            OGRGeometry.from_json(payload)
+
+    def test_malformed_crs_value_does_not_mask_subsequent_external_crs(self):
+        payload = json.dumps(
+            {
+                "type": "Point",
+                "coordinates": [0, 0],
+                "crs": {"type": 0, "TYPE": "link"},
+            }
+        )
+        msg = "GeoJSON input specified an external CRS."
+        with self.assertRaisesMessage(SuspiciousOperation, msg):
+            OGRGeometry.from_json(payload)
 
     def test_points(self):
         "Testing Point objects."

@@ -1,10 +1,10 @@
 import sys
+from functools import cached_property
 
 from django.conf import settings
 from django.db import DatabaseError
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.utils.crypto import get_random_string
-from django.utils.functional import cached_property
 
 TEST_DATABASE_PREFIX = "test_"
 

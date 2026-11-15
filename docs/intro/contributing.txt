@@ -158,7 +158,7 @@ terminal window.
 
     .. code-block:: doscon
 
-        ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
+        ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate
 
 The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
@@ -244,7 +244,7 @@ __ https://djangoci.com
     is sufficient, however, it's possible (and sometimes necessary) to
     :ref:`run the tests using a different database
     <running-unit-tests-settings>`. When making UI changes, you will need to
-    :ref:`run the Selenium tests <running-selenium-tests>`.
+    :ref:`run the Playwright tests <running-playwright-tests>`.
 
 Working on an approved new feature
 ==================================

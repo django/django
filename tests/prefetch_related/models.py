@@ -1,10 +1,13 @@
 import uuid
+from functools import cached_property
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.query import ModelIterable
-from django.utils.functional import cached_property
+from django.test import ignore_warnings
+from django.utils import functional
+from django.utils.deprecation import RemovedInDjango2029Warning
 
 
 class Author(models.Model):
@@ -272,6 +275,13 @@ class Person(models.Model):
     @cached_property
     def cached_all_houses(self):
         return self.all_houses
+
+    # RemovedInDjango2029Warning: When the deprecation ends, remove.
+    with ignore_warnings(category=RemovedInDjango2029Warning):
+
+        @functional.cached_property
+        def django_cached_all_houses(self):
+            return self.all_houses
 
     class Meta:
         ordering = ["id"]

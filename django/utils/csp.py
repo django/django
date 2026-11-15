@@ -117,6 +117,10 @@ def build_policy(config, nonce=None):
                 values = [f"'nonce-{nonce}'" if v == CSP.NONCE else v for v in values]
             elif has_sentinel:
                 values = [v for v in values if v != CSP.NONCE]
+                if not values:
+                    # Removing the nonce sentinel left the directive empty.
+                    # Omitting it would fail open, so emit 'none' instead.
+                    values = [CSP.NONE]
 
             if not values:
                 continue
@@ -126,3 +130,17 @@ def build_policy(config, nonce=None):
         policy.append(f"{directive} {rendered_value}".rstrip())
 
     return "; ".join(policy)
+
+
+def _csp_policy_contains_nonce(policy):
+    try:
+        policy_values = policy.values()
+    except AttributeError:
+        return False
+    for values in policy_values:
+        try:
+            if values == CSP.NONCE or CSP.NONCE in values:
+                return True
+        except TypeError:
+            pass
+    return False

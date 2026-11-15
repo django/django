@@ -123,4 +123,5 @@ GeometryCollection._allowed = (
     MultiPoint,
     MultiLineString,
     MultiPolygon,
+    GeometryCollection,
 )

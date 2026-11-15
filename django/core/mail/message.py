@@ -20,7 +20,7 @@ from pathlib import Path
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
 from django.utils.deprecation import (
-    RemovedInDjango70Warning,
+    RemovedInDjango2028Warning,
     deprecate_posargs,
     warn_about_external_use,
 )
@@ -33,7 +33,7 @@ from .deprecation import (
     report_using_incompatibility,
 )
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
 utf8_charset = Charset.Charset("utf-8")
@@ -45,17 +45,17 @@ utf8_charset_qp.body_encoding = Charset.QP
 # and cannot be guessed).
 DEFAULT_ATTACHMENT_MIME_TYPE = "application/octet-stream"
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 RFC5322_EMAIL_LINE_LENGTH_LIMIT = 998
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 # BadHeaderError must be ValueError (not subclass it), so that existing code
 # with `except BadHeaderError` will catch the ValueError that Python's modern
 # email API raises for headers containing CR or NL.
 BadHeaderError = ValueError
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 # Header names that contain structured address data (RFC 5322).
 ADDRESS_HEADERS = {
     "from",
@@ -72,14 +72,14 @@ ADDRESS_HEADERS = {
 }
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 def forbid_multi_line_headers(name, val, encoding):
     """Forbid multi-line headers to prevent header injection."""
     warnings.warn(
         "The internal API forbid_multi_line_headers() is deprecated."
         " Python's modern email API (with email.message.EmailMessage or"
         " email.policy.default) will reject multi-line headers.",
-        RemovedInDjango70Warning,
+        RemovedInDjango2028Warning,
     )
 
     encoding = encoding or settings.DEFAULT_CHARSET
@@ -103,7 +103,7 @@ def forbid_multi_line_headers(name, val, encoding):
     return name, val
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 def sanitize_address(addr, encoding):
     """
     Format a pair of (name, address) or an email address string.
@@ -114,7 +114,7 @@ def sanitize_address(addr, encoding):
         " email.policy.default) will handle most required validation and"
         " encoding. Use Python's email.headerregistry.Address to construct"
         " formatted addresses from component parts.",
-        RemovedInDjango70Warning,
+        RemovedInDjango2028Warning,
     )
 
     address = None
@@ -159,7 +159,7 @@ def sanitize_address(addr, encoding):
     return formataddr((nm, parsed_address.addr_spec))
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class MIMEMixin:
     def as_string(self, unixfrom=False, linesep="\n"):
         """Return the entire formatted message as a string.
@@ -188,7 +188,7 @@ class MIMEMixin:
         return fp.getvalue()
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):
     def __setitem__(self, name, val):
         # Per RFC 2046 Section 5.2.1, message/rfc822 attachment headers must be
@@ -197,7 +197,7 @@ class SafeMIMEMessage(MIMEMixin, MIMEMessage):
         MIMEMessage.__setitem__(self, name, val)
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class SafeMIMEText(MIMEMixin, MIMEText):
     def __init__(self, _text, _subtype="plain", _charset=None):
         self.encoding = _charset
@@ -220,7 +220,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
         MIMEText.set_payload(self, payload, charset=charset)
 
 
-# RemovedInDjango70Warning.
+# RemovedInDjango2028Warning.
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
     def __init__(
         self, _subtype="mixed", boundary=None, _subparts=None, encoding=None, **_params
@@ -247,7 +247,7 @@ class EmailMessage:
     encoding = None
 
     @deprecate_posargs(
-        RemovedInDjango70Warning,
+        RemovedInDjango2028Warning,
         [
             "bcc",
             "connection",
@@ -308,23 +308,23 @@ class EmailMessage:
                 if isinstance(attachment, email.message.MIMEPart):
                     self.attach(attachment)
                 elif isinstance(attachment, MIMEBase):
-                    # RemovedInDjango70Warning.
+                    # RemovedInDjango2028Warning.
                     self.attach(attachment)
                 else:
                     self.attach(*attachment)
         self.extra_headers = headers or {}
-        # RemovedInDjango70Warning.
+        # RemovedInDjango2028Warning.
         if connection is not None:
             warn_about_external_use(
-                CONNECTION_ARG_WARNING, RemovedInDjango70Warning, skip_frames=1
+                CONNECTION_ARG_WARNING, RemovedInDjango2028Warning, skip_frames=1
             )
         self._connection = connection
 
-    # RemovedInDjango70Warning: connection property.
+    # RemovedInDjango2028Warning: connection property.
     @property
     def connection(self):
         msg = "The EmailMessage.connection attribute is deprecated."
-        warn_about_external_use(msg, RemovedInDjango70Warning)
+        warn_about_external_use(msg, RemovedInDjango2028Warning)
         return self._connection
 
     @connection.setter
@@ -333,7 +333,7 @@ class EmailMessage:
             "The EmailMessage.connection attribute is deprecated. Switch to "
             "EmailMessage.send(using=...) with a MAILERS alias."
         )
-        warn_about_external_use(msg, RemovedInDjango70Warning)
+        warn_about_external_use(msg, RemovedInDjango2028Warning)
         self._connection = value
 
     def message(self, *, policy=email.policy.default):
@@ -342,7 +342,12 @@ class EmailMessage:
         self._add_attachments(msg)
 
         msg["Subject"] = str(self.subject)
-        msg["From"] = str(self.extra_headers.get("From", self.from_email))
+
+        from_header = self.extra_headers.get("From", self.from_email)
+        msg["From"] = (
+            from_header if isinstance(from_header, Address) else str(from_header)
+        )
+
         self._set_list_header_if_not_empty(msg, "To", self.to)
         self._set_list_header_if_not_empty(msg, "Cc", self.cc)
         self._set_list_header_if_not_empty(msg, "Reply-To", self.reply_to)
@@ -386,7 +391,8 @@ class EmailMessage:
             # send to.
             return 0
 
-        # RemovedInDjango70Warning: replace the remainder of this method with:
+        # RemovedInDjango2028Warning: replace the remainder of this method
+        # with:
         #   from django.core.mail import mailers
         #   mailer = mailers.default if using is None else mailers[using]
         #   return mailer.send_messages([self])
@@ -394,7 +400,9 @@ class EmailMessage:
         from django.core import mail
 
         if fail_silently:
-            warn_about_external_use(FAIL_SILENTLY_ARG_WARNING, RemovedInDjango70Warning)
+            warn_about_external_use(
+                FAIL_SILENTLY_ARG_WARNING, RemovedInDjango2028Warning
+            )
         if hasattr(self, "get_connection"):
             raise AttributeError(
                 "EmailMessage no longer supports the undocumented "
@@ -439,7 +447,7 @@ class EmailMessage:
             warnings.warn(
                 "MIMEBase attachments are deprecated."
                 " Use an email.message.MIMEPart instead.",
-                RemovedInDjango70Warning,
+                RemovedInDjango2028Warning,
             )
             if content is not None or mimetype is not None:
                 raise ValueError(
@@ -495,7 +503,7 @@ class EmailMessage:
     def _add_attachments(self, msg):
         if self.attachments:
             if hasattr(self, "mixed_subtype"):
-                # RemovedInDjango70Warning.
+                # RemovedInDjango2028Warning.
                 raise AttributeError(
                     "EmailMessage no longer supports the"
                     " undocumented `mixed_subtype` attribute"
@@ -505,7 +513,7 @@ class EmailMessage:
                 if isinstance(attachment, email.message.MIMEPart):
                     msg.attach(attachment)
                 elif isinstance(attachment, MIMEBase):
-                    # RemovedInDjango70Warning.
+                    # RemovedInDjango2028Warning.
                     msg.attach(attachment)
                 else:
                     self._add_attachment(msg, *attachment)
@@ -563,7 +571,11 @@ class EmailMessage:
             msg[header] = self.extra_headers[header]
         except KeyError:
             if values:
-                msg[header] = ", ".join(str(v) for v in values)
+                msg[header] = (
+                    values
+                    if all(isinstance(v, Address) for v in values)
+                    else ", ".join(str(v) for v in values)
+                )
 
     def _idna_encode_address_header_domains(self, msg):
         """
@@ -605,7 +617,7 @@ class EmailMultiAlternatives(EmailMessage):
     """
 
     @deprecate_posargs(
-        RemovedInDjango70Warning,
+        RemovedInDjango2028Warning,
         [
             "bcc",
             "connection",
@@ -662,7 +674,7 @@ class EmailMultiAlternatives(EmailMessage):
             super()._add_bodies(msg)
         if self.alternatives:
             if hasattr(self, "alternative_subtype"):
-                # RemovedInDjango70Warning.
+                # RemovedInDjango2028Warning.
                 raise AttributeError(
                     "EmailMultiAlternatives no longer supports the"
                     " undocumented `alternative_subtype` attribute"

@@ -136,7 +136,8 @@ with the CSP specification.
 
       Represents ``'unsafe-inline'``. Allows execution of inline scripts,
       styles, and ``javascript:`` URLs. Generally discouraged, especially for
-      scripts.
+      scripts. Ignored by browsers when the same directive contains a nonce or
+      hash source. See :ref:`csp-nonce-generation` for details.
 
    .. attribute:: WASM_UNSAFE_EVAL
 
@@ -300,15 +301,52 @@ but the header will lack the required source expression. In this case, the
 browser will block the inline script or style (or report it for report-only
 configurations).
 
-Nonce generation and caching
-----------------------------
+If a directive's only source is :attr:`~django.utils.csp.CSP.NONCE` and the
+nonce is never used, the directive is emitted as ``'none'`` instead (e.g.
+``script-src 'none'``), keeping the policy restrictive.
 
-Django's nonce generation is **lazy**: the middleware only generates a nonce if
-``{{ csp_nonce }}`` is accessed during template rendering. This avoids
-unnecessary work for pages that do not use nonces.
+.. versionchanged:: 6.2
 
-However, because nonces must be unique per request, extra care is needed when
-using full-page caching (e.g., Django's cache middleware, CDN caching). Serving
+    Emitting ``'none'`` for nonce-only directives with an unused nonce was
+    added.
+
+.. _csp-nonce-generation:
+
+Nonce generation
+----------------
+
+Django's nonce generation is **lazy** for non-streaming responses: the
+middleware generates a nonce when it is accessed while constructing the
+response, for example by ``{{ csp_nonce }}`` or :ttag:`csp_nonce_attr`.
+
+For streaming responses (:class:`~django.http.StreamingHttpResponse` and
+:class:`~django.http.FileResponse`), the middleware generates a nonce before
+adding a CSP header for a policy configured with
+:attr:`~django.utils.csp.CSP.NONCE`. The response body may access the nonce
+after the header has been sent, so the header will include a nonce even if the
+body never uses it.
+
+.. admonition:: Using ``UNSAFE_INLINE`` with ``NONCE`` in streaming responses
+
+    For streaming responses, Django includes a nonce in the CSP header even if
+    the response body does not use it. Browsers ignore ``'unsafe-inline'`` in
+    ``script-src`` and ``style-src`` directives containing a nonce, which may
+    block inline scripts, styles, and event handlers.
+
+    To allow style attributes or inline event handlers while using nonces for
+    ``<style>`` or ``<script>`` elements, configure ``style-src-attr`` or
+    ``script-src-attr``, respectively.
+
+.. versionchanged:: 6.2
+
+    CSP nonces are now generated before headers are added to streaming
+    responses, even if the response body never uses the nonce.
+
+Nonce and caching
+-----------------
+
+Because nonces must be unique per request, extra care is needed when using
+full-page caching (e.g., Django's cache middleware, CDN caching). Serving
 cached responses with previously generated nonces may result in reuse across
 users and requests. Although such responses may still appear to work (since the
 nonce in the CSP header and HTML content match), reuse defeats the purpose of

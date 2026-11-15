@@ -136,6 +136,8 @@ class Field:
         #             that is its widget is shown in the form but not editable.
         # label_suffix -- Suffix to be added to the label. Overrides
         #                 form's label_suffix.
+        # template_name -- Template name to use in BoundField.as_field_group.
+        #                  Overrides the renderer's field_template_name.
         # bound_field_class -- BoundField class to use in
         #                      Field.get_bound_field.
         self.required, self.label, self.initial = required, label, initial
@@ -1363,7 +1365,7 @@ class JSONField(CharField):
             return value
         try:
             converted = json.loads(value, cls=self.decoder)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, RecursionError):
             raise ValidationError(
                 self.error_messages["invalid"],
                 code="invalid",
@@ -1381,7 +1383,7 @@ class JSONField(CharField):
             return None
         try:
             return json.loads(data, cls=self.decoder)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, RecursionError):
             return InvalidJSONInput(data)
 
     def prepare_value(self, value):

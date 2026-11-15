@@ -81,6 +81,12 @@ def get_commit_hash():
     return subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
 
 
+def get_commit_timestamp():
+    return subprocess.check_output(
+        ["git", "log", "HEAD", "-1", r"--pretty=%ct"], text=True
+    ).strip()
+
+
 def parse_major_version(django_version):
     major = ".".join(django_version.split(".")[:2])
     match = re.search("[abrc]", major)
@@ -149,14 +155,19 @@ def main():
     assert (
         pgp_key_url
     ), "Missing PGP_KEY_URL: Set this env var to your PGP public key URL."
-    assert dest_folder and os.path.exists(
-        dest_folder
+    assert (
+        (dest_folder := os.getenv("DEST_FOLDER"))
+        and (dest_folder := os.path.expanduser(dest_folder))
+        and os.path.exists(dest_folder)
     ), "Missing DEST_FOLDER: Set this env var to the path to place the artifacts."
 
     # Ensure the working directory is clean.
     subprocess.call(["git", "clean", "-fdx"])
 
     commit_hash = get_commit_hash()
+    commit_timestamp = get_commit_timestamp()
+    assert commit_timestamp
+    os.environ["SOURCE_DATE_EPOCH"] = commit_timestamp
 
     django_repo_path = os.path.abspath(os.path.curdir)
     dist_path = os.path.join(django_repo_path, "dist")

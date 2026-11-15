@@ -1,12 +1,13 @@
 import gzip
 import json
 import sys
+from contextlib import aclosing
 
 from django.core.exceptions import SuspiciousFileOperation
 from django.test import SimpleTestCase
 from django.utils import text
 from django.utils.functional import lazystr
-from django.utils.text import format_lazy
+from django.utils.text import acompress_sequence, format_lazy
 from django.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = len("\U0001f4a9") == 1
@@ -404,6 +405,28 @@ class TestUtilsText(SimpleTestCase):
         with self.assertRaisesMessage(SuspiciousFileOperation, msg):
             text.get_valid_filename("$.$.$")
 
+    def test_trim_value(self):
+        tests = [
+            ("", ("", "")),
+            ("POINT (0 0)", ("POINT (0 0)", "")),
+            ("x" * 4096, ("x" * 4096, "")),
+            ("x" * 4097, ("x" * 4096, "… <trimmed 1 chars out of 4097>")),
+        ]
+        for value, expected in tests:
+            with self.subTest(length=len(value)):
+                self.assertEqual(text.trim_value(value), expected)
+
+    def test_trim_value_custom_limit(self):
+        self.assertEqual(
+            text.trim_value("abcdef", limit=3),
+            ("abc", "… <trimmed 3 chars out of 6>"),
+        )
+
+    def test_trim_value_non_string(self):
+        for value in [None, 42, b"x" * 5000, ["x"] * 5000]:
+            with self.subTest(value_type=type(value)):
+                self.assertEqual(text.trim_value(value), (value, ""))
+
     def test_compress_sequence(self):
         data = [{"key": i} for i in range(100)]
         seq = [s.encode() for s in json.JSONEncoder().iterencode(data)]
@@ -417,6 +440,22 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(gzip.decompress(out), original)
         self.assertLess(len(out), len(original))
         self.assertGreater(len(compressed_chunks), 2)
+
+    async def test_acompress_sequence_closes_inner_sequence_promptly(self):
+        finally_ran = False
+
+        async def sequence():
+            nonlocal finally_ran
+            try:
+                yield b"chunk1" * 1024
+                yield b"chunk2" * 1024
+            finally:
+                finally_ran = True
+
+        async with aclosing(acompress_sequence(sequence())) as compressed:
+            await anext(compressed)  # gzip header
+            await anext(compressed)  # first sequence-derived chunk
+        self.assertTrue(finally_ran)
 
     def test_format_lazy(self):
         self.assertEqual("django/test", format_lazy("{}/{}", "django", lazystr("test")))

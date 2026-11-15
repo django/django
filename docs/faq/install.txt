@@ -26,7 +26,7 @@ For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate web server installed or database server.
 
 Django comes with its own lightweight development server
-(:djadmin:`runserver`). For a production environment, Django follows the WSGI
+(:cli:`runserver`). For a production environment, Django follows the WSGI
 spec, :pep:`3333`, which means it can run on a variety of web servers. See
 :doc:`/howto/deployment/index` for more information.
 
@@ -52,8 +52,8 @@ Django version Python versions
 ============== ===============
 5.2            3.10, 3.11, 3.12, 3.13, 3.14 (added in 5.2.8)
 6.0            3.12, 3.13, 3.14
-6.1            3.12, 3.13, 3.14
-6.2            3.12, 3.13, 3.14
+6.1            3.12, 3.13, 3.14, 3.15 (added in 6.1.3)
+6.2            3.12, 3.13, 3.14, 3.15
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially
@@ -63,11 +63,27 @@ maintained by the Python project and therefore should not be used with Django.
 You can find the latest supported micro version for each series on the `Python
 download page <https://www.python.org/downloads/>`_.
 
-We will support a Python version up to and including the first Django LTS
-release whose security support ends after security support for that version of
-Python ends. For example, Python 3.9 security support ends in October 2025 and
-Django 4.2 LTS security support ends in April 2026. Therefore Django 4.2 is the
-last version to support Python 3.9.
+Starting with Django 2028, each feature release supports three Python versions:
+the two Python versions receiving bug fixes when its alpha is released, plus
+the most recent Python version to have moved to security fixes only. During its
+year of mainstream support, a feature release also adds support, in a patch
+release, for the Python version released that October. For example, Django 2028
+supports Python 3.14, 3.15, and 3.16, and adds support for Python 3.17 in a
+patch release.
+
+The oldest Python version supported by a feature release reaches end-of-life
+about two months before that feature release does. Django continues to test
+against it until then, but may decline to fix issues that affect only that
+Python version.
+
+.. RemovedInDjango2028Warning: Remove the A.B paragraph below.
+
+Under the ``A.B`` versioning scheme, used up to and including Django 6.2, we
+will support a Python version up to and including the first Django LTS release
+whose security support ends after security support for that version of Python
+ends. For example, Python 3.9 security support ends in October 2025 and Django
+4.2 LTS security support ends in April 2026. Therefore Django 4.2 is the last
+version to support Python 3.9.
 
 What Python version should I use with Django?
 =============================================

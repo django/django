@@ -566,13 +566,14 @@ class ParseHeaderParameterTests(unittest.TestCase):
     def test_rfc2231_wrong_title(self):
         """
         Test wrongly formatted RFC 2231 headers (missing double single quotes).
-        Parsing should not crash (#24209).
+        Parsing should not crash (#24209), but stdlib email still decodes the
+        value (#35440).
         """
         test_data = (
             (
                 "Content-Type: application/x-stuff; "
                 "title*='This%20is%20%2A%2A%2Afun%2A%2A%2A",
-                "'This%20is%20%2A%2A%2Afun%2A%2A%2A",
+                "'This is ***fun***",
             ),
             ("Content-Type: application/x-stuff; title*='foo.html", "'foo.html"),
             ("Content-Type: application/x-stuff; title*=bar.html", "bar.html"),
@@ -626,6 +627,16 @@ class ParseHeaderParameterTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     parse_header_parameters(line, **kwargs)
 
+    def test_many_separators_in_quoted_value(self):
+        # A quoted value containing many semicolons is a single parameter, and
+        # trailing unquoted parameters are still parsed.
+        value = ";" * 5000
+        header = 'attachment; filename="%s"; size=1' % value
+        self.assertEqual(
+            parse_header_parameters(header),
+            ("attachment", {"filename": value, "size": "1"}),
+        )
+
 
 class ContentDispositionHeaderTests(unittest.TestCase):
     def test_basic(self):
@@ -644,6 +655,8 @@ class ContentDispositionHeaderTests(unittest.TestCase):
                 "attachment; filename*=utf-8''%22esp%C3%A9cimen%22%20filename",
             ),
             ((True, "some\nfile"), "attachment; filename*=utf-8''some%0Afile"),
+            ((True, "\n"), "attachment; filename*=utf-8''%0A"),
+            ((True, "example\n"), "attachment; filename*=utf-8''example%0A"),
         )
 
         for (is_attachment, filename), expected in tests:

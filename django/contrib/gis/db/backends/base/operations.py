@@ -1,9 +1,10 @@
+from functools import cached_property
+
 from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import Area as AreaMeasure
 from django.contrib.gis.measure import Distance as DistanceMeasure
 from django.db import NotSupportedError
-from django.utils.functional import cached_property
 
 
 class BaseSpatialOperations:
@@ -117,7 +118,13 @@ class BaseSpatialOperations:
 
     @staticmethod
     def _must_transform_value(value, field):
-        return value is not None and value.srid != field.srid
+        if value is None:
+            return False
+        if value.srid == field.srid:
+            return False
+        if field.srid is None:
+            raise ValueError("Cannot transform a spatial value to an undefined SRID.")
+        return True
 
     def get_geom_placeholder_sql(self, f, value, compiler):
         """

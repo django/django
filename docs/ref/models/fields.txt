@@ -552,9 +552,9 @@ or globally in the :setting:`DEFAULT_AUTO_FIELD` setting. For more, see
 :class:`CompositePrimaryKey` instead of setting this flag to ``True`` for all
 fields to maintain this invariant.
 
-The primary key field is read-only. If you change the value of the primary
-key on an existing object and then save it, a new object will be created
-alongside the old one.
+Changing an object's primary key and saving it does not change the original
+object in the database. If another object already has the new primary key, that
+object is updated. Otherwise, a new object is created.
 
 The primary key field is set to ``None`` when calling a model instance’s
 :meth:`~django.db.models.Model.delete` method.
@@ -1366,9 +1366,6 @@ materialized view.
 .. _PostgreSQL: https://www.postgresql.org/docs/current/ddl-generated-columns.html
 .. _SQLite: https://www.sqlite.org/gencol.html#limitations
 
-:attr:`~Field.null` has no effect on ``GeneratedField`` since whether the
-column is nullable depends on the database and expression used.
-
 ``GenericIPAddressField``
 -------------------------
 
@@ -1405,14 +1402,11 @@ values are stored as null.
 
 .. class:: ImageField(upload_to=None, height_field=None, width_field=None, max_length=100, **options)
 
-Inherits all attributes and methods from :class:`FileField`, but also
-validates that the uploaded object is a valid image.
+Inherits all attributes and methods from :class:`FileField`, and also provides
+``height`` and ``width`` attributes. No additional image-specific validation is
+performed at the model field level.
 
-In addition to the special attributes that are available for
-:class:`FileField`, an :class:`ImageField` also has ``height`` and ``width``
-attributes.
-
-To facilitate querying on those attributes, :class:`ImageField` has the
+To facilitate querying on ``height`` and ``width``, :class:`ImageField` has the
 following optional arguments:
 
 .. attribute:: ImageField.height_field
@@ -1494,6 +1488,13 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
     ``default={}`` or ``default=[]`` creates a mutable default that is shared
     between all instances.
 
+.. admonition:: Object key order is not guaranteed to be preserved
+
+    JSON objects are unordered collections of key/value pairs (:rfc:`8259`).
+    Although Python's :class:`dict` preserves insertion order, you should not
+    rely on ``JSONField`` preserving that order when storing and retrieving
+    data.
+
 .. admonition:: Indexing
 
     :class:`~django.db.models.Index` and :attr:`.Field.db_index` both create a
@@ -1508,8 +1509,12 @@ To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
     queried. PostgreSQL's ``json`` field is stored as the original string
     representation of the JSON and must be decoded on the fly when queried
     based on keys. The ``jsonb`` field is stored based on the actual structure
-    of the JSON which allows indexing. The trade-off is a small additional cost
-    on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
+    of the JSON, which allows indexing but doesn't preserve the order of object
+    keys. The trade-off is a small additional cost on writing to the ``jsonb``
+    field. ``JSONField`` uses ``jsonb``.
+
+    For more details, see PostgreSQL's `documentation on JSON types
+    <https://www.postgresql.org/docs/current/datatype-json.html>`_.
 
 .. admonition:: Oracle users
 

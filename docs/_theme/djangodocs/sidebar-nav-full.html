@@ -1,0 +1,34 @@
+{# Adapted from https://github.com/executablebooks/sphinx-book-theme/blob/main/src/sphinx_book_theme/theme/sphinx_book_theme/components/sbt-sidebar-nav.html #}
+<nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        {# Ref: https://github.com/pydata/pydata-sphinx-theme/blob/9fd11dffe6faa2a6070e87191ef1e8f51b324a9f/src/pydata_sphinx_theme/toctree.py#L337 #}
+        {{- generate_toctree_html(
+            kind="sidebar",
+            startdepth=0,
+            maxdepth=theme_navigation_depth | int,
+            show_nav_level=theme_show_nav_level | int,
+            collapse=False,
+            includehidden=True,
+            titles_only=True,
+        ) }}
+
+        <hr>
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1{% if pagename == root_doc %} current active{% endif %}">
+                <a class="reference internal" href="{{ pathto(root_doc) }}">
+                    {{ _('Table of Contents') }}
+                </a>
+            </li>
+            <li class="toctree-l1{% if pagename == 'genindex' %} current active{% endif %}">
+              <a class="reference internal"
+                 href="{{ pathto('genindex') }}"
+                 accesskey="I">{{ _('General Index') }}</a>
+            </li>
+            <li class="toctree-l1{% if pagename == 'py-modindex' %} current active{% endif %}">
+              <a class="reference internal" href="{{ pathto('py-modindex') }}">
+                {{ _('Python Module Index') }}
+              </a>
+            </li>
+        </ul>
+    </div>
+</nav>

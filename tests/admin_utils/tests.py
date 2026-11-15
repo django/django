@@ -17,6 +17,7 @@ from django.contrib.admin.utils import (
     lookup_field,
     quote,
 )
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import User
 from django.contrib.auth.templatetags.auth import render_password_as_hash
 from django.core.validators import EMPTY_VALUES
@@ -31,10 +32,13 @@ from .models import (
     Article,
     Car,
     Cascade,
+    ChildUser,
     DBCascade,
     Event,
     EventGuide,
     Location,
+    MinimalPasswordUser,
+    ParentUser,
     Site,
     Vehicle,
 )
@@ -164,6 +168,7 @@ class UtilsTests(SimpleTestCase):
             ("test_from_model", article.test_from_model()),
             ("non_field", INSTANCE_ATTRIBUTE),
             ("site__domain", SITE_NAME),
+            ("site__parent", None),
         )
 
         mock_admin = MockModelAdmin()
@@ -239,6 +244,19 @@ class UtilsTests(SimpleTestCase):
         expected = '<a href="http://example.com">http://example.com</a>'
         self.assertHTMLEqual(display_value, expected)
 
+    def test_url_display_for_field_invalid_url(self):
+        # An invalid URL, such as one with an unsafe scheme, is rendered as
+        # plain text instead of a clickable link.
+        model_field = models.URLField()
+        for value in [
+            "javascript:alert(1)",
+            "data:text/html,<script>alert(1)</script>",
+        ]:
+            with self.subTest(value=value):
+                display_value = display_for_field(value, model_field, self.empty_value)
+                self.assertNotIn("<a", display_value)
+                self.assertEqual(display_value, value)
+
     def test_number_formats_display_for_field(self):
         display_value = display_for_field(
             12345.6789, models.FloatField(), self.empty_value
@@ -293,6 +311,31 @@ class UtilsTests(SimpleTestCase):
                     password, password_field, self.empty_value
                 )
                 self.assertEqual(display_value, render_password_as_hash(password))
+
+    @override_settings(AUTH_USER_MODEL="admin_utils.ChildUser")
+    def test_password_display_for_field_inherited_user_model(self):
+        password_field = ChildUser._meta.get_field("password")
+        self.assertIs(password_field.model, ParentUser)
+        password = "md5$zjIiKM8EiyfXEGiexlQRw4$a59a82cf344546e7bc09cb5f2246370a"
+        display_value = display_for_field(password, password_field, self.empty_value)
+        self.assertEqual(display_value, render_password_as_hash(password))
+
+    @override_settings(AUTH_USER_MODEL="admin_utils.MinimalPasswordUser")
+    def test_password_display_for_field_user_model_not_abstract_base_user(self):
+        password_field = MinimalPasswordUser._meta.get_field("password")
+        password = "md5$zjIiKM8EiyfXEGiexlQRw4$a59a82cf344546e7bc09cb5f2246370a"
+        display_value = display_for_field(password, password_field, self.empty_value)
+        self.assertEqual(display_value, render_password_as_hash(password))
+
+    @isolate_apps("admin_utils")
+    def test_password_display_for_field_other_user_model(self):
+        class OtherUser(AbstractBaseUser):
+            pass
+
+        password_field = OtherUser._meta.get_field("password")
+        password = "md5$zjIiKM8EiyfXEGiexlQRw4$a59a82cf344546e7bc09cb5f2246370a"
+        display_value = display_for_field(password, password_field, self.empty_value)
+        self.assertEqual(display_value, render_password_as_hash(password))
 
     def test_list_display_for_value(self):
         display_value = display_for_value([1, 2, 3], self.empty_value)
@@ -443,6 +486,12 @@ class UtilsTests(SimpleTestCase):
             label_for_field("test_from_property", Article, model_admin=MockModelAdmin),
             "property short description",
         )
+
+    def test_label_for_field_str_admin_order_field(self):
+        _, attr = label_for_field("__str__", Cascade, return_attr=True)
+        self.assertIs(attr, Cascade.__str__)
+        self.assertTrue(hasattr(attr, "admin_order_field"))
+        self.assertEqual(attr.admin_order_field, "num")
 
     def test_help_text_for_field(self):
         tests = [

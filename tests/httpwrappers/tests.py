@@ -5,6 +5,7 @@ import os
 import pickle
 import unittest
 import uuid
+from contextlib import aclosing
 
 from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
@@ -24,7 +25,7 @@ from django.http import (
     parse_cookie,
 )
 from django.test import SimpleTestCase
-from django.utils.deprecation import RemovedInDjango71Warning
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazystr
 from django.utils.http import MAX_URL_REDIRECT_LENGTH
@@ -704,7 +705,7 @@ class JsonResponseTests(SimpleTestCase):
         response = JsonResponse(data)
         self.assertEqual(json.loads(response.text), data)
 
-    # RemovedInDjango71Warning: When the deprecation ends, remove this test.
+    # RemovedInDjango2029Warning: When the deprecation ends, remove this test.
     def test_json_response_raises_type_error_with_safe_arg(self):
         with (
             self.assertRaisesMessage(
@@ -713,7 +714,7 @@ class JsonResponseTests(SimpleTestCase):
                 "safe parameter to False",
             ),
             self.assertWarnsMessage(
-                RemovedInDjango71Warning, "The safe parameter is deprecated."
+                RemovedInDjango2029Warning, "The safe parameter is deprecated."
             ),
         ):
             JsonResponse([1, 2, 3], safe=True)
@@ -856,6 +857,22 @@ class StreamingHttpResponseTests(SimpleTestCase):
 
         with self.assertRaisesMessage(AttributeError, msg):
             r.text
+
+    async def test_streaming_response_closes_user_generator_promptly(self):
+        finally_ran = False
+
+        async def body():
+            nonlocal finally_ran
+            try:
+                yield b"chunk"
+            finally:
+                finally_ran = True
+
+        response = StreamingHttpResponse(body())
+        async with aclosing(aiter(response)) as content:
+            async for _ in content:
+                break
+        self.assertTrue(finally_ran)
 
 
 class FileCloseTests(SimpleTestCase):

@@ -295,7 +295,7 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
                 search_type="websearch",
             ),
         )
-        self.assertSequenceEqual(searched, [self.verse0, self.verse1])
+        self.assertCountEqual(searched, [self.verse0, self.verse1])
 
     def test_web_search_with_config(self):
         line_qs = Line.objects.annotate(
@@ -879,6 +879,7 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
             ("backslash\\", "'backslash'"),
             ("exclamation!", "'exclamation'"),
             ("ampers&nd", "'ampers nd'"),
+            ("&", "NULL"),
         )
         for lexeme, quoted in tests:
             with self.subTest(lexeme=lexeme):
@@ -928,7 +929,7 @@ class TestLexemes(GrailTestData, PostgreSQLTestCase):
             )
         )
 
-        self.assertSequenceEqual(searched, [self.verse0, self.verse1])
+        self.assertCountEqual(searched, [self.verse0, self.verse1])
 
     def test_config_query_explicit(self):
         searched = Line.objects.annotate(

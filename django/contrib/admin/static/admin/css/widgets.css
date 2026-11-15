@@ -97,7 +97,7 @@
 .selector ul.selector-chooser {
     align-self: center;
     width: 30px;
-    background-color: var(--selected-bg);
+    background-color: var(--selector-chooser-bg);
     border-radius: 10px;
     margin: 0;
     padding: 0;
@@ -150,7 +150,7 @@
 }
 
 .selector-add {
-    background: url(../img/selector-icons.svg) 0 -144px no-repeat;
+    background: var(--selector-icons) 0 -144px no-repeat;
     background-size: 24px auto;
 }
 
@@ -160,7 +160,7 @@
 }
 
 .selector-remove {
-    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+    background: var(--selector-icons) 0 -96px no-repeat;
     background-size: 24px auto;
 }
 
@@ -241,8 +241,7 @@
     display: flex;
     height: 30px;
     width: 64px;
-    margin: 0 auto 10px auto;
-    background-color: #eee;
+    margin: 10px auto;
     border-radius: 10px;
     transform: none;
 }
@@ -252,13 +251,8 @@
     padding: 3px 3px 3px 5px;
 }
 
-.stacked .selector-chooseall,
-.stacked .selector-clearall {
-    display: none;
-}
-
 .stacked .selector-add {
-    background: url(../img/selector-icons.svg) 0 -48px no-repeat;
+    background: var(--selector-icons) 0 -48px no-repeat;
     background-size: 24px auto;
     cursor: default;
 }
@@ -275,7 +269,7 @@
 }
 
 .stacked .selector-remove {
-    background: url(../img/selector-icons.svg) 0 0 no-repeat;
+    background: var(--selector-icons) 0 0 no-repeat;
     background-size: 24px auto;
     cursor: default;
 }

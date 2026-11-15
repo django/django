@@ -9,6 +9,7 @@ import decimal
 import os
 import platform
 from contextlib import contextmanager
+from functools import cached_property
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -17,7 +18,6 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
 from django.utils.encoding import force_bytes, force_str
-from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 try:
@@ -410,13 +410,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
 class OracleParam:
     """
-    Wrapper object for formatting parameters for Oracle. If the string
-    representation of the value is large enough (greater than 4000 characters)
-    the input size needs to be set as CLOB. Alternatively, if the parameter
-    has an `input_size` attribute, then the value of the `input_size` attribute
-    will be used instead. Otherwise, no input size will be set for the
-    parameter when executing the query.
+    Wrapper object for formatting parameters for Oracle. If the parameter has
+    an ``input_size`` attribute specifying any LOB type, or if the string
+    representation of the value is large enough (greater than 4000 characters),
+    a temporary LOB is created so that it can be used with PL/SQL functions.
+    Alternatively, any other ``input_size`` attribute is observed if present.
     """
+
+    lob_types = frozenset(
+        [
+            Database.DB_TYPE_BLOB,
+            Database.DB_TYPE_CLOB,
+            Database.DB_TYPE_NCLOB,
+        ]
+    )
 
     def __init__(self, param, cursor, strings_only=False):
         # With raw SQL queries, datetimes can reach this function
@@ -459,6 +466,14 @@ class OracleParam:
         elif has_boolean_data_type and isinstance(param, bool):
             self.input_size = Database.DB_TYPE_BOOLEAN
         else:
+            self.input_size = None
+        if self.input_size in self.lob_types:
+            if self.force_bytes is not None and not isinstance(
+                self.force_bytes, Database.LOB
+            ):
+                self.force_bytes = cursor.connection.createlob(
+                    self.input_size, self.force_bytes
+                )
             self.input_size = None
 
 

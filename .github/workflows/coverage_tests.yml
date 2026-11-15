@@ -43,7 +43,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.15'
           cache: 'pip'
           cache-dependency-path: 'tests/requirements/py3.txt'
 
@@ -87,16 +87,10 @@ jobs:
             echo "No coverage data available." > diff-cover-report.md
           fi
 
-      - name: Save PR number
-        if: success()
-        run: echo "${{ github.event.pull_request.number }}" > pr_number.txt
-
       - name: Upload artifacts
         if: success()
         uses: actions/upload-artifact@v7
         with:
           name: coverage-artifacts
-          path: |
-            diff-cover-report.md
-            pr_number.txt
+          path: diff-cover-report.md
           retention-days: 1

@@ -23,6 +23,7 @@ rather than the HTML rendered to the end-user.
 import copy
 import itertools
 import tempfile
+from contextlib import aclosing
 from unittest import mock
 
 from django.contrib.auth.models import Permission, User
@@ -38,6 +39,7 @@ from django.test import (
     modify_settings,
     override_settings,
 )
+from django.test.client import aclosing_iterator_wrapper
 from django.urls import reverse_lazy
 from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import async_only_middleware
@@ -159,7 +161,7 @@ class ClientTest(TestCase):
 
     def test_json_serialization(self):
         """The test client serializes JSON data."""
-        methods = ("post", "put", "patch", "delete")
+        methods = ("post", "put", "patch", "delete", "query")
         tests = (
             ({"value": 37}, {"value": 37}),
             ([37, True], [37, True]),
@@ -198,6 +200,13 @@ class ClientTest(TestCase):
         self.assertEqual(response.templates[0].name, "PUT Template")
         self.assertEqual(response.context["data"], "{'foo': 'bar'}")
         self.assertEqual(response.context["Content-Length"], "14")
+
+    def test_query(self):
+        response = self.client.query("/query_view/", data="q=django")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, "QUERY Template")
+        self.assertEqual(response.context["data"], "q=django")
+        self.assertEqual(response.context["Content-Type"], "application/octet-stream")
 
     def test_trace(self):
         """TRACE a view"""
@@ -354,7 +363,17 @@ class ClientTest(TestCase):
         """
         A 307 or 308 redirect preserves the request method after the redirect.
         """
-        methods = ("get", "post", "head", "options", "put", "patch", "delete", "trace")
+        methods = (
+            "get",
+            "post",
+            "head",
+            "options",
+            "put",
+            "patch",
+            "delete",
+            "trace",
+            "query",
+        )
         codes = (307, 308)
         for method, code in itertools.product(methods, codes):
             with self.subTest(method=method, code=code):
@@ -367,7 +386,7 @@ class ClientTest(TestCase):
                 self.assertEqual(response.request["REQUEST_METHOD"], method.upper())
 
     def test_follow_307_and_308_preserves_query_string(self):
-        methods = ("post", "options", "put", "patch", "delete", "trace")
+        methods = ("post", "options", "put", "patch", "delete", "trace", "query")
         codes = (307, 308)
         for method, code in itertools.product(methods, codes):
             with self.subTest(method=method, code=code):
@@ -411,6 +430,16 @@ class ClientTest(TestCase):
             with self.subTest(code=code):
                 response = self.client.put(
                     "/redirect_view_%s/?to=/put_view/" % code, data="a=b", follow=True
+                )
+                self.assertContains(response, "a=b is the body")
+
+    def test_follow_307_and_308_preserves_query_body(self):
+        for code in (307, 308):
+            with self.subTest(code=code):
+                response = self.client.query(
+                    "/redirect_view_%s/?to=/query_view/" % code,
+                    data="a=b",
+                    follow=True,
                 )
                 self.assertContains(response, "a=b is the body")
 
@@ -908,6 +937,16 @@ class ClientTest(TestCase):
         )
         self.assertEqual(response.content, b"hostname2")
 
+    @override_settings(PREPEND_WWW=True, ALLOWED_HOSTS=["testserver", "www.testserver"])
+    def test_prepend_www_follow_redirect(self):
+        response = self.client.get("/get_view/", follow=True)
+        self.assertRedirects(
+            response,
+            "http://www.testserver/get_view/",
+            status_code=301,
+            target_status_code=200,
+        )
+
     def test_external_redirect_without_trailing_slash(self):
         """
         Client._handle_redirects() with an empty path.
@@ -1074,6 +1113,7 @@ class ClientTest(TestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
@@ -1236,6 +1276,7 @@ class RequestFactoryTest(SimpleTestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
@@ -1253,6 +1294,23 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.get("/async_get_view/")
         self.assertTrue(hasattr(response, "resolver_match"))
         self.assertEqual(response.resolver_match.url_name, "async_get_view")
+
+    async def test_aclosing_iterator_wrapper_closes_inner_iterable_promptly(self):
+        finally_ran = False
+
+        async def iterable():
+            nonlocal finally_ran
+            try:
+                yield b"chunk"
+            finally:
+                finally_ran = True
+
+        async with aclosing(
+            aclosing_iterator_wrapper(iterable(), close=lambda: None)
+        ) as wrapped:
+            async for _ in wrapped:
+                break
+        self.assertTrue(finally_ran)
 
     @modify_settings(
         MIDDLEWARE={"prepend": "test_client.tests.async_middleware_urlconf"},
@@ -1275,6 +1333,7 @@ class AsyncClientTest(TestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method_name in tests:
             with self.subTest(method=method_name):
@@ -1298,6 +1357,10 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.post("/post_view/", {"value": 37})
         self.assertContains(response, "Data received: 37 is the value.")
 
+    async def test_query_data(self):
+        response = await self.async_client.query("/query_view/", data="q=django")
+        self.assertContains(response, "Query received: q=django is the body.")
+
     async def test_body_read_on_get_data(self):
         response = await self.async_client.get("/post_view/")
         self.assertContains(response, "Viewing GET page.")
@@ -1312,6 +1375,7 @@ class AsyncClientTest(TestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):
@@ -1336,6 +1400,7 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method_name in tests:
             with self.subTest(method=method_name):
@@ -1426,6 +1491,7 @@ class AsyncRequestFactoryTest(SimpleTestCase):
             "head",
             "options",
             "trace",
+            "query",
         )
         for method in tests:
             with self.subTest(method=method):

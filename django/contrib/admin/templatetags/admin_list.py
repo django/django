@@ -16,7 +16,7 @@ from django.contrib.admin.views.main import (
     PAGE_VAR,
     SEARCH_VAR,
 )
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.template import Library
@@ -116,7 +116,9 @@ def result_headers(cl):
             # Set ordering for attr that is a property, if defined.
             if isinstance(attr, property) and hasattr(attr, "fget"):
                 admin_order_field = getattr(attr.fget, "admin_order_field", None)
-            if not admin_order_field and LOOKUP_SEP not in field_name:
+            if not admin_order_field and not (
+                LOOKUP_SEP in field_name and isinstance(attr, models.Field)
+            ):
                 is_field_sortable = False
 
         if not is_field_sortable:
@@ -226,6 +228,12 @@ def items_for_result(cl, result, form):
             empty_value_display = getattr(
                 attr, "empty_value_display", empty_value_display
             )
+            # Find a terminal field from a chain of relations.
+            if f is None and isinstance(field_name, str) and LOOKUP_SEP in field_name:
+                try:
+                    f = get_fields_from_path(cl.model, field_name)[-1]
+                except FieldDoesNotExist:
+                    pass  # e.g. __str__
             if f is None or f.auto_created:
                 if field_name == "action_checkbox":
                     row_classes = ["action-checkbox"]
@@ -238,11 +246,10 @@ def items_for_result(cl, result, form):
                     row_classes.append("nowrap")
             else:
                 if isinstance(f.remote_field, models.ManyToOneRel):
-                    field_val = getattr(result, f.name)
-                    if field_val is None:
+                    if value is None:
                         result_repr = empty_value_display
                     else:
-                        result_repr = field_val
+                        result_repr = value
                 else:
                     result_repr = display_for_field(
                         value,

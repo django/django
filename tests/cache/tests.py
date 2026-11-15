@@ -63,6 +63,7 @@ from django.utils.cache import (
     patch_cache_control,
     patch_vary_headers,
 )
+from django.utils.deprecation import RemovedInDjango2029Warning
 from django.views.decorators.cache import cache_control, cache_page
 
 from .models import Poll, expensive_calculation
@@ -1426,6 +1427,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         output = out.getvalue()
         self.assertTrue(output.startswith("CREATE TABLE"))
 
+    # RemovedInDjango2029Warning.
     def test_createcachetable_with_table_argument(self):
         """
         Delete and recreate cache table with legacy behavior (explicitly
@@ -1433,12 +1435,15 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         """
         self.drop_table()
         out = io.StringIO()
-        management.call_command(
-            "createcachetable",
-            "test cache table",
-            verbosity=2,
-            stdout=out,
-        )
+        msg = "Passing table names to createcachetable is deprecated."
+        with self.assertWarnsMessage(RemovedInDjango2029Warning, msg) as ctx:
+            management.call_command(
+                "createcachetable",
+                "test cache table",
+                verbosity=2,
+                stdout=out,
+            )
+        self.assertEqual(ctx.filename, __file__)
         self.assertEqual(out.getvalue(), "Cache table 'test cache table' created.\n")
 
     def test_has_key_query_columns_quoted(self):
@@ -2330,6 +2335,9 @@ class CacheUtils(SimpleTestCase):
             ("no-cache,\tmax-age=600", 600),
             # Whitespace after the value is handled by int() transparently.
             ("max-age=300 ", 300),
+            # Whitespace preceding the =.
+            ("max-age =300", 300),
+            ("max-age\t=300", 300),
         ]
         for header_value, expected in tests:
             with self.subTest(header_value=header_value):
@@ -2393,7 +2401,7 @@ class CacheUtils(SimpleTestCase):
         self.assertEqual(
             get_cache_key(request),
             "views.decorators.cache.cache_page.settingsprefix.GET."
-            "18a03f9c9649f7d684af5db3524f5c99.3b59035bd3b34e30981dc990dd93acbb",
+            "18a03f9c9649f7d684af5db3524f5c99.4792b9bac48c3f0441b0d9b0d7af8f2c",
         )
 
     def test_learn_cache_key_strips_whitespace(self):
@@ -2420,10 +2428,29 @@ class CacheUtils(SimpleTestCase):
         self.assertIsNotNone(key_b)
         self.assertNotEqual(key_a, key_b)
 
+    def test_cache_key_blank_header(self):
+        """
+        An absent field must be distinguished from a present-but-empty field
+        (RFC 9111, Section 4.1).
+        """
+        request_no_headers = self.factory.head(self.path)
+        request_empty_headers = self.factory.head(self.path, headers={"Pony": ""})
+        response = HttpResponse()
+        response.headers["Vary"] = "Pony"
+        key_no_headers = learn_cache_key(request_no_headers, response)
+        key_empty_headers = learn_cache_key(request_empty_headers, response)
+        self.assertNotEqual(key_no_headers, key_empty_headers)
+        self.assertNotEqual(
+            get_cache_key(request_no_headers),
+            get_cache_key(request_empty_headers),
+        )
+
     def test_learn_cache_key_no_header_collision(self):
         tests = [
             ({"X-Region": "EU", "X-Tenant": ""}, {"X-Region": "", "X-Tenant": "EU"}),
             ({"X-Region": "EU"}, {"X-Tenant": "EU"}),
+            ({"X-Region": ""}, {}),
+            ({}, {"X-Region": ""}),
         ]
         for headers_a, headers_b in tests:
             with self.subTest(headers=(headers_a, headers_b)):

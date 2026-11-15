@@ -37,7 +37,7 @@ Installing the contenttypes framework
 =====================================
 
 The contenttypes framework is included in the default
-:setting:`INSTALLED_APPS` list created by ``django-admin startproject``,
+:setting:`INSTALLED_APPS` list created by ``django startproject``,
 but if you've removed it or if you manually set up your
 :setting:`INSTALLED_APPS` list, you can enable it by adding
 ``'django.contrib.contenttypes'`` to your :setting:`INSTALLED_APPS` setting.
@@ -117,7 +117,8 @@ model it represents, or to retrieve objects from that model:
 .. method:: ContentType.model_class()
 
     Returns the model class represented by this
-    :class:`~django.contrib.contenttypes.models.ContentType` instance.
+    :class:`~django.contrib.contenttypes.models.ContentType` instance, or
+    ``None`` in case of a stale content type for a deleted model.
 
 For example, we could look up the
 :class:`~django.contrib.contenttypes.models.ContentType` for the

@@ -1,5 +1,7 @@
 import itertools
 import math
+from collections.abc import Iterator
+from functools import cached_property
 
 from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.models.expressions import (
@@ -21,7 +23,6 @@ from django.db.models.fields import (
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
-from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
 
@@ -292,7 +293,9 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     def get_prep_lookup(self):
         if hasattr(self.rhs, "resolve_expression"):
             return self.rhs
-        if any(hasattr(value, "resolve_expression") for value in self.rhs):
+        # Prevent iterator from being consumed by any().
+        rhs = list(self.rhs) if isinstance(self.rhs, Iterator) else self.rhs
+        if any(hasattr(value, "resolve_expression") for value in rhs):
             # Wrap direct values in Value expressions so they are handled by
             # the database at compilation time, along with other expressions.
             return ExpressionList(
@@ -302,11 +305,11 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
                         if hasattr(value, "resolve_expression")
                         else Value(value, getattr(self.lhs, "output_field", None))
                     )
-                    for value in self.rhs
+                    for value in rhs
                 ]
             )
         prepared_values = []
-        for rhs_value in self.rhs:
+        for rhs_value in rhs:
             if (
                 self.prepare_rhs
                 and hasattr(self.lhs, "output_field")
@@ -781,17 +784,18 @@ class UUIDTextMixin:
     a native datatype for UUID.
     """
 
-    def process_rhs(self, qn, connection):
+    def as_sql(self, compiler, connection):
         if not connection.features.has_native_uuid_field:
             from django.db.models.functions import Replace
 
-            if self.rhs_is_direct_value():
-                self.rhs = Value(self.rhs)
-            self.rhs = Replace(
-                self.rhs, Value("-"), Value(""), output_field=CharField()
+            copy = self.copy()
+            if copy.rhs_is_direct_value():
+                copy.rhs = Value(copy.rhs)
+            copy.rhs = Replace(
+                copy.rhs, Value("-"), Value(""), output_field=CharField()
             )
-        rhs, params = super().process_rhs(qn, connection)
-        return rhs, params
+            return super(UUIDTextMixin, copy).as_sql(compiler, connection)
+        return super().as_sql(compiler, connection)
 
 
 @UUIDField.register_lookup

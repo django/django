@@ -218,7 +218,10 @@ class SimplifiedURLTests(SimpleTestCase):
             REGISTERED_CONVERTERS.pop("base64", None)
 
     def test_invalid_view(self):
-        msg = "view must be a callable or a list/tuple in the case of include()."
+        msg = (
+            "view must be a callable or a list/tuple in the case of include(), "
+            "but got str."
+        )
         with self.assertRaisesMessage(TypeError, msg):
             path("articles/", "invalid_view")
 
@@ -454,6 +457,13 @@ class SimplifyRegexTests(SimpleTestCase):
             (r"^(?P<a>(x|y))/b/(?P<c>\w+)", "/<a>/b/<c>"),
             (r"^(?P<a>(x|y))/b/(?P<c>\w+)ab", "/<a>/b/<c>ab"),
             (r"^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab", "/<a>/b/<c>ab"),
+            # Multiple unnamed groups.
+            (r"^(\w+)/b/(\w+)$", "/<var>/b/<var>"),
+            (r"^(\w+)/b/(\w+)", "/<var>/b/<var>"),
+            (r"^a/(\w+)/b/(\d+)/c/(\w+)$", "/a/<var>/b/<var>/c/<var>"),
+            (r"^(?P<a>\w+)/b/(\w+)/(\d+)$", "/<a>/b/<var>/<var>"),
+            (r"^b/((x|y)\w+)/((z|w)\d+)$", "/b/<var>/<var>"),
+            (r"^(\w+)/\((\d+)\)$", r"/<var>/(<var>)"),
             # Non-capturing groups.
             (r"^a(?:\w+)b", "/ab"),
             (r"^a(?:(x|y))", "/a"),

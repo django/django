@@ -8,6 +8,10 @@ def normal_view(request):
     return HttpResponse("OK")
 
 
+async def async_normal_view(request):
+    return HttpResponse("OK")
+
+
 def template_response(request):
     template = engines["django"].from_string(
         "template_response OK{% for m in mw %}\n{{ m }}{% endfor %}"

@@ -6,15 +6,16 @@
 # Bawar Jalal, 2020
 # Jacob Walls, 2026
 # Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2020-2021
+# Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026
 # Natalia, 2025
 # Swara <swara09@gmail.com>, 2022-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 06:49+0000\n"
-"Last-Translator: Jacob Walls, 2026\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 06:49+0000\n"
+"Last-Translator: Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -486,6 +487,9 @@ msgstr "%(model_name)s لەگەڵ %(field_labels)s پێشتر تۆمارکراو
 msgid "Constraint “%(name)s” is violated."
 msgstr "سنوردارکردنی “%(name)s” پێشێلکراوە."
 
+msgid "- Select an option -"
+msgstr ""
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "بەهای %(value)r هەڵبژاردەیەکی دروست نیە."
@@ -666,6 +670,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "داتای دووانەیی خاو"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr ""
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -870,6 +878,12 @@ msgstr "بەڵێ"
 msgid "No"
 msgstr "نەخێر"
 
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr ""
+
 msgctxt "Task"
 msgid "Ready"
 msgstr "ئامادەیە"
@@ -977,172 +991,172 @@ msgid "Sun"
 msgstr "یەک"
 
 msgid "January"
-msgstr "ڕێبەندان"
+msgstr "کانوونی دووەم"
 
 msgid "February"
-msgstr "ڕەشەمە"
+msgstr "شوبات"
 
 msgid "March"
-msgstr "نەورۆز"
+msgstr "ئازار"
 
 msgid "April"
-msgstr "گوڵان"
+msgstr "نیسان"
 
 msgid "May"
-msgstr "جۆزەردان"
+msgstr "ئایار"
 
 msgid "June"
-msgstr "پوشپەڕ"
+msgstr "حوزەیران"
 
 msgid "July"
-msgstr "گەلاوێژ"
+msgstr "تەممووز"
 
 msgid "August"
-msgstr "خەرمانان"
+msgstr "ئاب"
 
 msgid "September"
-msgstr "ڕەزبەر"
+msgstr "ئەیلوول"
 
 msgid "October"
-msgstr "گەڵاڕێزان"
+msgstr "تشرینی یەکەم"
 
 msgid "November"
-msgstr "سەرماوەرز"
+msgstr "تشرینی دووەم"
 
 msgid "December"
-msgstr "بەفرانبار"
+msgstr "کانوونی یەکەم"
 
 msgid "jan"
-msgstr "‎ڕێبەندان"
+msgstr "کانوونی دووەم"
 
 msgid "feb"
-msgstr "ڕەشەمە"
+msgstr "شوبات"
 
 msgid "mar"
-msgstr "نەورۆز"
+msgstr "ئازار"
 
 msgid "apr"
-msgstr "گوڵان"
+msgstr "نیسان"
 
 msgid "may"
-msgstr "‎جۆزەردان"
+msgstr "ئایار"
 
 msgid "jun"
-msgstr "پوشپەڕ"
+msgstr "حوزەیران"
 
 msgid "jul"
-msgstr "‎گەلاوێژ"
+msgstr "تەممووز"
 
 msgid "aug"
-msgstr "خەرمانان"
+msgstr "ئاب"
 
 msgid "sep"
-msgstr "‎ڕەزبەر"
+msgstr "ئەیلوول"
 
 msgid "oct"
-msgstr "‎گەڵاڕێزان"
+msgstr "تشرینی یەکەم"
 
 msgid "nov"
-msgstr "‎سەرماوەرز"
+msgstr "تشرینی دووەم"
 
 msgid "dec"
-msgstr "‎بەفرانبار"
+msgstr "کانوونی یەکەم"
 
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "‎ڕێبەندان"
+msgstr "کانوونی دووەم"
 
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "ڕەشەمە"
+msgstr "شوبات"
 
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "نەورۆز"
+msgstr "ئازار"
 
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "گوڵان"
+msgstr "نیسان"
 
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "جۆزەردان"
+msgstr "ئایار"
 
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "پوشپەڕ"
+msgstr "حوزەیران"
 
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "گەلاوێژ"
+msgstr "تەممووز"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "خەرمانان"
+msgstr "ئاب"
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "ڕەزبەر"
+msgstr "ئەیلوول"
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "‎گەڵاڕێزان"
+msgstr "تشرینی یەکەم"
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "‎سەرماوەرز"
+msgstr "تشرینی دووەم"
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "‎بەفرانبار"
+msgstr "کانوونی یەکەم"
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "ڕێبەندان"
+msgstr "کانوونی دووەم"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "ڕەشەمە"
+msgstr "شوبات"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "نەورۆز"
+msgstr "ئازار"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "گوڵان"
+msgstr "نیسان"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "جۆزەردان"
+msgstr "ئایار"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "پوشپەڕ"
+msgstr "حوزەیران"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "گەلاوێژ"
+msgstr "تەممووز"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "خەرمانان"
+msgstr "ئاب"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "ڕەزبەر"
+msgstr "ئەیلوول"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "گەڵاڕێزان"
+msgstr "تشرینی یەکەم"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "سەرماوەرز"
+msgstr "تشرینی دووەم"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "بەفرانبار"
+msgstr "کانوونی یەکەم"
 
 msgid "This is not a valid IPv6 address."
 msgstr "ئەمە ناونیشانی IPv6 دروست نیە."

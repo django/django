@@ -16,8 +16,9 @@ from django.core.exceptions import FieldError
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
-from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
+from django.utils.log import log_message
+from django.utils.text import trim_value
 
 logger = logging.getLogger("django.db.models")
 
@@ -197,7 +198,15 @@ class Q(tree.Node):
             with context_manager:
                 return compiler.execute_sql(SINGLE) is not None
         except DatabaseError as e:
-            logger.warning("Got a database error calling check() on %r: %s", self, e)
+            # Trim large values, keeping the suffix out of the escaped args.
+            error, suffix = trim_value(str(e))
+            log_message(
+                logger,
+                "Got a database error calling check() on %r: %s" + suffix,
+                self,
+                error,
+                level="warning",
+            )
             return True
 
     def deconstruct(self):
@@ -212,7 +221,7 @@ class Q(tree.Node):
             kwargs["_negated"] = True
         return path, args, kwargs
 
-    @cached_property
+    @functools.cached_property
     def identity(self):
         path, args, kwargs = self.deconstruct()
         identity = [path, *kwargs.items()]
@@ -233,7 +242,7 @@ class Q(tree.Node):
     def __hash__(self):
         return hash(self.identity)
 
-    @cached_property
+    @functools.cached_property
     def referenced_base_fields(self):
         """
         Retrieve all base fields referenced directly or through F expressions
@@ -277,6 +286,11 @@ class DeferredAttribute:
                     )
 
                 instance._state.fetch_mode.fetch(self, instance)
+                if field_name not in data:
+                    # FETCH_PEERS may not load the field if the instance's row
+                    # was deleted after the queryset was evaluated.
+                    msg = f"{instance._meta.object_name} matching query does not exist."
+                    raise instance._meta.model.DoesNotExist(msg)
             else:
                 data[field_name] = val
         return data[field_name]
@@ -299,13 +313,17 @@ class DeferredAttribute:
     def fetch_many(self, instances):
         attname = self.field.attname
         db = instances[0]._state.db
-        value_by_pk = (
-            self.field.model._base_manager.using(db)
-            .values_list(attname, flat=True)
-            .in_bulk({i.pk for i in instances})
-        )
-        for instance in instances:
-            setattr(instance, attname, value_by_pk[instance.pk])
+        if to_fetch := [
+            i for i in instances if attname not in i.__dict__ and i._is_pk_set()
+        ]:
+            value_by_pk = (
+                self.field.model._base_manager.using(db)
+                .values_list(attname, flat=True)
+                .in_bulk([i.pk for i in to_fetch])
+            )
+            for instance in to_fetch:
+                if instance.pk in value_by_pk:
+                    setattr(instance, attname, value_by_pk[instance.pk])
 
 
 class class_or_instance_method:

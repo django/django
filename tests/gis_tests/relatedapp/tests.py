@@ -5,23 +5,23 @@ from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import ignore_warnings, override_settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from ..utils import skipUnlessGISLookup
 from .models import Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel
 
 
 class RelatedGeoModelTest(TestCase):
-    fixtures = ["initial"]
+    fixtures = ["relatedapp_initial"]
 
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
         qs1 = City.objects.order_by("id")
-        # RemovedInDjango70Warning: when the deprecation ends, the below
+        # RemovedInDjango2028Warning: when the deprecation ends, the below
         # queryset can be removed.
         with ignore_warnings(
-            category=RemovedInDjango70Warning,
-            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            category=RemovedInDjango2028Warning,
+            message="Calling select_related() with no arguments is deprecated.",
         ):
             qs2 = City.objects.order_by("id").select_related()
         qs3 = City.objects.order_by("id").select_related("location")
@@ -116,7 +116,7 @@ class RelatedGeoModelTest(TestCase):
         ]
         for union, ref in tests:
             for point, ref_point in zip(sorted(union), sorted(ref), strict=True):
-                self.assertIs(point.equals_exact(ref_point, tolerance=6), True)
+                self.assertIs(point.equals_exact(ref_point, tolerance=1e-6), True)
 
     def test05_select_related_fk_to_subclass(self):
         """

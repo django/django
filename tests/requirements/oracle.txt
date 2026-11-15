@@ -1,1 +1,1 @@
-oracledb >= 2.3.0
+oracledb >= 4.0.2

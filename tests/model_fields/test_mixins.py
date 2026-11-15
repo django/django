@@ -1,6 +1,7 @@
+from functools import cached_property
+
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.test import SimpleTestCase
-from django.utils.functional import cached_property
 
 from .models import Foo
 

@@ -20,6 +20,8 @@ if is_psycopg3:
 
     class UTF8Dumper(Dumper):
         def dump(self, obj):
+            if obj is None:
+                return None
             return bytes(obj, "utf-8")
 
     def quote_lexeme(value):

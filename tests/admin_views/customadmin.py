@@ -75,6 +75,10 @@ class BookAdminZeroDisplay(BookAdmin):
     delete_confirmation_max_display = 0
 
 
+class QuestionAdminZeroDisplay(base_admin.QuestionAdmin):
+    delete_confirmation_max_display = 0
+
+
 site = Admin2(name="admin2")
 
 site.register(models.Article, base_admin.ArticleAdmin)
@@ -94,3 +98,4 @@ simple_site.register(User, CustomPwdTemplateUserAdmin)
 
 zero_display_site = Admin2(name="admin_zero_display")
 zero_display_site.register(models.Book, BookAdminZeroDisplay)
+zero_display_site.register(models.Question, QuestionAdminZeroDisplay)

@@ -1,3 +1,8 @@
+from os.path import relpath
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from unittest import skipIf
+
 from django.contrib.gis.gdal import (
     GDAL_VERSION,
     AxisOrder,
@@ -394,3 +399,52 @@ class SpatialRefTest(SimpleTestCase):
             if hasattr(s, "epsg"):
                 srs = SpatialReference(s.wkt)
                 self.assertEqual(srs.srid, s.epsg)
+
+    def test_no_dictionary_access(self):
+        # GDAL searches for dictionary files relative to the working directory.
+        tmpdir = self.enterContext(TemporaryDirectory(dir="."))
+        dictionary = Path(relpath(tmpdir)) / "srs.wkt"
+        dictionary.write_text(f"4326,{srlist[0].wkt}\n", encoding="utf-8")
+        msg = "Spatial references from dictionaries are not supported."
+        for prefix in (
+            "DICT:",
+            "dict:",
+            "DiCt:",
+            "ESRI::DICT:",
+            "esri::dict:",
+            "eSrI::DiCt:",
+        ):
+            for whitespace in ("", " ", "\t\r\n\v\f"):
+                user_input = f"{whitespace}{prefix}{dictionary},4326"
+                with (
+                    self.subTest(user_input=user_input),
+                    self.assertRaisesMessage(GDALException, msg),
+                ):
+                    SpatialReference(user_input)
+
+    def test_esri_prefixed_wkt(self):
+        wkt = srlist[0].wkt
+        expected = SpatialReference(wkt)
+        for prefix in ("ESRI::", "esri::", " \teSrI::"):
+            with self.subTest(prefix=prefix):
+                srs = SpatialReference(prefix + wkt)
+                self.assertEqual(srs.wkt, expected.wkt)
+
+    @skipIf(GDAL_VERSION < (3, 9), "OSRSetFromUserInputEx() is new in 3.9.")
+    def test_no_file_access(self):
+        cities_prj = Path(__file__).parent.parent / "data" / "cities" / "cities.prj"
+        with (
+            self.assertRaises(GDALException),
+            self.assertLogs("django.contrib.gis", "ERROR") as cm,
+        ):
+            SpatialReference(str(cities_prj))
+        self.assertIn("due to ALLOW_FILE_ACCESS=NO", cm.records[0].getMessage())
+
+    @skipIf(GDAL_VERSION < (3, 9), "OSRSetFromUserInputEx() is new in 3.9.")
+    def test_no_network_access(self):
+        with (
+            self.assertRaises(GDALException),
+            self.assertLogs("django.contrib.gis", "ERROR") as cm,
+        ):
+            SpatialReference("https://spatialreference.org/ref/epsg/2796/")
+        self.assertIn("due to ALLOW_NETWORK_ACCESS=NO", cm.records[0].getMessage())

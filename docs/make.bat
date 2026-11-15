@@ -37,6 +37,7 @@ if "%1" == "help" (
 	echo.  spelling   to check for typos in documentation
 	echo.  black      to apply the black formatting to code blocks in documentation
 	echo.  lint       to check for linting errors in documentation
+	echo.  epubcheck  to validate the epub build with EPUBCheck
 	goto end
 )
 
@@ -116,10 +117,8 @@ if "%1" == "devhelp" (
 )
 
 if "%1" == "epub" (
-	%SPHINXBUILD% -b epub %ALLSPHINXOPTS% %BUILDDIR%/epub
+	call :run_epub
 	if errorlevel 1 exit /b 1
-	echo.
-	echo.Build finished. The epub file is in %BUILDDIR%/epub.
 	goto end
 )
 
@@ -189,6 +188,16 @@ results in %BUILDDIR%/doctest/output.txt.
 	goto end
 )
 
+if "%1" == "epubcheck" (
+	call :run_epub
+	if errorlevel 1 exit /b 1
+	python -m epubcheck %BUILDDIR%/epub/Django.epub
+	if errorlevel 1 exit /b 1
+	echo.
+	echo.EPUBCheck complete.
+	goto end
+)
+
 if "%1" == "spelling" (
 	call :run_spelling
 	goto end
@@ -205,25 +214,28 @@ if "%1" == "lint" (
 )
 
 if "%1" == "check" (
-	call :run_lint
-	call :run_black
-	call :run_spelling
-	echo.
-	echo.All checks completed.
+	call :run_check
+	if errorlevel 1 exit /b 1
 	goto end
 )
 
+:run_epub
+	%SPHINXBUILD% -b epub %ALLSPHINXOPTS% %BUILDDIR%/epub
+	if errorlevel 1 exit /b 1
+	echo.
+	echo.Build finished. The epub file is in %BUILDDIR%/epub.
+	exit /b
+
 :run_spelling
-	%SPHINXBUILD% -b spelling %ALLSPHINXOPTS% %BUILDDIR%/spelling
+	%SPHINXBUILD% -b spelling %* %ALLSPHINXOPTS% %BUILDDIR%/spelling
 	if errorlevel 1 exit /b 1
 	echo.
 	echo.Check finished. Wrong words can be found in %BUILDDIR%/spelling/output.txt.
 	exit /b
 
 :run_black
-	for /f "usebackq tokens=*" %%i in (`dir *.txt /s /b ^| findstr /v /c:"_build" /c:"_theme"`) do (
-		blacken-docs --rst-literal-block %%i
-	)
+	python blacken-sources.py
+	if errorlevel 1 exit /b 1
 	echo.
 	echo.Code blocks reformatted
 	exit /b
@@ -233,5 +245,22 @@ if "%1" == "check" (
 	if errorlevel 1 exit /b 1
 	echo.
 	echo.Documentation lint complete.
+	exit /b
+
+:run_check
+	set CHECK_FAILED=
+	call :run_lint
+	if errorlevel 1 set CHECK_FAILED=1
+	call :run_black
+	if errorlevel 1 set CHECK_FAILED=1
+	call :run_spelling -q -W
+	if errorlevel 1 set CHECK_FAILED=1
+	echo.
+	if defined CHECK_FAILED (
+		echo.Some checks failed.
+		exit /b 1
+	)
+	echo.All style and spelling checks passed.
+	exit /b
 
 :end

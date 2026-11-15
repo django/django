@@ -4,12 +4,12 @@ from os.path import abspath, curdir, dirname, join, normcase, sep
 from pathlib import Path
 
 from django.core.exceptions import SuspiciousFileOperation
+from django.utils.version import PY315
 
 
+# PY315: Remove this vendored copy when Python 3.14 support ends.
 # Copied verbatim (minus `os.path` fixes) from:
 # https://github.com/python/cpython/pull/23901.
-# Python versions >= PY315 may include this fix, so periodic checks are needed
-# to remove this vendored copy of `makedirs` once solved upstream.
 def makedirs(name, mode=0o777, exist_ok=False, *, parent_mode=None):
     """makedirs(name [, mode=0o777][, exist_ok=False][, parent_mode=None])
 
@@ -44,12 +44,6 @@ def makedirs(name, mode=0o777, exist_ok=False, *, parent_mode=None):
             return
     try:
         os.mkdir(name, mode)
-        # PY315: The call to `chmod()` is not in the CPython proposed code.
-        # Apply `chmod()` after `mkdir()` to enforce the exact requested
-        # permissions, since the kernel masks the mode argument with the
-        # process umask. This guarantees consistent directory permissions
-        # without mutating global umask state.
-        os.chmod(name, mode)
     except OSError:
         # Cannot rely on checking for EEXIST, since the operating system
         # could give priority to other errors like EACCES or EROFS
@@ -58,8 +52,14 @@ def makedirs(name, mode=0o777, exist_ok=False, *, parent_mode=None):
 
 
 def safe_makedirs(name, mode=0o777, exist_ok=False):
-    """Create directories recursively with explicit `mode` on each level."""
-    makedirs(name=name, mode=mode, exist_ok=exist_ok, parent_mode=mode)
+    """Create directories recursively with `mode` on each newly created level.
+
+    As with `os.makedirs()` and `os.mkdir()`, `mode` is combined with the
+    process's umask value.
+    """
+    # PY315: Use `os.makedirs()` unconditionally.
+    _makedirs = os.makedirs if PY315 else makedirs
+    _makedirs(name=name, mode=mode, exist_ok=exist_ok, parent_mode=mode)
 
 
 def safe_join(base, *paths):

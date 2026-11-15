@@ -38,6 +38,13 @@ ARG_KINDS = frozenset(
     }
 )
 
+KEYWORD_ARG_KINDS = frozenset(
+    {
+        inspect.Parameter.KEYWORD_ONLY,
+        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+    }
+)
+
 
 def get_func_args(func):
     params = _get_callable_parameters(func)
@@ -87,7 +94,11 @@ def method_has_no_args(meth):
 
 
 def func_supports_parameter(func, name):
-    return any(param.name == name for param in _get_callable_parameters(func))
+    """Return True if function 'func' accepts a (keyword) argument 'name'."""
+    return any(
+        param.name == name and param.kind in KEYWORD_ARG_KINDS
+        for param in _get_callable_parameters(func)
+    )
 
 
 def is_module_level_function(func):

@@ -2,6 +2,7 @@ import codecs
 import copy
 import operator
 import os
+from functools import cached_property
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -27,7 +28,6 @@ from django.utils.datastructures import (
     MultiValueDict,
 )
 from django.utils.encoding import escape_uri_path, iri_to_uri
-from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
 

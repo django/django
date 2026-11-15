@@ -1,0 +1,151 @@
+==========================
+Django 6.1.3 release notes
+==========================
+
+*November 3, 2026*
+
+Django 6.1.3 fixes five security issues with severity "low", one security issue
+with severity "moderate", and several bugs in 6.1.2. It also adds compatibility
+with Python 3.15.
+
+CVE-2026-108147: Potential memory exhaustion in ``MultiPartParser`` via base64-encoded file upload
+==================================================================================================
+
+When using ``django.http.multipartparser.MultiPartParser``, multipart uploads
+with ``Content-Transfer-Encoding: base64`` could be buffered entirely in
+memory, regardless of :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`, before being
+passed to upload handlers, potentially consuming excessive memory.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-111211: Potential log injection via unescaped geometry form values
+===========================================================================
+
+:class:`~django.contrib.gis.forms.GeometryField` and its widgets logged invalid
+submitted values directly, allowing control characters (e.g. newlines or ANSI
+escape sequences) to be written unescaped into logs. This could enable log
+injection or forgery, letting attackers manipulate log appearance or
+structure, especially in logs processed by external systems or viewed in
+terminals.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-111362: Server-side request forgery via ``crs`` member of GeoJSON geometries
+=====================================================================================
+
+Earlier versions of the :rfc:`GeoJSON spec <7946#section-4>` allowed specifying
+a coordinate reference system (CRS) by URL. Since GDAL still resolves these
+URLs, any validation, save, or query path where a geometry is instantiated from
+user input allowed an attacker to submit a malicious CRS that would make a
+network request as the Django process user, or read a file, or both.
+
+:ref:`Lookups against spatial fields <spatial-lookups-intro>`, the
+:class:`~django.contrib.gis.forms.GeometryField` form field, and
+:class:`~django.contrib.gis.geos.GEOSGeometry` now reject GeoJSON geometries
+with CRS references to external resources. The
+:class:`~django.contrib.gis.gdal.DataSource` and
+:class:`~django.contrib.gis.utils.LayerMapping` utilities for loading trusted
+data continue to accept these values.
+
+This issue has severity "moderate" according to the :ref:`Django security
+policy <severity-levels>`.
+
+CVE-2026-113593: Potential exposure of private data via empty and missing ``Vary`` headers
+==========================================================================================
+
+:class:`~django.middleware.cache.UpdateCacheMiddleware` and
+:func:`~django.views.decorators.cache.cache_page` generated the same cache key
+for a request that omitted a header listed in the response's ``Vary`` header
+and a request that sent that header with an empty value. As a result, a
+response cached for one of these requests could be served to the other, which
+could lead to the exposure of private data.
+
+Cache keys now distinguish between absent and empty header values, as required
+by :rfc:`9111#section-4.1`.
+
+Responses previously cached for requests that omitted a header listed in
+``Vary`` will no longer be matched, and will be cached again on the next
+request.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-113733: Password hash disclosure to "view only" admin users with custom user models
+============================================================================================
+
+Admin users with the view (but not change) permission to a user model were
+displayed the entire password hash when the model was not
+:setting:`AUTH_USER_MODEL`, or when :setting:`AUTH_USER_MODEL` inherited its
+``password`` field from a concrete parent model through multi-table
+inheritance.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+CVE-2026-114582: Server-side request forgery via ``SpatialReference`` string input
+==================================================================================
+
+:class:`~django.contrib.gis.gdal.SpatialReference` passed string input to GDAL,
+which by default resolves URLs and reads files. This behavior was not
+documented by Django. Other affected methods included
+:meth:`GEOSGeometry.transform()
+<django.contrib.gis.geos.GEOSGeometry.transform>`,
+:meth:`OGRGeometry.transform()
+<django.contrib.gis.gdal.OGRGeometry.transform>`,
+:meth:`GDALRaster.transform() <django.contrib.gis.gdal.GDALRaster.transform>`,
+the :attr:`~django.contrib.gis.gdal.OGRGeometry.srs` setter of
+:class:`~django.contrib.gis.gdal.OGRGeometry`, and the
+:attr:`~django.contrib.gis.gdal.GDALRaster.srs` and
+:attr:`~django.contrib.gis.gdal.GDALRaster.srid` setters of
+:class:`~django.contrib.gis.gdal.GDALRaster`. A URL or file path reaching any
+of these would issue an outbound request or read a file as the Django process
+user. The attack vectors could be combined to reveal local file contents by
+observing outbound requests.
+
+``SpatialReference`` now disables network and file access when parsing string
+input on GDAL 3.9 and later. As a consequence, file paths and URLs are no
+longer accepted as ``SpatialReference`` inputs. Dictionary references using the
+``DICT:`` prefix, including those prefixed with ``ESRI::``, are rejected on all
+GDAL versions.
+
+Full protection requires GDAL 3.9 or later. Integer SRIDs are looked up
+directly in the EPSG database, so prefer them when the input is untrusted. Or,
+if strings must be used on lower GDAL versions, compare to an allow list. The
+new ``gis.W001`` system check warns when the installed version of GDAL is not
+at least 3.9.
+
+This issue has severity "low" according to the :ref:`Django security policy
+<severity-levels>`.
+
+Bugfixes
+========
+
+* Fixed a bug in Django 6.1 where accessing a deferred field with the
+  :attr:`~django.db.models.FETCH_PEERS` fetch mode overwrote values that
+  peer instances had already modified locally or loaded via
+  :meth:`~django.db.models.Model.refresh_from_db` with an explicit ``fields``
+  argument. The fix also addresses a ``KeyError`` when a peer's row had been
+  deleted (:ticket:`37436`).
+
+* Fixed a regression in Django 6.1 where the YAML serializer crashed if passed
+  the ``sort_keys`` option (:ticket:`37405`).
+
+* Fixed a regression in Django 6.1 where a :class:`~django.db.models.Value`
+  expression with a ``None`` value and an output field other than
+  :class:`~django.db.models.JSONField` crashed on SQLite when used in a
+  top-level :class:`~django.db.models.JSONField` :lookup:`in` lookup
+  (:ticket:`37403`). Using such an expression in an ``IN`` lookup is likely
+  unintended, since SQL ``NULL`` cannot match any value.
+
+* Fixed a regression in Django 6.1 where
+  :meth:`~django.forms.BoundField.legend_tag` with a custom ``attrs`` could add
+  the :attr:`~django.forms.Form.required_css_class` more than once
+  (:ticket:`37463`).
+
+* Added compatibility for ``oracledb`` 26.0.0+ (:ticket:`37411`).
+
+* Fixed a crash in :cli:`makemessages` on Windows when processing files
+  with non-ASCII names on Python 3.15+, or with :ref:`UTF-8 mode
+  <python:utf8-mode>` enabled on older Python versions (:ticket:`37447`).

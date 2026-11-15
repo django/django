@@ -124,9 +124,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 fromstr(err.wkt)
 
         # Bad WKB
-        with self.assertRaisesMessage(
-            GEOSException, self.error_checking_geom.format("GEOSWKBReader_read_r")
-        ):
+        with self.assertRaisesMessage(GEOSException, "Invalid WKB input."):
             GEOSGeometry(memoryview(b"0"))
 
         class NotAGeometry:
@@ -1346,6 +1344,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
         # And, they should be equal.
         self.assertEqual(gc1, gc2)
+
+        # GeometryCollections can themselves contain GeometryCollections.
+        gc3 = GeometryCollection(gc2)
+        self.assertEqual(gc1, gc3[0])
 
     def test_gdal(self):
         "Testing `ogr` and `srs` properties."

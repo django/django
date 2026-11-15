@@ -5,15 +5,16 @@
 # Bakhtawar Barzan, 2021
 # Bakhtawar Barzan, 2021
 # Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2020
+# Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026
 # pejar hewrami <gumle@protonmail.com>, 2020
 # Swara <swara09@gmail.com>, 2022,2024-2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 07:05+0000\n"
-"Last-Translator: Swara <swara09@gmail.com>, 2022,2024-2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-08-05 07:05+0000\n"
+"Last-Translator: Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -183,8 +184,13 @@ msgstr ""
 "پەنجە داگرە لەسەر “Control”، یاخود “Command” لەسەر ماک، بۆ هەڵبژاردنی "
 "دانەیەک زیاتر."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "ئەم تەنە هەڵبژێرە بۆ کردارێک - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -249,14 +255,14 @@ msgstr "گۆڕینی %s"
 msgid "View %s"
 msgstr "بینینی %s"
 
-msgid "Database error"
-msgstr "هەڵەی بنکەدراوە"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s بەسەرکەوتوویی گۆڕدرا."
 msgstr[1] "%(count)s %(name)s بەسەرکەوتوویی گۆڕدران."
+
+msgid "Database error"
+msgstr "هەڵەی بنکەدراوە"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -281,6 +287,17 @@ msgstr "مێژووی گۆڕین: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(instance)sی %(class_name)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -334,9 +351,6 @@ msgstr ""
 msgid "Run"
 msgstr "جێبەجێکردن"
 
-msgid "Click here to select the objects across all pages"
-msgstr "کرتە لێرە بکە بۆ هەڵبژاردنی ئۆبجێکتەکان لە تەواوی هەموو پەڕەکان"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "هەموو %(total_count)s %(module_name)s هەڵبژێرە"
@@ -346,10 +360,6 @@ msgstr "پاککردنەوەی هەڵبژاردن"
 
 msgid "Breadcrumbs"
 msgstr "وردەنان"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "مۆدێلەکان لە بەرنامەی %(name)s"
 
 msgid "Model name"
 msgstr "ناوی یەکە"
@@ -463,6 +473,10 @@ msgstr "گۆڕینی ڕووکار (ڕووکاری ئێستا: ڕووناک)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "گۆڕینی ڕووکار (ڕووکاری ئێستا: تاریک)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -671,6 +685,9 @@ msgstr "هەڵبژێردراوەکان بسڕەوە %(model)s"
 msgid "View selected %(model)s"
 msgstr "سەیری %(model)s هەڵبژێردراوەکان بکە"
 
+msgid "Logout"
+msgstr ""
+
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "سوپاس بۆ بەسەربردنی هەندێک کاتێکی ئەمڕۆ لەگەڵ ماڵپەڕەکەدا."
 
@@ -726,7 +743,7 @@ msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"ئێمە ڕێنماییەکانمان بۆ دانانی تێپەڕەوشەکەت ئیمەیڵ بۆت ناردووە، ئەگەر "
+"ئێمە ڕێنماییەکانمان بۆ دانانی تێپەڕەوشەکەت بە ئیمەیڵ بۆت ناردووە، ئەگەر "
 "هەژمارێک هەبێت لەگەڵ ئەو ئیمەیڵەی کە نوسیوتە. پێویستە بەم زووانە بەدەستت "
 "بگات."
 

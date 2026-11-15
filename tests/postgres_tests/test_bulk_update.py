@@ -42,9 +42,7 @@ class BulkSaveTests(PostgreSQLTestCase):
                 for instance in instances:
                     setattr(instance, field, new)
                 Model.objects.bulk_update(instances, [field])
-                self.assertSequenceEqual(
-                    Model.objects.filter(**{field: new}), instances
-                )
+                self.assertCountEqual(Model.objects.filter(**{field: new}), instances)
 
     def test_bulk_create(self):
         OffByOneModel.objects.bulk_create(OffByOneModel(one_off=0) for _ in range(20))

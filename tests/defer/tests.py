@@ -1,8 +1,8 @@
 from django.core.exceptions import FieldDoesNotExist, FieldError, FieldFetchBlocked
-from django.db.models import FETCH_PEERS, RAISE
+from django.db.models import FETCH_PEERS, FETCH_RAISE
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango70Warning
+from django.utils.deprecation import RemovedInDjango2028Warning
 
 from .models import (
     BigChild,
@@ -104,7 +104,7 @@ class DeferTests(AssertionMixin, TestCase):
         # User values() won't defer anything (you get the full list of
         # dictionaries back), but it still works.
         self.assertEqual(
-            Primary.objects.defer("name").values()[0],
+            Primary.objects.defer("name").values().get(pk=self.p1.pk),
             {
                 "id": self.p1.id,
                 "name": "p1",
@@ -115,7 +115,7 @@ class DeferTests(AssertionMixin, TestCase):
 
     def test_only_values_does_not_defer(self):
         self.assertEqual(
-            Primary.objects.only("name").values()[0],
+            Primary.objects.only("name").values().get(pk=self.p1.pk),
             {
                 "id": self.p1.id,
                 "name": "p1",
@@ -138,19 +138,23 @@ class DeferTests(AssertionMixin, TestCase):
         self.assert_delayed(obj, 0)
 
     def test_only_with_select_related(self):
-        obj = Primary.objects.select_related("related").only("related__first")[0]
+        obj = (
+            Primary.objects.select_related("related")
+            .only("related__first")
+            .get(pk=self.p1.pk)
+        )
         self.assert_delayed(obj, 2)
         self.assert_delayed(obj.related, 1)
         self.assertEqual(obj.related_id, self.s1.pk)
         self.assertEqual(obj.name, "p1")
 
-    # RemovedInDjango70Warning: when the deprecation ends, remove this test.
+    # RemovedInDjango2028Warning: when the deprecation ends, remove this test.
     def test_defer_foreign_keys_are_deferred_and_not_traversed(self):
         # select_related() overrides defer().
         with self.assertNumQueries(1):
             with ignore_warnings(
-                category=RemovedInDjango70Warning,
-                message=r"Calling select_related\(\) with no arguments is deprecated\.",
+                category=RemovedInDjango2028Warning,
+                message="Calling select_related() with no arguments is deprecated.",
             ):
                 obj = Primary.objects.defer("related").select_related()[0]
             self.assert_delayed(obj, 1)
@@ -241,7 +245,7 @@ class DeferTests(AssertionMixin, TestCase):
             self.assertEqual(p2.related, self.s1)
 
     def test_only_fetch_mode_raise(self):
-        p1 = Primary.objects.fetch_mode(RAISE).only("name").get(name="p1")
+        p1 = Primary.objects.fetch_mode(FETCH_RAISE).only("name").get(name="p1")
         msg = "Fetching of Primary.value blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             p1.value
@@ -249,12 +253,71 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertTrue(cm.exception.__suppress_context__)
 
     def test_defer_fetch_mode_raise(self):
-        p1 = Primary.objects.fetch_mode(RAISE).defer("value").get(name="p1")
+        p1 = Primary.objects.fetch_mode(FETCH_RAISE).defer("value").get(name="p1")
         msg = "Fetching of Primary.value blocked."
         with self.assertRaisesMessage(FieldFetchBlocked, msg) as cm:
             p1.value
         self.assertIsNone(cm.exception.__cause__)
         self.assertTrue(cm.exception.__suppress_context__)
+
+    def test_fetch_peers_preserves_local_modification(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value")
+        # Modify the deferred field on one peer without saving.
+        p1.value = "local modification"
+        # Trigger the peer fetch by accessing the field on another peer.
+        with self.assertNumQueries(1):
+            _ = p2.value
+        # The local modification should be preserved.
+        self.assertEqual(p1.value, "local modification")
+        # The other peer should receive its database value.
+        self.assertEqual(p2.value, "yy")
+
+    def test_fetch_peers_deleted_peer_does_not_cause_keyerror(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk")
+        # Delete one peer's database row after queryset evaluation.
+        Primary.objects.filter(pk=p1.pk).delete()
+        # Accessing another peer's deferred field should not raise KeyError.
+        with self.assertNumQueries(1):
+            _ = p2.value
+        # The surviving peer should receive the correct value.
+        self.assertEqual(p2.value, "yy")
+
+    def test_fetch_peers_accessed_instance_deleted(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk")
+        Primary.objects.filter(pk=p1.pk).delete()
+        with self.assertNumQueries(1):
+            with self.assertRaises(Primary.DoesNotExist):
+                p1.value
+        # The surviving peer was loaded by the same query.
+        with self.assertNumQueries(0):
+            self.assertEqual(p2.value, "yy")
+
+    def test_fetch_peers_batching_preserved(self):
+        # Create a third Primary instance inside this test.
+        Primary.objects.create(name="p3", value="zz", related=self.s1)
+        p1, p2, p3 = (
+            Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk")
+        )
+        with self.assertNumQueries(1):
+            _ = p1.value
+        with self.assertNumQueries(0):
+            _ = p2.value
+        with self.assertNumQueries(0):
+            _ = p3.value
+        self.assertEqual(p1.value, "xx")
+        self.assertEqual(p2.value, "yy")
+        self.assertEqual(p3.value, "zz")
+
+    def test_fetch_peers_skips_peer_without_pk(self):
+        p1, p2 = Primary.objects.fetch_mode(FETCH_PEERS).defer("value").order_by("pk")
+        p1.pk = None
+        with self.assertNumQueries(1):
+            self.assertEqual(p2.value, "yy")
+        self.assertNotIn("value", p1.__dict__)
+        # Consistent with DeferredAttribute.__get__() for unsaved instances.
+        msg = "Cannot retrieve deferred field 'value' from an unsaved model."
+        with self.assertRaisesMessage(AttributeError, msg):
+            p1.value
 
 
 class DeferOtherDatabaseTests(TestCase):
@@ -333,8 +396,8 @@ class TestDefer2(AssertionMixin, TestCase):
         related = Secondary.objects.create(first="x1", second="x2")
         ChildProxy.objects.create(name="p1", value="xx", related=related)
         with ignore_warnings(
-            category=RemovedInDjango70Warning,
-            message=r"Calling select_related\(\) with no arguments is deprecated\.",
+            category=RemovedInDjango2028Warning,
+            message="Calling select_related() with no arguments is deprecated.",
         ):
             children = ChildProxy.objects.select_related().only("id", "name")
         self.assertEqual(len(children), 1)

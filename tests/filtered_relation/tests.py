@@ -358,6 +358,29 @@ class FilteredRelationTests(TestCase):
             ],
         )
 
+    def test_lookup_sep_in_alias_values(self):
+        alias = "editor__name"
+        queryset = Book.objects.annotate(
+            **{alias: FilteredRelation("editor", condition=Q(editor__isnull=False))}
+        ).filter(title="The book by Alice")
+        self.assertSequenceEqual(queryset.values(alias), [{alias: self.editor_a.pk}])
+        self.assertSequenceEqual(queryset.values_list(alias), [(self.editor_a.pk,)])
+
+    def test_lookup_sep_in_alias_order_by(self):
+        alias = "editor__name"
+        editor_d = Editor.objects.create(name="d")
+        editor_c = Editor.objects.create(name="c")
+        book5 = Book.objects.create(
+            title="Poems from outer space", editor=editor_d, author=self.author1
+        )
+        book6 = Book.objects.create(
+            title="Stories from outer space", editor=editor_c, author=self.author1
+        )
+        queryset = Book.objects.annotate(
+            **{alias: FilteredRelation("editor", condition=Q(editor__isnull=False))}
+        ).filter(title__contains="outer space")
+        self.assertSequenceEqual(queryset.order_by(alias), [book5, book6])
+
     def test_extra(self):
         self.assertSequenceEqual(
             Author.objects.annotate(

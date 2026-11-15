@@ -4,7 +4,10 @@ from django.contrib.gis import gdal
 from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.geometry import json_regex
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
+from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.forms.widgets import Widget
+from django.utils.log import log_message
+from django.utils.text import trim_value
 
 logger = logging.getLogger("django.contrib.gis")
 
@@ -19,6 +22,7 @@ class BaseGeometryWidget(Widget):
     geom_type = "GEOMETRY"
     map_srid = 4326
     display_raw = False
+    max_geom_collections = MAX_GEOM_COLLECTIONS
 
     supports_3d = False
     template_name = ""  # set on subclasses
@@ -36,9 +40,17 @@ class BaseGeometryWidget(Widget):
 
     def deserialize(self, value):
         try:
-            return GEOSGeometry(value)
+            return GEOSGeometry(value, max_geom_collections=self.max_geom_collections)
         except (GEOSException, GDALException, ValueError, TypeError) as err:
-            logger.error("Error creating geometry from value '%s' (%s)", value, err)
+            # Trim large values, keeping the suffix out of the escaped args.
+            trimmed, suffix = trim_value(value)
+            log_message(
+                logger,
+                "Error creating geometry from value '%s" + suffix + "' (%s)",
+                trimmed,
+                err,
+                level="error",
+            )
         return None
 
     def get_context(self, name, value, attrs):

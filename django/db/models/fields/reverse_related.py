@@ -9,8 +9,9 @@ They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
 
+from functools import cached_property
+
 from django.core import exceptions
-from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
 from ..utils import get_blank_choice_label

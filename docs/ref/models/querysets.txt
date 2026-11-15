@@ -223,6 +223,12 @@ underlying SQL statement.
 If you need to execute more complex queries (for example, queries with ``OR``
 statements), you can use :ref:`q-objects` (``*args``).
 
+.. admonition:: ``NULL`` values and three-valued logic
+
+    When passing a ``QuerySet`` to the :lookup:`in` lookup, ensure the
+    subquery does not return ``NULL`` values. See :ref:`this note
+    <null-and-three-valued-logic>` for details.
+
 ``exclude()``
 ~~~~~~~~~~~~~
 
@@ -264,6 +270,12 @@ Note the second example is more restrictive.
 
 If you need to execute more complex queries (for example, queries with ``OR``
 statements), you can use :class:`Q objects <django.db.models.Q>` (``*args``).
+
+.. admonition:: ``NULL`` values and three-valued logic
+
+    When passing a ``QuerySet`` to the :lookup:`in` lookup, ensure the
+    subquery does not return ``NULL`` values. See :ref:`this note
+    <null-and-three-valued-logic>` for details.
 
 ``annotate()``
 ~~~~~~~~~~~~~~
@@ -1157,7 +1169,7 @@ underlying query more complex, and return more data, than is actually needed.
 .. deprecated:: 6.1
 
     Calling ``select_related()`` with no arguments is deprecated, and support
-    for it will be removed in Django 7.0. Specify the fields to fetch instead.
+    for it will be removed in Django 2028. Specify the fields to fetch instead.
 
 ``prefetch_related()``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -3362,6 +3374,26 @@ extract two field values, where only one is expected::
     inner_qs = Blog.objects.filter(name__contains="Ch").values("name", "id")
     entries = Entry.objects.filter(blog__name__in=inner_qs)
 
+.. _null-and-three-valued-logic:
+
+.. admonition:: ``NULL`` values and three-valued logic
+
+    When using a subquery (a ``QuerySet``) on the right-hand side of an
+    ``__in`` lookup, if the subquery returns any ``NULL`` values, it can
+    produce unexpected results due to SQL's three-valued logic.
+
+    For example, when using ``exclude(field__in=subquery)``, if the subquery
+    returns even a single ``NULL`` value, the SQL ``NOT IN`` comparison
+    evaluates to ``UNKNOWN`` for all rows, resulting in an empty queryset.
+
+    To avoid this, filter out ``NULL`` values from the subquery::
+
+        inner_qs = Blog.objects.filter(name__isnull=False).values("pk")
+        entries = Entry.objects.exclude(blog__in=inner_qs)
+
+    Alternatively, rewrite the query to use a NULL-safe
+    :class:`~django.db.models.Exists` subquery.
+
 .. _nested-queries-performance:
 
 .. admonition:: Performance considerations
@@ -4308,7 +4340,7 @@ attribute:
 
     >>> prefetch = Prefetch("choice_set", queryset=voted_choices, to_attr="voted_choices")
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    <QuerySet [<Choice: The sky>]>
+    [<Choice: The sky>]
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 

@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class DeprecatePosargsTests(SimpleTestCase):
     # Note: these tests use the generic RemovedAfterNextVersionWarning so they
     # don't need to be updated each release. In actual use, you must substitute
-    # a specific RemovedInDjangoXXWarning.
+    # a specific RemovedInDjangoXXXXWarning.
 
     def assertDeprecated(self, params, name):
         msg = (

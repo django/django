@@ -483,7 +483,7 @@ class M2mThroughReferentialTests(TestCase):
             [anne, kate],
             through_defaults={"date_friended": date_friended_set},
         )
-        self.assertSequenceEqual(tony.sym_friends.all(), [anne, kate])
+        self.assertSequenceEqual(tony.sym_friends.order_by("name"), [anne, kate])
         self.assertSequenceEqual(anne.sym_friends.all(), [tony])
         self.assertSequenceEqual(kate.sym_friends.all(), [tony])
         self.assertEqual(

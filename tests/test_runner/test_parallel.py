@@ -1,12 +1,21 @@
+import ctypes
+import multiprocessing
+import os
 import pickle
 import sys
 import unittest
+from unittest import mock
 from unittest.case import TestCase
 from unittest.result import TestResult
 from unittest.suite import TestSuite, _ErrorHolder
 
 from django.test import SimpleTestCase
-from django.test.runner import ParallelTestSuite, RemoteTestResult
+from django.test.runner import (
+    ParallelTestSuite,
+    RemoteTestResult,
+    _claim_database_clone_slot,
+    _release_dead_worker_slots,
+)
 
 from . import models
 
@@ -224,6 +233,59 @@ class RemoteTestResultTest(SimpleTestCase):
         result = RemoteTestResult()
         result.addDuration(None, 2.3)
         self.assertEqual(result.collectedDurations, [("None", 2.3)])
+
+
+class DatabaseCloneSlotTests(SimpleTestCase):
+    def make_slots(self, *owners):
+        slots = multiprocessing.Array(ctypes.c_longlong, len(owners))
+        for index, owner in enumerate(owners):
+            slots[index] = owner
+        return slots
+
+    def test_claims_first_free_slot(self):
+        slots = self.make_slots(101, 0, 0)
+        self.assertEqual(_claim_database_clone_slot(slots), 2)
+        self.assertEqual(slots[1], os.getpid())
+
+    def test_reclaims_slot_owned_by_own_pid(self):
+        # The OS may reuse the pid of an exited worker whose slot was not
+        # released yet.
+        slots = self.make_slots(101, os.getpid(), 0)
+        self.assertEqual(_claim_database_clone_slot(slots), 2)
+
+    def test_prefers_own_slot_over_earlier_free_slot(self):
+        # A pid already owning a slot must reclaim it rather than take an
+        # earlier free slot, otherwise a pid reused by the OS could hold two
+        # slots at once and strand the old one.
+        slots = self.make_slots(0, os.getpid())
+        self.assertEqual(_claim_database_clone_slot(slots), 2)
+        # The earlier free slot is left untouched for another worker.
+        self.assertEqual(slots[0], 0)
+
+    def test_times_out_when_no_slot_is_free(self):
+        slots = self.make_slots(101, 102)
+        msg = "could not acquire a test database clone"
+        with self.assertRaisesMessage(RuntimeError, msg):
+            _claim_database_clone_slot(slots, timeout=0)
+
+    def test_release_dead_worker_slots(self):
+        alive_worker = mock.Mock(pid=103)
+        slots = self.make_slots(101, 0, 103)
+        with mock.patch.object(
+            multiprocessing, "active_children", return_value=[alive_worker]
+        ):
+            _release_dead_worker_slots(slots)
+        self.assertEqual(list(slots), [0, 0, 103])
+
+    def test_released_slot_is_claimed_by_replacement_worker(self):
+        dead_worker_pid = 101
+        slots = self.make_slots(dead_worker_pid, 102)
+        with mock.patch.object(
+            multiprocessing, "active_children", return_value=[mock.Mock(pid=102)]
+        ):
+            _release_dead_worker_slots(slots)
+        self.assertEqual(_claim_database_clone_slot(slots), 1)
+        self.assertEqual(slots[0], os.getpid())
 
 
 class ParallelTestSuiteTest(SimpleTestCase):

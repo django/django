@@ -2,7 +2,7 @@ import datetime
 import decimal
 import sqlite3
 import uuid
-from functools import lru_cache
+from functools import cached_property, lru_cache
 from itertools import chain
 
 from django.conf import settings
@@ -13,7 +13,6 @@ from django.db.models.constants import OnConflict
 from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.functional import cached_property
 
 from .base import Database
 
@@ -315,7 +314,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_decimalfield_converter(self, expression):
         # SQLite stores only 15 significant digits. Digits coming from
         # float inaccuracy must be removed.
-        if isinstance(expression, Col):
+        if (
+            isinstance(expression, Col)
+            and expression.output_field.decimal_places is not None
+        ):
             quantize_value = decimal.Decimal(1).scaleb(
                 -expression.output_field.decimal_places
             )
