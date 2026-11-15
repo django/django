@@ -2746,6 +2746,63 @@ class AggregateAnnotationPruningTests(TestCase):
         self.assertEqual(sql.count("select"), 2, "Subquery wrapping required")
         self.assertNotIn("authors_count", sql)
 
+    def test_values_only_masked_aggregate_annotations(self):
+        qs = Author.objects.annotate(book_count=Count("book")).values("book_count")
+        self.assertEqual(qs.count(), 2)
+        self.assertEqual(qs.filter(book_count__gt=1).count(), 1)
+        self.assertEqual(qs.aggregate(max_age=Max("age")), {"max_age": 2})
+        self.assertEqual(
+            qs.filter(book_count__gt=1).aggregate(max_age=Max("age")),
+            {"max_age": 1},
+        )
+        self.assertEqual(
+            qs.order_by("book_count")[:1].aggregate(max_age=Max("age")),
+            {"max_age": 2},
+        )
+
+    def test_values_only_masked_aggregate_annotations_explicit_group_by(self):
+        Book.objects.create(
+            name="b3",
+            publisher=self.p1,
+            pages=200,
+            rating=4.5,
+            price=10,
+            contact=self.a1,
+            pubdate=datetime.date.today(),
+        )
+        qs = (
+            Book.objects.values("publisher")
+            .annotate(book_count=Count("pk"))
+            .values("book_count")
+        )
+        self.assertEqual(qs.count(), 2)
+        self.assertEqual(qs.filter(book_count__gt=1).count(), 1)
+        # Ordering by a column adds it to the GROUP BY clause.
+        self.assertEqual(qs.order_by("pages").count(), 3)
+
+    def test_values_only_masked_aggregate_annotations_pruned(self):
+        querysets = {
+            "implicit": Author.objects.annotate(pages_sum=Sum("book__pages")),
+            "explicit": Book.objects.values("publisher").annotate(
+                pages_sum=Sum("pages")
+            ),
+        }
+        for group_by, qs in querysets.items():
+            with self.subTest(group_by=group_by):
+                with CaptureQueriesContext(connection) as ctx:
+                    cnt = qs.values("pages_sum").count()
+                self.assertEqual(cnt, 2)
+                sql = ctx.captured_queries[0]["sql"].lower()
+                self.assertEqual(sql.count("select"), 2, "Subquery wrapping required")
+                self.assertNotIn("pages_sum", sql)
+
+    def test_values_only_masked_aggregate_annotations_reused_alias(self):
+        qs = Author.objects.annotate(book_count=Count("book")).values("book_count")
+        self.assertEqual(qs.aggregate(book_count=Max("age")), {"book_count": 2})
+        self.assertEqual(
+            qs.distinct().aggregate(book_count=Max("age")), {"book_count": 2}
+        )
+
     def test_unused_aliased_aggregate_and_annotation_reverse_fk(self):
         Book.objects.create(
             name="b3",
