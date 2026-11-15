@@ -12,6 +12,7 @@ Models, data and databases
 
    initial-data
    legacy-databases
+   standalone-orm
    custom-model-fields
    writing-migrations
    custom-lookups
