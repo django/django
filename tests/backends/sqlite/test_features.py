@@ -1,9 +1,14 @@
 import copy
+import os
 import sqlite3
+import subprocess
+import sys
+from pathlib import Path
 from unittest import mock, skipUnless
 
+import django
 from django.db import OperationalError, connection
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 
 @skipUnless(connection.vendor == "sqlite", "SQLite tests.")
@@ -40,3 +45,27 @@ class FeaturesTests(TestCase):
             self.assertIsInstance(result, int)
         finally:
             new_connection._close()
+
+
+class FeaturesImportTests(SimpleTestCase):
+    def test_import_features_before_base(self):
+        """
+        The sqlite3 features module can be imported before the base module.
+
+        Importing django.db.backends.sqlite3.features directly used to raise
+        "ImportError: cannot import name 'DatabaseFeatures' from partially
+        initialized module".
+        """
+        env = {
+            key: value
+            for key, value in os.environ.items()
+            if key != "DJANGO_SETTINGS_MODULE"
+        }
+        result = subprocess.run(
+            [sys.executable, "-c", "import django.db.backends.sqlite3.features"],
+            capture_output=True,
+            text=True,
+            cwd=Path(django.__file__).resolve().parent.parent,
+            env=env,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
