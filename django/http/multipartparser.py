@@ -572,15 +572,20 @@ class InterBoundaryIter:
     def __init__(self, stream, boundary):
         self._stream = stream
         self._boundary = boundary
+        self._at_body_start = True
 
     def __iter__(self):
         return self
 
     def __next__(self):
         try:
-            return LazyStream(BoundaryIter(self._stream, self._boundary))
+            boundary_iter = BoundaryIter(
+                self._stream, self._boundary, at_body_start=self._at_body_start
+            )
         except InputStreamExhausted:
             raise StopIteration()
+        self._at_body_start = False
+        return LazyStream(boundary_iter)
 
 
 class BoundaryIter:
@@ -595,10 +600,13 @@ class BoundaryIter:
     StopIteration exception.
     """
 
-    def __init__(self, stream, boundary):
+    def __init__(self, stream, boundary, at_body_start=False):
         self._stream = stream
         self._boundary = boundary
         self._done = False
+        # Only the first delimiter of the body may appear without a line
+        # break before it.
+        self._at_body_start = at_body_start
         # rollback an additional six bytes because the format is like
         # this: CRLF<boundary>[--CRLF]
         self._rollback = len(boundary) + 6
@@ -636,7 +644,7 @@ class BoundaryIter:
             raise StopIteration()
 
         chunk = b"".join(chunks)
-        boundary = self._find_boundary(chunk)
+        boundary = self._find_boundary(chunk, self._at_body_start)
 
         if boundary:
             end, next = boundary
@@ -652,31 +660,34 @@ class BoundaryIter:
                 return chunk
             else:
                 stream.unget(chunk[-rollback:])
+                self._at_body_start = False
                 return chunk[:-rollback]
 
-    def _find_boundary(self, data):
+    def _find_boundary(self, data, at_body_start=False):
         """
         Find a multipart boundary in data.
+
+        Per RFC 2046 section 5.1.1, a delimiter is a boundary at the start of
+        a line, so a boundary not preceded by a line break is part of the
+        data. The only exception is the first delimiter, which may be at the
+        very start of the body.
 
         Should no boundary exist in the data, return None. Otherwise, return
         a tuple containing the indices of the following:
          * the end of current encapsulation
          * the start of the next encapsulation
         """
-        index = data.find(self._boundary)
+        if at_body_start and data.startswith(self._boundary):
+            return 0, len(self._boundary)
+        index = data.find(b"\n" + self._boundary)
         if index < 0:
             return None
-        else:
-            end = index
-            next = index + len(self._boundary)
-            # backup over CRLF
-            last = max(0, end - 1)
-            if data[last : last + 1] == b"\n":
-                end -= 1
-            last = max(0, end - 1)
-            if data[last : last + 1] == b"\r":
-                end -= 1
-            return end, next
+        end = index
+        next = index + 1 + len(self._boundary)
+        # backup over the CR of CRLF
+        if end > 0 and data[end - 1 : end] == b"\r":
+            end -= 1
+        return end, next
 
 
 def exhaust(stream_or_iterable):
