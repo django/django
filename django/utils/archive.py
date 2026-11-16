@@ -185,7 +185,7 @@ class TarArchive(BaseArchive):
             elif not (member.isfile() or member.issym() or member.islnk()):
                 # Character/block devices, FIFOs, and other special files.
                 raise SuspiciousOperation(
-                    "Archive contains special file: '%s'" % member.name
+                    f"Archive contains special file: '{member.name}'"
                 )
             else:
                 try:
