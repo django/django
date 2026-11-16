@@ -36,6 +36,7 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   6.0.11
    6.0.10
    6.0.9
    6.0.8
@@ -53,6 +54,7 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   5.2.20
    5.2.19
    5.2.18
    5.2.17
