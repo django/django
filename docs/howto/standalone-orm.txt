@@ -128,8 +128,9 @@ registry is not ready yet. ``query.py``::
 
         from books.models import Book
 
-        book = Book.objects.create(title="The Great Gatsby")
-        print(book.title)
+        Book.objects.get_or_create(title="The Great Gatsby")
+        for title in Book.objects.values_list("title", flat=True):
+            print(title)
 
 
     if __name__ == "__main__":
@@ -143,8 +144,13 @@ Python can import both:
     $ python query.py
     The Great Gatsby
 
-``Book.objects.create()`` inserts a row. If you run it before ``migrate``,
-SQLite has no ``books_book`` table and Django raises
+``get_or_create()`` inserts a row when that title is not already stored, so
+you can run the script more than once. ``title`` is unique, so ``create()``
+raises :exc:`~django.db.IntegrityError` on a second run. ``values_list()``
+reads the title from the database. Printing ``title`` on the object returned
+by ``create()`` does not issue another query, because that object already
+holds the value that was just saved. If you run the script before
+``migrate``, SQLite has no ``books_book`` table and Django raises
 :exc:`~django.db.OperationalError`: ``no such table: books_book``.
 Opening the database is what creates the empty ``books.sqlite3`` file; it
 does not create your model tables.
