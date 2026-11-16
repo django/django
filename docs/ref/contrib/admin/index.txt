@@ -2934,9 +2934,73 @@ template override to your project:
 The list of CSS variables are defined at
 :source:`django/contrib/admin/static/admin/css/base.css`.
 
+Color variables
+---------------
+
+Variables ending in ``-fg`` set foreground colors, and those ending in ``-bg``
+set background colors. For example, ``--body-fg`` and ``--body-bg`` set the
+body text and background colors. Other pairs include ``--button-fg`` and
+``--button-bg``, and ``--breadcrumbs-fg`` and ``--breadcrumbs-bg``. Links may
+use a separate foreground color, such as ``--breadcrumbs-link-fg``.
+
+Some existing color variables have different names:
+
+* ``--body-quiet-color``, ``--body-medium-color``, and ``--body-loud-color``
+  define the body foreground palette. ``--body-quiet-color`` is also used for
+  some borders.
+* ``--header-color`` and ``--header-link-color`` set the header text and link
+  colors, respectively. ``--link-hover-color`` sets the default color of
+  hovered or focused links.
+* ``--selected-row`` sets the background of selected rows in the change list
+  and the current model in the navigation sidebar.
+* ``--hairline-color`` and ``--border-color`` are used for borders.
+  ``--hairline-color`` also sets the color of horizontal rules.
+
+``--primary``, ``--secondary``, and ``--accent`` are shared palette colors.
+For example, ``--secondary`` supplies the default values of ``--header-bg``
+and ``--button-bg``. Override a component's variable, such as ``--header-bg``,
+to change that component's color independently.
+
+Message backgrounds use ``--message-debug-bg``, ``--message-info-bg``,
+``--message-success-bg``, ``--message-warning-bg``, and ``--message-error-bg``.
+Their text uses ``--body-fg``. When changing these backgrounds, check their
+contrast against ``--body-fg`` in both light and dark modes. Also check links
+and secondary text on any backgrounds you change.
+
+Dark mode
+---------
+
 Dark mode variables, respecting the `prefers-color-scheme`_ media query, are
 defined at :source:`django/contrib/admin/static/admin/css/dark_mode.css`. This
 is linked to the document in ``{% block dark-mode-vars %}``.
+
+The theme toggle sets ``data-theme`` on the ``<html>`` element to ``light``,
+``dark``, or ``auto``. In automatic mode, the browser's color scheme determines
+which colors apply. To customize both explicit and automatic theme choices,
+use the selectors from the admin stylesheets. For example, add these rules
+inside the ``<style>`` element of the ``extrastyle`` block shown above:
+
+.. code-block:: css
+
+    html[data-theme="light"], :root {
+      --body-fg: #222;
+      --body-bg: #f5f5f5;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --body-fg: #eee;
+        --body-bg: #222;
+      }
+    }
+
+    html[data-theme="dark"] {
+      --body-fg: #eee;
+      --body-bg: #222;
+    }
+
+The explicit light selector takes precedence over the media query, so choosing
+light mode still works when the browser prefers dark mode.
 
 .. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
