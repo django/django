@@ -7,7 +7,7 @@ on:
     paths:
       - 'docs/make.bat'
       - 'docs/**.py'
-      - 'docs/requirements.txt'
+      - 'pyproject.toml'
       - 'tests/sphinx_tests/**'
       - '.github/workflows/docs_win.yml'
   push:
@@ -16,7 +16,7 @@ on:
     paths:
       - 'docs/make.bat'
       - 'docs/**.py'
-      - 'docs/requirements.txt'
+      - 'pyproject.toml'
       - 'tests/sphinx_tests/**'
       - '.github/workflows/docs_win.yml'
 
@@ -44,8 +44,8 @@ jobs:
         with:
           python-version: '3.15'
           cache: 'pip'
-          cache-dependency-path: 'docs/requirements.txt'
-      - run: python -m pip install -r requirements.txt
+          cache-dependency-path: 'pyproject.toml'
+      - run: python -m pip install --group=../pyproject.toml:docs
       # Batch file exit status is ignored with PowerShell or bash. `shell: cmd`
       # is the workaround -- see https://github.com/actions/runner/issues/351.
       - name: Lint
@@ -76,10 +76,10 @@ jobs:
         with:
           python-version: '3.14'
           cache: 'pip'
-          cache-dependency-path: 'docs/requirements.txt'
+          cache-dependency-path: 'pyproject.toml'
       - name: Install and upgrade packaging tools
         run: python -m pip install --upgrade pip wheel
-      - name: Install docs requirements and Django
-        run: python -m pip install -r docs/requirements.txt -e .
+      - name: Install docs dependencies and Django
+        run: python -m pip install --group=docs -e .
       - name: Run tests for Sphinx extensions
         run: python -Wall tests/runtests.py -v2 sphinx_tests

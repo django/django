@@ -98,6 +98,15 @@ test-free-threading = [
 postgres = ["django[postgresql-pool]", "psycopg[binary]"]
 # psycopg-binary doesn't publish free-threaded wheels.
 postgres-free-threading = ["django[postgresql-pool]"]
+docs = [
+    "blacken-docs",
+    "epubcheck",
+    "pydata-sphinx-theme",
+    "pyenchant",
+    "Sphinx>=8.2.0",
+    "sphinx-lint",
+    "sphinxcontrib-spelling",
+]
 
 [tool.black]
 target-version = ["py312"]
