@@ -25,3 +25,8 @@ Bugfixes
   :exc:`~django.core.exceptions.ValidationError` by the
   :class:`~django.contrib.gis.forms.GeometryField` form field
   (:ticket:`37491`).
+
+* Fixed a regression in Django 6.1 where combining querysets with
+  :meth:`.QuerySet.union`, :meth:`.QuerySet.intersection`, or
+  :meth:`.QuerySet.difference` could crash when the model's
+  :attr:`.Options.ordering` referenced related fields (:ticket:`37505`).
