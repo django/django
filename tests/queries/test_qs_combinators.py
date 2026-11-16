@@ -25,6 +25,7 @@ from .models import (
     ExtraInfo,
     Note,
     Number,
+    Ranking,
     Report,
     ReservedName,
     Tag,
@@ -445,6 +446,28 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Tag.objects.filter(name__in=["A", "B"])[:1]
         qs2 = Tag.objects.filter(name__in=["C"])[:1]
         self.assertSequenceEqual(qs1.union(qs2), [a, c])
+
+    @skipUnlessDBFeature(
+        "supports_select_difference",
+        "supports_select_intersection",
+        "supports_slicing_ordering_in_compound",
+    )
+    def test_combined_default_ordering_by_related_fields(self):
+        note = Note.objects.create(note="n1", misc="m1")
+        extra = ExtraInfo.objects.create(info="e1", note=note)
+        author_b = Author.objects.create(name="b", num=1, extra=extra)
+        author_a = Author.objects.create(name="a", num=2, extra=extra)
+        r1 = Ranking.objects.create(rank=1, author=author_b)
+        r2 = Ranking.objects.create(rank=2, author=author_a)
+
+        qs = Ranking.objects.all()
+        for combined in [
+            qs.union(qs),
+            qs.intersection(qs),
+            qs.difference(qs.filter(rank=3)),
+        ]:
+            with self.subTest(combinator=combined.query.combinator):
+                self.assertSequenceEqual(list(combined), [r2, r1])
 
     def test_union_multiple_models_with_values_list_and_order(self):
         reserved_name = ReservedName.objects.create(name="rn1", order=0)

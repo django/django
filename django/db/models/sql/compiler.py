@@ -506,6 +506,7 @@ class SQLCompiler:
         """
         result = []
         seen = set()
+        order_by_idx = len(self.query.select)
         for expr, is_ref in self._order_by_pairs():
             resolved = expr.resolve_expression(self.query, allow_joins=True, reuse=None)
             if not is_ref and self.query.combinator and self.select:
@@ -528,9 +529,9 @@ class SQLCompiler:
                         )
                         break
                 else:
-                    # Add column used in ORDER BY clause to the selected
-                    # columns and to each combined query.
-                    order_by_idx = len(self.query.select) + 1
+                    # Ensure the ORDER BY column is selected by each combined
+                    # query.
+                    order_by_idx += 1
                     col_alias = f"__orderbycol{order_by_idx}"
                     for q in self.query.combined_queries:
                         # If fields were explicitly selected through values()
@@ -541,7 +542,11 @@ class SQLCompiler:
                                 "the result set."
                             )
                         q.add_annotation(expr_src, col_alias)
-                    self.query.add_select_col(resolved, col_alias)
+                    # Without an explicit selection, the ordering column is
+                    # supplied by the annotations added to the combined
+                    # queries.
+                    if self.query.selected is not None:
+                        self.query.add_select_col(resolved, col_alias)
                     resolved.set_source_expressions([Ref(col_alias, src)])
             sql, params = self.compile(resolved)
             # Don't add the same column twice, but the order direction is
