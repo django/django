@@ -10,7 +10,7 @@ class ContainsTests(TestCase):
         cls.proxy_category = ProxyCategory.objects.create()
 
     def test_unsaved_obj(self):
-        msg = "QuerySet.contains() cannot be used on unsaved objects."
+        msg = "QuerySet.contains() cannot be used on objects without a primary key."
         with self.assertRaisesMessage(ValueError, msg):
             DumbCategory.objects.contains(DumbCategory())
 
