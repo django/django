@@ -795,10 +795,10 @@ doesn't change: its value is hashed on each request to find the session. A
 backend key doesn't reveal the session key, and it's never accepted as a
 session key.
 
-This applies to the ``db``, ``cached_db``, and ``cache`` session engines. With
-``cached_db``, both the database and the cache use the backend key. The
-``file`` session engine doesn't support it, and the ``signed_cookies`` session
-engine doesn't keep anything in a session store.
+This applies to the ``db``, ``cached_db``, ``cache``, and ``file`` session
+engines. With ``cached_db``, both the database and the cache use the backend
+key. With ``file``, session files are named after it. The ``signed_cookies``
+session engine doesn't keep anything in a session store.
 
 Hashing session keys doesn't protect the sessions from someone who can write to
 the session store, and it doesn't encrypt the session data.

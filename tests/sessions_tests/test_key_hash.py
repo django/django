@@ -1,3 +1,6 @@
+import os
+import shutil
+import tempfile
 from unittest import mock
 
 from asgiref.sync import async_to_sync, sync_to_async
@@ -11,7 +14,6 @@ from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sessions.models import Session
 from django.core.cache import caches
-from django.core.exceptions import ImproperlyConfigured
 from django.db import DatabaseError, transaction
 from django.db.models import QuerySet
 from django.http import HttpResponse
@@ -134,6 +136,9 @@ class SessionStoreKeyHashTestsMixin:
         if "cache" in self.stores:
             if self.backend.cache_key_prefix + backend_key in caches["default"]:
                 stores.add("cache")
+        if "file" in self.stores:
+            if os.path.exists(self.session_file(backend_key)):
+                stores.add("file")
         return stores
 
     def assertKeptUnder(self, backend_key):
@@ -935,14 +940,110 @@ class CacheSessionStoreKeyHashTests(SessionStoreKeyHashTestsMixin, SimpleTestCas
             self.assertEqual(await self.backend(session_key).aget("color"), "red")
 
 
-class FileSessionStoreKeyHashTests(SimpleTestCase):
-    def test_not_supported(self):
-        msg = "The file session backend doesn't support SESSION_STORE_KEY_HASH."
+class FileSessionStoreKeyHashTests(SessionStoreKeyHashTestsMixin, SimpleTestCase):
+    backend = FileSession
+    stores = {"file"}
+
+    def setUp(self):
+        super().setUp()
+        self.storage_path = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.storage_path)
+        self.enterContext(override_settings(SESSION_FILE_PATH=self.storage_path))
+        # Reset the file session backend's internal caches.
+        self.reset_storage_path()
+        self.addCleanup(self.reset_storage_path)
+
+    def reset_storage_path(self):
+        if hasattr(self.backend, "_storage_path"):
+            del self.backend._storage_path
+
+    def session_file(self, backend_key):
+        return os.path.join(
+            self.storage_path, settings.SESSION_COOKIE_NAME + backend_key
+        )
+
+    def test_transition_save_when_file_cannot_be_renamed(self):
+        # For example, when another process has the file open on Windows.
+        session = self.create_unhashed_session(color="red")
+        session_key = session.session_key
+        with self.settings(SESSION_STORE_KEY_HASH="transition"):
+            other = self.backend(session_key)
+            other["color"] = "blue"
+            with mock.patch("os.replace", side_effect=PermissionError):
+                other.save()
+            self.assertKeptUnder(session_key)
+            self.assertNotKeptUnder(other.get_backend_key(session_key))
+            self.assertEqual(self.backend(session_key)["color"], "blue")
+
+    def test_transition_load_of_session_being_moved(self):
+        # A concurrent request renames the file right after it wasn't found
+        # under the name of the hashed backend key.
+        def open_(file, *args, **kwargs):
+            if file == unhashed_session_file and other.modified:
+                other.modified = False
+                other.save()
+            return builtin_open(file, *args, **kwargs)
+
+        builtin_open = open
+        session = self.create_unhashed_session(color="red")
+        session_key = session.session_key
+        unhashed_session_file = self.session_file(session_key)
+        with self.settings(SESSION_STORE_KEY_HASH="transition"):
+            other = self.backend(session_key)
+            self.assertEqual(other["color"], "red")
+            with mock.patch("builtins.open", open_):
+                self.assertEqual(self.backend(session_key)["color"], "red")
+            self.assertNotKeptUnder(session_key)
+
+    def test_clear_expired(self):
         for value in (True, "transition"):
             with self.subTest(SESSION_STORE_KEY_HASH=value):
                 with self.settings(SESSION_STORE_KEY_HASH=value):
-                    with self.assertRaisesMessage(ImproperlyConfigured, msg):
-                        FileSession()
+                    session = self.create_session(color="red")
+                    expired_session = self.create_session(color="blue")
+                    expired_session.set_expiry(-3600)
+                    expired_session.save()
+                    self.backend.clear_expired()
+                    self.assertKeptUnder(session.get_backend_key(session.session_key))
+                    self.assertNotKeptUnder(
+                        session.get_backend_key(expired_session.session_key)
+                    )
+
+    def test_clear_expired_session_kept_under_session_key(self):
+        for value in (True, "transition"):
+            with self.subTest(SESSION_STORE_KEY_HASH=value):
+                with self.settings(SESSION_STORE_KEY_HASH=False):
+                    session = self.create_session(color="red")
+                    expired_session = self.create_session(color="blue")
+                    expired_session.set_expiry(-3600)
+                    expired_session.save()
+                with self.settings(SESSION_STORE_KEY_HASH=value):
+                    self.backend.clear_expired()
+                self.assertKeptUnder(session.session_key)
+                self.assertNotKeptUnder(expired_session.session_key)
+
+    def test_clear_expired_session_kept_under_hashed_backend_key(self):
+        # SESSION_STORE_KEY_HASH was set back to False.
+        with self.settings(SESSION_STORE_KEY_HASH=True):
+            session = self.create_session(color="red")
+            expired_session = self.create_session(color="blue")
+            expired_session.set_expiry(-3600)
+            expired_session.save()
+            backend_key = session.get_backend_key(session.session_key)
+            expired_backend_key = session.get_backend_key(expired_session.session_key)
+        with self.settings(SESSION_STORE_KEY_HASH=False):
+            self.backend.clear_expired()
+        self.assertKeptUnder(backend_key)
+        self.assertNotKeptUnder(expired_backend_key)
+
+    @override_settings(SESSION_STORE_KEY_HASH=True)
+    def test_clear_expired_ignores_unreadable_files(self):
+        session = self.create_session(color="red")
+        backend_key = session.get_backend_key(session.session_key)
+        with open(self.session_file(backend_key[:-1] + "2"), "wb") as f:
+            f.write(b"\xff\xfe")
+        self.backend.clear_expired()
+        self.assertKeptUnder(backend_key)
 
 
 class SessionStoreKeyHashMiddlewareTests(TestCase):
