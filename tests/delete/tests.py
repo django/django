@@ -508,6 +508,22 @@ class DeletionTests(TestCase):
         self.assertEqual(len(deletions), 1)
         self.assertEqual(deletions[0], s_id)
 
+    def test_delete_with_select_related(self):
+        r = R.objects.create()
+        s = S.objects.create(r=r)
+        cached = []
+
+        def log_post_delete(instance, **kwargs):
+            cached.append(instance._state.fields_cache.get("r") is not None)
+
+        models.signals.post_delete.connect(log_post_delete, sender=S)
+        try:
+            S.objects.filter(pk=s.pk).select_related("r").delete()
+        finally:
+            models.signals.post_delete.disconnect(log_post_delete)
+
+        self.assertEqual(cached, [True])
+
     @skipUnlessDBFeature("can_defer_constraint_checks")
     def test_can_defer_constraint_checks(self):
         u = User.objects.create(avatar=Avatar.objects.create())
