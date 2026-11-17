@@ -3840,6 +3840,30 @@ Included serializer is:
 
 See :ref:`session_serialization` for details.
 
+.. setting:: SESSION_STORE_KEY_HASH
+
+``SESSION_STORE_KEY_HASH``
+--------------------------
+
+.. versionadded:: 6.2
+
+Default: ``False``
+
+Whether to keep sessions in the session store under a hash of the session key,
+rather than under the session key itself, so that the keys read from the
+session store can't be used to impersonate users. Possible values are:
+
+* ``False``: sessions are kept under their session key.
+
+* ``True``: sessions are kept under a hash of their session key. Sessions kept
+  under their session key are ignored.
+
+* ``"transition"``: sessions are kept under a hash of their session key.
+  Sessions kept under their session key are still accepted, and moved to the
+  hash when they are next saved.
+
+See :ref:`hashing-session-keys` for details.
+
 Sites
 =====
 

@@ -513,6 +513,10 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_FILE_PATH = None
 # class to serialize session data
 SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
+# Whether to keep sessions in the session store under a hash of the session
+# key, rather than under the session key itself. This can be True, False, or
+# "transition" to also accept the sessions kept under their session key.
+SESSION_STORE_KEY_HASH = False
 
 #########
 # CACHE #

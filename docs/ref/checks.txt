@@ -627,6 +627,8 @@ configured:
 * **security.W027**: Your Content Security Policy includes ``CSP.NONCE`` and
   :class:`~django.middleware.csp.ContentSecurityPolicyMiddleware` is enabled,
   but ``django.template.context_processors.csp`` is not configured.
+* **security.E028**: :setting:`SESSION_STORE_KEY_HASH` must be ``True``,
+  ``False``, or ``"transition"``.
 
 Signals
 -------

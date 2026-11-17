@@ -4,9 +4,12 @@ Cached, database-backed sessions.
 
 import logging
 
+from asgiref.sync import sync_to_async
+
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore as DBStore
 from django.core.cache import caches
+from django.db import connections, transaction
 
 KEY_PREFIX = "django.contrib.sessions.cached_db"
 
@@ -26,10 +29,69 @@ class SessionStore(DBStore):
 
     @property
     def cache_key(self):
-        return self.cache_key_prefix + self._get_or_create_session_key()
+        return self.cache_key_prefix + self.get_backend_key(
+            self._get_or_create_session_key()
+        )
 
     async def acache_key(self):
-        return self.cache_key_prefix + await self._aget_or_create_session_key()
+        return self.cache_key_prefix + self.get_backend_key(
+            await self._aget_or_create_session_key()
+        )
+
+    def _get_cache_keys(self, session_key):
+        return [
+            self.cache_key_prefix + backend_key
+            for backend_key in self._get_backend_keys(session_key)
+        ]
+
+    def _is_cacheable(self, using, created=False):
+        """
+        While SESSION_STORE_KEY_HASH is "transition", return whether the
+        session, which was just loaded from or saved to the `using` database,
+        can be cached: it must be kept under its hashed backend key, and the
+        database must not be in a transaction, which may be rolled back and
+        return a session that it moved to its session key.
+
+        A session that was just created is cached nonetheless, as with the
+        other values of the setting, so it stays in the cache if the
+        transaction that created it is rolled back.
+        """
+        if settings.SESSION_STORE_KEY_HASH != "transition":
+            return True
+        if self._kept_under_session_key:
+            return False
+        # A session that was just created isn't a session that was moved.
+        if created:
+            return True
+        # Whichever session store moved the session in this transaction.
+        connection = connections[using]
+        return not connection.in_atomic_block and connection.get_autocommit()
+
+    async def _ais_cacheable(self, using, created=False):
+        if settings.SESSION_STORE_KEY_HASH != "transition":
+            return True
+        # The transaction is the one of the thread that accesses the database.
+        return await sync_to_async(self._is_cacheable)(using, created)
+
+    def _uncache_on_commit(self, using, cache_keys):
+        """
+        While SESSION_STORE_KEY_HASH is "transition", a session that's saved
+        inside a transaction is removed from the cache. Have it removed again
+        when the transaction is committed, because a concurrent request may
+        cache it in the meantime, as the database has it until then.
+        """
+        # on_commit() isn't available when autocommit is turned off.
+        if not connections[using].in_atomic_block:
+            return
+        cache = self._cache
+
+        def uncache():
+            try:
+                cache.delete_many(cache_keys)
+            except Exception:
+                logger.exception("Error deleting from cache (%s)", cache)
+
+        transaction.on_commit(uncache, using=using)
 
     def load(self):
         try:
@@ -43,9 +105,12 @@ class SessionStore(DBStore):
             s = self._get_session_from_db()
             if s:
                 data = self.decode(s.session_data)
-                self._cache.set(
-                    self.cache_key, data, self.get_expiry_age(expiry=s.expire_date)
-                )
+                if self._is_cacheable(s._state.db):
+                    self._cache.set(
+                        self.cache_key,
+                        data,
+                        self.get_expiry_age(expiry=s.expire_date),
+                    )
             else:
                 data = {}
         return data
@@ -62,11 +127,12 @@ class SessionStore(DBStore):
             s = await self._aget_session_from_db()
             if s:
                 data = self.decode(s.session_data)
-                await self._cache.aset(
-                    await self.acache_key(),
-                    data,
-                    await self.aget_expiry_age(expiry=s.expire_date),
-                )
+                if await self._ais_cacheable(s._state.db):
+                    await self._cache.aset(
+                        await self.acache_key(),
+                        data,
+                        await self.aget_expiry_age(expiry=s.expire_date),
+                    )
             else:
                 data = {}
         return data
@@ -74,32 +140,51 @@ class SessionStore(DBStore):
     def exists(self, session_key):
         return (
             session_key
-            and (self.cache_key_prefix + session_key) in self._cache
+            and any(key in self._cache for key in self._get_cache_keys(session_key))
             or super().exists(session_key)
         )
 
     async def aexists(self, session_key):
         return (
             session_key
-            and (self.cache_key_prefix + session_key) in self._cache
+            and any(key in self._cache for key in self._get_cache_keys(session_key))
             or await super().aexists(session_key)
         )
 
     def save(self, must_create=False):
+        created = must_create or self.session_key is None
         super().save(must_create)
         try:
-            self._cache.set(self.cache_key, self._session, self.get_expiry_age())
+            if self._is_cacheable(self._saved_using, created):
+                self._cache.set(self.cache_key, self._session, self.get_expiry_age())
+                # The session isn't kept under its session key anymore.
+                for key in self._get_cache_keys(self.session_key)[1:]:
+                    self._cache.delete(key)
+            else:
+                cache_keys = self._get_cache_keys(self.session_key)
+                self._cache.delete_many(cache_keys)
+                self._uncache_on_commit(self._saved_using, cache_keys)
         except Exception:
             logger.exception("Error saving to cache (%s)", self._cache)
 
     async def asave(self, must_create=False):
+        created = must_create or self.session_key is None
         await super().asave(must_create)
         try:
-            await self._cache.aset(
-                await self.acache_key(),
-                self._session,
-                await self.aget_expiry_age(),
-            )
+            if await self._ais_cacheable(self._saved_using, created):
+                await self._cache.aset(
+                    await self.acache_key(),
+                    self._session,
+                    await self.aget_expiry_age(),
+                )
+                for key in self._get_cache_keys(self.session_key)[1:]:
+                    await self._cache.adelete(key)
+            else:
+                cache_keys = self._get_cache_keys(self.session_key)
+                await self._cache.adelete_many(cache_keys)
+                await sync_to_async(self._uncache_on_commit)(
+                    self._saved_using, cache_keys
+                )
         except Exception:
             logger.exception("Error saving to cache (%s)", self._cache)
 
@@ -110,7 +195,8 @@ class SessionStore(DBStore):
                 return
             session_key = self.session_key
         try:
-            self._cache.delete(self.cache_key_prefix + session_key)
+            for key in reversed(self._get_cache_keys(session_key)):
+                self._cache.delete(key)
         except Exception:
             logger.exception("Error deleting from cache (%s)", self._cache)
 
@@ -121,7 +207,8 @@ class SessionStore(DBStore):
                 return
             session_key = self.session_key
         try:
-            await self._cache.adelete(self.cache_key_prefix + session_key)
+            for key in reversed(self._get_cache_keys(session_key)):
+                await self._cache.adelete(key)
         except Exception:
             logger.exception("Error deleting from cache (%s)", self._cache)
 

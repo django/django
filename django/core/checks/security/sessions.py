@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.checks import Tags, Warning, register
+from django.core.checks import Error, Tags, Warning, register
 
 
 def add_session_cookie_message(message):
@@ -61,6 +61,11 @@ W015 = Warning(
     id="security.W015",
 )
 
+E028 = Error(
+    'SESSION_STORE_KEY_HASH must be True, False, or "transition".',
+    id="security.E028",
+)
+
 
 @register(Tags.security, deploy=True)
 def check_session_cookie_secure(app_configs, **kwargs):
@@ -88,6 +93,14 @@ def check_session_cookie_httponly(app_configs, **kwargs):
     if len(errors) > 1:
         errors = [W015]
     return errors
+
+
+@register(Tags.security)
+def check_session_store_key_hash(app_configs, **kwargs):
+    value = settings.SESSION_STORE_KEY_HASH
+    if value is True or value is False or value == "transition":
+        return []
+    return [E028]
 
 
 def _session_middleware():

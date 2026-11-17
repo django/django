@@ -1,3 +1,5 @@
+import base64
+import hashlib
 import logging
 import string
 from datetime import datetime, timedelta
@@ -39,6 +41,9 @@ class SessionBase:
 
     TEST_COOKIE_NAME = "testcookie"
     TEST_COOKIE_VALUE = "worked"
+
+    # Prefix of the backend keys that hold a hash of the session key.
+    hashed_key_prefix = "sha256$"
 
     __not_given = object()
 
@@ -217,12 +222,48 @@ class SessionBase:
             self._session_key = await self._aget_new_session_key()
         return self._session_key
 
+    def get_backend_key(self, session_key):
+        """
+        Return the key under which the session identified by session_key is
+        kept in the session store: a hash of session_key if
+        SESSION_STORE_KEY_HASH is enabled, session_key itself otherwise.
+        """
+        if session_key is None or not settings.SESSION_STORE_KEY_HASH:
+            return session_key
+        # The session key is a long random string, so a fast unsalted hash is
+        # enough. 160 bits of it in base32 fit, with the prefix, the 40
+        # characters of AbstractBaseSession.session_key. Lowercase base32 also
+        # suits case-insensitive database collations and file systems.
+        digest = hashlib.sha256(session_key.encode()).digest()[:20]
+        return self.hashed_key_prefix + base64.b32encode(digest).decode().lower()
+
+    def _get_backend_keys(self, session_key):
+        """
+        Return the backend keys under which the session identified by
+        session_key may be kept: its backend key and, while
+        SESSION_STORE_KEY_HASH is "transition", session_key itself.
+        """
+        backend_key = self.get_backend_key(session_key)
+        if (
+            settings.SESSION_STORE_KEY_HASH == "transition"
+            and self._validate_session_key(session_key)
+        ):
+            return [backend_key, session_key]
+        return [backend_key]
+
     def _validate_session_key(self, key):
         """
         Key must be truthy and at least 8 characters long. 8 characters is an
         arbitrary lower bound for some minimal key security.
+
+        Key must also be an ASCII string without "$", which hashed backend keys
+        contain. Otherwise a hashed backend key read from the session store, or
+        a string that a database collation deems equal to it, could be used as
+        a session key.
         """
-        return key and len(key) >= 8
+        return (
+            isinstance(key, str) and len(key) >= 8 and key.isascii() and "$" not in key
+        )
 
     def _get_session_key(self):
         return self.__session_key

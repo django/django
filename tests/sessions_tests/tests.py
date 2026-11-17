@@ -668,15 +668,20 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
     def model(self):
         return self.backend.get_model_class()
 
+    @property
+    def backend_key(self):
+        # The key under which the session is kept in the database, whatever
+        # SESSION_STORE_KEY_HASH is.
+        return self.session.get_backend_key(self.session.session_key)
+
     def test_session_str(self):
         "Session repr should be the session key."
         self.session["x"] = 1
         self.session.save()
 
-        session_key = self.session.session_key
-        s = self.model.objects.get(session_key=session_key)
+        s = self.model.objects.get(session_key=self.backend_key)
 
-        self.assertEqual(str(s), session_key)
+        self.assertEqual(str(s), self.backend_key)
 
     def test_session_get_decoded(self):
         """
@@ -686,7 +691,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.session["x"] = 1
         self.session.save()
 
-        s = self.model.objects.get(session_key=self.session.session_key)
+        s = self.model.objects.get(session_key=self.backend_key)
 
         self.assertEqual(s.get_decoded(), {"x": 1})
 
@@ -698,7 +703,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.session["y"] = 1
         self.session.save()
 
-        s = self.model.objects.get(session_key=self.session.session_key)
+        s = self.model.objects.get(session_key=self.backend_key)
         # Change it
         self.model.objects.save(s.session_key, {"y": 2}, s.expire_date)
         # Clear cache, so that it will be retrieved from DB
@@ -766,7 +771,7 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
         self.session.save()
 
         # Make sure that the customized create_model_instance() was called.
-        s = self.model.objects.get(session_key=self.session.session_key)
+        s = self.model.objects.get(session_key=self.backend_key)
         self.assertEqual(s.account_id, 42)
 
         # Make the session "anonymous".
@@ -774,7 +779,7 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
         self.session.save()
 
         # Make sure that save() on an existing session did the right job.
-        s = self.model.objects.get(session_key=self.session.session_key)
+        s = self.model.objects.get(session_key=self.backend_key)
         self.assertIsNone(s.account_id)
 
     def test_custom_expiry_reset(self):
@@ -1271,7 +1276,9 @@ class SessionMiddlewareTests(TestCase):
         response = HttpResponse("Session test")
         response = middleware.process_response(request, response)
         self.assertEqual(dict(request.session.values()), {})
-        session = Session.objects.get(session_key=request.session.session_key)
+        session = Session.objects.get(
+            session_key=request.session.get_backend_key(request.session.session_key)
+        )
         self.assertEqual(session.get_decoded(), {})
         # While the session is empty, it hasn't been flushed so a cookie should
         # still be set, along with Vary: Cookie.

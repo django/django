@@ -403,6 +403,15 @@ You can edit it multiple times.
       :func:`django.contrib.auth.login` calls this method to mitigate against
       session fixation.
 
+    .. method:: get_backend_key(session_key)
+
+      .. versionadded:: 6.2
+
+      Returns the key under which the session identified by ``session_key`` is
+      kept in the session store, its *backend key*: a hash of ``session_key``
+      if :setting:`SESSION_STORE_KEY_HASH` is enabled, ``session_key`` itself
+      otherwise. See :ref:`hashing-session-keys`.
+
 .. _session_serialization:
 
 Session serialization
@@ -608,6 +617,14 @@ can access sessions using the normal Django database API:
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
+If :setting:`SESSION_STORE_KEY_HASH` is enabled, the primary key of a session
+is its backend key rather than its session key:
+
+.. code-block:: pycon
+
+    >>> pk = SessionStore().get_backend_key("2b1189a188b44ad18c35e113ac6ceead")
+    >>> s = Session.objects.get(pk=pk)
+
 Note that you'll need to call
 :meth:`~base_session.AbstractBaseSession.get_decoded` to get the session
 dictionary. This is necessary because the dictionary is stored in an encoded
@@ -737,6 +754,7 @@ behavior:
 * :setting:`SESSION_FILE_PATH`
 * :setting:`SESSION_SAVE_EVERY_REQUEST`
 * :setting:`SESSION_SERIALIZER`
+* :setting:`SESSION_STORE_KEY_HASH`
 
 .. _topics-session-security:
 
@@ -758,6 +776,94 @@ the attacker's account.
 Another possible attack would be if ``good.example.com`` sets its
 :setting:`SESSION_COOKIE_DOMAIN` to ``"example.com"`` which would cause
 session cookies from that site to be sent to ``bad.example.com``.
+
+.. _hashing-session-keys:
+
+Hashing session keys in the session store
+-----------------------------------------
+
+.. versionadded:: 6.2
+
+By default, a session is kept in the session store under its session key, the
+value of the session cookie. Anyone who can read the session store, for example
+a database backup or a cache server, can use the keys in it to impersonate the
+users who have a session.
+
+Set :setting:`SESSION_STORE_KEY_HASH` to ``True`` to keep each session under a
+hash of its session key instead, called its *backend key*. The session cookie
+doesn't change: its value is hashed on each request to find the session. A
+backend key doesn't reveal the session key, and it's never accepted as a
+session key.
+
+This applies to the ``db``, ``cached_db``, and ``cache`` session engines. With
+``cached_db``, both the database and the cache use the backend key. The
+``file`` session engine doesn't support it, and the ``signed_cookies`` session
+engine doesn't keep anything in a session store.
+
+Hashing session keys doesn't protect the sessions from someone who can write to
+the session store, and it doesn't encrypt the session data.
+
+With ``SESSION_STORE_KEY_HASH = True``, the sessions that are already in the
+session store are no longer found, so users have to log in again. To avoid
+that:
+
+#. Set ``SESSION_STORE_KEY_HASH = "transition"``. New sessions are kept under
+   their backend key. Sessions kept under their session key are still accepted.
+   Loading one of them marks it as modified, so that it's saved at the end of
+   the request, and saving it moves it to its backend key.
+
+#. Once those sessions have had the time to expire, set
+   ``SESSION_STORE_KEY_HASH = True``. That's two weeks with the default
+   :setting:`SESSION_COOKIE_AGE`, and longer if your site sets a longer expiry
+   on some sessions. The sessions that weren't used in the meantime are ignored
+   from then on.
+
+While ``SESSION_STORE_KEY_HASH`` is ``"transition"``:
+
+* The sessions that haven't been moved yet can still be used by someone who
+  reads their keys from the session store.
+
+* All the processes that serve the site must use the same value of the
+  setting. A process where it's ``False`` doesn't find the sessions that
+  another process has moved, so users may be logged out while the setting is
+  being changed with a rolling restart.
+
+* In the database, a session is moved by changing the primary key of its row,
+  so a session isn't moved while rows of other models reference that primary
+  key, for example through a :class:`~django.db.models.ForeignKey` to the
+  session model. It remains usable under its session key, and it's ignored,
+  like any session kept under its session key, once
+  ``SESSION_STORE_KEY_HASH`` is ``True``.
+
+* With ``cached_db``, a session that's still kept under its session key isn't
+  cached. Inside a transaction, for example in a view when
+  :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>` is ``True``, a session
+  that's loaded from the database isn't cached, and a session that's saved is
+  removed from the cache, because the transaction may be rolled back, which
+  would return a session that it moved to its session key. In an
+  :func:`~django.db.transaction.atomic` block, the session is removed from
+  the cache again when the transaction is committed, in case a concurrent
+  request cached it in the meantime. A session is cached when it's loaded or
+  saved outside of a transaction. As with the other values of the setting, a
+  session that's created inside a transaction is cached at once, even if the
+  transaction is rolled back afterwards, and a request that loads a session
+  while another one saves it may cache the session as it was.
+
+Setting ``SESSION_STORE_KEY_HASH`` back to ``False`` makes the sessions kept
+under their backend key unreachable, so users have to log in again.
+
+To prevent a backend key from being used as a session key, a session key that
+isn't an ASCII string, or that contains ``$``, is never valid, whatever the
+value of ``SESSION_STORE_KEY_HASH``. The session keys that Django generates
+aren't affected. A custom session engine that generates session keys with such
+characters, and that validates session keys as
+:class:`~backends.base.SessionBase` does, no longer loads its sessions, even
+if ``SESSION_STORE_KEY_HASH`` is ``False``.
+
+If you write your own session engine, use
+:meth:`~backends.base.SessionBase.get_backend_key` wherever it reads from or
+writes to the session store, so that it honors the setting. ``session_key``,
+``exists()``, and ``delete()`` always take or return session keys.
 
 Technical details
 =================
@@ -831,6 +937,10 @@ including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
         current implementation generates a 32-character string (a random
         sequence of digits and lowercase ASCII letters).
 
+        If :setting:`SESSION_STORE_KEY_HASH` is enabled, this field contains
+        the backend key of the session, a 39-character string, rather than its
+        session key. See :ref:`hashing-session-keys`.
+
     .. attribute:: session_data
 
         A string containing an encoded and serialized session dictionary.
@@ -868,7 +978,10 @@ You can also customize the model manager by subclassing
     .. method:: save(session_key, session_dict, expire_date)
 
         Saves session data for a provided session key, or deletes the session
-        in case the data is empty.
+        in case the data is empty. ``session_key`` is the value of the
+        :attr:`~base_session.AbstractBaseSession.session_key` field, which is
+        the backend key of the session if :setting:`SESSION_STORE_KEY_HASH` is
+        enabled.
 
 Customization of ``SessionStore`` classes is achieved by overriding methods
 and properties described below:

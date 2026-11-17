@@ -21,6 +21,10 @@ class SessionStore(SessionBase):
     """
 
     def __init__(self, session_key=None):
+        if settings.SESSION_STORE_KEY_HASH:
+            raise ImproperlyConfigured(
+                "The file session backend doesn't support SESSION_STORE_KEY_HASH."
+            )
         self.storage_path = self._get_storage_path()
         self.file_prefix = settings.SESSION_COOKIE_NAME
         super().__init__(session_key)

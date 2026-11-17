@@ -134,6 +134,22 @@ class CheckSessionCookieHttpOnlyTest(SimpleTestCase):
         self.assertEqual(sessions.check_session_cookie_httponly(None), [])
 
 
+class CheckSessionStoreKeyHashTest(SimpleTestCase):
+    def test_valid_values(self):
+        for value in (False, True, "transition"):
+            with self.subTest(value=value):
+                with override_settings(SESSION_STORE_KEY_HASH=value):
+                    self.assertEqual(sessions.check_session_store_key_hash(None), [])
+
+    def test_invalid_values(self):
+        for value in (None, 1, "", "true", "Transition"):
+            with self.subTest(value=value):
+                with override_settings(SESSION_STORE_KEY_HASH=value):
+                    self.assertEqual(
+                        sessions.check_session_store_key_hash(None), [sessions.E028]
+                    )
+
+
 class CheckCSRFMiddlewareTest(SimpleTestCase):
     @override_settings(MIDDLEWARE=[])
     def test_no_csrf_middleware(self):

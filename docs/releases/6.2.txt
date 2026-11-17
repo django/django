@@ -118,6 +118,19 @@ and ``RemovedInDjango71Warning`` becomes ``RemovedInDjango2029Warning``.
 interface </ref/django-admin>`. ``django-admin`` remains available as an
 alias. Both names provide the same functionality.
 
+Hashed session keys in the session store
+----------------------------------------
+
+The new :setting:`SESSION_STORE_KEY_HASH` setting allows keeping sessions in
+the session store under a hash of their session key, rather than under the
+session key itself. The keys read from the session store, for example from a
+database backup or a cache server, can then no longer be used to impersonate
+users. The session cookie doesn't change.
+
+The setting is ``False`` by default. Setting it to ``"transition"`` before
+setting it to ``True`` allows the sessions that are in use to be kept. See
+:ref:`hashing-session-keys` for details.
+
 Minor features
 --------------
 
@@ -503,6 +516,14 @@ Miscellaneous
 * :class:`~django.middleware.http.ConditionalGetMiddleware` now computes
   ``ETag`` headers for, and returns HTTP 304 responses to, conditional
   ``QUERY`` requests.
+
+* A session key that isn't an ASCII string, or that contains ``$``, is no
+  longer valid, so that the keys of the sessions stored with
+  :setting:`SESSION_STORE_KEY_HASH` can't be used as session keys. This doesn't
+  affect the session keys that Django generates. A custom session engine that
+  generates session keys with such characters, and that validates session keys
+  as ``SessionBase`` does, no longer loads its sessions, whatever the value of
+  the setting.
 
 * With :setting:`DEBUG` and :setting:`APPEND_SLASH` enabled,
   :class:`~django.middleware.common.CommonMiddleware` now raises a
