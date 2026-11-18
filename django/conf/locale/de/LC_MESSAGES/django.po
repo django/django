@@ -11,15 +11,15 @@
 # Markus Holtermann <info@markusholtermann.eu>, 2023
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 # Raphael Michel <mail@raphaelmichel.de>, 2021
-# Ronny Vedrilla, 2025
+# Ronny Vedrilla, 2025-2026
 # Sarah Boyce, 2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 11:30-0500\n"
-"PO-Revision-Date: 2025-09-17 06:49+0000\n"
-"Last-Translator: Sarah Boyce, 2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Ronny Vedrilla, 2025-2026\n"
 "Language-Team: German (http://app.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -149,6 +149,9 @@ msgstr "Kroatisch"
 
 msgid "Upper Sorbian"
 msgstr "Obersorbisch"
+
+msgid "Haitian Creole"
+msgstr "Haitianisches Kreol"
 
 msgid "Hungarian"
 msgstr "Ungarisch"
@@ -504,6 +507,9 @@ msgstr ""
 msgid "Constraint “%(name)s” is violated."
 msgstr "Bedingung „%(name)s“ ist nicht erfüllt."
 
+msgid "- Select an option -"
+msgstr "- Wählen Sie eine Option aus -"
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Wert %(value)r ist keine gültige Option."
@@ -690,6 +696,10 @@ msgid "Raw binary data"
 msgstr "Binärdaten"
 
 #, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr "\"%(value)s\" ist kein gültiger Binärwert."
+
+#, python-format
 msgid "“%(value)s” is not a valid UUID."
 msgstr "Wert „%(value)s“ ist keine gültige UUID."
 
@@ -710,7 +720,7 @@ msgstr "Wert muss gültiges JSON sein."
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r is not a valid choice."
-msgstr ""
+msgstr "%(model)s-Instanz mit %(field)s %(value)r ist keine gültige Auswahl."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "Fremdschlüssel (Typ definiert durch verknüpftes Feld)"
@@ -730,8 +740,8 @@ msgid "Many-to-many relationship"
 msgstr "n:m-Beziehung"
 
 #. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
+#. characters will prevent the default label_suffix to be appended to
+#. the label
 msgid ":?.!"
 msgstr ":?.!"
 
@@ -897,6 +907,28 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr "%s ist kein gültiger Binärwert."
+
+msgctxt "Task"
+msgid "Ready"
+msgstr "Bereit"
+
+msgctxt "Task"
+msgid "Running"
+msgstr "Wird ausgeführt"
+
+msgctxt "Task"
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+msgctxt "Task"
+msgid "Successful"
+msgstr "Erfolgreich"
 
 #. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"

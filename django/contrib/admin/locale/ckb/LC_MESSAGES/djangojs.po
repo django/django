@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-20 15:53-0400\n"
-"PO-Revision-Date: 2026-08-05 07:59+0000\n"
-"Last-Translator: Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022-2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -123,7 +123,7 @@ msgid "6 p.m."
 msgstr "6ی ئێوارە."
 
 msgid "server"
-msgstr ""
+msgstr "ڕاژە"
 
 msgid ""
 "Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
@@ -132,7 +132,11 @@ msgid_plural ""
 "Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
 "ahead.)"
 msgstr[0] ""
+"تێبینی: کاتەکان لە ناوچەی کاتی %(timezone)s داخڵ بکە. (تۆ %(offset)s کاتژمێر "
+"لە پێشتریت.)"
 msgstr[1] ""
+"تێبینی: کاتەکان لە ناوچەی کاتی %(timezone)s داخڵ بکە. (تۆ %(offset)s کاتژمێر "
+"لە پێشتریت.)"
 
 msgid ""
 "Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
@@ -141,7 +145,11 @@ msgid_plural ""
 "Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
 "behind.)"
 msgstr[0] ""
+"تێبینی: کاتەکان لە ناوچەی کاتی %(timezone)s داخڵ بکە. (تۆ %(offset)s کاتژمێر "
+"لە پاشتریت.)"
 msgstr[1] ""
+"تێبینی: کاتەکان لە ناوچەی کاتی %(timezone)s داخڵ بکە. (تۆ %(offset)s کاتژمێر "
+"لە پاشتریت.)"
 
 msgid "Choose a Time"
 msgstr "کاتێک دیاریبکە"
@@ -156,7 +164,7 @@ msgid "Today"
 msgstr "ئەمڕۆ"
 
 msgid "Today (%(date)s)"
-msgstr ""
+msgstr "ئەمڕۆ (%(date)s)"
 
 msgid "Choose a Date"
 msgstr "ڕۆژێک دیاریبکە"
@@ -165,19 +173,19 @@ msgid "Yesterday"
 msgstr "دوێنێ"
 
 msgid "Yesterday (%(date)s)"
-msgstr ""
+msgstr "دوێنێ (%(date)s)"
 
 msgid "Tomorrow"
 msgstr "سبەینێ"
 
 msgid "Tomorrow (%(date)s)"
-msgstr ""
+msgstr "سبەینێ (%(date)s)"
 
 msgid "Previous (%(month)s %(year)s)"
-msgstr ""
+msgstr "(%(month)s %(year)s)ی پێشتر"
 
 msgid "Next (%(month)s %(year)s)"
-msgstr ""
+msgstr "(%(month)s %(year)s)ی دواتر"
 
 msgid "January"
 msgstr "کانوونی دووەم"
@@ -341,16 +349,16 @@ msgid "S"
 msgstr "ش"
 
 msgid "%(month)s %(day)s, %(year)s"
-msgstr ""
+msgstr "%(month)s %(day)s، %(year)s"
 
 #, javascript-format
 msgid "%s (today, current selection)"
-msgstr ""
+msgstr "%s (ئەمڕۆ، هەڵبژێردراوی ئێستا)"
 
 #, javascript-format
 msgid "%s (today)"
-msgstr ""
+msgstr "%s (ئەمڕۆ)"
 
 #, javascript-format
 msgid "%s (current selection)"
-msgstr ""
+msgstr "%s (هەڵبژاردەی ئێستا)"
