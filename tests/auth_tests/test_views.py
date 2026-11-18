@@ -1537,7 +1537,9 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
             {"_saveasnew": "Save as new"},
         )
         self.assertEqual(response.status_code, 404)
-        self.assertContains(response, "&quot;Change user&quot; permission", status_code=404)
+        self.assertContains(
+            response, "&quot;Change user&quot; permission", status_code=404
+        )
 
     def test_save_as_new_with_add_and_change_permissions(self):
         user = User.objects.create_user(username="add_change", is_staff=True)
