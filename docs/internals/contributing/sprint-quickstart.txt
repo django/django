@@ -84,6 +84,8 @@ Set up
 
        $ cd docs && make html && cd ..
 
+.. _finding-a-ticket:
+
 Finding a ticket to work on
 ===========================
 
