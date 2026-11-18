@@ -97,7 +97,7 @@ the server or, if ``upload_to`` is a callable, the filename returned by that
 method after any path information is removed. Override this to customize how
 non-standard characters are converted to safe filenames.
 
-The code provided on ``Storage`` retains only alpha-numeric characters, periods
+The code provided on ``Storage`` retains only alphanumeric characters, periods
 and underscores from the original filename, removing everything else.
 
 .. method:: get_alternative_name(file_root, file_ext)
@@ -110,8 +110,8 @@ string is appended to the filename before the extension.
 
 Returns a filename that is available in the storage mechanism, possibly taking
 the provided filename into account. The ``name`` argument passed to this method
-will have already cleaned to a filename valid for the storage system, according
-to the ``get_valid_name()`` method described above.
+will have already been cleaned to a filename valid for the storage system,
+according to the ``get_valid_name()`` method described above.
 
 The length of the filename will not exceed ``max_length``, if provided. If a
 free unique filename cannot be found, a :exc:`SuspiciousFileOperation
