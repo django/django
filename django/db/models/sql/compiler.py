@@ -599,10 +599,14 @@ class SQLCompiler:
 
     def get_combinator_sql(self, combinator, all):
         features = self.connection.features
-        compilers = [
-            query.get_compiler(self.using, self.connection, self.elide_empty)
-            for query in self.query.combined_queries
-        ]
+        compilers = []
+        for query in self.query.combined_queries:
+            if not query.order_by and not query.extra_order_by:
+                query = query.clone()
+                query.default_ordering = False
+            compilers.append(
+                query.get_compiler(self.using, self.connection, self.elide_empty)
+            )
         if not features.supports_slicing_ordering_in_compound:
             for compiler in compilers:
                 if compiler.query.is_sliced:

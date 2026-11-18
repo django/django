@@ -570,6 +570,29 @@ class QuerySetSetOperationTests(TestCase):
         # Combined queries don't mutate.
         self.assertCountEqual(qs, ["a1", "a2"])
 
+    def test_union_with_model_default_ordering(self):
+        e1 = ExtraInfo.objects.create(value=1, info="e1")
+        e2 = ExtraInfo.objects.create(value=2, info="e2")
+        qs1 = ExtraInfo.objects.filter(value=1)
+        qs2 = ExtraInfo.objects.filter(value=2)
+        self.assertSequenceEqual(qs1.union(qs2), [e1, e2])
+
+    def test_union_in_subquery_with_model_default_ordering(self):
+        e1 = ExtraInfo.objects.create(value=7, info="e3")
+        e2 = ExtraInfo.objects.create(value=5, info="e2")
+        Author.objects.create(name="a1", num=7, extra=e1)
+        Author.objects.create(name="a2", num=1, extra=e2)
+        qs1 = ExtraInfo.objects.filter(value=OuterRef("num"))
+        qs2 = ExtraInfo.objects.filter(value__lt=OuterRef("extra__value"))
+        qs = (
+            Author.objects.annotate(
+                info=Subquery(qs1.union(qs2).values("info")[:1]),
+            )
+            .filter(info__isnull=False)
+            .values_list("name", flat=True)
+        )
+        self.assertCountEqual(qs, ["a1"])
+
     def test_union_in_with_ordering(self):
         qs1 = Number.objects.filter(num__gt=7).order_by("num")
         qs2 = Number.objects.filter(num__lt=2).order_by("num")
