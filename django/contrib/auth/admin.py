@@ -119,6 +119,23 @@ class UserAdmin(admin.ModelAdmin):
             return self._add_view(request, form_url, extra_context)
 
     def _add_view(self, request, form_url="", extra_context=None):
+        self._check_add_permission(request)
+        if extra_context is None:
+            extra_context = {}
+        username_field = self.opts.get_field(self.model.USERNAME_FIELD)
+        defaults = {
+            "auto_populated_fields": (),
+            "username_help_text": username_field.help_text,
+        }
+        extra_context.update(defaults)
+        return super().add_view(request, form_url, extra_context)
+
+    def _changeform_view(self, request, object_id, form_url, extra_context):
+        if request.method == "POST" and "_saveasnew" in request.POST:
+            self._check_add_permission(request)
+        return super()._changeform_view(request, object_id, form_url, extra_context)
+
+    def _check_add_permission(self, request):
         # It's an error for a user to have add permission but NOT change
         # permission for users. If we allowed such users to add users, they
         # could create superusers, which would mean they would essentially have
@@ -136,15 +153,6 @@ class UserAdmin(admin.ModelAdmin):
                     "permissions set."
                 )
             raise PermissionDenied
-        if extra_context is None:
-            extra_context = {}
-        username_field = self.opts.get_field(self.model.USERNAME_FIELD)
-        defaults = {
-            "auto_populated_fields": (),
-            "username_help_text": username_field.help_text,
-        }
-        extra_context.update(defaults)
-        return super().add_view(request, form_url, extra_context)
 
     @method_decorator(sensitive_post_parameters())
     def user_change_password(self, request, id, form_url=""):

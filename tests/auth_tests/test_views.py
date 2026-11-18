@@ -1507,6 +1507,58 @@ class ChangelistTests(MessagesTestMixin, AuthViewsTestCase):
             )
         self.assertEqual(response.status_code, 400)
 
+    def test_save_as_new_requires_change_permission(self):
+        user = User.objects.create_user(username="add_only", is_staff=True)
+        user.user_permissions.add(get_perm(User, "add_user"))
+        self.client.force_login(user)
+        data = {
+            "username": "new_user",
+            "usable_password": "true",
+            "password1": "a-long-test-password-123",
+            "password2": "a-long-test-password-123",
+            "_saveasnew": "Save as new",
+        }
+        for url in (
+            reverse("auth_test_admin:auth_user_add"),
+            reverse("auth_test_admin:auth_user_change", args=(user.pk,)),
+        ):
+            with self.subTest(url=url):
+                response = self.client.post(url, data)
+                self.assertEqual(response.status_code, 403)
+                self.assertFalse(User.objects.filter(username="new_user").exists())
+
+    @override_settings(DEBUG=True)
+    def test_save_as_new_requires_change_permission_debug(self):
+        user = User.objects.create_user(username="add_only", is_staff=True)
+        user.user_permissions.add(get_perm(User, "add_user"))
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("auth_test_admin:auth_user_change", args=(user.pk,)),
+            {"_saveasnew": "Save as new"},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "&quot;Change user&quot; permission", status_code=404)
+
+    def test_save_as_new_with_add_and_change_permissions(self):
+        user = User.objects.create_user(username="add_change", is_staff=True)
+        user.user_permissions.add(
+            get_perm(User, "add_user"), get_perm(User, "change_user")
+        )
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("auth_test_admin:auth_user_change", args=(user.pk,)),
+            {
+                "username": "new_user",
+                "usable_password": "true",
+                "password1": "a-long-test-password-123",
+                "password2": "a-long-test-password-123",
+                "_saveasnew": "Save as new",
+                "is_superuser": "on",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(User.objects.get(username="new_user").is_superuser)
+
     def test_user_change_email(self):
         data = self.get_user_data(self.admin)
         data["email"] = "new_" + data["email"]
