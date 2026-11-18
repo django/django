@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
 "Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>, 2023-2024,2026\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
@@ -497,6 +497,9 @@ msgstr "%(model_name)s بىلەن بۇ %(field_labels)s مەۋجۇت."
 msgid "Constraint “%(name)s” is violated."
 msgstr "«%(name)s» چەكلىمىسى بۇزۇلدى."
 
+msgid "- Select an option -"
+msgstr "- بىر رايون تاللىنىدۇ -"
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "قىممەت %(value)r ئىناۋەتسىز."
@@ -566,8 +569,8 @@ msgstr "چېسلا (سائەت مىنۇت يوق)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
-"HH:MM[:ss[.uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
 msgstr ""
 "«%(value)s» قىممىتى ئىناۋەتسىز. ئۇ چوقۇم YYYY-MM-DD HH: MM [: ss [.uuuuuu]] "
 "[TZ] شەكلىدە بولۇشى كېرەك."
@@ -592,8 +595,8 @@ msgstr "ئونلۇق سان"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] "
-"[[HH:]MM:]ss[.uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
 msgstr ""
 "«%(value)s» قىممىتى ئىناۋەتسىز. ئۇ چوقۇم [DD] [[HH:] MM:] ss [.uuuuuu] "
 "شەكلىدە بولۇشى كېرەك."
@@ -680,6 +683,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "خام ئىككىلىك سان"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr "«%(value)s» ئىناۋەتلىك ئىككىلىك قىممەت ئەمەس."
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -887,6 +894,12 @@ msgstr "ھەئە"
 
 msgid "No"
 msgstr "ياق"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr "بېرىلگەن سۈرۈشتۈرۈشكە ھېچقانداق %s ماس كەلمىدى."
 
 msgctxt "Task"
 msgid "Ready"
@@ -1295,11 +1308,11 @@ msgstr "%(verbose_name_plural)s يوق"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because "
-"%(class_name)s.allow_future is False."
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
 msgstr ""
-"كەلگۈسى %(verbose_name_plural)s ئىشلەتكىلى بولمايدۇ ، چۈنكى "
-"%(class_name)s.allow_future بولسا False."
+"كەلگۈسى %(verbose_name_plural)s ئىشلەتكىلى بولمايدۇ ، چۈنكى %(class_name)s."
+"allow_future بولسا False."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

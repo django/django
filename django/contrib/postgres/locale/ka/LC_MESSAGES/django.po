@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
-"Language-Team: Georgian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: André Bouatchidzé <a@anbz.net>, 2015\n"
+"Language-Team: Georgian (http://app.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,29 +22,29 @@ msgstr "PostgreSQL-ის გაფართოებები"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
-msgstr ""
+msgstr "ელემენტი %(nth)s მასივში სწორი არაა:"
 
 msgid "Nested arrays must have the same length."
-msgstr ""
+msgstr "ერთმანეთში ჩალაგებულ მასივებს ტოლი სიგრძე უნდა ჰქონდეთ."
 
 msgid "Map of strings to strings/nulls"
-msgstr ""
+msgstr "სტრიქონების ასახვა სტრიქონებზე/ნულებზე"
 
 #, python-format
 msgid "The value of “%(key)s” is not a string or null."
-msgstr ""
+msgstr "“%(key)s”-ის მნიშვნელობა სტრიქონი, ან ნული არაა."
 
 msgid "Could not load JSON data."
-msgstr ""
+msgstr "JSON მონაცემების ჩატვირთვა შეუძლებელია."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "შეყვანა JSON ლექსიკონი უნდა იყოს."
 
 msgid "Enter two valid values."
-msgstr ""
+msgstr "შეიყვანეთ ორი სწორი მნიშვნელობა."
 
 msgid "The start of the range must not exceed the end of the range."
-msgstr ""
+msgstr "შუალედის დასაწყისი მის დასასრულზე მეტი არ უნდა იყოს."
 
 msgid "Enter two whole numbers."
 msgstr "შეიყვანეთ ორი მთელი რიცხვი."
@@ -53,10 +53,10 @@ msgid "Enter two numbers."
 msgstr "შეიყვანეთ ორი რიცხვი."
 
 msgid "Enter two valid date/times."
-msgstr ""
+msgstr "შეიყვანეთ ორი სწორი თარიღი/დრო."
 
 msgid "Enter two valid dates."
-msgstr ""
+msgstr "შეიყვანეთ ორი სწორი თარიღი."
 
 #, python-format
 msgid ""
@@ -66,7 +66,11 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
+"სია შეიცავს %(show_value)d ელემენტის. ის არ უნდა შეიცავდეს %(limit_value)d-"
+"ზე მეტს."
 msgstr[1] ""
+"სია შეიცავს %(show_value)d ელემენტის. ის არ უნდა შეიცავდეს %(limit_value)d-"
+"ზე მეტს."
 
 #, python-format
 msgid ""
@@ -76,23 +80,26 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
+"სია შეიცავს %(show_value)d ელემენტის. ის არ უნდა შეიცავდეს %(limit_value)d-"
+"ზე ნაკლებს."
 msgstr[1] ""
+"სია შეიცავს %(show_value)d ელემენტის. ის არ უნდა შეიცავდეს %(limit_value)d-"
+"ზე ნაკლებს."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr ""
+msgstr "აკლია ზოგიერთი გასაღები: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
-msgstr ""
+msgstr "მოწოდებულია რამდენიმე უცნობი გასაღები: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr ""
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr "დარწმუნდით, რომ შუალედის ზედა ზღვარი %(limit_value)s-ზე მეტი არაა."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr ""
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr "დარწმუნდით, რომ შუალედის ქვედა ზღვარი %(limit_value)s-ზე ნაკლები არაა."

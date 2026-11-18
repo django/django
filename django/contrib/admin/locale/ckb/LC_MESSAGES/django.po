@@ -7,14 +7,14 @@
 # Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2020
 # Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026
 # pejar hewrami <gumle@protonmail.com>, 2020
-# Swara <swara09@gmail.com>, 2022,2024-2025
+# Swara <swara09@gmail.com>, 2022,2024-2026
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-22 16:14-0400\n"
-"PO-Revision-Date: 2026-08-05 07:05+0000\n"
-"Last-Translator: Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022,2024-2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -190,7 +190,7 @@ msgstr "ئەم تەنە هەڵبژێرە بۆ کردارێک - {}"
 
 #, python-format
 msgid "The app \"%s\" could not be found."
-msgstr ""
+msgstr "ناتوانرێت ئەپی \"%s\" بدۆزرێتەوە."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -291,13 +291,13 @@ msgstr "%(instance)sی %(class_name)s"
 #. Translators: This string is used as a
 #. separator between list elements.
 msgid ", "
-msgstr ""
+msgstr "،"
 
 #, python-format
 msgid "…and %(count)d more object."
 msgid_plural "…and %(count)d more objects."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "…هەروەها %(count)d دانەی تر."
+msgstr[1] "…هەروەها %(count)d دانەی تر."
 
 #, python-format
 msgid ""
@@ -476,7 +476,7 @@ msgstr "گۆڕینی ڕووکار (ڕووکاری ئێستا: تاریک)"
 
 #, python-format
 msgid "Filter by %(field_name)s"
-msgstr ""
+msgstr "پاڵاوتن بەپێی %(field_name)s"
 
 #, python-format
 msgid ""
@@ -686,7 +686,7 @@ msgid "View selected %(model)s"
 msgstr "سەیری %(model)s هەڵبژێردراوەکان بکە"
 
 msgid "Logout"
-msgstr ""
+msgstr "چوونەدەرەوە"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "سوپاس بۆ بەسەربردنی هەندێک کاتێکی ئەمڕۆ لەگەڵ ماڵپەڕەکەدا."

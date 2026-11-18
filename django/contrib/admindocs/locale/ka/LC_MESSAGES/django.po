@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Georgian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>, 2011\n"
+"Language-Team: Georgian (http://app.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -50,7 +50,7 @@ msgstr ""
 "გვერდს აგენერირებს."
 
 msgid "Tags"
-msgstr "ტეგები"
+msgstr "ჭდეები"
 
 msgid "List of all the template tags and their functions."
 msgstr "ყველა შაბლონის ტეგის სია და მათი ფუნქციები."
@@ -87,12 +87,12 @@ msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
 
 msgid "Please install docutils"
-msgstr "გთხოვთ, დააყენოთ docutils"
+msgstr "დააყენეთ docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
-"\">docutils</a> library."
+"The admin documentation system requires Python’s <a "
+"href=\"%(link)s\">docutils</a> library."
 msgstr ""
 
 #, python-format
@@ -105,7 +105,7 @@ msgid "Model: %(name)s"
 msgstr "მოდელი: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "ველები"
 
 msgid "Field"
 msgstr "ველი"
@@ -117,53 +117,53 @@ msgid "Description"
 msgstr "აღწერა"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "მეთოდები არგუმენტებით"
 
 msgid "Method"
-msgstr ""
+msgstr "მეთოდი"
 
 msgid "Arguments"
-msgstr ""
+msgstr "არგუმენტები"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "მოდელის დოკუმენტაციაზე დაბრუნება"
 
 msgid "Model documentation"
 msgstr "მოდელის დოკუმენტაცია"
 
 msgid "Model groups"
-msgstr ""
+msgstr "მოდელის ჯგუფები"
 
 msgid "Templates"
-msgstr "შაბლონები"
+msgstr "ნიმუშები"
 
 #, python-format
 msgid "Template: %(name)s"
-msgstr "შაბლონი: %(name)s"
+msgstr "ნიმუში: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "შაბლონი: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "ნიმუში: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "ძებნის ბილიკი ნიმუშისთვის <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(არ არსებობს)"
 
 msgid "Back to Documentation"
-msgstr ""
+msgstr "დოკუმენტაციაზე დაბრუნება"
 
 msgid "Template filters"
-msgstr "შაბლონის ფილტრები"
+msgstr "ნიმუშის ფილტრები"
 
 msgid "Template filter documentation"
-msgstr ""
+msgstr "ნიმუშის ფილტრის დოკუმენტაცია"
 
 msgid "Built-in filters"
-msgstr ""
+msgstr "ჩაშენებული ფილტრები"
 
 #, python-format
 msgid ""
@@ -172,13 +172,13 @@ msgid ""
 msgstr ""
 
 msgid "Template tags"
-msgstr "შაბლონის ტეგები"
+msgstr "ნიმუშის ჭდეები"
 
 msgid "Template tag documentation"
-msgstr "შაბლონის ტეგების დოკუმენტაცია"
+msgstr "ნიმუშის ჭდის დოკუმენტაცია"
 
 msgid "Built-in tags"
-msgstr ""
+msgstr "ჩაშენებული ჭდეები"
 
 #, python-format
 msgid ""
@@ -191,22 +191,22 @@ msgid "View: %(name)s"
 msgstr "ხედი: %(name)s"
 
 msgid "Context:"
-msgstr "კონტექსტი"
+msgstr "კონტექსტი:"
 
 msgid "Templates:"
-msgstr "შაბლონები:"
+msgstr "ნიმუშები:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "ხედის დოკუმენტაციაზე დაბრუნება"
 
 msgid "View documentation"
 msgstr "ხედების დოკუმენტაცია"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "გადასვლა სახელების სივრცეზე"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "სახელების სივრცის დაცარიელება"
 
 #, python-format
 msgid "Views by namespace %(name)s"
@@ -223,7 +223,7 @@ msgid ""
 msgstr ""
 
 msgid "tag:"
-msgstr "ტეგი:"
+msgstr "ჭდე:"
 
 msgid "filter:"
 msgstr "ფილტრი:"

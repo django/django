@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abduqadir Abliz <sahranbay@gmail.com>, 2023
+# Abduqadir Abliz <sahranbay@gmail.com>, 2023,2026
 # Azat, 2023,2025
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-18 15:04-0300\n"
-"PO-Revision-Date: 2025-03-25 15:04-0500\n"
-"Last-Translator: Azat, 2023,2025\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>, 2023,2026\n"
 "Language-Team: Uyghur (http://app.transifex.com/django/django/language/ug/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -93,12 +93,12 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"سىز بىر ھەرىكەتنى تاللىدىڭىز ، ھەمدە ئايرىم ساھەدە ھېچقانداق ئۆزگەرتىش ئېلىپ "
-"بارمىدىڭىز. سىز «ساقلاش» كۇنۇپكىسىنى ئەمەس ، بەلكى Go كۇنۇپكىسىنى "
-"ئىزدەۋاتقان بولۇشىڭىز مۇمكىن."
+"سىز بىر مەشغۇلاتنى تاللىدىڭىز ھەمدە ئايرىم بۆلەكتە ھېچقانداق ئۆزگەرتىش ئېلىپ "
+"بارمىدىڭىز. سىز ساقلا توپچىنى ئەمەس بەلكى ئىجرا قىل توپچىسىنى ئىزدەۋاتقان "
+"بولۇشىڭىز مۇمكىن."
 
 msgid "Now"
 msgstr "ھازىرلا"
@@ -115,17 +115,34 @@ msgstr "چۈش"
 msgid "6 p.m."
 msgstr "6 p.m."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "ئەسكەرتىش: سىز مۇلازىمېتىر ۋاقتىدىن %s سائەت ئالدىدا."
-msgstr[1] "ئەسكەرتىش: سىز مۇلازىمېتىر ۋاقتىدىن %s سائەت ئالدىدا."
+msgid "server"
+msgstr "مۇلازىمېتىر"
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "ئەسكەرتىش: سىز مۇلازىمېتىر ۋاقتىدىن %s سائەت ئارقىدا."
-msgstr[1] "ئەسكەرتىش: سىز مۇلازىمېتىر ۋاقتىدىن %s سائەت ئارقىدا."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+"ئەسكەرتىش: %(timezone)s ۋاقىت رايونىنىڭ ۋاقتى كىرگۈزۈلىدۇ. (سىز %(offset)s "
+"سائەت ئالدىدا.)"
+msgstr[1] ""
+"ئەسكەرتىش: %(timezone)s ۋاقىت رايونىنىڭ ۋاقتى كىرگۈزۈلىدۇ. (سىز %(offset)s "
+"سائەت ئالدىدا.)"
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+"ئەسكەرتىش: %(timezone)s ۋاقىت رايونىنىڭ ۋاقتى كىرگۈزۈلىدۇ. (سىز %(offset)s "
+"سائەت كەينىدە.)"
+msgstr[1] ""
+"ئەسكەرتىش: %(timezone)s ۋاقىت رايونىنىڭ ۋاقتى كىرگۈزۈلىدۇ. (سىز %(offset)s "
+"سائەت كەينىدە.)"
 
 msgid "Choose a Time"
 msgstr "بىر ۋاقىت تاللاڭ"
@@ -139,14 +156,29 @@ msgstr "ۋاز كەچ"
 msgid "Today"
 msgstr "بۈگۈن"
 
+msgid "Today (%(date)s)"
+msgstr "بۈگۈن (%(date)s)"
+
 msgid "Choose a Date"
 msgstr "بىر چېسلا تاللاڭ"
 
 msgid "Yesterday"
 msgstr "تۈنۈگۈن"
 
+msgid "Yesterday (%(date)s)"
+msgstr "تۈنۈگۈن (%(date)s)"
+
 msgid "Tomorrow"
 msgstr "ئەتە"
+
+msgid "Tomorrow (%(date)s)"
+msgstr "ئەتە (%(date)s)"
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr "ئالدىنقى (%(month)s %(year)s)"
+
+msgid "Next (%(month)s %(year)s)"
+msgstr "كېيىنكى (%(month)s %(year)s)"
 
 msgid "January"
 msgstr "يانۋار"
@@ -308,3 +340,18 @@ msgstr "F"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr "%(year)s-يىلى %(day)s-%(month)s"
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr "%s (بۈگۈن، نۆۋەتتىكى تاللاش)"
+
+#, javascript-format
+msgid "%s (today)"
+msgstr "%s (بۈگۈن)"
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr "%s (نۆۋەتتىكى تاللاش)"

@@ -10,7 +10,7 @@
 # tcc <tcchou@tcchou.org>, 2011
 # Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
 # W. H. Wang <mattwang44@gmail.com>, 2025
-# YAO WEN LIANG, 2024
+# YAO WEN LIANG, 2024,2026
 # Yeh-Yung <yyc1217@gmail.com>, 2013
 # coby2023t, 2024
 # Yeh-Yung <yyc1217@gmail.com>, 2012
@@ -18,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-06-01 07:05+0000\n"
-"Last-Translator: coby2023t, 2025-2026\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: YAO WEN LIANG, 2024,2026\n"
 "Language-Team: Chinese (Taiwan) (http://app.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -186,8 +186,13 @@ msgstr "無"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "按住 \"Control\", 或者在 Mac 上按 \"Command\", 以選取更多值"
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "選擇此對象進行操作 - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -244,13 +249,13 @@ msgstr "修改 %s"
 msgid "View %s"
 msgstr "查看 %s"
 
-msgid "Database error"
-msgstr "資料庫錯誤"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "共 %(count)s %(name)s 已修改成功。"
+
+msgid "Database error"
+msgstr "資料庫錯誤"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -274,6 +279,16 @@ msgstr "修改歷史: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ""
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] ""
 
 #, python-format
 msgid ""
@@ -327,9 +342,6 @@ msgstr ""
 msgid "Run"
 msgstr "執行"
 
-msgid "Click here to select the objects across all pages"
-msgstr "點選這裡可選取全部頁面的物件"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "選擇全部 %(total_count)s %(module_name)s"
@@ -339,10 +351,6 @@ msgstr "清除選擇"
 
 msgid "Breadcrumbs"
 msgstr "導覽路徑"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s 應用程式中的模型"
 
 msgid "Model name"
 msgstr "模型名稱"
@@ -453,12 +461,16 @@ msgid "Toggle theme (current theme: dark)"
 msgstr "切換主題（當前主題:深色）"
 
 #, python-format
+msgid "Filter by %(field_name)s"
+msgstr ""
+
+#, python-format
 msgid ""
 "Deleting the %(object_name)s “%(escaped_object)s” would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"刪除 %(object_name)s '%(escaped_object)s' 將一併刪除相關的物件，只是貴帳號並"
+"刪除 %(object_name)s '%(escaped_object)s' 將一併刪除相關的物件，只是此帳號並"
 "沒有刪除下列物件的權限:"
 
 #, python-format
@@ -648,6 +660,9 @@ msgstr "刪除所選的 %(model)s"
 msgid "View selected %(model)s"
 msgstr "查看已選擇的%(model)s"
 
+msgid "Logout"
+msgstr ""
+
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "感謝您今天在網站上度過了一段美好的時光。"
 
@@ -717,7 +732,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "請到該頁面選擇一個新的密碼："
 
 msgid "In case you’ve forgotten, you are:"
-msgstr "如果您真忘了，您是: "
+msgstr "如果您忘了，您是: "
 
 msgid "Thanks for using our site!"
 msgstr "感謝使用本網站！"

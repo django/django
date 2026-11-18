@@ -3,15 +3,16 @@
 # Translators:
 # angularcircle, 2011-2013
 # angularcircle, 2013-2014
+# Franciszek Domański, 2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@trilab.pl>, 2014-2015
 # Karol <kfuks2@o2.pl>, 2012
 # 0d5641585fd67fbdb97037c19ab83e4c_18c98b0 <f6e7dac08616696bd890d93a38e13b13_5231>, 2011
 # 0d5641585fd67fbdb97037c19ab83e4c_18c98b0 <f6e7dac08616696bd890d93a38e13b13_5231>, 2011
-# Maciej Olko <maciej.olko@gmail.com>, 2016-2022
-# Maciej Olko <maciej.olko@gmail.com>, 2023
-# Maciej Olko <maciej.olko@gmail.com>, 2015
-# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020,2022-2025
+# Maciej Olko, 2016-2022
+# Maciej Olko, 2023
+# Maciej Olko, 2015
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020,2022-2026
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Roman Barczyński, 2014
@@ -20,10 +21,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 07:05+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
 "Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, "
-"2020,2022-2025\n"
+"2020,2022-2026\n"
 "Language-Team: Polish (http://app.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -194,8 +195,13 @@ msgstr ""
 "Przytrzymaj wciśnięty klawisz „Ctrl” lub „Command” na Macu, aby zaznaczyć "
 "więcej niż jeden wybór."
 
+#, python-brace-format
 msgid "Select this object for an action - {}"
 msgstr "Wybierz ten obiekt do wykonania akcji - {}"
+
+#, python-format
+msgid "The app \"%s\" could not be found."
+msgstr "Aplikacja \"%s\" nie została znaleziona"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -260,9 +266,6 @@ msgstr "Zmień %s"
 msgid "View %s"
 msgstr "Zobacz %s"
 
-msgid "Database error"
-msgstr "Błąd bazy danych"
-
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -270,6 +273,9 @@ msgstr[0] "%(count)s %(name)s został(a)(-ło) pomyślnie zmieniony(-na)(-ne)."
 msgstr[1] "%(count)s %(name)s zostały(-ło) pomyślnie zmienione(-nych)."
 msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
 msgstr[3] "%(count)s %(name)s zostało pomyślnie zmienione."
+
+msgid "Database error"
+msgstr "Błąd bazy danych"
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -296,6 +302,19 @@ msgstr "Historia zmian: %s"
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
+
+#. Translators: This string is used as a
+#. separator between list elements.
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "…and %(count)d more object."
+msgid_plural "…and %(count)d more objects."
+msgstr[0] "…i %(count)d więcej obiekt"
+msgstr[1] "…i %(count)d więcej obiekty"
+msgstr[2] "…i %(count)d więcej obiektów"
+msgstr[3] "…i %(count)d więcej obiektów"
 
 #, python-format
 msgid ""
@@ -349,9 +368,6 @@ msgstr ""
 msgid "Run"
 msgstr "Uruchom"
 
-msgid "Click here to select the objects across all pages"
-msgstr "Kliknij by wybrać obiekty na wszystkich stronach"
-
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Wybierz wszystkie(-kich) %(total_count)s %(module_name)s"
@@ -361,10 +377,6 @@ msgstr "Wyczyść wybór"
 
 msgid "Breadcrumbs"
 msgstr "Breadcrumbs"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modele w aplikacji %(name)s"
 
 msgid "Model name"
 msgstr "Nazwa modelu"
@@ -478,6 +490,10 @@ msgstr "Przełącz motyw (bieżący motyw: jasny)"
 
 msgid "Toggle theme (current theme: dark)"
 msgstr "Przełącz motyw (bieżący motyw: ciemny)"
+
+#, python-format
+msgid "Filter by %(field_name)s"
+msgstr "Filtruj przez %(field_name)s"
 
 #, python-format
 msgid ""
@@ -689,6 +705,9 @@ msgstr "Usuń wybraną(-ne)(-nego)(-ny) %(model)s"
 #, python-format
 msgid "View selected %(model)s"
 msgstr "Obejrzyj wybraną(-ne)(-nego)(-ny) %(model)s"
+
+msgid "Logout"
+msgstr "Wyloguj"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Dzięki za spędzenie cennego czasu ze stroną."
