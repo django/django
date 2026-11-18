@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-22 16:14-0400\n"
-"PO-Revision-Date: 2026-08-05 06:49+0000\n"
-"Last-Translator: Kosar Tofiq Saeed <kosar.belana@gmail.com>, 2026\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022-2026\n"
 "Language-Team: Central Kurdish (http://app.transifex.com/django/django/"
 "language/ckb/)\n"
 "MIME-Version: 1.0\n"
@@ -488,7 +488,7 @@ msgid "Constraint “%(name)s” is violated."
 msgstr "سنوردارکردنی “%(name)s” پێشێلکراوە."
 
 msgid "- Select an option -"
-msgstr ""
+msgstr "- بژاردەیەک هەڵبژێرە -"
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -557,11 +557,11 @@ msgstr "بەروار (بەبێ کات)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
-"HH:MM[:ss[.uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
 msgstr ""
-"بەهای “%(value)s” شێوازێکی نادروستی هەیە. دەبێت بەشێوەی  YYYY-MM-DD "
-"HH:MM[:ss[.uuuuuu]][TZ] بێت."
+"بەهای “%(value)s” شێوازێکی نادروستی هەیە. دەبێت بەشێوەی  YYYY-MM-DD HH:MM[:"
+"ss[.uuuuuu]][TZ] بێت."
 
 #, python-format
 msgid ""
@@ -583,11 +583,11 @@ msgstr "ژمارەی دەیی"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] "
-"[[HH:]MM:]ss[.uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
 msgstr ""
-"بەهای “%(value)s” شێوازێکی هەڵەی هەیە. دەبێت بەشێوەی [DD] "
-"[[HH:]MM:]ss[.uuuuuu] format بێت."
+"بەهای “%(value)s” شێوازێکی هەڵەی هەیە. دەبێت بەشێوەی [DD] [[HH:]MM:]ss[."
+"uuuuuu] format بێت."
 
 msgid "Duration"
 msgstr "ماوە"
@@ -673,7 +673,7 @@ msgstr "داتای دووانەیی خاو"
 
 #, python-format
 msgid "“%(value)s” is not a valid binary value."
-msgstr ""
+msgstr "“%(value)s” بەهایەکی دووانەیی دروست نییە."
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -882,7 +882,7 @@ msgstr "نەخێر"
 #. given query."
 #, python-format
 msgid "No %s matches the given query."
-msgstr ""
+msgstr "هیچ %s ـێکی گونجاو بۆ ئەم گەڕانە نەدۆزرایەوە."
 
 msgctxt "Task"
 msgid "Ready"
@@ -1288,11 +1288,11 @@ msgstr "هیچ %(verbose_name_plural)s بەردەست نییە"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because "
-"%(class_name)s.allow_future is False."
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
 msgstr ""
-"لەداهاتوودا %(verbose_name_plural)s بەردەست نیە چونکە "
-"%(class_name)s.allow_future چەوتە."
+"لەداهاتوودا %(verbose_name_plural)s بەردەست نیە چونکە %(class_name)s."
+"allow_future چەوتە."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"

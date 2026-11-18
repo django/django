@@ -12,7 +12,8 @@
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023-2025
+# Shinya Okano (tokibito) <tokibito@gmail.com>, 2012-2019,2021,2023-2025
+# Shinya Okano (tokibito) <tokibito@gmail.com>, 2026
 # TANIGUCHI Taichi, 2022
 # TAKAHASHI Shuuji <shuuji3@gmail.com>, 2026
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
@@ -22,9 +23,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 06:49+0000\n"
-"Last-Translator: TAKAHASHI Shuuji <shuuji3@gmail.com>, 2026\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Shinya Okano (tokibito) <tokibito@gmail.com>, 2026\n"
 "Language-Team: Japanese (http://app.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -493,6 +494,9 @@ msgstr "この %(field_labels)s を持った %(model_name)s が既に存在し�
 msgid "Constraint “%(name)s” is violated."
 msgstr "制約 “%(name)s” に違反しています。"
 
+msgid "- Select an option -"
+msgstr "- オプションを選択 -"
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r は有効な選択肢ではありません。"
@@ -559,8 +563,8 @@ msgstr "日付"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
-"HH:MM[:ss[.uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
 msgstr ""
 "“%(value)s” は無効な形式の値です。 YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] 形式で"
 "なければなりません。"
@@ -585,8 +589,8 @@ msgstr "10 進数 (小数可)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] "
-"[[HH:]MM:]ss[.uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
 msgstr ""
 "“%(value)s” は無効な形式の値です。 [DD] [HH:[MM:]]ss[.uuuuuu] 形式でなければ"
 "なりません。"
@@ -671,6 +675,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "生のバイナリデータ"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr "\"%(value)s\"は無効なバイナリ値です。"
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -877,6 +885,12 @@ msgstr "はい"
 
 msgid "No"
 msgstr "いいえ"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr "クエリに一致する%sは見つかりませんでした。"
 
 msgctxt "Task"
 msgid "Ready"
@@ -1274,8 +1288,8 @@ msgstr "%(verbose_name_plural)s は利用できません"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because "
-"%(class_name)s.allow_future is False."
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
 msgstr ""
 "%(class_name)s.allow_futureがFalseであるため、未来の%(verbose_name_plural)sは"
 "利用できません。"

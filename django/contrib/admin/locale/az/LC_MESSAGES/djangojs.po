@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2026-03-09 07:59+0000\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
 "Last-Translator: Nijat Mammadov, 2024-2026\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
@@ -100,11 +100,12 @@ msgstr ""
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
-"fields. You’re probably looking for the Go button rather than the Save "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"Əməliyyat seçmisiniz və fərdi xanalarda heç bir dəyişiklik etməmisiniz. "
-"Böyük ehtimal Saxla düyməsi yerinə İrəli düyməsinə ehtiyyacınız var."
+" Siz əməliyyat seçmisiniz, lakin fərdi sahələrdə heç bir dəyişiklik "
+"etməmisiniz. Ehtimal ki, \"Saxla\" düyməsi əvəzinə \"İcra et\" düyməsini "
+"axtarırsınız."
 
 msgid "Now"
 msgstr "İndi"
@@ -121,17 +122,34 @@ msgstr "Günorta"
 msgid "6 p.m."
 msgstr "Axşam 6"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Diqqət: Server vaxtından %s saat irəlidəsiniz."
-msgstr[1] "Qeyd: Server vaxtından %s saat irəlidəsiniz."
+msgid "server"
+msgstr "server"
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Diqqət: Server vaxtından %s saat geridəsiniz."
-msgstr[1] "Qeyd: Server vaxtından %s saat geridəsiniz."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+"Qeyd: Vaxtları %(timezone)s saat qurşağında daxil edin. (Siz %(offset)s saat "
+"irləidəsiniz.)"
+msgstr[1] ""
+"Qeyd: Vaxtları %(timezone)s saat qurşağında daxil edin. (Siz %(offset)s saat "
+"irləidəsiniz.)"
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+"Qeyd: Vaxtları %(timezone)s saat qurşağında daxil edin. (Siz%(offset)s saat "
+"geridəsiniz.)"
+msgstr[1] ""
+"Qeyd: Vaxtları %(timezone)s saat qurşağında daxil edin. (Siz %(offset)s saat "
+"geridəsiniz.)"
 
 msgid "Choose a Time"
 msgstr "Vaxt Seçin"
@@ -145,14 +163,29 @@ msgstr "İmtina"
 msgid "Today"
 msgstr "Bu gün"
 
+msgid "Today (%(date)s)"
+msgstr "Bu gün (%(date)s)"
+
 msgid "Choose a Date"
 msgstr "Tarix Seçin"
 
 msgid "Yesterday"
 msgstr "Dünən"
 
+msgid "Yesterday (%(date)s)"
+msgstr "Dünən (%(date)s)"
+
 msgid "Tomorrow"
 msgstr "Sabah"
+
+msgid "Tomorrow (%(date)s)"
+msgstr "Sabah (%(date)s)"
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr "Öncəki (%(month)s %(year)s)"
+
+msgid "Next (%(month)s %(year)s)"
+msgstr "Sonrakı (%(month)s %(year)s)"
 
 msgid "January"
 msgstr "Yanvar"
@@ -314,3 +347,18 @@ msgstr "C"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Ş"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr "%(day)s %(month)s %(year)s"
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr "%s (bu gün; hazırki seçiminiz)"
+
+#, javascript-format
+msgid "%s (today)"
+msgstr "%s (bu gün)"
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr "%s (hazırki seçim)"

@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Jakub Boukal, 2026
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jan Papež <honyczek@centrum.cz>, 2024
 # Jiří Podhorecký <jirka.p@volny.cz>, 2024
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-25 15:04-0500\n"
-"PO-Revision-Date: 2026-06-01 07:59+0000\n"
-"Last-Translator: J Nezbeda, 2026\n"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Jakub Boukal, 2026\n"
 "Language-Team: Czech (http://app.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,6 +33,7 @@ msgstr "Dostupné položky: %s"
 msgid ""
 "Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
+"Vyberte položky %s výběrem a poté klepněte na tlačítko se šipkou \"Vybrat\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -48,7 +50,7 @@ msgstr "Vybrat vše %s"
 
 #, javascript-format
 msgid "Choose selected %s"
-msgstr ""
+msgstr "Vybrat vybrané %s"
 
 #, javascript-format
 msgid "Remove selected %s"
@@ -62,6 +64,8 @@ msgstr "Vybrané položky %s"
 msgid ""
 "Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
+"Chcete-li položky %s odstranit, vyberte je a poté klikněte na tlačítko se "
+"šipkou \"Odstranit\"."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
@@ -109,6 +113,8 @@ msgid ""
 "fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
+"Vybrali jste akci, ale v jednotlivých polích jste neprovedli žádné změny. "
+"Pravděpodobně hledáte tlačítko \"Spustit\" místo tlačítka \"Uložit\"."
 
 msgid "Now"
 msgstr "Nyní"
@@ -125,21 +131,46 @@ msgstr "Poledne"
 msgid "6 p.m."
 msgstr "6h večer"
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Poznámka: Váš čas o %s hodinu předstihuje čas na serveru."
-msgstr[1] "Poznámka: Váš čas o %s hodiny předstihuje čas na serveru."
-msgstr[2] "Poznámka: Váš čas o %s hodiny předstihuje čas na serveru."
-msgstr[3] "Poznámka: Váš čas o %s hodin předstihuje čas na serveru."
+msgid "server"
+msgstr "server"
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Poznámka: Váš čas se o %s hodinu zpožďuje za časem na serveru."
-msgstr[1] "Poznámka: Váš čas se o %s hodiny zpožďuje za časem na serveru."
-msgstr[2] "Poznámka: Váš čas se o %s hodiny zpožďuje za časem na serveru."
-msgstr[3] "Poznámka: Váš čas se o %s hodin zpožďuje za časem na serveru."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+"Poznámka: Časy zadávejte v časovém pásmu %(timezone)s. (Jste o %(offset)s "
+"hodinu napřed.)"
+msgstr[1] ""
+"Poznámka: Časy zadávejte v časovém pásmu %(timezone)s. (Jste o %(offset)s "
+"hodiny napřed.)"
+msgstr[2] ""
+"Poznámka: Časy zadávejte v časovém pásmu %(timezone)s. (Jste o %(offset)s "
+"hodin napřed.)"
+msgstr[3] ""
+"Poznámka: Časy zadávejte v časovém pásmu %(timezone)s. (Jste o %(offset)s "
+"hodin napřed.)"
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+"Poznámka: Časy zadávejte v časovém pásmu %(timezone)s. (Jste o %(offset)s "
+"hodinu pozadu.)"
+msgstr[1] ""
+"Poznámka: Časy zadávejte v časovém pásmu %(timezone)s. (Jste o %(offset)s "
+"hodiny pozadu.)"
+msgstr[2] ""
+"Poznámka: Časy zadávejte v časovém pásmu %(timezone)s. (Jste o %(offset)s "
+"hodin pozadu.)"
+msgstr[3] ""
+"Poznámka: Časy zadávejte v časovém pásmu %(timezone)s. (Jste o %(offset)s "
+"hodin pozadu.)"
 
 msgid "Choose a Time"
 msgstr "Vyberte čas"
@@ -153,14 +184,29 @@ msgstr "Storno"
 msgid "Today"
 msgstr "Dnes"
 
+msgid "Today (%(date)s)"
+msgstr "Dnes (%(date)s)"
+
 msgid "Choose a Date"
 msgstr "Vyberte datum"
 
 msgid "Yesterday"
 msgstr "Včera"
 
+msgid "Yesterday (%(date)s)"
+msgstr "Včera (%(date)s)"
+
 msgid "Tomorrow"
 msgstr "Zítra"
+
+msgid "Tomorrow (%(date)s)"
+msgstr "Zítra (%(date)s)"
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr "Předchozí (%(month)s %(year)s)"
+
+msgid "Next (%(month)s %(year)s)"
+msgstr "Příští (%(month)s %(year)s)"
 
 msgid "January"
 msgstr "leden"
@@ -322,3 +368,18 @@ msgstr "P"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid "%(month)s %(day)s, %(year)s"
+msgstr "%(day)s %(month)s %(year)s"
+
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr "%s (dnes, aktuální výběr)"
+
+#, javascript-format
+msgid "%s (today)"
+msgstr "%s (dnes)"
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr "%s (aktuální výběr)"

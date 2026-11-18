@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2026-03-09 06:49+0000\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
 "Last-Translator: Nijat Mammadov, 2024-2026\n"
 "Language-Team: Azerbaijani (http://app.transifex.com/django/django/language/"
 "az/)\n"
@@ -497,6 +497,9 @@ msgstr "%(field_labels)s ilə %(model_name)s artıq mövcuddur."
 msgid "Constraint “%(name)s” is violated."
 msgstr "“%(name)s” məhdudiyyəti pozuldu."
 
+msgid "- Select an option -"
+msgstr "- Seçim edin -"
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r dəyəri doğru seçim deyil."
@@ -564,8 +567,8 @@ msgstr "Tarix (saatsız)"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD "
-"HH:MM[:ss[.uuuuuu]][TZ] format."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
 msgstr ""
 "“%(value)s” dəyərinin formatı səhvdir. Formatı YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ] olmalıdır."
@@ -590,8 +593,8 @@ msgstr "Rasional ədəd"
 
 #, python-format
 msgid ""
-"“%(value)s” value has an invalid format. It must be in [DD] "
-"[[HH:]MM:]ss[.uuuuuu] format."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
+"uuuuuu] format."
 msgstr ""
 "“%(value)s” dəyərinin formatı səhvdir. Formatı [DD] [HH:[MM:]]ss[.uuuuuu] "
 "olmalıdır."
@@ -677,6 +680,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Xam ikili məlumat"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr "“%(value)s” ikili bir dəyər deyil."
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -884,6 +891,12 @@ msgstr "Hə"
 
 msgid "No"
 msgstr "Yox"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr "Verilən sorğuya uyğun heç bir %s tapılmadı."
 
 msgctxt "Task"
 msgid "Ready"
@@ -1289,11 +1302,11 @@ msgstr "%(verbose_name_plural)s seçmək mümkün deyil"
 
 #, python-format
 msgid ""
-"Future %(verbose_name_plural)s not available because "
-"%(class_name)s.allow_future is False."
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
 msgstr ""
-"Gələcək %(verbose_name_plural)s seçmək mümkün deyil, çünki "
-"%(class_name)s.allow_future Yalan kimi qeyd olunub."
+"Gələcək %(verbose_name_plural)s seçmək mümkün deyil, çünki %(class_name)s."
+"allow_future Yalan kimi qeyd olunub."
 
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
