@@ -308,6 +308,9 @@ standalone. When invoked by your web server, or through the :doc:`django
 
             django.setup()
 
+For an example of configuring Django's ORM in a Python script, see
+:doc:`/howto/standalone-orm`.
+
 .. seealso::
 
     :doc:`The Settings Reference </ref/settings>`
