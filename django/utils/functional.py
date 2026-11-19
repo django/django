@@ -269,6 +269,14 @@ def new_method_proxy(func):
     return inner
 
 
+# Avoid the implicit __class__ closure cell created by zero-argument super()
+# inside LazyObject methods. When tracing is active (e.g. coverage or
+# debuggers), frame introspection during class creation can cause classes with
+# a custom __class__ property and a __classcell__ to lose the custom property
+# (#35418).
+_builtin_super = super
+
+
 class LazyObject:
     """
     A wrapper for another class that can be used to delay instantiation of the
@@ -289,8 +297,8 @@ class LazyObject:
     def __getattribute__(self, name):
         if name == "_wrapped":
             # Avoid recursion when getting wrapped object.
-            return super().__getattribute__(name)
-        value = super().__getattribute__(name)
+            return _builtin_super(LazyObject, self).__getattribute__(name)
+        value = _builtin_super(LazyObject, self).__getattribute__(name)
         # If attribute is a proxy method, raise an AttributeError to call
         # __getattr__() and use the wrapped object method.
         if not getattr(value, "_mask_wrapped", True):

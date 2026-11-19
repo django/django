@@ -1,8 +1,10 @@
 import copy
 import pickle
+import subprocess
 import sys
 import unittest
 import warnings
+from pathlib import Path
 
 from django.test import TestCase
 from django.utils.functional import LazyObject, SimpleLazyObject, empty
@@ -523,3 +525,131 @@ class SimpleLazyObjectPickleTestCase(TestCase):
                 )
                 # Assert that there were no warnings.
                 self.assertEqual(len(recorded), 0)
+
+
+class LazyObjectImplementationTestCase(unittest.TestCase):
+    def test_no_class_closure_cell(self):
+        """
+        LazyObject.__getattribute__ must not create an implicit __class__
+        closure cell (ticket #35418).
+        """
+        self.assertNotIn(
+            "__class__",
+            LazyObject.__getattribute__.__code__.co_freevars,
+        )
+
+    def test_multiple_inheritance_mro_cooperation(self):
+        """
+        LazyObject.__getattribute__ cooperates with mixins in multiple
+        inheritance via super() while still allowing access to wrapped-object
+        attributes.
+        """
+
+        class AuditMixin:
+            def __getattribute__(self, name):
+                if name == "audit_log":
+                    return "logged"
+                return super().__getattribute__(name)
+
+        class ModelWithFoo:
+            foo = "bar"
+
+        class MultiLazy(LazyObject, AuditMixin):
+            def _setup(self):
+                self._wrapped = ModelWithFoo()
+
+        obj = MultiLazy()
+        self.assertEqual(obj.audit_log, "logged")
+        self.assertEqual(obj.foo, "bar")
+
+    def test_lazyobject_tracing_import_subprocess(self):
+        """
+        LazyObject custom __class__ property must survive when imported under
+        tracing (ticket #35418).
+        """
+        code = """
+import sys
+
+if "django.utils.functional" in sys.modules:
+    sys.stderr.write("django.utils.functional already imported!\\n")
+    sys.exit(1)
+if "django.conf" in sys.modules:
+    sys.stderr.write("django.conf already imported!\\n")
+    sys.exit(1)
+
+def tracer(frame, event, arg):
+    if "functional" in frame.f_code.co_filename:
+        _ = frame.f_locals
+    return tracer
+
+sys.settrace(tracer)
+try:
+    import django.utils.functional
+    from django.utils.functional import LazyObject
+finally:
+    sys.settrace(None)
+
+if "__class__" not in LazyObject.__dict__:
+    sys.stderr.write("LazyObject lost its __class__ descriptor\\n")
+    sys.exit(2)
+if not isinstance(LazyObject.__dict__["__class__"], property):
+    sys.stderr.write(
+        f"LazyObject.__class__ is not a property descriptor: "
+        f"{LazyObject.__dict__['__class__']}\\n"
+    )
+    sys.exit(3)
+
+from django.conf import settings
+if not settings.configured:
+    settings.configure(
+        INSTALLED_APPS=[
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.admin",
+        ],
+        DATABASES={
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": ":memory:",
+            }
+        },
+    )
+import django
+django.setup()
+
+from django.contrib.admin import AdminSite, ModelAdmin, register, site
+from django.db import models
+
+if not isinstance(site, AdminSite):
+    sys.stderr.write(
+        f"site must be an instance of AdminSite, got {type(site)}\\n"
+    )
+    sys.exit(4)
+
+class SubprocessTestModel(models.Model):
+    title = models.CharField(max_length=50)
+
+    class Meta:
+        app_label = "admin"
+
+@register(SubprocessTestModel, site=site)
+class SubprocessTestModelAdmin(ModelAdmin):
+    pass
+
+if SubprocessTestModel not in site._registry:
+    sys.stderr.write("SubprocessTestModel was not registered\\n")
+    sys.exit(5)
+"""
+        repo_root = Path(__file__).resolve().parents[2]
+        result = subprocess.run(
+            [sys.executable, "-c", code],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(
+            result.returncode,
+            0,
+            f"Subprocess failed with exit code {result.returncode}.\n"
+            f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}",
+        )
