@@ -1229,6 +1229,57 @@ class StateTests(SimpleTestCase):
         self.assertIn("account_id", model_state.fields)
         self.assertIn("id", model_state.fields)
 
+    def test_clone_relations_independent_of_other_clones(self):
+        project_state = ProjectState()
+        project_state.add_model(ModelState("migrations", "A", []))
+        project_state.add_model(
+            ModelState(
+                "migrations", "B", [("a", models.ForeignKey("A", models.CASCADE))]
+            )
+        )
+        project_state.apps  # Render the models.
+        before = project_state.clone()
+        project_state.reload_model("migrations", "a")
+        other = before.clone()
+        other.add_model(ModelState("migrations", "C", []))
+        A = before.apps.get_model("migrations", "A")
+        B = before.apps.get_model("migrations", "B")
+        self.assertEqual([r.related_model for r in A._meta.related_objects], [B])
+
+    def test_clone_relations_remove_model(self):
+        project_state = ProjectState()
+        project_state.add_model(ModelState("migrations", "A", []))
+        project_state.add_model(
+            ModelState(
+                "migrations", "B", [("a", models.ForeignKey("A", models.CASCADE))]
+            )
+        )
+        project_state.apps
+        before = project_state.clone()
+        before.remove_model("migrations", "b")
+        A_before = before.apps.get_model("migrations", "A")
+        A_orig = project_state.apps.get_model("migrations", "A")
+        B_orig = project_state.apps.get_model("migrations", "B")
+        self.assertEqual([r.related_model for r in A_before._meta.related_objects], [])
+        self.assertEqual(
+            [r.related_model for r in A_orig._meta.related_objects], [B_orig]
+        )
+
+    def test_clone_relations_m2m(self):
+        project_state = ProjectState()
+        project_state.add_model(ModelState("migrations", "A", []))
+        project_state.add_model(
+            ModelState("migrations", "B", [("a", models.ManyToManyField("A"))])
+        )
+        project_state.apps
+        before = project_state.clone()
+        project_state.reload_model("migrations", "a")
+        other = before.clone()
+        other.add_model(ModelState("migrations", "C", []))
+        A = before.apps.get_model("migrations", "A")
+        B = before.apps.get_model("migrations", "B")
+        self.assertEqual([r.related_model for r in A._meta.related_objects], [B])
+
 
 class StateRelationsTests(SimpleTestCase):
     def get_base_project_state(self):
