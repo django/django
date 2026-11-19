@@ -1,3 +1,4 @@
+import struct
 from ctypes import POINTER, c_byte, c_double, c_int, c_uint
 
 from django.contrib.gis.geos.libgeos import (
@@ -26,6 +27,18 @@ def check_cs_get(result, func, cargs):
     check_cs_op(result, func, cargs)
     # Object in by reference, return its value.
     return last_arg_byref(cargs)
+
+
+def check_cs_copy_to_buffer(result, func, cargs):
+    "Check the coordinate sequence copy to buffer operation."
+    if result == 0:
+        raise GEOSException("Could not copy coordinate sequence to buffer")
+
+    # GEOSCoordSeq_copyToBuffer_r
+    # https://libgeos.org/doxygen/geos__c_8h.html#a59a8a4e26d9bc20aedf00c4b7b0dd592
+    ContextHandle, CoordSeq, buffer, hasz, hasm = cargs
+    dims = 2 + int(hasz) + int(hasm)
+    return struct.iter_unpack("=" + "d" * dims, buffer)
 
 
 # ## Coordinate sequence prototype factory classes. ##
@@ -97,6 +110,12 @@ cs_getx = CsOperation("GEOSCoordSeq_getX", get=True)
 cs_gety = CsOperation("GEOSCoordSeq_getY", get=True)
 cs_getz = CsOperation("GEOSCoordSeq_getZ", get=True)
 cs_getm = CsOperation("GEOSCoordSeq_getM", get=True)
+cs_copy_to_buffer = GEOSFuncFactory(
+    "GEOSCoordSeq_copyToBuffer",
+    restype=c_int,
+    argtypes=[CS_PTR, POINTER(c_double), c_int, c_int],
+    errcheck=check_cs_copy_to_buffer,
+)
 
 # For setting, x, y, z, m
 cs_setx = CsOperation("GEOSCoordSeq_setX")
