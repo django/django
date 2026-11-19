@@ -1591,13 +1591,15 @@ class NegatedExpression(ExpressionWrapper):
         return self.expression.copy()
 
     def as_sql(self, compiler, connection):
+        # Use predicates rather than constants for empty and full conditions,
+        # as some databases reject constants or treat them as positional
+        # references in ORDER BY.
         try:
             sql, params = super().as_sql(compiler, connection)
         except EmptyResultSet:
-            features = compiler.connection.features
-            if not features.supports_boolean_expr_in_select_clause:
-                return "1=1", ()
-            return compiler.compile(Value(True))
+            return "1=1", ()
+        except FullResultSet:
+            return "1=0", ()
         ops = compiler.connection.ops
         # Some database backends (e.g. Oracle) don't allow EXISTS() and filters
         # to be compared to another expression unless they're wrapped in a CASE
