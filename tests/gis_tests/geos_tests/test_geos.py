@@ -1738,6 +1738,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         with self.assertRaisesMessage(IndexError, "invalid index: 1"):
             next(it)
 
+    def test_empty_geometry_tuple(self):
+        self.assertEqual(LineString().tuple, ())
+
     def test_collection_tuples(self):
         # 2D geometries.
         multipoint = MultiPoint(Point(0, 0), Point(1, 1))
