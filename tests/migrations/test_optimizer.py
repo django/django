@@ -729,6 +729,34 @@ class OptimizerTests(OptimizerTestBase):
             ],
         )
 
+    def test_create_model_rename_field_composite_primary_key(self):
+        create_model = migrations.CreateModel(
+            "Release",
+            [
+                ("pk", models.CompositePrimaryKey("version", "name")),
+                ("version", models.IntegerField()),
+                ("name", models.CharField(max_length=20)),
+            ],
+        )
+        self.assertOptimizesTo(
+            [
+                create_model,
+                migrations.RenameField("Release", "version", "number"),
+            ],
+            [
+                migrations.CreateModel(
+                    "Release",
+                    [
+                        ("pk", models.CompositePrimaryKey("number", "name")),
+                        ("number", models.IntegerField()),
+                        ("name", models.CharField(max_length=20)),
+                    ],
+                ),
+            ],
+        )
+        # The original operation is left unchanged.
+        self.assertEqual(create_model.fields[0][1].field_names, ("version", "name"))
+
     def test_alter_field_rename_field(self):
         """
         RenameField should optimize to the other side of AlterField,
