@@ -19,3 +19,9 @@ Bugfixes
   :exc:`~django.core.exceptions.ValidationError` by the
   :class:`~django.contrib.gis.forms.GeometryField` form field
   (:ticket:`37491`).
+
+* Fixed a bug in Django 6.1 where accessing a non-nullable
+  :class:`~django.db.models.ForeignKey` with :attr:`~django.db.models.FETCH_PEERS`
+  could return ``None`` instead of raising
+  :exc:`~django.core.exceptions.ObjectDoesNotExist` when the related object had
+  been deleted (:ticket:`37513`).

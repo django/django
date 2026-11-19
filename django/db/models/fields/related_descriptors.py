@@ -266,9 +266,9 @@ class ForwardManyToOneDescriptor:
 
             if rel_obj is None and has_value:
                 instance._state.fetch_mode.fetch(self, instance)
-                return self.field.get_cached_value(instance)
-
-            self.field.set_cached_value(instance, rel_obj)
+                rel_obj = self.field.get_cached_value(instance)
+            else:
+                self.field.set_cached_value(instance, rel_obj)
 
         if rel_obj is None and not self.field.null:
             raise self.RelatedObjectDoesNotExist(

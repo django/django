@@ -946,6 +946,17 @@ class ManyToOneTests(TestCase):
         with self.assertNumQueries(0):
             a2.reporter
 
+    def test_fetch_mode_fetch_peers_missing_related_object(self):
+        Article.objects.create(
+            headline="Another article", pub_date=self.a.pub_date, reporter=self.r2
+        )
+        article, peer = Article.objects.fetch_mode(FETCH_PEERS).order_by("pk")
+        self.r.delete()
+        with self.assertRaises(Article.reporter.RelatedObjectDoesNotExist):
+            article.reporter
+        with self.assertNumQueries(0):
+            self.assertEqual(peer.reporter, self.r2)
+
     def test_fetch_mode_raise_forward(self):
         a = Article.objects.fetch_mode(FETCH_RAISE).get(pk=self.a.pk)
         msg = "Fetching of Article.reporter blocked."
