@@ -14,6 +14,12 @@ Bugfixes
   :class:`~django.contrib.contenttypes.fields.GenericRelation`
   (:ticket:`37471`).
 
+* Fixed a bug in Django 6.1 where accessing a non-nullable
+  :class:`~django.db.models.ForeignKey` with the
+  :attr:`~django.db.models.FETCH_PEERS` fetch mode could return ``None``
+  instead of raising :exc:`~django.core.exceptions.ObjectDoesNotExist` when the
+  related object had been deleted (:ticket:`37513`).
+
 * Fixed a regression in Django 6.1.3 where a :exc:`RecursionError` from a
   GeoJSON value was not reraised as a
   :exc:`~django.core.exceptions.ValidationError` by the
