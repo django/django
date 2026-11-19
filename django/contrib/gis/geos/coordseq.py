@@ -256,10 +256,15 @@ class GEOSCoordSeq(GEOSBase):
     def tuple(self):
         "Return a tuple version of this coordinate sequence."
         n = self.size
-        get_point = self._point_getter
-        if n == 1:
-            return get_point(0)
-        return tuple(get_point(i) for i in range(n))
+        if not n:
+            return ()
+        hasz = int(self.hasz)
+        hasm = int(self.hasm) if geos_version_tuple() >= (3, 14) else 0
+        dims = 2 + hasz + hasm
+
+        buffer = (c_double * (n * dims))()
+        points = capi.cs_copy_to_buffer(self.ptr, buffer, hasz, hasm)
+        return next(points) if n == 1 else tuple(points)
 
     @property
     def is_counterclockwise(self):
