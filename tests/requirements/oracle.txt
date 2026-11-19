@@ -1,1 +1,2 @@
+# Deprecated: use pyproject.toml. Kept for Jenkins and the conda env files.
 oracledb >= 4.0.2

@@ -36,6 +36,11 @@ def setup(app):
         rolename="lookup",
         indextemplate="pair: %s; field lookup type",
     )
+    app.add_crossref_type(
+        directivename="optional-dependency",
+        rolename="optional-dependency",
+        indextemplate="pair: %s; optional dependency",
+    )
     app.add_object_type(
         directivename="cli",
         rolename="cli",
