@@ -71,7 +71,32 @@ class RegexValidator:
 @deconstructible
 class DomainNameValidator(RegexValidator):
     message = _("Enter a valid domain name.")
-    ul = "\u00a1-\uffff"  # Unicode letters range (must not be a raw string).
+    # Unicode letters range (must not be a raw string): U+00A1 to U+FFFF,
+    # excluding separators (Zs, Zl, Zp), invisible format characters (Cf),
+    # surrogates (Cs), private use characters (Co), and noncharacters. ZERO
+    # WIDTH NON-JOINER and ZERO WIDTH JOINER (U+200C, U+200D) are kept since
+    # IDNA 2008 allows them in some contexts (RFC 5892, Appendix A.1-A.2).
+    ul = (
+        "\u00a1-\u00ac"
+        "\u00ae-\u05ff"
+        "\u0606-\u061b"
+        "\u061d-\u06dc"
+        "\u06de-\u070e"
+        "\u0710-\u088f"
+        "\u0892-\u08e1"
+        "\u08e3-\u167f"
+        "\u1681-\u180d"
+        "\u180f-\u1fff"
+        "\u200c-\u200d"
+        "\u2010-\u2027"
+        "\u2030-\u205e"
+        "\u2070-\u2fff"
+        "\u3001-\ud7ff"
+        "\uf900-\ufdcf"
+        "\ufdf0-\ufefe"
+        "\uff00-\ufff8"
+        "\ufffc-\ufffd"
+    )
     # Host patterns.
     hostname_re = (
         r"[a-z" + ul + r"0-9](?:[a-z" + ul + r"0-9-]{0,61}[a-z" + ul + r"0-9])?"

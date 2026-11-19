@@ -277,6 +277,13 @@ Validators
   :meth:`~django.core.validators.EmailValidator.validate_username` methods can
   be overridden to customize how the address is parsed and validated.
 
+* :class:`~django.core.validators.DomainNameValidator`,
+  :class:`~django.core.validators.EmailValidator`, and
+  :class:`~django.core.validators.URLValidator` now reject Unicode separators
+  (such as U+2028 LINE SEPARATOR), invisible format characters (except ZERO
+  WIDTH NON-JOINER and ZERO WIDTH JOINER), surrogates, private use characters,
+  and noncharacters in domain names.
+
 .. _backwards-incompatible-6.2:
 
 Backwards incompatible changes in 6.2

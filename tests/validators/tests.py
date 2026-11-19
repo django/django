@@ -271,6 +271,11 @@ INVALID_URLS = [
     "http://www.djangoproject.com/\x00",
     "http://www.django\x00project.com/",
     "http://www.djangoproject.com/\x00@example.com/",
+    # Unicode separators and invisible format characters in the host are not
+    # accepted.
+    "http://example\N{PARAGRAPH SEPARATOR}.com/",
+    "http://exa\N{LINE SEPARATOR}mple.com/",
+    "http://exa\N{ZERO WIDTH SPACE}mple.com/",
     # Trailing junk does not take forever to reject.
     "http://www.asdasdasdasdsadfm.com.br ",
     "http://www.asdasdasdasdsadfm.com.br z",
@@ -352,6 +357,11 @@ TEST_DATA = [
     (validate_email, "a\n@b.com", ValidationError),
     (validate_email, '"test@test"\n@example.com', ValidationError),
     (validate_email, "a@[127.0.0.1]\n", ValidationError),
+    # Unicode separators and invisible format characters in the domain are not
+    # allowed.
+    (validate_email, "user@example\N{LINE SEPARATOR}.com", ValidationError),
+    (validate_email, "user@exa\N{PARAGRAPH SEPARATOR}mple.com", ValidationError),
+    (validate_email, "user@exa\N{ZERO WIDTH SPACE}mple.com", ValidationError),
     (validate_slug, "slug-ok", None),
     (validate_slug, "longer-slug-still-ok", None),
     (validate_slug, "--------", None),
@@ -678,6 +688,27 @@ TEST_DATA = [
     (validate_domain_name, "255.0.0.0", ValidationError),
     (validate_domain_name, "fe80::1", ValidationError),
     (validate_domain_name, "1:2:3:4:5:6:7:8", ValidationError),
+    # Unicode separators and invisible format characters are not accepted.
+    (validate_domain_name, "example\N{LINE SEPARATOR}.com", ValidationError),
+    (validate_domain_name, "example.com\N{PARAGRAPH SEPARATOR}", ValidationError),
+    (validate_domain_name, "exa\N{OGHAM SPACE MARK}mple.com", ValidationError),
+    (validate_domain_name, "exa\N{IDEOGRAPHIC SPACE}mple.com", ValidationError),
+    (validate_domain_name, "exa\N{ZERO WIDTH SPACE}mple.com", ValidationError),
+    (validate_domain_name, "exa\N{SOFT HYPHEN}mple.com", ValidationError),
+    (
+        validate_domain_name,
+        "exa\N{RIGHT-TO-LEFT OVERRIDE}mple.com",
+        ValidationError,
+    ),
+    (
+        validate_domain_name,
+        "exa\N{ZERO WIDTH NO-BREAK SPACE}mple.com",
+        ValidationError,
+    ),
+    # Private use character.
+    (validate_domain_name, "exa%smple.com" % chr(0xE000), ValidationError),
+    # ZERO WIDTH NON-JOINER is allowed in some contexts by IDNA 2008.
+    (validate_domain_name, "نامه\N{ZERO WIDTH NON-JOINER}ای.com", None),
     (DomainNameValidator(accept_idna=False), "non-idna-domain-name-passes.com", None),
     (
         DomainNameValidator(accept_idna=False),
