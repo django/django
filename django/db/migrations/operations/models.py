@@ -291,16 +291,21 @@ class CreateModel(ModelOperation):
                 order_with_respect_to = options.get("order_with_respect_to")
                 if order_with_respect_to == operation.old_name:
                     options["order_with_respect_to"] = operation.new_name
-                return [
-                    replace(
-                        self,
-                        fields=[
-                            (operation.new_name if n == operation.old_name else n, v)
-                            for n, v in self.fields
-                        ],
-                        options=options,
-                    ),
-                ]
+                fields = []
+                for name, field in self.fields:
+                    if name == operation.old_name:
+                        name = operation.new_name
+                    # Fix field names (e.g. for CompositePrimaryKey) to refer
+                    # to the new field.
+                    field_names = getattr(field, "field_names", None)
+                    if field_names and operation.old_name in field_names:
+                        field = field.clone()
+                        field.field_names = tuple(
+                            operation.new_name if n == operation.old_name else n
+                            for n in field_names
+                        )
+                    fields.append((name, field))
+                return [replace(self, fields=fields, options=options)]
         elif (
             isinstance(operation, IndexOperation)
             and self.name_lower == operation.model_name_lower
