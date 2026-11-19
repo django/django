@@ -265,6 +265,27 @@ class AppsTests(SimpleTestCase):
             with self.settings(INSTALLED_APPS=["import_error_package"]):
                 pass
 
+    def test_populate_retry_after_ready_failure(self):
+        installed_apps = ["apps.one_config_app", "apps.two_configs_one_default_app"]
+        new_apps = Apps()
+        with (
+            patch.object(OneConfig, "ready") as one_ready,
+            patch.object(
+                TwoConfig, "ready", side_effect=[ValueError("Oops"), None]
+            ) as two_ready,
+        ):
+            with self.assertRaisesMessage(ValueError, "Oops"):
+                new_apps.set_installed_apps(installed_apps)
+            self.assertIs(new_apps.ready, False)
+            # Retrying doesn't import models modules again.
+            with patch.object(AppConfig, "import_models") as import_models:
+                new_apps.populate(installed_apps)
+            import_models.assert_not_called()
+        self.assertIs(new_apps.ready, True)
+        # ready() methods that succeeded aren't called again.
+        self.assertEqual(one_ready.call_count, 1)
+        self.assertEqual(two_ready.call_count, 2)
+
     def test_models_py(self):
         """
         The models in the models.py file were loaded correctly.
