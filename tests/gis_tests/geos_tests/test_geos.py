@@ -1737,3 +1737,85 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         ls[:] = []
         with self.assertRaisesMessage(IndexError, "invalid index: 1"):
             next(it)
+
+    def test_collection_tuples(self):
+        # 2D geometries.
+        multipoint = MultiPoint(Point(0, 0), Point(1, 1))
+        self.assertEqual(multipoint.tuple, ((0.0, 0.0), (1.0, 1.0)))
+
+        multipolygon = MultiPolygon(
+            Polygon(((0, 0), (0, 1), (1, 1), (0, 0))),
+            Polygon(((1, 1), (1, 2), (2, 2), (1, 1))),
+        )
+        self.assertEqual(
+            multipolygon.tuple,
+            (
+                (((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (0.0, 0.0)),),
+                (((1.0, 1.0), (1.0, 2.0), (2.0, 2.0), (1.0, 1.0)),),
+            ),
+        )
+
+        multilinestring = MultiLineString(
+            LineString((0, 0), (1, 1)),
+            LineString((1, 1), (2, 2)),
+        )
+        self.assertEqual(
+            multilinestring.tuple,
+            (
+                ((0.0, 0.0), (1.0, 1.0)),
+                ((1.0, 1.0), (2.0, 2.0)),
+            ),
+        )
+
+        geometrycollection = GeometryCollection(
+            Point(0, 0),
+            MultiPoint(Point(0, 0), Point(1, 1)),
+            Polygon(((0, 0), (0, 1), (1, 1), (0, 0))),
+        )
+        self.assertEqual(
+            geometrycollection.tuple,
+            (
+                (0.0, 0.0),
+                ((0.0, 0.0), (1.0, 1.0)),
+                (((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (0.0, 0.0)),),
+            ),
+        )
+
+        # 3D geometries.
+        multipoint = MultiPoint(
+            Point(0, 0, 2),
+            Point(1, 1, 3),
+        )
+        self.assertEqual(
+            multipoint.tuple,
+            (
+                (0.0, 0.0, 2.0),
+                (1.0, 1.0, 3.0),
+            ),
+        )
+
+        geometrycollection = GeometryCollection(
+            Point(0, 0),
+            GeometryCollection(Point(1, 1, 3)),
+        )
+        self.assertEqual(
+            geometrycollection.tuple,
+            ((0.0, 0.0), ((1.0, 1.0, 3.0),)),
+        )
+
+    @skipIf(geos_version_tuple() < (3, 14), "GEOS >= 3.14.0 is required")
+    def test_collection_tuples_m(self):
+        multipoint = GEOSGeometry("MULTIPOINT M ((0 0 2), (1 1 3))")
+        self.assertEqual(multipoint.tuple, ((0.0, 0.0, 2.0), (1.0, 1.0, 3.0)))
+
+        geometrycollection = GEOSGeometry(
+            "GEOMETRYCOLLECTION ZM (POINT ZM (1 2 3 4), "
+            "LINESTRING ZM (5 6 7 8, 9 10 11 12))"
+        )
+        self.assertEqual(
+            geometrycollection.tuple,
+            (
+                (1.0, 2.0, 3.0, 4.0),
+                ((5.0, 6.0, 7.0, 8.0), (9.0, 10.0, 11.0, 12.0)),
+            ),
+        )
