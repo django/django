@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.servers.basehttp import get_internal_wsgi_application
-from django.core.signals import request_started
+from django.core.signals import request_finished, request_started
 from django.core.wsgi import get_wsgi_application
 from django.db import close_old_connections
 from django.http import FileResponse
@@ -88,6 +88,102 @@ class WSGITest(SimpleTestCase):
         self.assertEqual(response_data["status"], "200 OK")
         self.assertIsInstance(response, FileWrapper)
         self.assertEqual(response.block_size, FileResponse.block_size)
+
+    def test_head_response(self):
+        application = get_wsgi_application()
+        environ = self.request_factory._base_environ(
+            PATH_INFO="/",
+            CONTENT_TYPE="text/html; charset=utf-8",
+            REQUEST_METHOD="HEAD",
+        )
+        response_data = {}
+
+        def start_response(status, headers):
+            response_data["status"] = status
+            response_data["headers"] = headers
+
+        response = application(environ, start_response)
+        self.assertEqual(response_data["status"], "200 OK")
+        self.assertEqual(
+            set(response_data["headers"]),
+            {("Content-Length", "12"), ("Content-Type", "text/html; charset=utf-8")},
+        )
+        self.assertEqual(list(response), [])
+        self.assertIn(
+            bytes(response),
+            [
+                b"Content-Length: 12\r\nContent-Type: text/html; "
+                b"charset=utf-8\r\n\r\n",
+                b"Content-Type: text/html; "
+                b"charset=utf-8\r\nContent-Length: 12\r\n\r\n",
+            ],
+        )
+        self.assertEqual(response.status_code, 200)
+
+        signals_fired = []
+
+        def on_finish(sender, **kwargs):
+            signals_fired.append(sender)
+
+        request_finished.connect(on_finish)
+        try:
+            response.close()
+            self.assertEqual(len(signals_fired), 1)
+        finally:
+            request_finished.disconnect(on_finish)
+
+    def test_head_file_response(self):
+        class FileWrapper:
+            def __init__(self, filelike, block_size=None):
+                self.block_size = block_size
+                filelike.close()
+
+        application = get_wsgi_application()
+        environ = self.request_factory._base_environ(
+            PATH_INFO="/file/",
+            REQUEST_METHOD="HEAD",
+            **{"wsgi.file_wrapper": FileWrapper},
+        )
+        response_data = {}
+
+        def start_response(status, headers):
+            response_data["status"] = status
+            response_data["headers"] = headers
+
+        response = application(environ, start_response)
+        self.assertEqual(response_data["status"], "200 OK")
+        self.assertNotIsInstance(response, FileWrapper)
+        self.assertEqual(list(response), [])
+        file_to_stream = response._response.file_to_stream
+        self.assertFalse(file_to_stream.closed)
+        response.close()
+        self.assertTrue(file_to_stream.closed)
+
+    def test_head_streaming_response(self):
+        application = get_wsgi_application()
+        environ = self.request_factory._base_environ(
+            PATH_INFO="/streaming/", REQUEST_METHOD="HEAD"
+        )
+        response_data = {}
+
+        def start_response(status, headers):
+            response_data["status"] = status
+            response_data["headers"] = headers
+
+        response = application(environ, start_response)
+        self.assertEqual(response_data["status"], "200 OK")
+        self.assertEqual(list(response), [])
+        signals_fired = []
+
+        def on_finish(sender, **kwargs):
+            signals_fired.append(sender)
+
+        request_finished.connect(on_finish)
+        try:
+            response.close()
+            self.assertEqual(len(signals_fired), 1)
+        finally:
+            request_finished.disconnect(on_finish)
 
 
 class GetInternalWSGIApplicationTest(SimpleTestCase):

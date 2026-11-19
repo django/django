@@ -110,6 +110,33 @@ class WSGIRequest(HttpRequest):
     POST = property(_get_post, _set_post)
 
 
+class WSGIEmptyResponse:
+    """
+    An empty response body iterable for WSGI responses that must not contain
+    a body (such as responses to HEAD requests), preserving resource cleanup
+    via close().
+    """
+
+    def __init__(self, response):
+        self._response = response
+        if hasattr(response, "close"):
+            self.close = response.close
+
+    def __iter__(self):
+        return iter(())
+
+    def __getattr__(self, name):
+        return getattr(self._response, name)
+
+    def __bytes__(self):
+        if hasattr(self._response, "serialize_headers"):
+            return self._response.serialize_headers() + b"\r\n\r\n"
+        return bytes(self._response)
+
+    def __repr__(self):
+        return repr(self._response)
+
+
 class WSGIHandler(base.BaseHandler):
     request_class = WSGIRequest
 
@@ -131,8 +158,10 @@ class WSGIHandler(base.BaseHandler):
             *(("Set-Cookie", c.OutputString()) for c in response.cookies.values()),
         ]
         start_response(status, response_headers)
-        if getattr(response, "file_to_stream", None) is not None and environ.get(
-            "wsgi.file_wrapper"
+        if (
+            request.method != "HEAD"
+            and getattr(response, "file_to_stream", None) is not None
+            and environ.get("wsgi.file_wrapper")
         ):
             # If `wsgi.file_wrapper` is used the WSGI server does not call
             # .close on the response, but on the file wrapper. Patch it to use
@@ -141,6 +170,8 @@ class WSGIHandler(base.BaseHandler):
             response = environ["wsgi.file_wrapper"](
                 response.file_to_stream, response.block_size
             )
+        elif request.method == "HEAD":
+            response = WSGIEmptyResponse(response)
         return response
 
 
