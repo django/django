@@ -1,9 +1,15 @@
 import re
 from functools import cached_property
+from unittest import skipUnless
+from uuid import uuid4
 
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.gdal import SpatialReference
+from django.contrib.gis.utils import add_srs_entry
 from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
+from django.db.transaction import TransactionManagementError
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 test_srs = (
     {
@@ -53,7 +59,8 @@ test_srs = (
             r"\+proj=lcc (\+lat_1=30.28333333333333? |\+lat_2=28.38333333333333? "
             r"|\+lat_0=27.83333333333333? |"
             r"\+lon_0=-99 ){4}\+x_0=600000 \+y_0=4000000 (\+ellps=GRS80 )?"
-            r"(\+datum=NAD83 |\+towgs84=0,0,0,0,0,0,0 )?\+units=m \+no_defs ?"
+            r"(\+datum=NAD83 |\+towgs84=(?:0,0,0|1,1,-1),0,0,0,0 )?"
+            r"\+units=m \+no_defs ?"
         ),
         "spheroid": "GRS 1980",
         "name": "NAD83 / Texas South Central",
@@ -98,8 +105,8 @@ class SpatialRefSysTest(TestCase):
 
             self.assertEqual(sd["auth_srid"], srs.auth_srid)
 
-            # No PROJ and different srtext on Oracle.
-            if not connection.ops.oracle:
+            # MySQL and Oracle store different WKT and no PROJ text.
+            if not (connection.ops.oracle or connection.ops.mysql):
                 self.assertTrue(srs.wkt.startswith(sd["srtext"]))
                 self.assertRegex(srs.proj4text, sd["proj_re"])
 
@@ -141,8 +148,6 @@ class SpatialRefSysTest(TestCase):
         Test adding a new entry in the SpatialRefSys model using the
         add_srs_entry utility.
         """
-        from django.contrib.gis.utils import add_srs_entry
-
         add_srs_entry(3857)
         self.assertTrue(self.SpatialRefSys.objects.filter(srid=3857).exists())
         srs = self.SpatialRefSys.objects.get(srid=3857)
@@ -163,3 +168,40 @@ class SpatialRefSysTest(TestCase):
             "Error for PROJ.4 '+proj=invalid': Corrupt data.",
         ):
             MockSpatialRefSys(wkt="INVALID_WKT", proj4text="+proj=invalid").srs
+
+
+@skipUnless(connection.ops.mysql, "MySQL specific test.")
+class MySQLSpatialRefSysTests(TransactionTestCase):
+    available_apps = ["django.contrib.gis"]
+
+    def test_add_custom_entry(self):
+        # The SRS catalog is shared by all databases on the server.
+        srid = 100_000_000 + uuid4().int % 100_000_000
+        entries = connection.ops.spatial_ref_sys().objects
+        self.assertFalse(entries.filter(srid=srid).exists())
+        wkt = SpatialReference(4326).wkt.replace(
+            'AUTHORITY["EPSG","4326"]', f'AUTHORITY["Django","{srid}"]'
+        )
+        srs = SpatialReference(wkt)
+        name = f"Django's test {srid}"
+        authority = f"Django {srid}"
+        try:
+            connection.set_autocommit(False)
+            try:
+                with self.assertRaisesMessage(TransactionManagementError, "autocommit"):
+                    add_srs_entry(srs, auth_name=authority, ref_sys_name=name)
+            finally:
+                connection.rollback()
+                connection.set_autocommit(True)
+            add_srs_entry(srs, auth_name=authority, auth_srid=0, ref_sys_name=name)
+            # Registering the SRID again preserves its definition.
+            add_srs_entry(srs, auth_name="Django", ref_sys_name="other")
+            entry = entries.get(srid=srid)
+            self.assertEqual(entry.ref_sys_name, name)
+            self.assertEqual(entry.auth_name, authority)
+            self.assertEqual(entry.auth_srid, 0)
+            self.assertTrue(PointField(srid=srid).geodetic(connection))
+            self.assertTrue(entry.geographic)
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute("DROP SPATIAL REFERENCE SYSTEM IF EXISTS %s", [srid])

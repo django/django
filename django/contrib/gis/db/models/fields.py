@@ -18,7 +18,7 @@ from django.contrib.gis.geos import (
     Polygon,
 )
 from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.db.models import Field
 from django.utils.translation import gettext_lazy as _
 
@@ -58,7 +58,17 @@ def get_srid_info(srid, connection):
         else (None, SpatialReference)
     )
     if srid not in _srid_cache[alias]:
-        srs = get_srs(srid)
+        try:
+            srs = get_srs(srid)
+        except ObjectDoesNotExist:
+            if not connection.ops.mysql:
+                raise
+            # MySQL allows SRIDs known only to GDAL. Keep the fallback out of
+            # the database cache since the SRID may be registered later.
+            alias = None
+            if srid in _srid_cache[alias]:
+                return _srid_cache[alias][srid]
+            srs = SpatialReference(srid)
         units, units_name = srs.units
         _srid_cache[alias][srid] = SRIDCacheEntry(
             units=units,

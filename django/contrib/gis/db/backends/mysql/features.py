@@ -6,14 +6,21 @@ from django.db.backends.mysql.features import DatabaseFeatures as MySQLDatabaseF
 
 class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     empty_intersection_returns_none = False
-    has_spatialrefsys_table = False
-    supports_add_srs_entry = False
+    supports_srid_in_geometry_literals = False
     supports_distance_geodetic = False
     supports_length_geodetic = False
     supports_area_geodetic = False
     supports_transform = False
     supports_null_geometries = False
     supports_num_points_poly = False
+
+    @cached_property
+    def has_spatialrefsys_table(self):
+        return not self.connection.mysql_is_mariadb
+
+    @property
+    def supports_add_srs_entry(self):
+        return self.has_spatialrefsys_table
 
     @cached_property
     def unsupported_geojson_options(self):
