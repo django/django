@@ -468,28 +468,28 @@ class Lexer:
         if not token_string.startswith(BLOCK_TAG_START):
             return None
 
-        bits = token_string[2:-2].strip().split()
+        contents = token_string[2:-2].strip()
+        bits = contents.split()
         if not bits or bits[0] not in ("comment", "verbatim"):
             return None
-        if bits[0] == "comment":
-            return self._comment_end_re
-        if len(bits) == 1:
-            return self._verbatim_end_re
-        # RemovedInDjango2029Warning: When the deprecation ends, replace with:
-        # end_bits = ["endverbatim", *bits[1:]]
-        # end_content = r"\s*".join(re.escape(bit) for bit in end_bits)
+        # RemovedInDjango2029Warning: Remove the legacy branch and use r"\s*"
+        # directly in the regex below.
         if self.allow_multiline_tags:
+            if bits[0] == "comment":
+                return self._comment_end_re
+            if len(bits) == 1:
+                return self._verbatim_end_re
+            padding = r"\s*"
             end_bits = ["endverbatim", *bits[1:]]
             end_content = r"\s*".join(re.escape(bit) for bit in end_bits)
         else:
-            end_content = re.escape("end" + token_string[2:-2].strip())
-        return re.compile(
-            r"%s\s*%s\s*%s"
-            % (
-                re.escape(BLOCK_TAG_START),
-                end_content,
-                re.escape(BLOCK_TAG_END),
+            padding = r"[^\S\n]*"
+            end_content = (
+                "endcomment" if bits[0] == "comment" else re.escape("end" + contents)
             )
+        return re.compile(
+            f"{re.escape(BLOCK_TAG_START)}{padding}{end_content}"
+            f"{padding}{re.escape(BLOCK_TAG_END)}"
         )
 
     def _tag_re_split(self):
