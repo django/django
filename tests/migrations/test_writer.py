@@ -86,8 +86,15 @@ class IntEnum(enum.IntEnum):
 
 
 class IntFlagEnum(enum.IntFlag):
+    NONE = 0
     A = 1
     B = 2
+
+
+class FlagEnum(enum.Flag):
+    A = 1
+    AB = 3
+    CD = 12
 
 
 def decorator(f):
@@ -486,6 +493,41 @@ class WriterTests(SimpleTestCase):
                 {"import migrations.test_writer"},
             ),
         )
+
+    def test_serialize_zero_flag_default(self):
+        for default in (re.NOFLAG, FlagEnum(0)):
+            with self.subTest(default=default):
+                field = self.serialize_round_trip(models.IntegerField(default=default))
+                self.assertIsInstance(field.default, type(default))
+                self.assertEqual(field.default, default)
+
+    def test_serialize_intflag_with_unknown_bit(self):
+        value = IntFlagEnum.A | 4
+        result = self.serialize_round_trip(value)
+        self.assertIsInstance(result, IntFlagEnum)
+        self.assertEqual(result, value)
+
+    def test_serialize_flag_names_and_remaining_bits(self):
+        int_flag = "migrations.test_writer.IntFlagEnum"
+        flag = "migrations.test_writer.FlagEnum"
+        tests = [
+            (IntFlagEnum.NONE, f"{int_flag}['NONE']"),
+            (FlagEnum(0), f"{flag}(0)"),
+            (IntFlagEnum(4), f"{int_flag}(4)"),
+            (IntFlagEnum.A | 4, f"{int_flag}({int_flag}['A'].value | 4)"),
+            (FlagEnum.AB, f"{flag}['AB']"),
+            # AB | CD (15) is valid, but the remaining bits (14) aren't a
+            # standalone flag. Reconstruct the entire value in one operation.
+            (FlagEnum.AB | FlagEnum.CD, f"{flag}({flag}['A'].value | 14)"),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertSerializedResultEqual(
+                    value, (expected, {"import migrations.test_writer"})
+                )
+                result = self.serialize_round_trip(value)
+                self.assertIsInstance(result, type(value))
+                self.assertEqual(result, value)
 
     def test_serialize_choices(self):
         class TextChoices(models.TextChoices):

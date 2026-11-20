@@ -164,19 +164,25 @@ class EnumSerializer(BaseSerializer):
     def serialize(self):
         enum_class = self.value.__class__
         module = enum_class.__module__
-        if issubclass(enum_class, enum.Flag):
-            members = list(self.value)
-        else:
-            members = (self.value,)
-        return (
-            " | ".join(
-                [
-                    f"{module}.{enum_class.__qualname__}[{item.name!r}]"
-                    for item in members
-                ]
-            ),
-            {"import %s" % module},
-        )
+        enum_path = f"{module}.{enum_class.__qualname__}"
+        imports = {f"import {module}"}
+        if isinstance(self.value, enum.Flag):
+            remaining = self.value.value
+            members = []
+            for member in self.value:
+                if member is None:
+                    # Bits defined only in composite members can yield None.
+                    continue
+                remaining &= ~member.value
+                members.append(f"{enum_path}[{member.name!r}]")
+            if members and not remaining:
+                return " | ".join(members), imports
+            if enum_class.__members__.get(self.value.name) is not self.value:
+                # The remaining bits may not form a valid flag on their own.
+                values = [f"{member}.value" for member in members]
+                values.append(repr(remaining))
+                return f"{enum_path}({' | '.join(values)})", imports
+        return f"{enum_path}[{self.value.name!r}]", imports
 
 
 class FloatSerializer(BaseSimpleSerializer):
