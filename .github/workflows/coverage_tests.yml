@@ -33,6 +33,10 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      memcached:
+        image: memcached:1.6-alpine
+        ports:
+          - 11211:11211
     steps:
       - name: Checkout
         uses: actions/checkout@v7
