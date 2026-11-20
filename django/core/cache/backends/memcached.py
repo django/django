@@ -159,11 +159,39 @@ class PyLibMCCache(BaseMemcachedCache):
             output.append(server.removeprefix("unix:"))
         return output
 
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        # get_backend_timeout() maps 0 to -1, which means expire immediately.
+        if timeout is not None and self.get_backend_timeout(timeout) < 0:
+            key = self.make_and_validate_key(key, version=version)
+            # Memcached can't immediately expire an added key, so add it for
+            # one second and delete it. The value may be briefly visible.
+            if ret := self._cache.add(key, value, 1):
+                self._cache.delete(key)
+            return ret
+        return super().add(key, value, timeout, version)
+
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        # get_backend_timeout() maps 0 to -1, which means expire immediately.
+        if timeout is not None and self.get_backend_timeout(timeout) < 0:
+            key = self.make_and_validate_key(key, version=version)
+            self._cache.delete(key)
+        else:
+            super().set(key, value, timeout, version)
+
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_and_validate_key(key, version=version)
-        if timeout == 0:
+        # get_backend_timeout() maps 0 to -1, which means expire immediately.
+        if timeout is not None and self.get_backend_timeout(timeout) < 0:
+            key = self.make_and_validate_key(key, version=version)
             return self._cache.delete(key)
-        return self._cache.touch(key, self.get_backend_timeout(timeout))
+        return super().touch(key, timeout, version)
+
+    def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
+        # get_backend_timeout() maps 0 to -1, which means expire immediately.
+        if timeout is not None and self.get_backend_timeout(timeout) < 0:
+            self.delete_many(data)
+            return list(data)
+        else:
+            return super().set_many(data, timeout, version)
 
     def close(self, **kwargs):
         # libmemcached manages its own connections. Don't call disconnect_all()
