@@ -6620,6 +6620,63 @@ class OperationTests(OperationTestBase):
             operation.database_backwards(app_label, editor, new_state, project_state)
         assertModelsAndTables(after_db=False)
 
+    def test_separate_database_and_state_alter_field_pk_fk(self):
+        """
+        Altering a primary key inside SeparateDatabaseAndState after another
+        operation on an unrelated model correctly alters foreign keys pointing
+        to it.
+        """
+        app_label = "test_sep_pk_fk"
+        project_state = self.set_up_test_model(app_label, related_model=True)
+        operations = [
+            migrations.CreateModel(
+                "Confounder",
+                [("id", models.AutoField(primary_key=True))],
+            ),
+            migrations.AlterField(
+                "Pony", "id", models.CharField(max_length=20, primary_key=True)
+            ),
+        ]
+        operation = migrations.SeparateDatabaseAndState(
+            state_operations=operations,
+            database_operations=operations,
+        )
+        self.apply_operations(app_label, project_state, [operation])
+        with connection.cursor() as cursor:
+            id_type = [
+                c.type_code
+                for c in connection.introspection.get_table_description(
+                    cursor, "%s_pony" % app_label
+                )
+                if c.name == "id"
+            ][0]
+            fk_type = [
+                c.type_code
+                for c in connection.introspection.get_table_description(
+                    cursor, "%s_rider" % app_label
+                )
+                if c.name == "pony_id"
+            ][0]
+        self.assertEqual(id_type, fk_type)
+        # And test reversal
+        self.unapply_operations(app_label, project_state, [operation])
+        with connection.cursor() as cursor:
+            id_type = [
+                c.type_code
+                for c in connection.introspection.get_table_description(
+                    cursor, "%s_pony" % app_label
+                )
+                if c.name == "id"
+            ][0]
+            fk_type = [
+                c.type_code
+                for c in connection.introspection.get_table_description(
+                    cursor, "%s_rider" % app_label
+                )
+                if c.name == "pony_id"
+            ][0]
+        self.assertEqual(id_type, fk_type)
+
     def _test_invalid_generated_field_changes(self, db_persist):
         regular = models.IntegerField(default=1)
         generated_1 = models.GeneratedField(

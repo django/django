@@ -135,10 +135,19 @@ class ProjectState:
                 if not model_relations:
                     del self._relations[related_model_key]
         if "apps" in self.__dict__:  # hasattr would cache the property
+            try:
+                old_model = self.apps.get_model(*model_key)
+            except LookupError:
+                related_models = set()
+            else:
+                related_models = {
+                    m for m in get_related_models_tuples(old_model) if m in self.models
+                }
             self.apps.unregister_model(*model_key)
-            # Need to do this explicitly since unregister_model() doesn't clear
-            # the cache automatically (#24513)
-            self.apps.clear_cache()
+            if related_models:
+                self.reload_models(related_models, delay=True)
+            else:
+                self.apps.clear_cache()
 
     def rename_model(self, app_label, old_name, new_name):
         # Add a new model.
@@ -617,6 +626,23 @@ class AppConfigStub(AppConfig):
 
     def import_models(self):
         self.models = self.apps.all_models[self.label]
+
+    def get_model(self, model_name, require_ready=True):
+        model = super().get_model(model_name, require_ready=require_ready)
+        if self.apps is not None and model._meta.apps is not self.apps:
+            model._meta.apps = self.apps
+            model._meta._expire_cache()
+        return model
+
+    def get_models(self, include_auto_created=False, include_swapped=False):
+        for model in super().get_models(
+            include_auto_created=include_auto_created,
+            include_swapped=include_swapped,
+        ):
+            if self.apps is not None and model._meta.apps is not self.apps:
+                model._meta.apps = self.apps
+                model._meta._expire_cache()
+            yield model
 
 
 class StateApps(Apps):
