@@ -381,8 +381,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         afterward.
         """
         with self.cursor() as cursor:
-            cursor.execute("SET CONSTRAINTS ALL IMMEDIATE")
-            cursor.execute("SET CONSTRAINTS ALL DEFERRED")
+            cursor.execute("""
+                BEGIN
+                    SAVEPOINT check_constraints;
+                    SET CONSTRAINTS ALL IMMEDIATE;
+                    ROLLBACK TO SAVEPOINT check_constraints;
+                END;
+            """)
 
     def is_usable(self):
         try:
