@@ -11,7 +11,7 @@ from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
 from django.conf import settings
 from django.core import signals
-from django.core.exceptions import RequestAborted, RequestDataTooBig
+from django.core.exceptions import BadRequest, RequestAborted, RequestDataTooBig
 from django.core.handlers import base
 from django.http import (
     FileResponse,
@@ -273,9 +273,10 @@ class ASGIHandler(base.BaseHandler):
         """
         try:
             return self.request_class(scope, body_file), None
-        except UnicodeDecodeError:
+        except (BadRequest, UnicodeDecodeError) as exc:
             logger.warning(
-                "Bad Request (UnicodeDecodeError)",
+                "Bad Request (%s)",
+                exc,
                 exc_info=sys.exc_info(),
                 extra={"status_code": 400},
             )
