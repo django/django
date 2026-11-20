@@ -53,6 +53,7 @@ from django.test import (
     override_settings,
 )
 from django.test.signals import setting_changed
+from django.test.testcases import SerializeMixin
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone, translation
 from django.utils.cache import (
@@ -1660,7 +1661,9 @@ RedisCache_params = configured_caches.get("django.core.cache.backends.redis.Redi
 redis_excluded_caches = {"cull", "zero_cull"}
 
 
-class BaseMemcachedTests(BaseCacheTests):
+class BaseMemcachedTests(SerializeMixin, BaseCacheTests):
+    lockfile = __file__
+
     # By default it's assumed that the client doesn't clean up connections
     # properly, in which case the backend must do so after each request.
     should_disconnect_on_close = True
