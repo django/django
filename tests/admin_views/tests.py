@@ -3124,6 +3124,34 @@ class AdminViewPermissionsTest(TestCase):
             post, reverse("admin:admin_views_article_change", args=(new_article.pk,))
         )
 
+    def test_user_change_view_save_as_new_without_change_permission(self):
+        """
+        A user with add_user permission but without change_user permission
+        cannot create a user through "Save as new".
+        """
+        self.adduser.user_permissions.add(
+            get_perm(User, get_permission_codename("add", User._meta))
+        )
+
+        user_count = User.objects.count()
+        user_change_url = reverse(
+            "admin:auth_user_change", args=(self.superuser.pk,)
+        )
+
+        self.client.force_login(self.adduser)
+        response = self.client.post(
+            user_change_url,
+            {
+                "_saveasnew": "Save as new",
+                "username": "newuser",
+                "password1": "newpassword",
+                "password2": "newpassword",
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(User.objects.count(), user_count)
+
     def test_change_view_with_view_only_inlines(self):
         """
         User with change permission to a section but view-only for inlines.
