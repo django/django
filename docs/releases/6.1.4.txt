@@ -30,3 +30,5 @@ Bugfixes
   :meth:`.QuerySet.union`, :meth:`.QuerySet.intersection`, or
   :meth:`.QuerySet.difference` could crash when the model's
   :attr:`.Options.ordering` referenced related fields (:ticket:`37505`).
+
+* Added compatibility with :pypi:`pylibmc` 1.8.0 (:ticket:`37529`).
