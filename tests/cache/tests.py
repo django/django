@@ -671,12 +671,19 @@ class BaseCacheTests:
         """
         Passing in zero into timeout results in a value that is not cached
         """
+        cache.set("key1", "eggs", 5)
         cache.set("key1", "eggs", 0)
         self.assertIsNone(cache.get("key1"))
 
         self.assertIs(cache.add("key2", "ham", 0), True)
         self.assertIsNone(cache.get("key2"))
 
+        # add() with a 0 timeout doesn't delete an existing key.
+        cache.set("key2", "salad", 5)
+        self.assertIs(cache.add("key2", "biscuits", 0), False)
+        self.assertEqual(cache.get("key2"), "salad")
+
+        cache.set_many({"key3": "sausage", "key4": "lobster bisque"}, 5)
         cache.set_many({"key3": "sausage", "key4": "lobster bisque"}, 0)
         self.assertIsNone(cache.get("key3"))
         self.assertIsNone(cache.get("key4"))
