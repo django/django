@@ -19,6 +19,7 @@ PY312 = sys.version_info >= (3, 12)
 PY313 = sys.version_info >= (3, 13)
 PY314 = sys.version_info >= (3, 14)
 PY315 = sys.version_info >= (3, 15)
+PY316 = sys.version_info >= (3, 16)
 
 
 def _validate_version(version):
