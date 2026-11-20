@@ -28,6 +28,16 @@ class Article(models.Model):
         return self.headline
 
 
+class ConcreteQuerysetArticle(Article):
+    class Meta:
+        proxy = True
+
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None):
+        if from_queryset is None:
+            from_queryset = Article._base_manager.db_manager(using)
+        super().refresh_from_db(using, fields, from_queryset)
+
+
 class Country(models.Model):
     id = models.SmallAutoField(primary_key=True)
     name = models.CharField(max_length=50)

@@ -289,7 +289,15 @@ class ForwardManyToOneDescriptor:
 
     def fetch_many(self, instances):
         is_cached = self.is_cached
-        missing_instances = [i for i in instances if not is_cached(i)]
+        missing_instances = []
+        for instance in instances:
+            if is_cached(instance):
+                continue
+            try:
+                self.field.get_local_related_value(instance)
+            except instance._meta.concrete_model.DoesNotExist:
+                continue
+            missing_instances.append(instance)
         prefetch_related_objects(missing_instances, self.field.name)
 
     def __set__(self, instance, value):
