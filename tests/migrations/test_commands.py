@@ -2082,6 +2082,39 @@ class MakeMigrationsTests(MigrationTestBase):
             )
             self.assertIn("Type 'exit' to exit this prompt", output)
 
+    def test_makemigrations_interactive_not_null_addition_invalid_default(self):
+        """
+        makemigrations prompts again when the one-off default isn't valid for
+        the field.
+        """
+
+        class Entry(models.Model):
+            title = models.CharField(max_length=255)
+            start_time = models.DateTimeField()
+
+            class Meta:
+                app_label = "migrations"
+
+        with self.temporary_migration_module(
+            module="migrations.test_auto_now_add"
+        ) as migration_dir:
+            with mock.patch("builtins.input", side_effect=["1", "0", "timezone.now"]):
+                with captured_stdout() as out:
+                    call_command(
+                        "makemigrations",
+                        "migrations",
+                        interactive=True,
+                        name="start_time",
+                    )
+            self.assertIn(
+                "'0' is not a valid value for this DateTimeField:",
+                out.getvalue(),
+            )
+            migration_file = os.path.join(migration_dir, "0002_start_time.py")
+            with open(migration_file, encoding="utf-8") as fp:
+                content = fp.read()
+            self.assertIn("default=django.utils.timezone.now", content)
+
     def test_makemigrations_non_interactive_not_null_alteration(self):
         """
         Non-interactive makemigrations fails when a default is missing on a
@@ -2713,7 +2746,8 @@ class MakeMigrationsTests(MigrationTestBase):
                     call_command("makemigrations", verbosity=0)
                 self.assertEqual(str(cm.warning), msg)
 
-    @mock.patch("builtins.input", return_value="1")
+    # 1 - provide a default, then accept the suggested timezone.now.
+    @mock.patch("builtins.input", side_effect=["1", ""])
     @mock.patch(
         "django.db.migrations.questioner.sys.stdin",
         mock.MagicMock(encoding=sys.getdefaultencoding()),
