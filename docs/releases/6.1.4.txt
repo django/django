@@ -25,3 +25,5 @@ Bugfixes
   :exc:`~django.core.exceptions.ValidationError` by the
   :class:`~django.contrib.gis.forms.GeometryField` form field
   (:ticket:`37491`).
+
+* Added compatibility with :pypi:`pylibmc` 1.8.0 (:ticket:`37529`).
