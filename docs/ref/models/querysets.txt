@@ -598,7 +598,9 @@ Examples (those after the first will only work on PostgreSQL):
     ...wouldn't work because the query would be ordered by ``blog__name`` thus
     mismatching the ``DISTINCT ON`` expression. You'd have to explicitly order
     by the relation ``_id`` field (``blog_id`` in this case) or the referenced
-    one (``blog__pk``) to make sure both expressions match.
+    one (``blog__pk``) to make sure both expressions match::
+
+        Entry.objects.order_by("blog_id").distinct("blog_id")
 
 ``values()``
 ~~~~~~~~~~~~
