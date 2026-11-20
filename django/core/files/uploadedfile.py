@@ -78,6 +78,10 @@ class TemporaryUploadedFile(UploadedFile):
 
     def __init__(self, name, content_type, size, charset, content_type_extra=None):
         _, ext = os.path.splitext(name)
+        # Only keep the extension if it is a reasonable length, as longer ones
+        # can overflow NAME_MAX and raise OSError. 100 bytes is a safe limit.
+        if len(os.fsencode(ext)) > 100:
+            ext = ""
         file = tempfile.NamedTemporaryFile(
             suffix=".upload" + ext, dir=settings.FILE_UPLOAD_TEMP_DIR
         )
