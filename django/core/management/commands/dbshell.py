@@ -47,3 +47,5 @@ class Command(BaseCommand):
                 ),
                 returncode=e.returncode,
             )
+        except KeyboardInterrupt:
+            pass

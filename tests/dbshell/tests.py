@@ -15,3 +15,10 @@ class DbshellCommandTestCase(SimpleTestCase):
         with self.assertRaisesMessage(CommandError, msg):
             with mock.patch("subprocess.run", side_effect=FileNotFoundError):
                 call_command("dbshell")
+
+    def test_keyboard_interrupt(self):
+        """
+        KeyboardInterrupt is suppressed when running dbshell (#37109).
+        """
+        with mock.patch("subprocess.run", side_effect=KeyboardInterrupt):
+            call_command("dbshell")
