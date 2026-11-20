@@ -9,4 +9,5 @@ urlpatterns = [
     re_path(_(r"^register/$"), view, name="register"),
     re_path(_(r"^register-without-slash$"), view, name="register-without-slash"),
     path(_("register-as-path/"), view, name="register-as-path"),
+    re_path(_(r"^users/$"), view),
 ]
