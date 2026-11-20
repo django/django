@@ -12,6 +12,7 @@ class PlaywrightTests(AdminPlaywrightTestCase):
     available_apps = ["admin_views"] + AdminPlaywrightTestCase.available_apps
 
     def setUp(self):
+        super().setUp()
         if self.browser == "webkit":
             self.skipTest("WebKit Tab key only focuses form controls, not links.")
         self.superuser = User.objects.create_superuser(

@@ -18,3 +18,5 @@ tests/*.sqlite3
 build/
 tests/report/
 tests/screenshots/
+tests/traces/
+tests/videos/
