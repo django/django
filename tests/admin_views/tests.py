@@ -5290,6 +5290,93 @@ class AdminViewListEditable(TestCase):
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class AdminSearchTest(TestCase):
+    def test_mti_pk_iexact_search(self):
+        """
+        Searching with pk__iexact on a true multi-table inherited model (MTI)
+        correctly handles primary key traversal and filters matching records.
+        """
+        from django.test.client import RequestFactory
+
+        vodcast1 = Vodcast.objects.create(name="Django Podcast")
+        Vodcast.objects.create(name="Python Podcast")
+
+        class VodcastAdmin(admin.ModelAdmin):
+            search_fields = ("pk__iexact",)
+
+        ma = VodcastAdmin(Vodcast, admin.site)
+        factory = RequestFactory()
+
+        # 1. Assert matching search result on MTI subclass PK
+        request = factory.get("/", {"q": str(vodcast1.pk)})
+        qs, _ = ma.get_search_results(request, Vodcast.objects.all(), str(vodcast1.pk))
+        self.assertQuerySetEqual(qs, [vodcast1], ordered=False)
+
+        # 2. Assert non-matching search result returns empty
+        request_nonmatching = factory.get("/", {"q": "999999"})
+        qs_none, _ = ma.get_search_results(
+            request_nonmatching, Vodcast.objects.all(), "999999"
+        )
+        self.assertQuerySetEqual(qs_none, [], ordered=False)
+
+    def test_search_date_transform(self):
+        """
+        Field transforms (like __year) in search_fields filter correctly
+        and return expected matching records.
+        """
+        from datetime import datetime
+
+        from django.test.client import RequestFactory
+
+        section = Section.objects.create(name="Tech")
+        Article.objects.create(
+            title="Django News 2020",
+            content="Content 2020",
+            date=datetime(2020, 1, 1),
+            section=section,
+        )
+        article2 = Article.objects.create(
+            title="Django News 2026",
+            content="Content 2026",
+            date=datetime(2026, 1, 1),
+            section=section,
+        )
+
+        class ArticleAdmin(admin.ModelAdmin):
+            search_fields = ("date__year",)
+
+        ma = ArticleAdmin(Article, admin.site)
+        factory = RequestFactory()
+
+        # 1. Assert matching year
+        request = factory.get("/", {"q": "2026"})
+        qs, _ = ma.get_search_results(request, Article.objects.all(), "2026")
+        self.assertQuerySetEqual(qs, [article2], ordered=False)
+
+        # 2. Assert non-matching year
+        request_missing = factory.get("/", {"q": "1999"})
+        qs_missing, _ = ma.get_search_results(
+            request_missing, Article.objects.all(), "1999"
+        )
+        self.assertQuerySetEqual(qs_missing, [], ordered=False)
+
+    def test_search_field_with_transform(self):
+        """
+        Searching fields with ORM transforms (e.g. date fields with __year)
+        preserves the fallback and does not raise FieldDoesNotExist.
+        """
+        from django.contrib import admin
+        from django.contrib.admin import ModelAdmin
+        from django.contrib.auth.models import User
+        from django.test import RequestFactory
+
+        model_admin = ModelAdmin(User, admin.site)
+        request = RequestFactory().get("/")
+        queryset = User.objects.all()
+
+        model_admin.search_fields = ["date_joined__year"]
+        qs, use_distinct = model_admin.get_search_results(request, queryset, "2026")
+        self.assertIsNotNone(qs)
+
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(
