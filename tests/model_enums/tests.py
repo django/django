@@ -301,6 +301,35 @@ class CustomChoicesTests(SimpleTestCase):
             with self.subTest(choice_enum.__name__):
                 self.assertNotIn(None, choice_enum.labels)
 
+    def test_model_field_default_selected(self):
+        test_data = [
+            # (Separator, models.BinaryField, Separator.FS, "\x1c"),
+            (Constants, models.FloatField, Constants.PI, "3.141592653589793"),
+            # (Set, models.JSONField, Set.UNION, "????"),
+            (MoonLandings, models.DateField, MoonLandings.APOLLO_11, "1969-07-20"),
+            (DateAndTime, models.DateTimeField, DateAndTime.B, "2011-11-11 11:11:11"),
+            (MealTimes, models.TimeField, MealTimes.LUNCH, "13:00:00"),
+            (Frequency, models.DurationField, Frequency.HOUR, "1:00:00"),
+            (Number, models.DurationField, Number.TAU, "6.283185307179586"),
+            (
+                IPv4Address,
+                models.GenericIPAddressField,
+                IPv4Address.GATEWAY,
+                "192.168.0.1",
+            ),
+        ]
+        for choice_enum, FieldType, default, html_default_value in test_data:
+            with self.subTest(choice_enum.__name__):
+                model_field = FieldType(choices=choice_enum.choices, default=default)
+                form_field = model_field.formfield()
+                html = form_field.widget.render(name="foo", value=form_field.initial)
+                html_field_label = str(default.label)
+                self.assertInHTML(
+                    f'<option value="{html_default_value}" selected>'
+                    f"{html_field_label}</option>",
+                    html,
+                )
+
     def test_bool_unsupported(self):
         msg = "type 'bool' is not an acceptable base type"
         with self.assertRaisesMessage(TypeError, msg):
