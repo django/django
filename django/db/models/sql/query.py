@@ -42,7 +42,15 @@ from django.db.models.query_utils import (
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
-from django.db.models.sql.where import AND, OR, XOR, ExtraWhere, NothingNode, WhereNode
+from django.db.models.sql.where import (
+    AND,
+    OR,
+    XOR,
+    ExtraWhere,
+    JoinOrSubquery,
+    NothingNode,
+    WhereNode,
+)
 from django.utils.deprecation import RemovedInDjango2028Warning
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.tree import Node
@@ -100,6 +108,39 @@ def get_children_from_q(q):
                 yield from get_paths_from_expression(rhs)
         elif hasattr(child, "resolve_expression"):
             yield from get_paths_from_expression(child)
+
+
+def walk_expressions(expr):
+    """
+    Yield expr and every expression, Q, and Query nested in it, including the
+    lookups' right-hand sides and the subqueries' where clauses, annotations,
+    and combined queries.
+    """
+    from django.db.models.query import QuerySet
+
+    if isinstance(expr, QuerySet):
+        expr = expr.query
+    yield expr
+    if isinstance(expr, Query):
+        sources = [expr.where, *expr.annotations.values(), *expr.combined_queries]
+    elif isinstance(expr, Q):
+        sources = [
+            child[1] if isinstance(child, tuple) else child for child in expr.children
+        ]
+    elif isinstance(expr, Lookup):
+        # An unresolved OuterRef() rhs isn't a source expression.
+        sources = [expr.lhs, expr.rhs]
+    elif isinstance(expr, (list, tuple)):
+        sources = [
+            item
+            for item in expr
+            if hasattr(item, "resolve_expression") or isinstance(item, (list, tuple))
+        ]
+    else:
+        sources = getattr(expr, "get_source_expressions", list)()
+    for source in sources:
+        if source is not None:
+            yield from walk_expressions(source)
 
 
 def get_child_with_renamed_prefix(prefix, replacement, child):
@@ -770,6 +811,8 @@ class Query(BaseExpression):
                 # unref the alias so that join promotion has information of
                 # the join type for the unused alias.
                 self.unref_alias(new_alias)
+            else:
+                self.alias_refcount[new_alias] += rhs.alias_refcount[alias] - 1
         joinpromoter.add_votes(rhs_votes)
         joinpromoter.update_join_types(self)
 
@@ -1688,10 +1731,101 @@ class Query(BaseExpression):
             can_reuse = set(self.alias_map)
         else:
             can_reuse = self.used_aliases
-        clause, _ = self._add_q(q_object, can_reuse)
+        if not can_reuse and self._can_filter_with_subquery(q_object):
+            clause = self._add_join_or_subquery(q_object, can_reuse)
+        else:
+            clause, _ = self._add_q(q_object, can_reuse)
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
+
+    def _can_filter_with_subquery(self, q_object):
+        """
+        Return True if q_object spans a multi-valued relationship of an
+        aggregated query, and can be checked with a subquery instead of a join
+        that would duplicate the aggregated rows.
+
+        q_object is added to the subquery a second time, so iterators (which
+        would be consumed), outer references (which would resolve against the
+        subquery), and annotation references (unavailable in the subquery) are
+        left to the join. So are negated conditions, which split_exclude()
+        handles, and queries with a "pk" annotation, which would shadow the
+        primary key in the pk__in lookup.
+        """
+        if self.group_by is None or "pk" in self.annotations:
+            return False
+        expressions = list(walk_expressions(q_object))
+        if any(
+            (isinstance(expr, Q) and expr.negated)
+            or isinstance(expr, (Iterator, OuterRef, ResolvedOuterRef))
+            for expr in expressions
+        ):
+            return False
+        paths = [
+            child[0].split(LOOKUP_SEP)
+            for expr in expressions
+            if isinstance(expr, Q)
+            for child in expr.children
+            if isinstance(child, tuple)
+        ]
+        paths += [
+            expr.name.split(LOOKUP_SEP) for expr in expressions if isinstance(expr, F)
+        ]
+        for filtered_relation in self._filtered_relations.values():
+            if any(path[0] == filtered_relation.alias for path in paths):
+                paths.extend(
+                    path.split(LOOKUP_SEP)
+                    for path in get_children_from_q(filtered_relation.condition)
+                )
+        if any(refs_expression(path, self.annotations)[0] for path in paths):
+            return False
+        opts = self.get_meta()
+        return any(
+            path_info.m2m
+            for path in paths
+            for path_info in self.names_to_path(path, opts, fail_on_missing=False)[0]
+        )
+
+    def _add_join_or_subquery(self, q_object, can_reuse):
+        """
+        Add q_object with joins, and keep an equivalent pk__in subquery that
+        the compiler uses instead if no other clause reuses those joins.
+        Conditions on aggregates or window functions are left to the join, as
+        they're split into the HAVING and QUALIFY clauses.
+        """
+        refcounts_before = self.alias_refcount.copy()
+        clause, _ = self._add_q(q_object, can_reuse)
+        if clause.contains_aggregate or clause.contains_over_clause:
+            return clause
+        refcounts = {
+            alias: count
+            for alias, count in self.alias_refcount.items()
+            if count and not refcounts_before.get(alias)
+        }
+        query = self.__class__(self.model)
+        query._filtered_relations = self._filtered_relations.copy()
+        query.add_q(q_object)
+        query.set_values(["pk"])
+        return JoinOrSubquery(clause, self.build_where(Q(pk__in=query)), refcounts)
+
+    def _has_raw_sql(self):
+        """
+        Return True if the query contains raw SQL, which may reference join
+        aliases without incrementing their refcount.
+        """
+        if self.extra or self.extra_tables or self.extra_order_by:
+            return True
+        sources = [
+            self.where,
+            *self.annotations.values(),
+            *self.order_by,
+            *(relation.condition for relation in self._filtered_relations.values()),
+        ]
+        return any(
+            isinstance(expr, (ExtraWhere, RawSQL))
+            for source in sources
+            for expr in walk_expressions(source)
+        )
 
     def build_where(self, filter_expr):
         return self.build_filter(filter_expr, allow_joins=False)[0]
