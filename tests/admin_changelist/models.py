@@ -10,7 +10,7 @@ class Event(models.Model):
 
 
 class Parent(models.Model):
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128, verbose_name="family name")
 
 
 class Child(models.Model):

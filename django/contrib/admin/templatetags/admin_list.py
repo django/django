@@ -2,6 +2,7 @@ import datetime
 
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
+    RELATED_LABEL_SEPARATOR,
     display_for_field,
     display_for_value,
     get_fields_from_path,
@@ -24,7 +25,7 @@ from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
 from django.utils import formats, timezone
-from django.utils.html import format_html
+from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import SafeString, mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
@@ -85,6 +86,26 @@ def pagination_tag(parser, token):
     )
 
 
+def _related_label_html(text, field_name, attr):
+    """
+    For a related lookup such as "parent__name", return its label (as built by
+    label_for_field()) as HTML with the separators replaced for assistive
+    technology, e.g. "Parent > Name" is displayed, but is read as
+    "Parent, Name". Return None for other fields.
+    """
+    if not (isinstance(attr, models.Field) and LOOKUP_SEP in field_name):
+        return None
+    separator = format_html(
+        '<span aria-hidden="true">{}</span><span class="visually-hidden">, </span>',
+        RELATED_LABEL_SEPARATOR,
+    )
+    return mark_safe(
+        separator.join(
+            conditional_escape(part) for part in text.split(RELATED_LABEL_SEPARATOR)
+        )
+    )
+
+
 def result_headers(cl):
     """
     Generate the list column headers.
@@ -94,6 +115,7 @@ def result_headers(cl):
         text, attr = label_for_field(
             field_name, cl.model, model_admin=cl.model_admin, return_attr=True
         )
+        text_html = _related_label_html(text, field_name, attr)
         is_field_sortable = cl.sortable_by is None or field_name in cl.sortable_by
         if attr:
             field_name = _coerce_field_name(field_name, i)
@@ -107,6 +129,7 @@ def result_headers(cl):
                         f'<input type="checkbox" id="action-toggle" '
                         f'aria-label="{aria_label}">'
                     ),
+                    "text_html": None,
                     "class_attrib": SafeString(' class="action-checkbox-column"'),
                     "sortable": False,
                 }
@@ -125,6 +148,7 @@ def result_headers(cl):
             # Not sortable
             yield {
                 "text": text,
+                "text_html": text_html,
                 "class_attrib": format_html(' class="column-{}"', field_name),
                 "sortable": False,
             }
@@ -170,6 +194,7 @@ def result_headers(cl):
 
         yield {
             "text": text,
+            "text_html": text_html,
             "sortable": True,
             "sorted": is_sorted,
             "ascending": order_type == "asc",
