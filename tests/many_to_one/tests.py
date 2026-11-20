@@ -18,6 +18,7 @@ from .models import (
     ChildNullableParent,
     ChildStringPrimaryKeyParent,
     City,
+    ConcreteQuerysetArticle,
     Country,
     District,
     First,
@@ -956,6 +957,43 @@ class ManyToOneTests(TestCase):
             a1.reporter
         with self.assertNumQueries(0):
             a2.reporter
+
+    def test_fetch_mode_fetch_peers_deleted_peer(self):
+        Article.objects.create(
+            headline="Another article", pub_date=self.a.pub_date, reporter=self.r2
+        )
+        a1, a2 = Article.objects.fetch_mode(FETCH_PEERS).only("headline").order_by("pk")
+        Article.objects.filter(pk=a1.pk).delete()
+        # The deleted peer doesn't affect the other one.
+        # Reading the deferred values, checking the deleted peer, and fetching.
+        with self.assertNumQueries(3):
+            self.assertEqual(a2.reporter, self.r2)
+        # The deleted peer behaves as it does with FETCH_ONE.
+        with self.assertRaises(Article.DoesNotExist):
+            a1.reporter
+
+    def test_fetch_mode_fetch_peers_deleted_accessed_peer(self):
+        Article.objects.create(
+            headline="Another article", pub_date=self.a.pub_date, reporter=self.r2
+        )
+        a1, a2 = Article.objects.fetch_mode(FETCH_PEERS).only("headline").order_by("pk")
+        Article.objects.filter(pk=a1.pk).delete()
+        with self.assertRaises(Article.DoesNotExist):
+            a1.reporter
+        self.assertEqual(a2.reporter, self.r2)
+
+    def test_fetch_mode_fetch_peers_deleted_peer_proxy_model(self):
+        # A proxy model can refresh from the concrete model's queryset, which
+        # raises the concrete model's DoesNotExist for a deleted instance.
+        Article.objects.create(
+            headline="Another article", pub_date=self.a.pub_date, reporter=self.r2
+        )
+        queryset = ConcreteQuerysetArticle.objects.fetch_mode(FETCH_PEERS)
+        a1 = queryset.only("headline").get(pk=self.a.pk)
+        a2 = queryset.only("headline").exclude(pk=self.a.pk).get()
+        Article.objects.filter(pk=a1.pk).delete()
+        Article.reporter.fetch_many([a1, a2])
+        self.assertEqual(a2.reporter, self.r2)
 
     def test_fetch_mode_raise_forward(self):
         a = Article.objects.fetch_mode(FETCH_RAISE).get(pk=self.a.pk)
