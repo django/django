@@ -1,5 +1,5 @@
 {# Adapted from https://github.com/executablebooks/sphinx-book-theme/blob/main/src/sphinx_book_theme/theme/sphinx_book_theme/components/sbt-sidebar-nav.html #}
-<nav class="bd-links bd-docs-nav" aria-label="Main">
+<nav class="bd-links bd-docs-nav" aria-label="{{ _('Main') }}">
     <div class="bd-toc-item navbar-nav active">
         {# Ref: https://github.com/pydata/pydata-sphinx-theme/blob/9fd11dffe6faa2a6070e87191ef1e8f51b324a9f/src/pydata_sphinx_theme/toctree.py#L337 #}
         {{- generate_toctree_html(
