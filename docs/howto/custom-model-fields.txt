@@ -486,6 +486,14 @@ to use the same data type::
         def rel_db_type(self, connection):
             return "integer UNSIGNED"
 
+        def get_internal_type(self):
+            return "BigAutoField"
+
+The :meth:`~Field.get_internal_type` override is needed because integer
+lookups use it to find the allowed range of values. Without it, looking up
+a row whose id is above the ``AutoField`` range finds nothing, even though
+the row exists.
+
 .. _converting-values-to-python-objects:
 
 Converting values to Python objects
@@ -676,10 +684,13 @@ fields.
 Emulating built-in field types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you have created a :meth:`.db_type` method, you don't need to worry about
-:meth:`.get_internal_type` -- it won't be used much. Sometimes, though, your
-database storage is similar in type to some other field, so you can use that
-other field's logic to create the right column.
+If you have created a :meth:`.db_type` method, :meth:`.get_internal_type`
+isn't used to create the column, but Django also uses it to determine the
+range of values accepted in integer lookups. If your :meth:`.db_type` changes
+that range, override :meth:`.get_internal_type` to return a type with an equal
+or wider range. Sometimes, though, your database storage is similar in type
+to some other field, so you can use that other field's logic to create the
+right column.
 
 For example::
 
