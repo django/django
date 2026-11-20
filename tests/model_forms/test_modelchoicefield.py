@@ -80,6 +80,21 @@ class ModelChoiceFieldTests(TestCase):
         self.assertEqual(f.clean(self.c1.slug), self.c1)
         self.assertEqual(f.clean(self.c1), self.c1)
 
+    def test_clean_sliced_queryset(self):
+        f = forms.ModelChoiceField(Category.objects.order_by("pk")[:2], required=False)
+        self.assertEqual(
+            list(f.choices),
+            [
+                ("", get_blank_choice_label()),
+                (self.c1.pk, "Entertainment"),
+                (self.c2.pk, "A test"),
+            ],
+        )
+        self.assertIsNone(f.clean(""))
+        msg = "ModelChoiceField does not support sliced querysets."
+        with self.assertRaisesMessage(TypeError, msg):
+            f.clean(self.c1.pk)
+
     def test_model_choice_null_characters(self):
         f = forms.ModelChoiceField(queryset=ExplicitPK.objects.all())
         msg = "Null characters are not allowed."
