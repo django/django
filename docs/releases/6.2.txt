@@ -151,6 +151,9 @@ Minor features
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* The new :func:`django.contrib.messages.clear_messages` function allows
+  clearing all messages from the message storage.
+
 * ...
 
 :mod:`django.contrib.postgres`
