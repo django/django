@@ -108,3 +108,39 @@ Plural for a `translate` and `blocktranslate` collision case
 {% endblocktranslate %}
 
 {% translate "Non-breaking space :" %}
+
+{# BasicExtractorTests.test_multiline_tags #}
+{% translate "Translatable literal #10a"
+    as var
+    context "Multiline translate context"
+%}
+{% translate "Translatable literal #10b" %}
+{% blocktranslate
+    with a=1
+    context "Multiline blocktranslate context"
+%}Translatable literal #10c {{ a }}{% endblocktranslate %}
+{% translate "Translatable literal #10d" %}
+{% blocktranslate
+    count 2
+    context "Multiline plural context"
+%}Translatable literal #10e-singular{%
+    plural
+%}Translatable literal #10e-plural{%
+    endblocktranslate
+%}
+{% translate "Translatable literal #10f" %}
+{% with
+    foo=_("Translatable literal #10g")
+%}{% endwith %}
+{% translate "Translatable literal #10h" %}
+{% if
+    foo
+%}{% endif %}
+{% translate "Translatable literal #10i" %}
+{%
+    comment
+%}Translators: Translator comment in multiline comment tags
+{%
+    endcomment
+%}
+{% translate "Translatable literal #10j" %}

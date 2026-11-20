@@ -11,3 +11,6 @@
 {% translate "Translatable literal #9i" %}
 {# Translators: valid i18n comment #8 #}{# Translators: valid i18n comment #9 #}
 {% translate "Translatable literal #9j" %}
+{# Translators: ignored i18n comment #10 #}{% translate "Translatable literal #9k"
+    context "Context #9k"
+%}
