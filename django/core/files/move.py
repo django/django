@@ -6,6 +6,7 @@ Move a file in the safest way possible::
 """
 
 import os
+import stat
 from shutil import copymode, copystat
 
 from django.core.files import locks
@@ -58,6 +59,10 @@ def file_move_safe(
                 | (os.O_EXCL if not allow_overwrite else 0)
                 | os.O_TRUNC
             ),
+            # Keep newly created files private until copystat() applies the
+            # source permissions after copying. Existing destinations retain
+            # their permissions when allow_overwrite=True.
+            mode=stat.S_IRUSR | stat.S_IWUSR,
         )
         try:
             locks.lock(fd, locks.LOCK_EX)
