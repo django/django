@@ -73,14 +73,22 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             return "JSONField"
         return field_type
 
-    def get_table_list(self, cursor):
+    def get_table_list(self, cursor, only_tables=None):
         """Return a list of table and view names in the current database."""
         # Skip the sqlite_sequence system table used for autoincrement key
         # generation.
-        cursor.execute("""
+        sql = """
             SELECT name, type FROM sqlite_master
-            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
-            ORDER BY name""")
+            WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'"""
+        params = None
+        if (
+            only_tables
+            and len(only_tables) <= self.connection.features.max_query_params
+        ):
+            placeholders = ", ".join(["%s"] * len(only_tables))
+            sql += f" AND name IN ({placeholders})"
+            params = sorted(only_tables)
+        cursor.execute(f"{sql} ORDER BY name", params)
         return [TableInfo(row[0], row[1][0]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):

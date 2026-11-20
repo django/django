@@ -57,9 +57,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         return super().get_field_type(data_type, description)
 
-    def get_table_list(self, cursor):
+    def get_table_list(self, cursor, only_tables=None):
         """Return a list of table and view names in the current database."""
-        cursor.execute("""
+        sql = """
             SELECT
                 user_tables.table_name,
                 't',
@@ -78,7 +78,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT view_name, 'v', NULL FROM user_views
             UNION ALL
             SELECT mview_name, 'v', NULL FROM user_mviews
-        """)
+        """
+        params = None
+        if only_tables and len(only_tables) <= self.connection.ops.max_in_list_size():
+            # Match the lowercased names from identifier_converter().
+            placeholders = ", ".join(["%s"] * len(only_tables))
+            sql = f"SELECT * FROM ({sql}) WHERE LOWER(table_name) IN ({placeholders})"
+            params = sorted(only_tables)
+        cursor.execute(sql, params)
         return [
             TableInfo(self.identifier_converter(row[0]), row[1], row[2])
             for row in cursor.fetchall()

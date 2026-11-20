@@ -411,7 +411,11 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``DatabaseIntrospection.table_names()`` and ``get_table_list()`` now accept
+  an ``only_tables`` argument. ``table_names()`` returns only the tables whose
+  names are in it, and passes the names to ``get_table_list()``, which may use
+  them to filter the tables in the database. Third-party backends that override
+  either method must accept the new argument.
 
 :mod:`django.contrib.admin`
 ---------------------------

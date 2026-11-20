@@ -77,16 +77,22 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             return "JSONField"
         return field_type
 
-    def get_table_list(self, cursor):
+    def get_table_list(self, cursor, only_tables=None):
         """Return a list of table and view names in the current database."""
-        cursor.execute("""
+        sql = """
             SELECT
                 table_name,
                 table_type,
                 table_comment
             FROM information_schema.tables
             WHERE table_schema = DATABASE()
-            """)
+            """
+        params = None
+        if only_tables:
+            placeholders = ", ".join(["%s"] * len(only_tables))
+            sql += f" AND table_name IN ({placeholders})"
+            params = sorted(only_tables)
+        cursor.execute(sql, params)
         return [
             TableInfo(row[0], {"BASE TABLE": "t", "VIEW": "v"}.get(row[1]), row[2])
             for row in cursor.fetchall()
