@@ -8,6 +8,7 @@ certain test -- e.g. being a DateField or ForeignKey.
 
 import datetime
 
+from django import forms
 from django.contrib.admin.exceptions import NotRegistered
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.utils import (
@@ -17,6 +18,7 @@ from django.contrib.admin.utils import (
     prepare_lookup_value,
     reverse_field_path,
 )
+from django.contrib.admin.widgets import AutocompleteSelect
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.utils import timezone
@@ -649,6 +651,60 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
         return field.get_choices(
             include_blank=False, limit_choices_to={"pk__in": pk_qs}, ordering=ordering
         )
+
+
+class AutocompleteFieldListFilter(RelatedFieldListFilter):
+    """A related field filter that uses the admin autocomplete widget."""
+
+    template = "admin/autocomplete_filter.html"
+
+    def field_choices(self, field, request, model_admin):
+        # Choices are loaded asynchronously by the autocomplete widget.
+        return ()
+
+    def has_output(self):
+        return True
+
+    def choices(self, changelist):
+        return ()
+
+    def __init__(self, field, request, params, model, model_admin, field_path):
+        if not (field.many_to_one or field.one_to_one or field.many_to_many):
+            raise ImproperlyConfigured(
+                "AutocompleteFieldListFilter must be used with a forward "
+                "relationship field."
+            )
+        super().__init__(field, request, params, model, model_admin, field_path)
+        form_field = forms.ModelChoiceField(
+            queryset=field.remote_field.model._default_manager.complex_filter(
+                field.get_limit_choices_to()
+            ),
+            required=False,
+            widget=AutocompleteSelect(
+                field,
+                model_admin.admin_site,
+                using=model_admin.get_queryset(request).db,
+            ),
+        )
+        form_class = type(
+            "AutocompleteFieldFilterForm",
+            (forms.Form,),
+            {self.lookup_kwarg: form_field},
+        )
+        form = form_class(initial={self.lookup_kwarg: self.lookup_val})
+        self.form_field = form[self.lookup_kwarg]
+        # Match ChangeList.filter_params, which omits pagination and error
+        # parameters.
+        self.extra_parameters = [
+            (key, value)
+            for key, values in request.GET.lists()
+            if key not in (*self.expected_parameters(), "p", "e")
+            for value in values
+        ]
+
+    @property
+    def media(self):
+        return self.form_field.field.widget.media
 
 
 class EmptyFieldListFilter(FieldListFilter):
