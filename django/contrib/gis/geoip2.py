@@ -32,18 +32,6 @@ else:
     __all__ += ["GeoIP2", "GeoIP2Exception"]
 
 
-# These are the values stored in the `database_type` field of the metadata.
-# See https://maxmind.github.io/MaxMind-DB/#database_type for details.
-SUPPORTED_DATABASE_TYPES = {
-    "DBIP-City-Lite",
-    "DBIP-Country-Lite",
-    "GeoIP2-City",
-    "GeoIP2-Country",
-    "GeoLite2-City",
-    "GeoLite2-Country",
-}
-
-
 class GeoIP2Exception(Exception):
     pass
 
@@ -63,6 +51,19 @@ class GeoIP2:
     cache_options = frozenset(
         (MODE_AUTO, MODE_MMAP_EXT, MODE_MMAP, MODE_FILE, MODE_MEMORY)
     )
+
+    # These are the values stored in the `database_type` field of the metadata.
+    # See https://maxmind.github.io/MaxMind-DB/#database_type for details.
+    SUPPORTED_DATABASE_TYPES = {
+        "DBIP-City",
+        "DBIP-City-Lite",
+        "DBIP-Country",
+        "DBIP-Country-Lite",
+        "GeoIP2-City",
+        "GeoIP2-Country",
+        "GeoLite2-City",
+        "GeoLite2-Country",
+    }
 
     _path = None
     _reader = None
@@ -116,7 +117,7 @@ class GeoIP2:
             )
 
         database_type = self._metadata.database_type
-        if database_type not in SUPPORTED_DATABASE_TYPES:
+        if database_type not in self.SUPPORTED_DATABASE_TYPES:
             raise GeoIP2Exception(f"Unable to handle database edition: {database_type}")
 
     def __del__(self):
