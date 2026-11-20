@@ -5,6 +5,7 @@ from django.template import Library, Node, TemplateSyntaxError, Variable
 from django.template.base import TokenType, render_value_in_context
 from django.template.defaulttags import token_kwargs
 from django.utils import translation
+from django.utils.html import escape
 from django.utils.safestring import SafeData, SafeString, mark_safe
 
 register = Library()
@@ -72,10 +73,18 @@ class GetCurrentLanguageBidiNode(Node):
 class TranslateNode(Node):
     child_nodelists = ()
 
-    def __init__(self, filter_expression, noop, asvar=None, message_context=None):
+    def __init__(
+        self,
+        filter_expression,
+        noop,
+        asvar=None,
+        message_context=None,
+        force_escape=False,
+    ):
         self.noop = noop
         self.asvar = asvar
         self.message_context = message_context
+        self.force_escape = force_escape
         self.filter_expression = filter_expression
         if isinstance(self.filter_expression.var, str):
             self.filter_expression.is_var = True
@@ -94,6 +103,8 @@ class TranslateNode(Node):
         is_safe = isinstance(value, SafeData)
         value = value.replace("%%", "%")
         value = mark_safe(value) if is_safe else value
+        if self.force_escape:
+            value = escape(value)
         if self.asvar:
             context[self.asvar] = value
             return ""
@@ -113,6 +124,7 @@ class BlockTranslateNode(Node):
         trimmed=False,
         asvar=None,
         tag_name="blocktranslate",
+        force_escape=False,
     ):
         self.extra_context = extra_context
         self.singular = singular
@@ -123,6 +135,7 @@ class BlockTranslateNode(Node):
         self.trimmed = trimmed
         self.asvar = asvar
         self.tag_name = tag_name
+        self.force_escape = force_escape
 
     def __repr__(self):
         return (
@@ -175,6 +188,10 @@ class BlockTranslateNode(Node):
                 result = translation.pgettext(message_context, singular)
             else:
                 result = translation.gettext(singular)
+        if self.force_escape:
+            # Escape the translated text before interpolation. Variables are
+            # escaped on their own by render_value_in_context().
+            result = escape(result)
         default_value = context.template.engine.string_if_invalid
 
         def render_value(key):
@@ -396,6 +413,11 @@ def do_translate(parser, token):
         {% translate "this is a test" context "greeting" %}
 
     This is equivalent to calling pgettext instead of (u)gettext.
+
+    Translations are not escaped by default. Use ``force_escape`` to escape
+    the translated string, e.g. inside an HTML attribute::
+
+        <input value="{% translate "this is a test" force_escape %}">
     """
     bits = token.split_contents()
     if len(bits) < 2:
@@ -406,8 +428,9 @@ def do_translate(parser, token):
     noop = False
     asvar = None
     message_context = None
+    force_escape = False
     seen = set()
-    invalid_context = {"as", "noop"}
+    invalid_context = {"as", "noop", "force_escape"}
 
     while remaining:
         option = remaining.pop(0)
@@ -417,6 +440,8 @@ def do_translate(parser, token):
             )
         elif option == "noop":
             noop = True
+        elif option == "force_escape":
+            force_escape = True
         elif option == "context":
             try:
                 value = remaining.pop(0)
@@ -442,7 +467,8 @@ def do_translate(parser, token):
         else:
             raise TemplateSyntaxError(
                 "Unknown argument for '%s' tag: '%s'. The only options "
-                "available are 'noop', 'context' \"xxx\", and 'as VAR'."
+                "available are 'noop', 'context' \"xxx\", 'force_escape', and "
+                "'as VAR'."
                 % (
                     bits[0],
                     option,
@@ -450,7 +476,7 @@ def do_translate(parser, token):
             )
         seen.add(option)
 
-    return TranslateNode(message_string, noop, asvar, message_context)
+    return TranslateNode(message_string, noop, asvar, message_context, force_escape)
 
 
 @register.tag("blocktranslate")
@@ -495,6 +521,11 @@ def do_block_translate(parser, token):
 
     This is equivalent to calling pgettext/npgettext instead of
     (u)gettext/(u)ngettext.
+
+    The translated text is not escaped by default. Use ``force_escape`` to
+    escape it, e.g. inside an HTML attribute. Variables are escaped as usual::
+
+        {% blocktranslate force_escape %}Edit {{ name }}{% endblocktranslate %}
     """
     bits = token.split_contents()
 
@@ -528,7 +559,7 @@ def do_block_translate(parser, token):
                 raise TemplateSyntaxError(
                     '"context" in %r tag expected exactly one argument.' % bits[0]
                 )
-        elif option == "trimmed":
+        elif option in ("trimmed", "force_escape"):
             value = True
         elif option == "asvar":
             try:
@@ -556,6 +587,7 @@ def do_block_translate(parser, token):
     extra_context = options.get("with", {})
 
     trimmed = options.get("trimmed", False)
+    force_escape = options.get("force_escape", False)
 
     singular = []
     plural = []
@@ -593,6 +625,7 @@ def do_block_translate(parser, token):
         trimmed=trimmed,
         asvar=asvar,
         tag_name=bits[0],
+        force_escape=force_escape,
     )
 
 

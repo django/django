@@ -5,7 +5,7 @@
 
 {% if not is_popup %}
 {% block nav-breadcrumbs %}
-  <nav aria-label="{% translate 'Breadcrumbs' %}">
+  <nav aria-label="{% translate 'Breadcrumbs' force_escape %}">
     <ol class="breadcrumbs">
       <li><a href="{% url 'admin:index' %}">{% translate 'Home' %}</a></li>
       <li aria-current="page">
