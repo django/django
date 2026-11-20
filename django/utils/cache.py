@@ -365,6 +365,14 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
         data = value.encode()
         # Use the netstring delimiter (with trailing comma).
         ctx.update(b"%d:%s," % (len(data), data))
+    if method == "QUERY":
+        # RFC 10008 requires the cache key for a QUERY request to
+        # incorporate the request content and related metadata.
+        for meta_key in ("CONTENT_TYPE", "HTTP_CONTENT_ENCODING"):
+            data = request.META.get(meta_key, "").encode()
+            ctx.update(b"%d:%s," % (len(data), data))
+        body = request.body
+        ctx.update(b"%d:%s," % (len(body), body))
     url = md5(request.build_absolute_uri().encode("ascii"), usedforsecurity=False)
     cache_key = "views.decorators.cache.cache_page.%s.%s.%s.%s" % (
         key_prefix,
@@ -382,6 +390,10 @@ def _generate_cache_header_key(key_prefix, request):
         key_prefix,
         url.hexdigest(),
     )
+    if request.method == "QUERY":
+        # QUERY responses may vary on other headers than GET and HEAD
+        # responses for the same URL, so they keep their own header list.
+        cache_key += ".QUERY"
     return _i18n_cache_key_suffix(request, cache_key)
 
 
