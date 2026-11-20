@@ -1,7 +1,7 @@
 import json
 from io import StringIO
 from pathlib import Path
-from unittest import mock, skipIf
+from unittest import mock, skipIf, skipUnless
 
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
@@ -22,7 +22,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
-from django.db.models import F, OuterRef, Subquery
+from django.db.models import F, Func, IntegerField, OuterRef, Subquery
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
@@ -55,6 +55,14 @@ class GeoModelTest(TestCase):
         self.assertEqual(2, Country.objects.count())
         self.assertEqual(8, City.objects.count())
         self.assertEqual(2, State.objects.count())
+
+    @skipUnless(connection.ops.mysql, "MySQL specific test.")
+    def test_stored_srid(self):
+        city = City.objects.create(name="Origin", point=Point(0, 0, srid=4326))
+        stored_srid = Func("point", function="ST_SRID", output_field=IntegerField())
+        self.assertEqual(
+            City.objects.values_list(stored_srid, flat=True).get(pk=city.pk), 0
+        )
 
     def test_proxy(self):
         "Testing Lazy-Geometry support (using the GeometryProxy)."

@@ -1,5 +1,6 @@
 from django.contrib.gis.gdal import SpatialReference
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.transaction import TransactionManagementError
 
 
 def add_srs_entry(
@@ -25,7 +26,7 @@ def add_srs_entry(
        Defaults to the SRID determined by GDAL.
 
      ref_sys_name:
-       For SpatiaLite users only, sets the value of the `ref_sys_name` field.
+       For MySQL and SpatiaLite, the name of the spatial reference system.
        Defaults to the name determined by GDAL.
 
      database:
@@ -52,6 +53,28 @@ def add_srs_entry(
             "Spatial reference requires an SRID to be "
             "compatible with the spatial backend."
         )
+
+    if connection.ops.mysql:
+        if SpatialRefSys.objects.using(database).filter(srid=srs.srid).exists():
+            return
+        # Creating a MySQL SRS implicitly commits any open transaction.
+        if not connection.get_autocommit():
+            raise TransactionManagementError(
+                "Adding a spatial reference system on MySQL requires autocommit."
+            )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "CREATE SPATIAL REFERENCE SYSTEM IF NOT EXISTS %s "
+                "NAME %s DEFINITION %s ORGANIZATION %s IDENTIFIED BY %s",
+                (
+                    srs.srid,
+                    ref_sys_name or srs.name,
+                    srs.wkt,
+                    auth_name,
+                    srs.srid if auth_srid is None else auth_srid,
+                ),
+            )
+        return
 
     # Initializing the keyword arguments dictionary for both PostGIS
     # and SpatiaLite.

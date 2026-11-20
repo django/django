@@ -165,6 +165,15 @@ class OperationTests(OperationTestCase):
             self.alter_gis_model(migrations.RemoveField, "Neighborhood", "path")
         self.assertColumnNotExists("gis_neighborhood", "path")
 
+    @skipUnless(connection.ops.mysql, "MySQL specific test.")
+    def test_mysql_geometry_column(self):
+        column = connection.ops.geometry_columns().objects.get(
+            f_table_name="gis_neighborhood", f_geometry_column="geom"
+        )
+        self.assertEqual(column.f_table_schema, connection.settings_dict["NAME"])
+        self.assertEqual(column.type.lower(), "multipolygon")
+        self.assertIsNone(column.srid)
+
     @skipUnless(HAS_GEOMETRY_COLUMNS, "Backend doesn't support GeometryColumns.")
     def test_geom_col_name(self):
         self.assertEqual(

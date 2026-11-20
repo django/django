@@ -12,6 +12,11 @@ class BaseSpatialFeatures:
     # information?
     has_spatialrefsys_table = True
 
+    # Does the geometry constructor receive an SRID when storing a literal?
+    @property
+    def supports_srid_in_geometry_literals(self):
+        return self.has_spatialrefsys_table
+
     # Does the backend support the django.contrib.gis.utils.add_srs_entry()
     # utility?
     supports_add_srs_entry = True
