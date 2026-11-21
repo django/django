@@ -52,6 +52,12 @@ def extract(path, to_path):
         archive.extract(to_path)
 
 
+def get_size(path):
+    """Return the total uncompressed size, in bytes, of the archive at path."""
+    with Archive(path) as archive:
+        return archive.get_size()
+
+
 class Archive:
     """
     The external API class that encapsulates an archive implementation.
@@ -97,6 +103,9 @@ class Archive:
 
     def close(self):
         self._archive.close()
+
+    def get_size(self):
+        return self._archive.get_size()
 
 
 class BaseArchive:
@@ -206,6 +215,10 @@ class TarArchive(BaseArchive):
     def close(self):
         self._archive.close()
 
+    def get_size(self):
+        size = sum(archive_file.size for archive_file in self._archive.getmembers())
+        return size
+
 
 class ZipArchive(BaseArchive):
     def __init__(self, file):
@@ -240,6 +253,10 @@ class ZipArchive(BaseArchive):
 
     def close(self):
         self._archive.close()
+
+    def get_size(self):
+        size = sum(archive_file.file_size for archive_file in self._archive.filelist)
+        return size
 
 
 extension_map = dict.fromkeys(
