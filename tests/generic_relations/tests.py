@@ -1,8 +1,16 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.prefetch import GenericPrefetch
-from django.core.exceptions import FieldError, FieldFetchBlocked
+from django.core.exceptions import (
+    FieldError,
+    FieldFetchBlocked,
+    SynchronousOnlyOperation,
+)
 from django.db.models import Q, prefetch_related_objects
-from django.db.models.fetch_modes import FETCH_PEERS, FETCH_RAISE
+from django.db.models.fetch_modes import (
+    ASYNC_UNSAFE_FETCH_MSG,
+    FETCH_PEERS,
+    FETCH_RAISE,
+)
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
@@ -819,6 +827,12 @@ class GenericRelationsTests(TestCase):
             tag.content_object
         self.assertIsNone(cm.exception.__cause__)
         self.assertTrue(cm.exception.__suppress_context__)
+
+    async def test_fetch_mode_async(self):
+        tag = await TaggedItem.objects.aget(tag="salty")
+        msg = ASYNC_UNSAFE_FETCH_MSG.format(model="TaggedItem", field="content_object")
+        with self.assertRaisesMessage(SynchronousOnlyOperation, msg):
+            tag.content_object
 
     def test_fetch_mode_copied_forward_fetching_one(self):
         tag = TaggedItem.objects.fetch_mode(FETCH_PEERS).get(tag="yellow")
