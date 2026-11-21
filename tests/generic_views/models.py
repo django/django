@@ -43,7 +43,7 @@ class Book(models.Model):
     slug = models.SlugField()
     pages = models.IntegerField()
     authors = models.ManyToManyField(Author)
-    pubdate = models.DateField()
+    pubdate = models.DateField(null=True)
 
     objects = models.Manager()
     does_not_exist = DoesNotExistBookManager()
