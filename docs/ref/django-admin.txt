@@ -757,6 +757,15 @@ Prevents deleting the temporary ``.pot`` files generated before creating the
 ``.po`` file. This is useful for debugging errors which may prevent the final
 language files from being created.
 
+.. cli-option:: --dry-run
+
+Reports which message files would be created or updated without writing
+anything. Exits with a non-zero status if any catalog would change, which
+makes it useful for checking whether translations are up to date, for
+example in continuous integration.
+
+.. versionadded:: 6.2
+
 .. seealso::
 
     See :ref:`customizing-makemessages` for instructions on how to customize
