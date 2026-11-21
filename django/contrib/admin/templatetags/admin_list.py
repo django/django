@@ -275,26 +275,30 @@ def items_for_result(cl, result, form):
             except NoReverseMatch:
                 link_or_text = result_repr
             else:
-                url = add_preserved_filters(
-                    {"preserved_filters": cl.preserved_filters, "opts": cl.opts}, url
-                )
-                # Convert the pk to something that can be used in JavaScript.
-                # Problem cases are non-ASCII strings.
-                if cl.to_field:
-                    attr = str(cl.to_field)
+                if not url:
+                    link_or_text = result_repr
                 else:
-                    attr = pk
-                value = result.serializable_value(attr)
-                link_or_text = format_html(
-                    '<a href="{}"{}>{}</a>',
-                    url,
-                    (
-                        format_html(' data-popup-opener="{}"', value)
-                        if cl.is_popup
-                        else ""
-                    ),
-                    result_repr,
-                )
+                    url = add_preserved_filters(
+                        {"preserved_filters": cl.preserved_filters, "opts": cl.opts},
+                        url,
+                    )
+                    # Convert the pk to something that can be used in
+                    # JavaScript. Problem cases are non-ASCII strings.
+                    if cl.to_field:
+                        attr = str(cl.to_field)
+                    else:
+                        attr = pk
+                    value = result.serializable_value(attr)
+                    link_or_text = format_html(
+                        '<a href="{}"{}>{}</a>',
+                        url,
+                        (
+                            format_html(' data-popup-opener="{}"', value)
+                            if cl.is_popup
+                            else ""
+                        ),
+                        result_repr,
+                    )
 
             yield format_html(
                 "<{}{}>{}</{}>", table_tag, row_class, link_or_text, table_tag
