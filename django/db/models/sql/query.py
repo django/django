@@ -2600,6 +2600,8 @@ class Query(BaseExpression):
         return self.selected is not None
 
     def set_values(self, fields):
+        # Whether values() or values_list() was already called on this query.
+        has_previous_values = self.has_select_fields
         self.select_related = False
         self.clear_deferred_loading()
         self.clear_select_fields()
@@ -2628,7 +2630,7 @@ class Query(BaseExpression):
                         (alias := f.split(LOOKUP_SEP, 1)[0]) in self.annotations
                     ):
                         if alias not in self.annotation_select:
-                            if self.annotation_select:
+                            if has_previous_values:
                                 raise FieldError(
                                     f"Cannot select the '{alias}' alias. It was "
                                     f"excluded by a previous values() or "

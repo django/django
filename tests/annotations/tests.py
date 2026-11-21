@@ -496,6 +496,15 @@ class NonAggregateAnnotationTestCase(TestCase):
                 author_name=F("authors__name"), author_id=F("authors__id")
             ).values("author_name").values("author_id")
 
+    def test_values_masked_annotation_error_message_after_values_pk(self):
+        msg = (
+            "Cannot select the 'b' alias. It was excluded by a previous "
+            "values() or values_list() call. Include 'b' in that call to "
+            "select it."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Book.objects.annotate(a=Value(1), b=Value(2)).values("pk").values("b")
+
     def test_decimal_annotation(self):
         salary = Decimal(10) ** -Employee._meta.get_field("salary").decimal_places
         Employee.objects.create(
@@ -1618,14 +1627,13 @@ class AliasTests(TestCase):
 
     def test_values_transform_on_annotation_masked_by_values(self):
         qs = Book.objects.annotate(published=TruncMonth("pubdate"))
-        msg = "Cannot select the 'published' alias. Use annotate() to promote it."
-        with self.assertRaisesMessage(FieldError, msg):
-            qs.values("pk").values("published__year")
         msg = (
             "Cannot select the 'published' alias. It was excluded by a previous "
             "values() or values_list() call. Include 'published' in that call to "
             "select it."
         )
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.values("pk").values("published__year")
         with self.assertRaisesMessage(FieldError, msg):
             qs.annotate(other=F("rating")).values("other").values("published__year")
 
@@ -1634,6 +1642,11 @@ class AliasTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Book.objects.alias(pub__date=TruncMonth("pubdate")).values("pub__date")
         qs = Book.objects.annotate(pub__date=TruncMonth("pubdate"))
+        msg = (
+            "Cannot select the 'pub__date' alias. It was excluded by a previous "
+            "values() or values_list() call. Include 'pub__date' in that call to "
+            "select it."
+        )
         with self.assertRaisesMessage(FieldError, msg):
             qs.values("pk").values("pub__date")
         self.assertEqual(
