@@ -15,6 +15,8 @@ Models, data and databases
    custom-model-fields
    writing-migrations
    custom-lookups
+   testing-file-uploads
+
 
 Templates and output
 ====================
@@ -49,6 +51,7 @@ Installing, deploying and upgrading
    windows
    deployment/index
    static-files/deployment
+
 
 Other guides
 ============
