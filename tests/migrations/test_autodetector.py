@@ -1527,6 +1527,45 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes, "testapp", 0, 1, expression=Concat(Lower("name"), Lower("surname"))
         )
 
+    def test_alter_generated_field_ignore_null(self):
+        initial_state = ModelState(
+            "testapp",
+            "Pony",
+            [
+                ("pink", models.IntegerField(default=3)),
+                (
+                    "modified_pink",
+                    models.GeneratedField(
+                        expression=models.F("pink") + models.F("pink"),
+                        output_field=models.IntegerField(),
+                        db_persist=True,
+                        null=False,
+                    ),
+                ),
+            ],
+        )
+        updated_state = ModelState(
+            "testapp",
+            "Pony",
+            [
+                ("pink", models.IntegerField(default=3)),
+                (
+                    "modified_pink",
+                    models.GeneratedField(
+                        expression=models.F("pink") + models.F("pink"),
+                        output_field=models.IntegerField(),
+                        db_persist=True,
+                        null=True,
+                    ),
+                ),
+            ],
+        )
+        changes = self.get_changes([initial_state], [updated_state])
+        self.assertNumberMigrations(changes, "testapp", 0)
+
+        changes = self.get_changes([updated_state], [initial_state])
+        self.assertNumberMigrations(changes, "testapp", 0)
+
     def test_add_fk_before_generated_field(self):
         initial_state = ModelState(
             "testapp",
