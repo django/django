@@ -2,7 +2,11 @@ import binascii
 import json
 
 from django.conf import settings
-from django.contrib.messages.storage.base import BaseStorage, Message
+from django.contrib.messages.storage.base import (
+    BaseStorage,
+    Message,
+    RestrictionsContainer,
+)
 from django.core import signing
 from django.http import SimpleCookie
 from django.utils.safestring import SafeData, mark_safe
@@ -22,6 +26,7 @@ class MessageEncoder(json.JSONEncoder):
             message = [self.message_key, is_safedata, obj.level, obj.message]
             if obj.extra_tags is not None:
                 message.append(obj.extra_tags)
+            message.append(obj.restrictions.to_json_obj())
             return message
         return super().default(obj)
 
@@ -31,12 +36,19 @@ class MessageDecoder(json.JSONDecoder):
     Decode JSON that includes serialized ``Message`` instances.
     """
 
+    def create_message(self, *vars):
+        """creates message on the basis of encoded data"""
+        args = vars[:-1]
+        restrictions = vars[-1]
+        restrictions = RestrictionsContainer.create_from_josn(restrictions)
+        return Message(*args, **{"restrictions": restrictions})
+
     def process_messages(self, obj):
         if isinstance(obj, list) and obj:
             if obj[0] == MessageEncoder.message_key:
                 if obj[1]:
                     obj[3] = mark_safe(obj[3])
-                return Message(*obj[2:])
+                return self.create_message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
             return {key: self.process_messages(value) for key, value in obj.items()}
