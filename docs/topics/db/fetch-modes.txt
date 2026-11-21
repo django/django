@@ -113,10 +113,46 @@ access of ``book.author``, like:
 
 .. code-block:: python
 
-    FieldFetchBlocked("Fetching of Primary.value blocked.")
+    FieldFetchBlocked("Fetching of Book.author blocked.")
 
 This mode can prevent unintentional queries in performance-critical
 sections of code.
+
+.. _writing-your-own-fetch-mode:
+
+Writing your own
+================
+
+You can implement your own fetch mode to perform side effects, such as emitting
+a warning. In this example the fallback strategy is ``FetchOne``, but you could
+inherit from ``FetchPeers`` instead:
+
+.. code-block::
+
+    import warnings
+    from django.db.models.fetch_modes import FetchOne
+
+
+    class LazyFetchWarning(RuntimeWarning): ...
+
+
+    class FetchWarn(FetchOne):
+        def fetch(self, fetcher, instance):
+            """Emit a warning before delegating to FetchOne."""
+            klass = instance.__class__.__qualname__
+            field_name = fetcher.field.name
+            warnings.warn(
+                f"Lazy fetch of {klass}.{field_name}",
+                LazyFetchWarning,
+            )
+            return super().fetch(fetcher, instance)
+
+.. code-block:: pycon
+
+    >>> book = Book.objects.fetch_mode(FetchWarn()).first()
+    >>> book.author
+    LazyFetchWarning: Lazy fetch of Book.author
+    <Author: ...>
 
 .. _fetch-modes-custom-manager:
 
