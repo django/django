@@ -60,7 +60,9 @@ class GDALRasterTests(SimpleTestCase):
                     ],
                 }
             )
-        self.assertEqual(rs.driver.name, "GTiff")
+            self.assertEqual(rs.driver.name, "GTiff")
+            # Close the file before removing the tmp_dir.
+            del rs
 
     def test_rs_size(self):
         self.assertEqual(self.rs.width, 163)
