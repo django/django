@@ -22,6 +22,7 @@ from django.db import migrations
 from django.db.utils import IntegrityError
 from django.test import TestCase, override_settings
 from django.test.testcases import TransactionTestCase
+from django.test.utils import captured_stdout
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
@@ -1593,6 +1594,74 @@ class CreatePermissionsTests(TestCase):
                 codename=codename,
             ).exists()
         )
+
+    def _organization_verbose_name(self, verbose_name):
+        return mock.patch.multiple(
+            Organization._meta,
+            verbose_name=verbose_name,
+            verbose_name_raw=verbose_name,
+        )
+
+    def test_verbose_name_change(self):
+        """
+        Existing permission names are updated to match a model's changed
+        verbose_name.
+        """
+        auth_tests_config = apps.get_app_config("auth_tests")
+        org_content_type = ContentType.objects.get_by_natural_key(
+            "auth_tests", "organization"
+        )
+        with self._organization_verbose_name("test org"):
+            create_permissions(auth_tests_config, verbosity=0)
+        self.assertTrue(
+            Permission.objects.filter(
+                content_type=org_content_type,
+                name="Can add test org",
+            ).exists()
+        )
+
+        with self._organization_verbose_name("new test org"):
+            create_permissions(auth_tests_config, verbosity=0)
+        self.assertTrue(
+            Permission.objects.filter(
+                content_type=org_content_type,
+                name="Can add new test org",
+            ).exists()
+        )
+        self.assertFalse(
+            Permission.objects.filter(
+                content_type=org_content_type,
+                name="Can add test org",
+            ).exists()
+        )
+
+    def test_verbose_name_change_verbosity(self):
+        """
+        Updated permissions are reported at verbosity 2, and permissions whose
+        names already match are left alone.
+        """
+        auth_tests_config = apps.get_app_config("auth_tests")
+        with self._organization_verbose_name("test org"):
+            create_permissions(auth_tests_config, verbosity=0)
+
+        with (
+            self._organization_verbose_name("new test org"),
+            captured_stdout() as stdout,
+        ):
+            create_permissions(auth_tests_config, verbosity=2)
+        for action in ("add", "change", "delete", "view"):
+            self.assertIn(
+                "Updating permission "
+                f"'Auth_Tests | new test org | Can {action} new test org'",
+                stdout.getvalue(),
+            )
+
+        with (
+            self._organization_verbose_name("new test org"),
+            captured_stdout() as stdout,
+        ):
+            create_permissions(auth_tests_config, verbosity=2)
+        self.assertEqual(stdout.getvalue(), "")
 
 
 @override_settings(

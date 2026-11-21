@@ -137,6 +137,9 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   1,500,000 to 1,800,000.
 
+* :cli:`migrate` now updates the names of default permissions when a
+  model's :attr:`~django.db.models.Options.verbose_name` changes.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -424,6 +427,17 @@ backends.
   or change permission regardless of whether the object exists.
 
 * The undocumented ``django.contrib.admin.tests`` module was removed.
+
+:mod:`django.contrib.auth`
+--------------------------
+
+* :cli:`migrate` now resets the name of each permission to the one derived
+  from its model, for both default permissions and those in
+  :attr:`Meta.permissions <django.db.models.Options.permissions>`. Names edited
+  directly in the database, for example to translate them, are overwritten
+  each time :cli:`migrate` runs. To change a permission's name, update the
+  model's :attr:`~django.db.models.Options.verbose_name` or
+  :attr:`~django.db.models.Options.permissions` instead.
 
 :mod:`django.contrib.gis`
 -------------------------
