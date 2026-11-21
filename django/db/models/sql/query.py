@@ -1144,6 +1144,11 @@ class Query(BaseExpression):
         sure chains like t1 LOUTER t2 INNER t3 aren't generated. All new
         joins are created as LOUTER if the join is nullable.
         """
+        if reuse is not None:
+            alias_candidate = join.table_alias
+            if alias_candidate in reuse:
+                return alias_candidate
+
         reuse_aliases = [
             a
             for a, j in self.alias_map.items()
