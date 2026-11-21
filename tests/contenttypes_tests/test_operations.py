@@ -3,7 +3,8 @@ from django.conf import settings
 from django.contrib.contenttypes import management as contenttypes_management
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
-from django.db import migrations, models
+from django.db import connection, migrations, models
+from django.db.migrations.recorder import MigrationRecorder
 from django.test import TransactionTestCase, override_settings
 
 
@@ -201,3 +202,64 @@ class ContentTypeOperationsTests(TransactionTestCase):
                 app_label="contenttypes_tests", model="renamedfoo"
             ).exists()
         )
+
+
+@override_settings(
+    INSTALLED_APPS=[
+        "contenttypes_tests.backward_rename_app",
+        "django.contrib.contenttypes",
+    ],
+    MIGRATION_MODULES=dict(
+        settings.MIGRATION_MODULES,
+        contenttypes="django.contrib.contenttypes.migrations",
+    ),
+)
+class ContentTypeOperationsBackwardsTests(TransactionTestCase):
+    available_apps = [
+        "contenttypes_tests.backward_rename_app",
+        "django.contrib.contenttypes",
+    ]
+
+    def setUp(self):
+        recorder = MigrationRecorder(connection)
+        for name in ["0001_initial", "0002_remove_content_type_name"]:
+            recorder.record_applied("contenttypes", name)
+            self.addCleanup(recorder.record_unapplied, "contenttypes", name)
+
+    def assertRenameRoundTrip(self):
+        ContentType.objects.create(app_label="app_backward_rename", model="foo")
+        content_types = ContentType.objects.filter(app_label="app_backward_rename")
+        call_command(
+            "migrate",
+            "app_backward_rename",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+        self.assertSequenceEqual(
+            content_types.values_list("model", flat=True), ["renamedfoo"]
+        )
+        call_command(
+            "migrate",
+            "app_backward_rename",
+            "zero",
+            database="default",
+            interactive=False,
+            verbosity=0,
+        )
+        self.assertSequenceEqual(content_types.values_list("model", flat=True), ["foo"])
+
+    def test_content_type_rename_backwards_before_contenttypes(self):
+        self.assertRenameRoundTrip()
+
+    @override_settings(
+        MIGRATION_MODULES=dict(
+            settings.MIGRATION_MODULES,
+            app_backward_rename=(
+                "contenttypes_tests.backward_rename_app.migrations_contenttypes_0001"
+            ),
+            contenttypes="django.contrib.contenttypes.migrations",
+        ),
+    )
+    def test_content_type_rename_backwards_before_contenttypes_0002(self):
+        self.assertRenameRoundTrip()
