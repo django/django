@@ -592,6 +592,11 @@ class Query(BaseExpression):
                 outer_query.annotations[alias] = aggregate.replace_expressions(
                     replacements
                 )
+            if inner_query.selected == {}:
+                # Masking every annotation selected through values() leaves
+                # an empty selection behind. Clear it as it would otherwise
+                # be used instead of the members selected for the subquery.
+                inner_query.selected = None
             if (
                 inner_query.select == ()
                 and not inner_query.default_cols
@@ -600,9 +605,16 @@ class Query(BaseExpression):
                 # In case of Model.objects[0:3].count(), there would be no
                 # field selected in the inner query, yet we must use a
                 # subquery. So, make sure at least one field is selected.
-                inner_query.select = (
-                    self.model._meta.pk.get_col(inner_query.get_initial_alias()),
-                )
+                pk = self.model._meta.pk.get_col(inner_query.get_initial_alias())
+                if (
+                    isinstance(inner_query.group_by, tuple)
+                    and pk not in inner_query.group_by
+                ):
+                    # Selecting the primary key would alter an explicit
+                    # grouping it is not part of.
+                    inner_query.select = (Value(1),)
+                else:
+                    inner_query.select = (pk,)
         else:
             outer_query = self
             self.select = ()

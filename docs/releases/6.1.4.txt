@@ -25,3 +25,7 @@ Bugfixes
   :exc:`~django.core.exceptions.ValidationError` by the
   :class:`~django.contrib.gis.forms.GeometryField` form field
   (:ticket:`37491`).
+
+* Fixed a regression in Django 5.2 where ``QuerySet.count()`` and
+  ``QuerySet.aggregate()`` could crash when ``values()`` selected only
+  aggregate annotations (:ticket:`37473`).
