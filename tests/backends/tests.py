@@ -390,6 +390,55 @@ class BackendTestCase(TransactionTestCase):
             self.create_squares(args, "pyformat", multiple=True)
         self.assertEqual(Square.objects.count(), 9)
 
+    def test_cursor_executemany_mixed_length_strings(self):
+        qn = connection.ops.quote_name
+        opts = Post._meta
+        small_text = "s" * 3500
+        large_text = "L" * 4199
+        rows = [
+            ["small", small_text, 2000],
+            ["large", large_text, 2001],
+        ]
+        with connection.cursor() as cursor:
+            cursor.executemany(
+                "INSERT INTO %s (%s, %s, %s) VALUES (%%s, %%s, %%s)"
+                % (
+                    qn(connection.introspection.identifier_converter(opts.db_table)),
+                    qn(opts.get_field("name").column),
+                    qn(opts.get_field("text").column),
+                    qn(opts.get_field("year").column),
+                ),
+                rows,
+            )
+        self.assertCountEqual(
+            Post.objects.values_list("name", flat=True), ["small", "large"]
+        )
+
+    @skipUnlessDBFeature("supports_paramstyle_pyformat")
+    def test_cursor_executemany_mixed_length_strings_pyformat(self):
+        qn = connection.ops.quote_name
+        opts = Post._meta
+        small_text = "s" * 3500
+        large_text = "L" * 4199
+        rows = [
+            {"name": "small", "text": small_text, "year": 2000},
+            {"year": 2001, "name": "large", "text": large_text},
+        ]
+        with connection.cursor() as cursor:
+            cursor.executemany(
+                "INSERT INTO %s (%s, %s, %s) VALUES (%%(name)s, %%(text)s, %%(year)s)"
+                % (
+                    qn(connection.introspection.identifier_converter(opts.db_table)),
+                    qn(opts.get_field("name").column),
+                    qn(opts.get_field("text").column),
+                    qn(opts.get_field("year").column),
+                ),
+                rows,
+            )
+        self.assertCountEqual(
+            Post.objects.values_list("name", flat=True), ["small", "large"]
+        )
+
     def test_unicode_fetches(self):
         # fetchone, fetchmany, fetchall return strings as Unicode objects.
         qn = connection.ops.quote_name

@@ -468,13 +468,16 @@ class OracleParam:
         else:
             self.input_size = None
         if self.input_size in self.lob_types:
-            if self.force_bytes is not None and not isinstance(
-                self.force_bytes, Database.LOB
-            ):
-                self.force_bytes = cursor.connection.createlob(
-                    self.input_size, self.force_bytes
-                )
-            self.input_size = None
+            self.create_lob(cursor)
+
+    def create_lob(self, cursor):
+        if self.force_bytes is not None and not isinstance(
+            self.force_bytes, Database.LOB
+        ):
+            self.force_bytes = cursor.connection.createlob(
+                self.input_size, self.force_bytes
+            )
+        self.input_size = None
 
 
 class VariableWrapper:
@@ -642,6 +645,31 @@ class FormatStylePlaceholderCursor:
             query %= tuple(args)
         return query, self._format_params(params)
 
+    def _make_lobs_homogenous_per_binding_position(self, param_groups):
+        if is_pyformat := isinstance(param_groups[0], dict):
+            has_clob = {k: False for k in param_groups[0]}
+        else:
+            has_clob = {i: False for i in range(len(param_groups[0]))}
+
+        def is_clob(param):
+            return (
+                isinstance(param.force_bytes, Database.LOB)
+                and param.force_bytes.type == Database.DB_TYPE_CLOB
+            )
+
+        for group in param_groups:
+            items = group.items() if is_pyformat else enumerate(group)
+            for key, param in items:
+                has_clob[key] |= is_clob(param)
+        if not any(has_clob.values()):
+            return
+        for group in param_groups:
+            items = group.items() if is_pyformat else enumerate(group)
+            for key, param in items:
+                if has_clob[key] and isinstance(param.force_bytes, str):
+                    param.input_size = Database.DB_TYPE_CLOB
+                    param.create_lob(self)
+
     def execute(self, query, params=None):
         query, params = self._fix_for_params(query, params, unify_by_values=True)
         self._guess_input_sizes([params])
@@ -658,6 +686,7 @@ class FormatStylePlaceholderCursor:
         # we build a list of formatted params; as we're going to traverse it
         # more than once, we can't make it lazy by using a generator
         formatted = [firstparams] + [self._format_params(p) for p in params_iter]
+        self._make_lobs_homogenous_per_binding_position(formatted)
         self._guess_input_sizes(formatted)
         with wrap_oracle_errors():
             return self.cursor.executemany(

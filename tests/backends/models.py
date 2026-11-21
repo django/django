@@ -71,6 +71,7 @@ class Post(models.Model):
     name = models.CharField(max_length=30)
     text = models.TextField()
     tags = GenericRelation("Tag")
+    year = models.PositiveIntegerField(default=2000)
 
     class Meta:
         db_table = "CaseSensitive_Post"
