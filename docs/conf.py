@@ -245,6 +245,10 @@ html_css_files = [
     "console-tabs.css",
 ]
 
+# JS files to include in both html and epub builds. (There is no Sphinx
+# `epub_js_files` setting. To include JS in html only, see add_custom_js().)
+# html_js_files = []
+
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 html_last_updated_fmt = "%b %d, %Y"
@@ -436,7 +440,10 @@ epub_cover = ("", "epub-cover.html")
 # epub_post_files = []
 
 # A list of files that should not be packed into the epub file.
-epub_exclude_files = [join("_static", "console-tabs.css")]
+epub_exclude_files = [
+    join("_static", "console-tabs.css"),
+    join("_static", "console-tabs.js"),
+]
 
 # Empty, rather than defaulting to html_css_files, because its only entry is
 # the console-tabs.css excluded above. Any epub compatible addition to
@@ -463,6 +470,15 @@ epub_css_files = []
 
 # If false, no index is generated.
 # epub_use_index = True
+
+
+def add_custom_js(app):
+    if app.builder.name != "epub":
+        app.add_js_file("console-tabs.js", type="module")
+
+
+def setup(app):
+    app.connect("builder-inited", add_custom_js)
 
 
 def version_github_linkcode_resolve(domain, info):
