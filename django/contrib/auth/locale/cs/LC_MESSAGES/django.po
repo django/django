@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Jakub Boukal, 2026
 # Jan Munclinger <jan.munclinger@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jiří Podhorecký <jirka.p@volny.cz>, 2024
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 11:46-0300\n"
-"PO-Revision-Date: 2024-10-07 08:09+0000\n"
-"Last-Translator: Jiří Podhorecký <jirka.p@volny.cz>, 2024\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Jakub Boukal, 2026\n"
 "Language-Team: Czech (http://app.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,12 +62,6 @@ msgstr "heslo"
 msgid "last login"
 msgstr "poslední přihlášení"
 
-msgid "No password set."
-msgstr "Heslo nenastaveno."
-
-msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Neplatný formát hesla nebo neplatný hashovací algoritmus."
-
 msgid "Reset password"
 msgstr "Resetovat heslo"
 
@@ -76,15 +71,6 @@ msgstr "Nastavit heslo"
 msgid "The two password fields didn’t match."
 msgstr "Hesla se neshodují."
 
-msgid ""
-"Whether the user will be able to authenticate using a password or not. If "
-"disabled, they may still be able to authenticate using other backends, such "
-"as Single Sign-On or LDAP."
-msgstr ""
-"Zda se uživatel bude moci ověřit pomocí hesla, nebo ne. Pokud je zakázáno, "
-"může být stále schopen ověřit se pomocí jiných backendů, například Single "
-"Sign-On nebo LDAP."
-
 msgid "Password"
 msgstr "Heslo"
 
@@ -93,6 +79,15 @@ msgstr "Potvrzení hesla"
 
 msgid "Enter the same password as before, for verification."
 msgstr "Zadejte pro ověření stejné heslo jako předtím."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Zda se uživatel bude moci ověřit pomocí hesla, nebo ne. Pokud je zakázáno, "
+"může být stále schopen ověřit se pomocí jiných backendů, například Single "
+"Sign-On nebo LDAP."
 
 msgid "Password-based authentication"
 msgstr "Ověřování pomocí hesla"
@@ -263,16 +258,13 @@ msgid "users"
 msgstr "uživatelé"
 
 #, python-format
-msgid ""
-"This password is too short. It must contain at least %(min_length)d "
-"character."
+msgid "This password is too short. It must contain at least %d character."
 msgid_plural ""
-"This password is too short. It must contain at least %(min_length)d "
-"characters."
-msgstr[0] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znak."
-msgstr[1] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znaky."
-msgstr[2] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znaků."
-msgstr[3] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znaků."
+"This password is too short. It must contain at least %d characters."
+msgstr[0] "Heslo je příliš krátké. Musí mít délku aspoň %d znak."
+msgstr[1] "Heslo je příliš krátké. Musí mít délku aspoň %d znaky."
+msgstr[2] "Heslo je příliš krátké. Musí mít délku aspoň %d znaků."
+msgstr[3] "Heslo je příliš krátké. Musí mít délku aspoň %d znaků."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -304,6 +296,12 @@ msgstr "Vaše heslo nemůže být čistě číselné."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Obnovení hesla na webu %(site_name)s"
+
+msgid "No password set."
+msgstr "Heslo nenastaveno."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Neplatný formát hesla nebo neplatný hashovací algoritmus."
 
 msgid ""
 "Enter a valid username. This value may contain only unaccented lowercase a-z "

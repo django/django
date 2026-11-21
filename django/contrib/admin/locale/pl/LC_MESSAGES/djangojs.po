@@ -6,9 +6,9 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@trilab.pl>, 2014-2015
 # 0d5641585fd67fbdb97037c19ab83e4c_18c98b0 <f6e7dac08616696bd890d93a38e13b13_5231>, 2011
-# Maciej Olko <maciej.olko@gmail.com>, 2016,2018,2020
-# Maciej Olko <maciej.olko@gmail.com>, 2023,2026
-# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021,2023,2025
+# Maciej Olko, 2016,2018,2020
+# Maciej Olko, 2023,2026
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021,2023,2025-2026
 # Roman Barczyński, 2012
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016-2017
 msgid ""
@@ -16,8 +16,9 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-20 15:53-0400\n"
-"PO-Revision-Date: 2026-08-05 07:59+0000\n"
-"Last-Translator: Maciej Olko <maciej.olko@gmail.com>, 2023,2026\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, "
+"2021,2023,2025-2026\n"
 "Language-Team: Polish (http://app.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -129,7 +130,7 @@ msgid "6 p.m."
 msgstr "6 po południu"
 
 msgid "server"
-msgstr ""
+msgstr "serwer"
 
 msgid ""
 "Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
@@ -138,9 +139,17 @@ msgid_plural ""
 "Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
 "ahead.)"
 msgstr[0] ""
+"Uwaga: Wprowadź czas w %(timezone)s strefie czasowej. (Jesteś %(offset)s "
+"godzinę do przodu.) "
 msgstr[1] ""
+"Uwaga: Wprowadź czas w %(timezone)s strefie czasowej. (Jesteś %(offset)s "
+"godziny do przodu.) "
 msgstr[2] ""
+"Uwaga: Wprowadź czas w %(timezone)s strefie czasowej. (Jesteś %(offset)s "
+"godzin do przodu.) "
 msgstr[3] ""
+"Uwaga: Wprowadź czas w %(timezone)s strefie czasowej. (Jesteś %(offset)s "
+"godzin do przodu.) "
 
 msgid ""
 "Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
@@ -149,9 +158,17 @@ msgid_plural ""
 "Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
 "behind.)"
 msgstr[0] ""
+"Uwaga: Wprowadź czas w %(timezone)s strefie czasowej. (Jesteś %(offset)s "
+"godzinę do tyłu.) "
 msgstr[1] ""
+"Uwaga: Wprowadź czas w %(timezone)s strefie czasowej. (Jesteś %(offset)s "
+"godziny do tyłu.) "
 msgstr[2] ""
+"Uwaga: Wprowadź czas w %(timezone)s strefie czasowej. (Jesteś %(offset)s "
+"godzin do tyłu.) "
 msgstr[3] ""
+"Uwaga: Wprowadź czas w %(timezone)s strefie czasowej. (Jesteś %(offset)s "
+"godzin do tyłu.) "
 
 msgid "Choose a Time"
 msgstr "Wybierz Czas"
@@ -166,7 +183,7 @@ msgid "Today"
 msgstr "Dzisiaj"
 
 msgid "Today (%(date)s)"
-msgstr ""
+msgstr "Dziś (%(date)s) "
 
 msgid "Choose a Date"
 msgstr "Wybierz Datę"
@@ -175,19 +192,19 @@ msgid "Yesterday"
 msgstr "Wczoraj"
 
 msgid "Yesterday (%(date)s)"
-msgstr ""
+msgstr "Wczoraj (%(date)s) "
 
 msgid "Tomorrow"
 msgstr "Jutro"
 
 msgid "Tomorrow (%(date)s)"
-msgstr ""
+msgstr "Jutro (%(date)s) "
 
 msgid "Previous (%(month)s %(year)s)"
-msgstr ""
+msgstr " Poprzedni (%(month)s %(year)s) "
 
 msgid "Next (%(month)s %(year)s)"
-msgstr ""
+msgstr "Następny (%(month)s %(year)s) "
 
 msgid "January"
 msgstr "Styczeń"
@@ -351,16 +368,16 @@ msgid "S"
 msgstr "S"
 
 msgid "%(month)s %(day)s, %(year)s"
-msgstr ""
+msgstr " %(month)s %(day)s, %(year)s"
 
 #, javascript-format
 msgid "%s (today, current selection)"
-msgstr ""
+msgstr "%s (dziś, obecnie wybrane) "
 
 #, javascript-format
 msgid "%s (today)"
-msgstr ""
+msgstr " %s (dziś) "
 
 #, javascript-format
 msgid "%s (current selection)"
-msgstr ""
+msgstr "%s (obecnie wybrane) "

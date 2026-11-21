@@ -13,7 +13,7 @@
 # Jonathan Lindén, 2014-2015
 # Jonathan Lindén, 2015
 # Jörgen Olofsson, 2024
-# Jörgen Olofsson, 2024
+# Jörgen Olofsson, 2024,2026
 # Ken Lewerentz, 2022
 # Ken Lewerentz, 2022
 # Jonathan Lindén, 2014
@@ -30,9 +30,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-17 18:23-0300\n"
-"PO-Revision-Date: 2025-12-03 06:49+0000\n"
-"Last-Translator: Daniel Nylander <po@danielnylander.se>, 2025\n"
+"POT-Creation-Date: 2026-07-22 16:14-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Jörgen Olofsson, 2024,2026\n"
 "Language-Team: Swedish (http://app.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -516,6 +516,9 @@ msgstr "%(model_name)s med samma %(field_labels)s finns redan."
 msgid "Constraint “%(name)s” is violated."
 msgstr "Begränsningen “%(name)s” överträds."
 
+msgid "- Select an option -"
+msgstr "- Välj ett alternativ -"
+
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Värdet %(value)r är inget giltigt alternativ."
@@ -698,6 +701,10 @@ msgstr "URL"
 
 msgid "Raw binary data"
 msgstr "Rå binärdata"
+
+#, python-format
+msgid "“%(value)s” is not a valid binary value."
+msgstr "\" %(value)s \" är ett ogiltigt binärt värde."
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -904,6 +911,12 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nej"
+
+#. Translators: %s is the name of a model, e.g. "No City matches the
+#. given query."
+#, python-format
+msgid "No %s matches the given query."
+msgstr "Hittade ingen 1%s som matchar frågan."
 
 msgctxt "Task"
 msgid "Ready"

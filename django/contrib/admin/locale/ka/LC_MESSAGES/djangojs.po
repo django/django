@@ -3,15 +3,16 @@
 # Translators:
 # André Bouatchidzé <a@anbz.net>, 2013,2015
 # David A. <avsd05@gmail.com>, 2011
+# David A. <avsd05@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Georgian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2026-05-20 15:53-0400\n"
+"PO-Revision-Date: 2026-11-18 06:49+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>, 2011\n"
+"Language-Team: Georgian (http://app.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,11 +26,8 @@ msgstr "მისაწვდომი %s"
 
 #, javascript-format
 msgid ""
-"This is the list of available %s. You may choose some by selecting them in "
-"the box below and then clicking the \"Choose\" arrow between the two boxes."
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
-"ეს არის მისაწვდომი %s-ის სია. ზოგიერთი მათგანის ასარჩევად,  მონიშვნით ისინი "
-"ქვედა სარკმელში და დააწკაპუნეთ  ორ სარკმელს შორის მდებარე ისარზე \"არჩევა\" ."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -38,18 +36,17 @@ msgstr "აკრიფეთ ამ სარკმელში მისაწ
 msgid "Filter"
 msgstr "ფილტრი"
 
-msgid "Choose all"
-msgstr "ავირჩიოთ ყველა"
+#, javascript-format
+msgid "Choose all %s"
+msgstr "ყველა %s-ის არჩევა"
 
 #, javascript-format
-msgid "Click to choose all %s at once."
-msgstr "დააწკაპუნეთ ერთდროულად ყველა %s-ის ასარჩევად."
+msgid "Choose selected %s"
+msgstr "მონიშნული %s-ის არჩევა"
 
-msgid "Choose"
-msgstr "არჩევა"
-
-msgid "Remove"
-msgstr "წავშალოთ"
+#, javascript-format
+msgid "Remove selected %s"
+msgstr "მონიშნული %s-ის წაშლა"
 
 #, javascript-format
 msgid "Chosen %s"
@@ -57,19 +54,25 @@ msgstr "არჩეული %s"
 
 #, javascript-format
 msgid ""
-"This is the list of chosen %s. You may remove some by selecting them in the "
-"box below and then clicking the \"Remove\" arrow between the two boxes."
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
-"ეს არის არჩეული %s-ის სია. ზოგიერთი მათგანის მოსაშორებლად,  მონიშვნით ისინი "
-"ქვედა სარკმელში და დააწკაპუნეთ  ორ სარკმელს შორის მდებარე ისარზე \"მოშორება"
-"\" ."
-
-msgid "Remove all"
-msgstr "ყველას მოშორება"
 
 #, javascript-format
-msgid "Click to remove all chosen %s at once."
-msgstr "დააწკაპუნეთ ყველა არჩეული %s-ის ერთდროულად მოსაშორებლად."
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
+msgid "(click to clear)"
+msgstr "(დააწკაპუნეთ გასასუფთავებლად)"
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr "ყველა %s-ის წაშლა"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s მონიშნული არჩევანი ხილული არაა"
+msgstr[1] "%s მონიშნული არჩევანი ხილული არაა"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -84,20 +87,16 @@ msgstr ""
 "შეუნახავი ცვლილებები დაიკარაგება."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"აგირჩევიათ მოქმედება, მაგრამ ცალკეული ველები ჯერ არ შეგინახიათ! გთხოვთ, "
-"შენახვისთვის დააჭიროთ OK. მოქმედების ხელახლა გაშვება მოგიწევთ."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Run button rather than the Save "
 "button."
 msgstr ""
-"აგირჩევიათ მოქმედება, მაგრამ ცალკეულ ველებში ცვლილებები არ გაგიკეთებიათ! "
-"სავარაუდოდ, ეძებთ ღილაკს \"Go\", და არა \"შენახვა\""
 
 msgid "Now"
 msgstr "ახლა"
@@ -106,28 +105,37 @@ msgid "Midnight"
 msgstr "შუაღამე"
 
 msgid "6 a.m."
-msgstr "დილის 6 სთ"
+msgstr "დილის 6 სთ."
 
 msgid "Noon"
 msgstr "შუადღე"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "საღამოს 6."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "შენიშვნა: თქვენ ხართ %s საათით წინ სერვერის დროზე."
-msgstr[1] "შენიშვნა: თქვენ ხართ %s საათით წინ სერვერის დროზე."
+msgid "server"
+msgstr "სერვერი"
 
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "შენიშვნა: თქვენ ხართ %s საათით უკან სერვერის დროზე."
-msgstr[1] "შენიშვნა: თქვენ ხართ %s საათით უკან სერვერის დროზე."
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"ahead.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"ahead.)"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hour "
+"behind.)"
+msgid_plural ""
+"Note: Enter times in the %(timezone)s timezone. (You are %(offset)s hours "
+"behind.)"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "აირჩიეთ დროი"
 
 msgid "Choose a time"
 msgstr "ავირჩიოთ დრო"
@@ -138,81 +146,202 @@ msgstr "უარი"
 msgid "Today"
 msgstr "დღეს"
 
+msgid "Today (%(date)s)"
+msgstr "დღეს (%(date)s)"
+
 msgid "Choose a Date"
-msgstr ""
+msgstr "აირჩიეთ თარიღი"
 
 msgid "Yesterday"
 msgstr "გუშინ"
 
+msgid "Yesterday (%(date)s)"
+msgstr "გუშინ (%(date)s)"
+
 msgid "Tomorrow"
 msgstr "ხვალ"
 
+msgid "Tomorrow (%(date)s)"
+msgstr "ხვალ (%(date)s)"
+
+msgid "Previous (%(month)s %(year)s)"
+msgstr "წინა (%(month)s %(year)s)"
+
+msgid "Next (%(month)s %(year)s)"
+msgstr "შემდეგი (%(month)s %(year)s)"
+
 msgid "January"
-msgstr ""
+msgstr "იანვარი"
 
 msgid "February"
-msgstr ""
+msgstr "თებერვალი"
 
 msgid "March"
-msgstr ""
+msgstr "მარტი"
 
 msgid "April"
-msgstr ""
+msgstr "აპრილი"
 
 msgid "May"
-msgstr ""
+msgstr "მაისი"
 
 msgid "June"
-msgstr ""
+msgstr "ივნისი"
 
 msgid "July"
-msgstr ""
+msgstr "ივლისი"
 
 msgid "August"
-msgstr ""
+msgstr "აგვისტო"
 
 msgid "September"
-msgstr ""
+msgstr "სექტემბერი"
 
 msgid "October"
-msgstr ""
+msgstr "ოქტომბერი"
 
 msgid "November"
-msgstr ""
+msgstr "ნოემბერი"
 
 msgid "December"
-msgstr ""
+msgstr "დეკემბერი"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "იან"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "თებ"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "მარ"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "აპრ"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "მაისი"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "ივნ"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "ივლ"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "აგვ"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "სექ"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "&რვა"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "ნოე"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "დეკ"
+
+msgid "Sunday"
+msgstr "კვირა"
+
+msgid "Monday"
+msgstr "ორშაბათი"
+
+msgid "Tuesday"
+msgstr "სამშაბათი"
+
+msgid "Wednesday"
+msgstr "ოთხშაბათი"
+
+msgid "Thursday"
+msgstr "ხუთშაბათი"
+
+msgid "Friday"
+msgstr "პარასკევი"
+
+msgid "Saturday"
+msgstr "შაბათი"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "მზე"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "ორშ"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "სამ"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "ოთხ"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "ხუთშ"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "პარ"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "შაბ"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "შაბ"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "ორშ"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "სამშ"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "ვტ"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "სამშ"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "პარ"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "შაბ"
 
-msgid "Show"
-msgstr "ვაჩვენოთ"
+msgid "%(month)s %(day)s, %(year)s"
+msgstr "%(month)s %(day)s, %(year)s"
 
-msgid "Hide"
-msgstr "დავმალოთ"
+#, javascript-format
+msgid "%s (today, current selection)"
+msgstr "%s (დღეს. მიმდინარე არჩევანი)"
+
+#, javascript-format
+msgid "%s (today)"
+msgstr "%s (დღეს)"
+
+#, javascript-format
+msgid "%s (current selection)"
+msgstr "%s (მიმდინარე არჩეული)"
