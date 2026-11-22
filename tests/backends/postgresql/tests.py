@@ -360,7 +360,6 @@ class Tests(TestCase):
             new_connection.close()
             new_connection.close_pool()
 
-
     @unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
     def test_pooling_health_checks(self):
         new_connection = no_pool_connection(alias="default_pool")
