@@ -1,9 +1,9 @@
-import ctypes
-import multiprocessing
 import os
 import pickle
+import subprocess
 import sys
 import unittest
+from pathlib import Path
 from unittest import mock
 from unittest.case import TestCase
 from unittest.result import TestResult
@@ -13,8 +13,7 @@ from django.test import SimpleTestCase
 from django.test.runner import (
     ParallelTestSuite,
     RemoteTestResult,
-    _claim_database_clone_slot,
-    _release_dead_worker_slots,
+    _wait_for_worker_results,
 )
 
 from . import models
@@ -235,59 +234,6 @@ class RemoteTestResultTest(SimpleTestCase):
         self.assertEqual(result.collectedDurations, [("None", 2.3)])
 
 
-class DatabaseCloneSlotTests(SimpleTestCase):
-    def make_slots(self, *owners):
-        slots = multiprocessing.Array(ctypes.c_longlong, len(owners))
-        for index, owner in enumerate(owners):
-            slots[index] = owner
-        return slots
-
-    def test_claims_first_free_slot(self):
-        slots = self.make_slots(101, 0, 0)
-        self.assertEqual(_claim_database_clone_slot(slots), 2)
-        self.assertEqual(slots[1], os.getpid())
-
-    def test_reclaims_slot_owned_by_own_pid(self):
-        # The OS may reuse the pid of an exited worker whose slot was not
-        # released yet.
-        slots = self.make_slots(101, os.getpid(), 0)
-        self.assertEqual(_claim_database_clone_slot(slots), 2)
-
-    def test_prefers_own_slot_over_earlier_free_slot(self):
-        # A pid already owning a slot must reclaim it rather than take an
-        # earlier free slot, otherwise a pid reused by the OS could hold two
-        # slots at once and strand the old one.
-        slots = self.make_slots(0, os.getpid())
-        self.assertEqual(_claim_database_clone_slot(slots), 2)
-        # The earlier free slot is left untouched for another worker.
-        self.assertEqual(slots[0], 0)
-
-    def test_times_out_when_no_slot_is_free(self):
-        slots = self.make_slots(101, 102)
-        msg = "could not acquire a test database clone"
-        with self.assertRaisesMessage(RuntimeError, msg):
-            _claim_database_clone_slot(slots, timeout=0)
-
-    def test_release_dead_worker_slots(self):
-        alive_worker = mock.Mock(pid=103)
-        slots = self.make_slots(101, 0, 103)
-        with mock.patch.object(
-            multiprocessing, "active_children", return_value=[alive_worker]
-        ):
-            _release_dead_worker_slots(slots)
-        self.assertEqual(list(slots), [0, 0, 103])
-
-    def test_released_slot_is_claimed_by_replacement_worker(self):
-        dead_worker_pid = 101
-        slots = self.make_slots(dead_worker_pid, 102)
-        with mock.patch.object(
-            multiprocessing, "active_children", return_value=[mock.Mock(pid=102)]
-        ):
-            _release_dead_worker_slots(slots)
-        self.assertEqual(_claim_database_clone_slot(slots), 1)
-        self.assertEqual(slots[0], os.getpid())
-
-
 class ParallelTestSuiteTest(SimpleTestCase):
     @unittest.skipUnless(tblib is not None, "requires tblib to be installed")
     def test_handle_add_error_before_first_test(self):
@@ -365,14 +311,60 @@ class ParallelTestSuiteTest(SimpleTestCase):
         test_result = TestResult()
         test_result.buffer = True
 
-        with unittest.mock.patch("multiprocessing.Pool") as mock_pool:
-
-            def fake_next(*args, **kwargs):
-                test_result.shouldStop = True
-                return (0, remote_result.events)
-
-            mock_imap = mock_pool.return_value.__enter__.return_value.imap_unordered
-            mock_imap.return_value = unittest.mock.Mock(next=fake_next)
+        with (
+            mock.patch("multiprocessing.Pipe") as pipe,
+            mock.patch("multiprocessing.Process") as process,
+            mock.patch("django.test.runner.wait") as wait,
+        ):
+            parent, child = mock.Mock(), mock.MagicMock()
+            pipe.return_value = parent, child
+            process.return_value.exitcode = None
+            wait.return_value = [parent]
+            parent.recv_bytes.side_effect = [
+                pickle.dumps(None),
+                pickle.dumps((True, (0, remote_result.events))),
+            ]
             pts.run(test_result)
 
         self.assertIn("ValueError: woops", test_result.errors[0][1])
+
+    def run_worker_scenario(self, function, *args):
+        # Start outside the test runner's worker, which cannot start children.
+        code = (
+            "import django; django.setup(); "
+            "from test_runner import parallel_worker_cases as cases; "
+            f"cases.{function}(*{args!r})"
+        )
+        completed = subprocess.run(
+            [sys.executable, "-c", code],
+            capture_output=True,
+            cwd=Path(__file__).resolve().parents[1],
+            env={**os.environ, "DJANGO_SETTINGS_MODULE": "test_sqlite"},
+            text=True,
+            timeout=30,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+
+    def test_worker_exit_reports_only_interrupted_subsuite(self):
+        for method in ("exit_during_test", "exit_on_decode"):
+            with self.subTest(method=method):
+                self.run_worker_scenario("run_worker_exit_scenario", method)
+
+    @unittest.skipIf(sys.platform == "win32", "Requires POSIX signal delivery.")
+    def test_interrupt_stops_waiting_for_worker(self):
+        self.run_worker_scenario("run_interrupt_scenario")
+
+    def test_worker_result_encoding_error(self):
+        self.run_worker_scenario("run_encoding_error_scenario")
+
+    def test_worker_waits_respect_handle_limit(self):
+        connections = list(range(65))
+        with mock.patch("django.test.runner.wait", side_effect=[[1], [64]]) as wait:
+            self.assertEqual(_wait_for_worker_results(connections), {1, 64})
+        self.assertEqual(
+            wait.call_args_list,
+            [
+                mock.call(connections[:60], timeout=0.1),
+                mock.call(connections[60:], timeout=0),
+            ],
+        )
