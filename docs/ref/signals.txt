@@ -686,6 +686,26 @@ Arguments sent with this signal:
     The :class:`~django.template.Context` with which the template was
     rendered.
 
+``pre_capture_queries``
+-----------------------
+
+.. data:: django.test.signals.pre_capture_queries
+   :module:
+
+Sent on entering a query capturing context (such as
+:meth:`~django.test.TransactionTestCase.assertNumQueries` or
+``CaptureQueriesContext``) when ``clear_caches=True``
+is specified. Handlers can clear internal or third-party caches to avoid
+test-ordering dependencies.
+
+Arguments sent with this signal:
+
+``sender``
+    The context manager class that captures queries.
+
+``connection``
+    The database connection on which queries are being captured.
+
 Database Wrappers
 =================
 
