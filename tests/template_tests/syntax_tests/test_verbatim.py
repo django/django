@@ -181,3 +181,15 @@ class VerbatimTagTests(SimpleTestCase):
             with self.subTest(template_name=template_name):
                 output = self.engine.render_to_string(template_name)
                 self.assertEqual(output, "{{ x }}")
+
+    @setup(
+        {
+            "closing_tag_without_separator": (
+                "{% verbatim note %}before {% endverbatimnote %} after"
+                "{% endverbatim note %}"
+            ),
+        }
+    )
+    def test_closing_tag_requires_separator(self):
+        output = self.engine.render_to_string("closing_tag_without_separator")
+        self.assertEqual(output, "before {% endverbatimnote %} after")

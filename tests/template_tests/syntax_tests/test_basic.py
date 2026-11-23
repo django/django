@@ -500,6 +500,35 @@ class BasicSyntaxTests(SimpleTestCase):
                         template = engine.from_string(source)
                         self.assertEqual(template.render(Context()), source)
 
+    # RemovedInDjango2029Warning.
+    @ignore_warnings(category=RemovedInDjango2029Warning)
+    def test_multiline_raw_closing_tags_disabled(self):
+        for debug in (False, True):
+            engine = Engine(debug=debug, allow_multiline_tags=False)
+            cases = (
+                ("comment", "{% comment %}", "{% endcomment %}", "after"),
+                (
+                    'comment "note"',
+                    '{% comment "note" %}',
+                    "{% endcomment %}",
+                    "after",
+                ),
+                ("verbatim", "{% verbatim %}", "{% endverbatim %}", None),
+                (
+                    "verbatim example",
+                    "{% verbatim example %}",
+                    "{% endverbatim example %}",
+                    None,
+                ),
+            )
+            for tag, opening_tag, closing_tag, expected in cases:
+                with self.subTest(debug=debug, tag=tag):
+                    body = "{%\nend" + tag + " %}{% end" + tag + "\n%}"
+                    source = opening_tag + body + closing_tag + "after"
+                    template = engine.from_string(source)
+                    expected = expected if expected is not None else body + "after"
+                    self.assertEqual(template.render(Context()), expected)
+
     @setup({"template": "{% block content %}"})
     def test_unclosed_block(self):
         msg = "Unclosed tag on line 1: 'block'. Looking for one of: endblock."
