@@ -58,3 +58,7 @@ class MigrationSchemaMissing(DatabaseError):
 
 class InvalidMigrationPlan(ValueError):
     pass
+
+
+class MigrationOperationError(Exception):
+    pass
