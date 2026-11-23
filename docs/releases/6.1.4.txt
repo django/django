@@ -35,3 +35,8 @@ Bugfixes
   :attr:`.Options.ordering` referenced related fields (:ticket:`37505`).
 
 * Added compatibility with :pypi:`pylibmc` 1.8.0 (:ticket:`37529`).
+
+* Fixed a regression in Django 6.1 where the admin changelist raised a
+  :exc:`~django.core.exceptions.FieldError` when automatic ``select_related()``
+  included a foreign key deferred by the model admin's queryset
+  (:ticket:`37536`).
