@@ -78,7 +78,8 @@ database or filesystem usage.
 
 After installing Memcached itself, you'll need to install a Memcached
 binding. There are several Python Memcached bindings available; the
-two supported by Django are :pypi:`pylibmc` and :pypi:`pymemcache`.
+two supported by Django are :pypi:`pylibmc` (below version 1.8.0) and
+:pypi:`pymemcache`.
 
 To use Memcached with Django:
 
