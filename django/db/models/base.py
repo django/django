@@ -1323,11 +1323,19 @@ class Model(AltersData, metaclass=ModelBase):
                 and hasattr(field, "fk_field")
             ):
                 obj = field.get_cached_value(self, default=None)
-                if obj and not obj._is_pk_set():
+                if obj is None:
+                    continue
+                if not obj._is_pk_set():
                     raise ValueError(
                         f"{operation_name}() prohibited to prevent data loss due to "
                         f"unsaved related object '{field.name}'."
                     )
+                if (
+                    field_val := getattr(self, field.fk_field)
+                ) in field.empty_values or isinstance(field_val, Expression):
+                    # Set related object if it has been saved after an
+                    # assignment.
+                    setattr(self, field.name, obj)
 
     def delete(self, using=None, keep_parents=False):
         if not self._is_pk_set():
