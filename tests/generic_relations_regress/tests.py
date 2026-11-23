@@ -1,4 +1,5 @@
 from django.contrib.contenttypes.models import ContentType
+from django.db import connection
 from django.db.models import ProtectedError, Q, Sum
 from django.forms.models import modelform_factory
 from django.test import TestCase, skipIfDBFeature
@@ -271,9 +272,10 @@ class GenericRelationTests(TestCase):
     def test_filter_targets_related_pk(self):
         # Use hardcoded PKs to ensure different PKs for "link" and "hs2"
         # objects.
-        HasLinkThing.objects.create(pk=1)
-        hs2 = HasLinkThing.objects.create(pk=2)
-        link = Link.objects.create(content_object=hs2, pk=1)
+        pk = connection.ops.get_hardcoded_pk
+        HasLinkThing.objects.create(pk=pk(1))
+        hs2 = HasLinkThing.objects.create(pk=pk(2))
+        link = Link.objects.create(content_object=hs2, pk=pk(1))
         self.assertNotEqual(link.object_id, link.pk)
         self.assertSequenceEqual(HasLinkThing.objects.filter(links=link.pk), [hs2])
 

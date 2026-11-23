@@ -5,7 +5,7 @@ from unittest import mock
 
 from django import dispatch
 from django.apps.registry import Apps
-from django.db import models
+from django.db import connection, models
 from django.db.models import signals
 from django.dispatch import receiver
 from django.test import SimpleTestCase, TestCase
@@ -111,7 +111,8 @@ class SignalTests(BaseSignalSetup, TestCase):
             data[:] = []
 
             p2 = Person(first_name="James", last_name="Jones")
-            p2.id = 99999
+            new_pk1 = connection.ops.get_nonexistent_pk(99999)
+            p2.id = new_pk1
             p2.save()
             self.assertEqual(
                 data,
@@ -121,7 +122,7 @@ class SignalTests(BaseSignalSetup, TestCase):
                 ],
             )
             data[:] = []
-            p2.id = 99998
+            p2.id = connection.ops.get_nonexistent_pk(99998)
             p2.save()
             self.assertEqual(
                 data,
@@ -178,9 +179,10 @@ class SignalTests(BaseSignalSetup, TestCase):
             data[:] = []
 
             p2 = Person(first_name="James", last_name="Jones")
-            p2.id = 99999
+            new_pk1 = connection.ops.get_nonexistent_pk(99999)
+            p2.id = new_pk1
             p2.save()
-            p2.id = 99998
+            p2.id = connection.ops.get_nonexistent_pk(99998)
             p2.save()
             p2.delete()
             self.assertEqual(
