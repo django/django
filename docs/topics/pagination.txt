@@ -153,3 +153,24 @@ function to paginate a queryset::
 
 In the template :file:`list.html`, you can include navigation between pages in
 the same way as in the template for the ``ListView`` above.
+
+Paginating an annotated queryset
+================================
+
+An aggregate annotation can add joins and grouping to the query that
+:class:`~django.core.paginator.Paginator` uses to count the results. If an
+annotation is only for display and preserves the number and order of rows,
+you can add it to the page's queryset after pagination.
+For example, using the :ref:`bookstore models <queryset-model-example>`, you
+can show the number of books per publisher while counting only publishers::
+
+    from django.core.paginator import Paginator
+    from django.db.models import Count
+
+    publishers = Publisher.objects.order_by("pk")
+    page = Paginator(publishers, 25).get_page(page_number)
+    page.object_list = page.object_list.annotate(num_books=Count("book"))
+
+Each publisher on the page now has a ``num_books`` attribute. To filter or
+order by ``num_books``, apply the annotation and the filter or ordering before
+pagination, since they determine which publishers appear on each page.
