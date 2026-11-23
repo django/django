@@ -1855,6 +1855,25 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(queryset.query.order_by, ("pk",))
         self.assertIs(queryset.totally_ordered, True)
 
+    def test_ordered_sliced_queryset(self):
+        for name in ["Walt", "Charles", "Arthur", "Paul"]:
+            Author.objects.create(name=name)
+        AuthorFormSet = modelformset_factory(Author, fields=["name"], extra=0)
+        queryset = Author.objects.order_by("name")[1:3]
+        formset = AuthorFormSet(queryset=queryset)
+        self.assertEqual(
+            [form.instance.name for form in formset.forms], ["Charles", "Paul"]
+        )
+
+    def test_unordered_sliced_queryset(self):
+        for name in ["Walt", "Charles", "Arthur"]:
+            Author.objects.create(name=name)
+        AuthorFormSet = modelformset_factory(Author, fields=["name"], extra=0)
+        queryset = Author.objects.order_by()[:2]
+        formset = AuthorFormSet(queryset=queryset)
+        self.assertEqual(len(formset.forms), 2)
+        self.assertIs(formset.get_queryset(), queryset)
+
     def test_prevent_duplicates_from_with_the_same_formset(self):
         FormSet = modelformset_factory(Product, fields="__all__", extra=2)
         data = {
