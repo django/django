@@ -477,6 +477,15 @@ Requests and responses
   scripts or styles without a matching nonce may be blocked or trigger
   violation reports. See :ref:`csp-nonce-generation` for details.
 
+Signals
+-------
+
+* Asynchronous signal receivers are now awaited one at a time, in the order
+  they were connected, instead of being executed concurrently. Slow receivers
+  no longer overlap, and if a receiver raises an exception,
+  :meth:`.Signal.send` and :meth:`.Signal.asend` no longer call the async
+  receivers connected after it.
+
 Tests
 -----
 

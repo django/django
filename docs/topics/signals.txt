@@ -333,8 +333,8 @@ in order to reduce the number of sync/async calling-style switches within a
 ``send()`` or ``asend()`` call, the receivers are grouped by whether or not
 they are async before being called. This means that an asynchronous receiver
 registered before a synchronous receiver may be executed after the synchronous
-receiver. In addition, async receivers are executed concurrently using
-:class:`asyncio.TaskGroup`.
+receiver. Async receivers are awaited one at a time, in the order they were
+connected.
 
 All built-in signals, except those in the async request-response cycle, are
 dispatched using :meth:`Signal.send`.
@@ -342,6 +342,10 @@ dispatched using :meth:`Signal.send`.
 .. versionchanged:: 6.1
 
     In older versions, async receivers were executed via ``asyncio.gather()``.
+
+.. versionchanged:: 6.2
+
+    In older versions, async receivers were executed concurrently.
 
 Disconnecting signals
 =====================

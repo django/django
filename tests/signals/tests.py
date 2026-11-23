@@ -1,3 +1,4 @@
+import asyncio
 import contextvars
 import gc
 from inspect import markcoroutinefunction
@@ -654,6 +655,82 @@ class AsyncReceiversTests(SimpleTestCase):
 
         result = await signal.asend_robust(self.__class__)
         self.assertEqual(result, [(async_handler, 1)])
+
+    def make_sleeping_receiver(self, finished, sleeps):
+        async def receiver(**kwargs):
+            for _ in range(sleeps):
+                await asyncio.sleep(0)
+            finished.append(sleeps)
+
+        return receiver
+
+    async def test_asend_async_receivers_run_sequentially_in_connection_order(self):
+        for method in ("asend", "asend_robust"):
+            with self.subTest(method=method):
+                signal = dispatch.Signal()
+                finished = []
+                # Connect in reverse order: if receivers ran concurrently,
+                # the one with the fewest sleeps would finish first.
+                receivers = [
+                    self.make_sleeping_receiver(finished, sleeps)
+                    for sleeps in (3, 2, 1)
+                ]
+                for receiver_ in receivers:
+                    signal.connect(receiver_)
+
+                await getattr(signal, method)(self.__class__)
+                self.assertEqual(finished, [3, 2, 1])
+
+    def test_send_async_receivers_run_sequentially_in_connection_order(self):
+        for method in ("send", "send_robust"):
+            with self.subTest(method=method):
+                signal = dispatch.Signal()
+                finished = []
+                # Connect in reverse order: if receivers ran concurrently,
+                # the one with the fewest sleeps would finish first.
+                receivers = [
+                    self.make_sleeping_receiver(finished, sleeps)
+                    for sleeps in (3, 2, 1)
+                ]
+                for receiver_ in receivers:
+                    signal.connect(receiver_)
+
+                getattr(signal, method)(self.__class__)
+                self.assertEqual(finished, [3, 2, 1])
+
+    async def test_asend_async_receiver_error_stops_dispatch(self):
+        class ReceiverException(Exception):
+            pass
+
+        async def failing_async_handler(**kwargs):
+            raise ReceiverException
+
+        async_handler = AsyncHandler()
+        signal = dispatch.Signal()
+        signal.connect(failing_async_handler)
+        signal.connect(async_handler)
+
+        with self.assertRaises(ReceiverException):
+            await signal.asend(self.__class__)
+
+        self.assertEqual(async_handler.param, 0)
+
+    def test_send_async_receiver_error_stops_dispatch(self):
+        class ReceiverException(Exception):
+            pass
+
+        async def failing_async_handler(**kwargs):
+            raise ReceiverException
+
+        async_handler = AsyncHandler()
+        signal = dispatch.Signal()
+        signal.connect(failing_async_handler)
+        signal.connect(async_handler)
+
+        with self.assertRaises(ReceiverException):
+            signal.send(self.__class__)
+
+        self.assertEqual(async_handler.param, 0)
 
 
 class TestReceiversContextVarsSharing(SimpleTestCase):

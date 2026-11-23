@@ -1,5 +1,3 @@
-import asyncio
-import contextvars
 import logging
 import threading
 import weakref
@@ -22,47 +20,6 @@ NONE_ID = _make_id(None)
 
 # A marker for caching
 NO_RECEIVERS = object()
-
-
-def _restore_context(context):
-    """
-    Check for changes in contextvars, and set them to the current
-    context for downstream consumers.
-    """
-    for cvar in context:
-        cvalue = context.get(cvar)
-        try:
-            if cvar.get() != cvalue:
-                cvar.set(cvalue)
-        except LookupError:
-            cvar.set(cvalue)
-
-
-async def _run_parallel(*coros):
-    """
-    Execute multiple asynchronous coroutines in parallel,
-    sharing the current context between them.
-    """
-    context = contextvars.copy_context()
-
-    if len(coros) == 0:
-        return []
-
-    async def run(i, coro):
-        results[i] = await coro
-
-    try:
-        async with asyncio.TaskGroup() as tg:
-            results = [None] * len(coros)
-            for i, coro in enumerate(coros):
-                tg.create_task(run(i, coro), context=context)
-        return results
-    except BaseExceptionGroup as exception_group:
-        if len(exception_group.exceptions) == 1:
-            raise exception_group.exceptions[0]
-        raise
-    finally:
-        _restore_context(context=context)
 
 
 class Signal:
@@ -226,7 +183,7 @@ class Signal:
 
         If any receivers are asynchronous, they are called after all the
         synchronous receivers via a single call to async_to_sync(). They are
-        also executed concurrently with asyncio.TaskGroup().
+        awaited one at a time, in the order they were connected.
 
         Arguments:
 
@@ -251,13 +208,11 @@ class Signal:
         if async_receivers:
 
             async def asend():
-                async_responses = await _run_parallel(
-                    *(
-                        receiver(signal=self, sender=sender, **named)
-                        for receiver in async_receivers
-                    )
-                )
-                return zip(async_receivers, async_responses)
+                async_responses = []
+                for receiver in async_receivers:
+                    response = await receiver(signal=self, sender=sender, **named)
+                    async_responses.append((receiver, response))
+                return async_responses
 
             responses.extend(async_to_sync(asend)())
         return responses
@@ -274,8 +229,8 @@ class Signal:
         If any receivers are synchronous, they are grouped and called behind a
         sync_to_async() adaption before executing any asynchronous receivers.
 
-        If any receivers are asynchronous, they are grouped and executed
-        concurrently with asyncio.TaskGroup().
+        If any receivers are asynchronous, they are grouped and awaited one at
+        a time, in the order they were connected.
 
         Arguments:
 
@@ -310,13 +265,9 @@ class Signal:
                 return []
 
         responses = await sync_send()
-        async_responses = await _run_parallel(
-            *(
-                receiver(signal=self, sender=sender, **named)
-                for receiver in async_receivers
-            )
-        )
-        responses.extend(zip(async_receivers, async_responses))
+        for receiver in async_receivers:
+            response = await receiver(signal=self, sender=sender, **named)
+            responses.append((receiver, response))
         return responses
 
     def _log_robust_failure(self, receiver, err):
@@ -333,7 +284,7 @@ class Signal:
 
         If any receivers are asynchronous, they are called after all the
         synchronous receivers via a single call to async_to_sync(). They are
-        also executed concurrently with asyncio.TaskGroup().
+        awaited one at a time, in the order they were connected.
 
         Arguments:
 
@@ -370,22 +321,17 @@ class Signal:
                 responses.append((receiver, response))
         if async_receivers:
 
-            async def asend_and_wrap_exception(receiver):
-                try:
-                    response = await receiver(signal=self, sender=sender, **named)
-                except Exception as err:
-                    self._log_robust_failure(receiver, err)
-                    return err
-                return response
-
             async def asend():
-                async_responses = await _run_parallel(
-                    *(
-                        asend_and_wrap_exception(receiver)
-                        for receiver in async_receivers
-                    )
-                )
-                return zip(async_receivers, async_responses)
+                async_responses = []
+                for receiver in async_receivers:
+                    try:
+                        response = await receiver(signal=self, sender=sender, **named)
+                    except Exception as err:
+                        self._log_robust_failure(receiver, err)
+                        async_responses.append((receiver, err))
+                    else:
+                        async_responses.append((receiver, response))
+                return async_responses
 
             responses.extend(async_to_sync(asend)())
         return responses
@@ -397,8 +343,8 @@ class Signal:
         If any receivers are synchronous, they are grouped and called behind a
         sync_to_async() adaption before executing any asynchronous receivers.
 
-        If any receivers are asynchronous, they are grouped and executed
-        concurrently with asyncio.TaskGroup.
+        If any receivers are asynchronous, they are grouped and awaited one at
+        a time, in the order they were connected.
 
         Arguments:
 
@@ -445,19 +391,15 @@ class Signal:
             async def sync_send():
                 return []
 
-        async def asend_and_wrap_exception(receiver):
+        responses = await sync_send()
+        for receiver in async_receivers:
             try:
                 response = await receiver(signal=self, sender=sender, **named)
             except Exception as err:
                 self._log_robust_failure(receiver, err)
-                return err
-            return response
-
-        responses = await sync_send()
-        async_responses = await _run_parallel(
-            *(asend_and_wrap_exception(receiver) for receiver in async_receivers),
-        )
-        responses.extend(zip(async_receivers, async_responses))
+                responses.append((receiver, err))
+            else:
+                responses.append((receiver, response))
         return responses
 
     def _clear_dead_receivers(self):
