@@ -40,3 +40,7 @@ Bugfixes
   :exc:`~django.core.exceptions.FieldError` when automatic ``select_related()``
   included a foreign key deferred by the model admin's queryset
   (:ticket:`37536`).
+
+* Fixed a regression in Django 6.1 where model formsets raised a
+  :exc:`TypeError` for sliced querysets whose ordering could contain ties
+  (:ticket:`37531`).
