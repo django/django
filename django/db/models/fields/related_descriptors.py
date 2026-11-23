@@ -87,9 +87,18 @@ from django.db.models.utils import AltersData, resolve_callables
 
 class ForeignKeyDeferredAttribute(DeferredAttribute):
     def __set__(self, instance, value):
-        if instance.__dict__.get(self.field.attname) != value and self.field.is_cached(
-            instance
-        ):
+        # Optimization: If the value is already set and equal, do nothing.
+        # This skips the expensive "is_cached" and "delete_cached_value" checks
+        # when fetching thousands of rows from the DB.
+        try:
+            current_value = instance.__dict__[self.field.attname]
+        except KeyError:
+            pass
+        else:
+            if current_value == value:
+                return
+
+        if self.field.is_cached(instance):
             self.field.delete_cached_value(instance)
         instance.__dict__[self.field.attname] = value
 
