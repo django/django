@@ -31,6 +31,7 @@ from asgiref.sync import async_to_sync
 from django.apps import apps
 from django.conf import settings
 from django.core import mail
+from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.files import locks
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
@@ -1377,7 +1378,7 @@ class TestData:
 
 class TestCase(TransactionTestCase):
     """
-    Similar to TransactionTestCase, but use `transaction.atomic()` to achieve
+    Similar to TransactionTestCase, but use ``transaction.atomic()`` to achieve
     test isolation.
 
     In most situations, TestCase should be preferred to TransactionTestCase as
@@ -1387,7 +1388,32 @@ class TestCase(TransactionTestCase):
 
     On database backends with no transaction support, TestCase behaves as
     TransactionTestCase.
+
+    Cache Isolation
+    ---------------
+    By default, TestCase clears all configured caches before and after each
+    test method to prevent cached data from leaking between tests. This
+    ensures that ``cache.set()`` in one test does not affect subsequent tests.
+
+    To disable this behavior for specific test classes, set
+    ``clears_caches = False``::
     """
+
+    # Opt-out mechanism for cache clearing between test methods.
+    # Set to ``False`` to persist cache data across test methods.
+    clears_caches = True
+
+    @classmethod
+    def _clear_caches(cls):
+        """
+        Clear only the DEFAULT cache, not internal Django caches.
+
+        Django uses multiple caches internally (e.g., for content types,
+        admin autodiscover). We should only clear the default cache
+        that user code typically interacts with.
+        """
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        cache.clear()
 
     @classmethod
     def _enter_atomics(cls):
@@ -1471,27 +1497,34 @@ class TestCase(TransactionTestCase):
     @classmethod
     def _fixture_setup(cls):
         if not cls._databases_support_transactions():
-            # If the backend does not support transactions, we should reload
-            # class data before each test
             cls.setUpTestData()
-            return super()._fixture_setup()
+            result = super()._fixture_setup()
+        else:
+            if cls.reset_sequences:
+                raise TypeError("reset_sequences cannot be used on TestCase instances")
+            cls.atomics = cls._enter_atomics()
+            if not cls._databases_support_savepoints():
+                if cls.fixtures:
+                    for db_name in cls._databases_names(include_mirrors=False):
+                        call_command(
+                            "loaddata",
+                            *cls.fixtures,
+                            **{"verbosity": 0, "database": db_name},
+                        )
+                cls.setUpTestData()
+            result = None
 
-        if cls.reset_sequences:
-            raise TypeError("reset_sequences cannot be used on TestCase instances")
-        cls.atomics = cls._enter_atomics()
-        if not cls._databases_support_savepoints():
-            if cls.fixtures:
-                for db_name in cls._databases_names(include_mirrors=False):
-                    call_command(
-                        "loaddata",
-                        *cls.fixtures,
-                        **{"verbosity": 0, "database": db_name},
-                    )
-            cls.setUpTestData()
+        # Clear default cache before each test, but only when
+        # database transactions are enabled (normal TestCase behavior).
+        if cls.clears_caches and cls._databases_support_transactions():
+            cls._clear_caches()
+
+        return result
 
     def _fixture_teardown(self):
         if not self._databases_support_transactions():
             return super()._fixture_teardown()
+
         try:
             for db_name in reversed(self._databases_names()):
                 if self._should_check_constraints(connections[db_name]):
