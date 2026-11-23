@@ -529,7 +529,16 @@ class ChangeList:
             return qs.select_related()
 
         if self.list_select_related is False:
-            if fields := self.get_select_related_fields():
+            fields = self.get_select_related_fields()
+            if fields and (select_mask := qs.query.get_select_mask()):
+                # Leave deferred fields to load on access.
+                deferred_fields = {
+                    field.name
+                    for field in qs.model._meta.concrete_fields
+                    if field not in select_mask
+                }
+                fields = [field for field in fields if field not in deferred_fields]
+            if fields:
                 return qs.select_related(*fields)
 
         if self.list_select_related:
