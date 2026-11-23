@@ -161,8 +161,9 @@ An aggregate annotation can add joins and grouping to the query that
 :class:`~django.core.paginator.Paginator` uses to count the results. If an
 annotation is only for display and preserves the number and order of rows,
 you can add it to the page's queryset after pagination.
-For example, using the :ref:`bookstore models <queryset-model-example>`, you
-can show the number of books per publisher while counting only publishers::
+For example, using the bookstore models from the
+:doc:`aggregation guide </topics/db/aggregation>`, you can show the number of
+books per publisher while counting only publishers::
 
     from django.core.paginator import Paginator
     from django.db.models import Count
