@@ -482,6 +482,13 @@ class BackendTestCase(TransactionTestCase):
             self.assertIsInstance(cursor, CursorWrapper)
         self.assertTrue(cursor.closed)
 
+    def test_is_usable_after_close(self):
+        connection.ensure_connection()
+        self.assertIs(connection.is_usable(), True)
+        connection.close()
+        # SQLite always considers its connections usable.
+        self.assertIs(connection.is_usable(), connection.vendor == "sqlite")
+
     # Unfortunately with sqlite3 the in-memory test database cannot be closed.
     @skipUnlessDBFeature("test_db_allows_multiple_connections")
     def test_is_usable_after_database_disconnects(self):
