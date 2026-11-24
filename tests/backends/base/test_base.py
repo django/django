@@ -1,7 +1,13 @@
 import gc
 from unittest.mock import MagicMock, patch
 
-from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    OperationalError,
+    connection,
+    connections,
+    transaction,
+)
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test import (
     SimpleTestCase,
@@ -94,6 +100,29 @@ class DatabaseWrapperTests(SimpleTestCase):
         # Enforce garbage collection to populate `gc.garbage` for inspection.
         gc.collect()
         self.assertEqual(gc.garbage, [])
+
+
+class ConnectionErrorTests(SimpleTestCase):
+    databases = {"default", "other"}
+
+    def test_connect_error_includes_alias(self):
+        """A connection failure is prefixed with the alias that failed."""
+        for alias in self.databases:
+            new_connection = connections[alias].copy()
+            self.addCleanup(new_connection.close)
+            with self.subTest(alias=alias):
+                with patch.object(
+                    new_connection,
+                    "get_new_connection",
+                    side_effect=new_connection.Database.OperationalError(
+                        "connection failed"
+                    ),
+                ):
+                    with self.assertRaisesMessage(
+                        OperationalError,
+                        f"DATABASES[{alias!r}]: connection failed",
+                    ):
+                        new_connection.ensure_connection()
 
 
 @skipUnlessDBFeature("supports_transactions")
