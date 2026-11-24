@@ -2,6 +2,7 @@ import struct
 
 from django.contrib.gis.geos import GEOSGeometry, WKTReader
 from django.contrib.gis.geos.error import GEOSException
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.contrib.gis.geos.prototypes.io import MAX_GEOM_COLLECTIONS
 from django.test import SimpleTestCase
 
@@ -233,7 +234,9 @@ class GEOSLimitTest(SimpleTestCase):
                 value = two_collections(separator)
                 with self.assertRaisesMessage(ValueError, msg):
                     GEOSGeometry(value, max_geom_collections=1)
-                GEOSGeometry(value, max_geom_collections=2)
+                # A separator is not necessary on GEOS 3.12+.
+                if separator or geos_version_tuple() >= (3, 12):
+                    GEOSGeometry(value, max_geom_collections=2)
 
     def test_wkt_reader_whitespace_is_limited(self):
         # WKTReader.read() takes str and bytes directly, so the whitespace
@@ -250,8 +253,12 @@ class GEOSLimitTest(SimpleTestCase):
                     for value in over, over.encode():
                         with self.assertRaisesMessage(ValueError, msg):
                             reader.read(value)
-                    under = f"{prefix}{collection}({point})"
-                    self.assertEqual(reader.read(under).geom_type, "GeometryCollection")
+                    # A separator is not necessary on GEOS 3.12+.
+                    if separator or geos_version_tuple() >= (3, 12):
+                        under = f"{prefix}{collection}({point})"
+                        self.assertEqual(
+                            reader.read(under).geom_type, "GeometryCollection"
+                        )
 
     def test_non_collection_wkt_root_fast_path(self):
         def make_geom(depth):
