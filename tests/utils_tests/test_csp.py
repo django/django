@@ -65,8 +65,7 @@ class CSPBuildPolicyTest(SimpleTestCase):
         }
         self.assertPolicyEqual(
             build_policy(policy),
-            "default-src 'self'; report-uri /csp-report/; "
-            "script-src example.com",
+            "default-src 'self'; report-uri /csp-report/; " "script-src example.com",
         )
 
     def test_config_value_as_tuple(self):
