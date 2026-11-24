@@ -253,7 +253,18 @@ class BaseDatabaseWrapper:
         self.health_check_done = True
         # Establish the connection
         conn_params = self.get_connection_params()
-        self.connection = self.get_new_connection(conn_params)
+        try:
+            self.connection = self.get_new_connection(conn_params)
+        except Exception as exc:
+            # Identify the connection that failed by prefixing the error
+            # message with its alias, e.g. "DATABASES['ecomdb']: ...",
+            # mirroring the MAILERS pattern in django.core.mail.exceptions.
+            if exc.args and isinstance(exc.args[0], str):
+                exc.args = (
+                    f"DATABASES[{self.alias!r}]: {exc.args[0]}",
+                    *exc.args[1:],
+                )
+            raise
         self.set_autocommit(self.settings_dict["AUTOCOMMIT"])
         self.init_connection_state()
         connection_created.send(sender=self.__class__, connection=self)
