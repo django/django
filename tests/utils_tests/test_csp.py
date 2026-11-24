@@ -62,14 +62,14 @@ class CSPBuildPolicyTest(SimpleTestCase):
             "default-src": [CSP.SELF],
             "report-uri": lazy(lambda: "/csp-report/", str)(),
             "script-src": [lazy(lambda: "example.com", str)()],
-        },
+        }
         self.assertPolicyEqual(
             build_policy(policy),
             "default-src 'self'; report-uri /csp-report/; "
             "script-src example.com",
         )
-    
-def test_config_value_as_tuple(self):
+
+    def test_config_value_as_tuple(self):
         """
         Test that a tuple can be passed as a value.
         """
