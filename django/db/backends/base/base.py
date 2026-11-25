@@ -253,7 +253,14 @@ class BaseDatabaseWrapper:
         self.health_check_done = True
         # Establish the connection
         conn_params = self.get_connection_params()
-        self.connection = self.get_new_connection(conn_params)
+        try:
+            self.connection = self.get_new_connection(conn_params)
+        except Exception as e:
+            db_name = self.settings_dict.get("NAME")
+            e.args = (
+                f"Failed to connect to database '{db_name}' (alias '{self.alias}'): {e}",
+            )
+            raise
         self.set_autocommit(self.settings_dict["AUTOCOMMIT"])
         self.init_connection_state()
         connection_created.send(sender=self.__class__, connection=self)

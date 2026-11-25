@@ -62,6 +62,18 @@ class DatabaseWrapperTests(SimpleTestCase):
         with patch.object(connection.features, "minimum_database_version", None):
             connection.check_database_version_supported()
 
+    def test_connect_failure_includes_alias_in_error_message(self):
+        conn = connection.copy()
+        self.addCleanup(conn.close)
+        original_error = Exception("original error")
+        msg = (
+            f"Failed to connect to database '{conn.settings_dict['NAME']}' "
+            f"(alias '{conn.alias}'): {original_error}"
+        )
+        with patch.object(conn, "get_new_connection", side_effect=original_error):
+            with self.assertRaisesMessage(Exception, msg):
+                conn.connect()
+
     @requires_gil
     def test_release_memory_without_garbage_collection(self):
         # Schedule the restore of the garbage collection settings.
