@@ -7,6 +7,8 @@ from io import StringIO
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
+from .utils import ClassLookupDict
+
 DEFER_FIELD = object()
 
 
@@ -80,6 +82,11 @@ class Serializer:
     internal_use_only = False
     progress_class = ProgressBar
     stream_class = StringIO
+    field_mapping = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.field_serializers = ClassLookupDict(self.field_mapping)
 
     def serialize(
         self,
@@ -148,6 +155,9 @@ class Serializer:
             self.first = self.first and False
         self.end_serialization()
         return self.getvalue()
+
+    def serialize_field(self, field, obj):
+        return self.field_serializers[field].serialize(field, obj, self)
 
     def start_serialization(self):
         """
@@ -243,6 +253,8 @@ class Deserializer:
     Abstract base deserializer class.
     """
 
+    serializer = Serializer
+
     def __init__(self, stream_or_string, **options):
         """
         Init this serializer given a stream or a string
@@ -252,6 +264,7 @@ class Deserializer:
             self.stream = StringIO(stream_or_string)
         else:
             self.stream = stream_or_string
+        self.field_deserializers = ClassLookupDict(self.serializer.field_mapping)
 
     def __iter__(self):
         return self
@@ -261,6 +274,9 @@ class Deserializer:
         raise NotImplementedError(
             "subclasses of Deserializer must provide a __next__() method"
         )
+
+    def deserialize_field(self, field, value, deserializer):
+        return self.field_deserializers[field].deserialize(field, value, deserializer)
 
 
 class DeserializedObject:
