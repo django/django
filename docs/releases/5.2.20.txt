@@ -2,9 +2,11 @@
 Django 5.2.20 release notes
 ===========================
 
-*Expected December 1, 2026*
+*December 2, 2026*
 
-Django 5.2.20 fixes one bug in 5.2.19.
+Django 5.2.20 fixes two security issues with severity "high", one security
+issue with severity "moderate", four security issues with severity "low", and
+one bug in 5.2.19.
 
 Bugfixes
 ========
