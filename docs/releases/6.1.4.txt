@@ -34,6 +34,11 @@ Bugfixes
   :meth:`.QuerySet.difference` could crash when the model's
   :attr:`.Options.ordering` referenced related fields (:ticket:`37505`).
 
+* Fixed a regression in Django 6.1 where combining querysets of a model with a
+  default :attr:`~.Options.ordering` using :meth:`.QuerySet.union`,
+  :meth:`.QuerySet.intersection`, or :meth:`.QuerySet.difference` crashed on
+  Oracle (:ticket:`37505`).
+
 * Added compatibility with :pypi:`pylibmc` 1.8.0 (:ticket:`37529`).
 
 * Fixed a regression in Django 6.1 where the admin changelist raised a

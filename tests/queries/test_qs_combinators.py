@@ -478,6 +478,29 @@ class QuerySetSetOperationTests(TestCase):
             with self.subTest(combinator=combined.query.combinator):
                 self.assertSequenceEqual(list(combined), [r2, r1])
 
+    def test_union_default_ordering_by_own_column(self):
+        note_b = Note.objects.create(note="n2", misc="m2")
+        note_a = Note.objects.create(note="n1", misc="m1")
+        qs = Note.objects.all()
+        with CaptureQueriesContext(connection) as context:
+            self.assertSequenceEqual(qs.union(qs), [note_a, note_b])
+        # The default ordering is only applied to the outer query.
+        sql = context.captured_queries[0]["sql"]
+        self.assertEqual(sql.count("ORDER BY"), 1)
+
+    def test_union_keeps_default_ordering_when_required(self):
+        # The default ordering determines which rows are selected by
+        # DISTINCT ON and in which order rows are locked by SELECT FOR UPDATE.
+        for case, qs in [
+            ("distinct_fields", Note.objects.distinct("note")),
+            ("select_for_update", Note.objects.select_for_update()),
+            ("sliced", Note.objects.all()[:1]),
+        ]:
+            with self.subTest(case=case):
+                combined = qs.union(qs)
+                for query in combined.query.combined_queries:
+                    self.assertIs(query.default_ordering, True)
+
     def test_union_multiple_models_with_values_list_and_order(self):
         reserved_name = ReservedName.objects.create(name="rn1", order=0)
         qs1 = Celebrity.objects.all()
