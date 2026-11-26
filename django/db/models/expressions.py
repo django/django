@@ -1603,6 +1603,8 @@ class NegatedExpression(ExpressionWrapper):
         # to be compared to another expression unless they're wrapped in a CASE
         # WHEN.
         if not ops.conditional_expression_supported_in_where_clause(self.expression):
+            if compiler.connection.features.supports_boolean_expr_in_select_clause:
+                return f"(NOT {sql})", params
             return f"CASE WHEN {sql} = 0 THEN 1 ELSE 0 END", params
         return f"NOT {sql}", params
 
