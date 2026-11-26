@@ -7,7 +7,7 @@ import sys
 import threading
 import unittest
 from collections import Counter
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
@@ -1166,6 +1166,13 @@ class TransactionTestCase(SimpleTestCase):
         try:
             cls._fixture_setup()
         except Exception:
+            # Attempt to teardown fixtures as _post_teardown() won't be
+            # triggered to cleanup state. _fixture_teardown() is an
+            # instance method (and TestCase's override relies on a bound
+            # super() call), so instantiate cls rather than calling it
+            # unbound.
+            with suppress(Exception):
+                cls()._fixture_teardown()
             if cls.available_apps is not None:
                 apps.unset_available_apps()
                 setting_changed.send(
