@@ -3,6 +3,7 @@ import os
 import shutil
 import string
 import tempfile
+import time
 import unittest
 from datetime import timedelta
 from http import cookies
@@ -560,6 +561,38 @@ class SessionTestsMixin:
         encoded = signer.sign(b"invalid data")
         self.assertEqual(self.session.decode(encoded), {})
 
+    def test_decode_expired_default_expiry(self):
+        # Session data signed longer than SESSION_COOKIE_AGE ago is expired,
+        # whatever metadata the backend keeps.
+        data = {"a test key": "a test value"}
+        signed_at = time.time() - settings.SESSION_COOKIE_AGE - 10
+        with mock.patch("django.core.signing.time.time", return_value=signed_at):
+            encoded = self.session.encode(data)
+        with self.assertNoLogs("django.security.SuspiciousSession", "WARNING"):
+            self.assertEqual(self.session.decode(encoded), {})
+
+    def test_decode_expired_custom_expiry_seconds(self):
+        data = {"a test key": "a test value", "_session_expiry": 60}
+        signed_at = time.time() - 70
+        with mock.patch("django.core.signing.time.time", return_value=signed_at):
+            encoded = self.session.encode(data)
+        self.assertEqual(self.session.decode(encoded), {})
+
+    def test_decode_expired_custom_expiry_datetime(self):
+        expiry = timezone.now() - timedelta(seconds=10)
+        data = {"a test key": "a test value", "_session_expiry": expiry.isoformat()}
+        encoded = self.session.encode(data)
+        self.assertEqual(self.session.decode(encoded), {})
+
+    def test_decode_custom_expiry_longer_than_cookie_age(self):
+        # A custom expiry longer than SESSION_COOKIE_AGE is honored.
+        expiry = settings.SESSION_COOKIE_AGE * 2
+        data = {"a test key": "a test value", "_session_expiry": expiry}
+        signed_at = time.time() - settings.SESSION_COOKIE_AGE - 10
+        with mock.patch("django.core.signing.time.time", return_value=signed_at):
+            encoded = self.session.encode(data)
+        self.assertEqual(self.session.decode(encoded), data)
+
     def test_actual_expiry(self):
         old_session_key = None
         new_session_key = None
@@ -689,6 +722,13 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         s = self.model.objects.get(session_key=self.session.session_key)
 
         self.assertEqual(s.get_decoded(), {"x": 1})
+
+    def test_session_get_decoded_expired(self):
+        self.session["x"] = 1
+        self.session.set_expiry(-timedelta(seconds=10))
+        self.session.save()
+        s = self.model.objects.get(session_key=self.session.session_key)
+        self.assertEqual(s.get_decoded(), {})
 
     def test_sessionmanager_save(self):
         """
@@ -1331,14 +1371,15 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
     async def test_cycle_async(self):
         pass
 
-    @unittest.expectedFailure
-    def test_actual_expiry(self):
-        # The cookie backend doesn't handle non-default expiry dates, see
-        # #19201
-        super().test_actual_expiry()
-
-    async def test_actual_expiry_async(self):
-        pass
+    def test_custom_expiry_longer_than_cookie_age(self):
+        # A custom expiry longer than SESSION_COOKIE_AGE is honored.
+        signed_at = time.time() - settings.SESSION_COOKIE_AGE - 10
+        with mock.patch("django.core.signing.time.time", return_value=signed_at):
+            self.session["foo"] = "bar"
+            self.session.set_expiry(settings.SESSION_COOKIE_AGE * 2)
+            self.session.save()
+        new_session = self.backend(self.session.session_key)
+        self.assertEqual(new_session["foo"], "bar")
 
     def test_unpickling_exception(self):
         # signed_cookies backend should handle unpickle exceptions gracefully

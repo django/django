@@ -133,11 +133,36 @@ class SessionBase:
             compress=True,
         )
 
+    def _loads_unexpired(self, session_data, salt):
+        """
+        Unsign session_data and return the session dictionary, raising
+        signing.SignatureExpired if the session has expired.
+
+        Expiry is computed from the session data itself: the timestamp added
+        by signing.dumps() is the last modification time, and the optional
+        "_session_expiry" key holds a custom expiry set by set_expiry(). It
+        doesn't depend on metadata stored by the backend.
+        """
+        session_dict = signing.loads(
+            session_data, salt=salt, serializer=self.serializer
+        )
+        expiry = session_dict.get("_session_expiry")
+        if isinstance(expiry, (datetime, str)):
+            # Absolute expiry date.
+            if self.get_expiry_age(expiry=expiry) <= 0:
+                raise signing.SignatureExpired("Session expired at %s." % expiry)
+        else:
+            # Relative expiry: number of seconds since the last modification.
+            signing.TimestampSigner(salt=salt).unsign(
+                session_data, max_age=expiry or self.get_session_cookie_age()
+            )
+        return session_dict
+
     def decode(self, session_data):
         try:
-            return signing.loads(
-                session_data, salt=self.key_salt, serializer=self.serializer
-            )
+            return self._loads_unexpired(session_data, self.key_salt)
+        except signing.SignatureExpired:
+            pass
         except signing.BadSignature:
             logger = logging.getLogger("django.security.SuspiciousSession")
             logger.warning("Session data corrupted")

@@ -156,7 +156,8 @@ and the :setting:`SECRET_KEY` setting.
     logs out. Thus if an attacker steals a user's cookie, they can use that
     cookie to login as that user even if the user logs out. Cookies will only
     be detected as 'stale' if they are older than your
-    :setting:`SESSION_COOKIE_AGE`.
+    :setting:`SESSION_COOKIE_AGE`, or than the custom expiry set with
+    :meth:`~backends.base.SessionBase.set_expiry`, if any.
 
     **Performance**
 
@@ -852,6 +853,10 @@ including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
         Returns decoded session data.
 
         Decoding is performed by the session store class.
+
+        .. versionchanged:: 6.2
+
+            An empty dictionary is returned if the session data has expired.
 
 You can also customize the model manager by subclassing
 :class:`~django.contrib.sessions.base_session.BaseSessionManager`:

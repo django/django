@@ -561,6 +561,26 @@ Miscellaneous
   :meth:`~django.contrib.sessions.backends.base.SessionBase.get_expiry_date`
   instead.
 
+* Session expiry is now enforced by
+  :class:`~django.contrib.sessions.backends.base.SessionBase` when decoding
+  session data, based on the time the data was signed and on any custom expiry
+  set with
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.set_expiry`,
+  rather than only on metadata kept by each session backend. As a consequence:
+
+  * The ``signed_cookies`` backend now honors a custom expiry, whether it's
+    shorter or longer than :setting:`SESSION_COOKIE_AGE`.
+
+  * Reducing :setting:`SESSION_COOKIE_AGE` now also expires existing sessions
+    that have no custom expiry and were last saved longer ago than the new
+    value.
+
+  * :meth:`AbstractBaseSession.get_decoded()
+    <django.contrib.sessions.base_session.AbstractBaseSession.get_decoded>`
+    now returns an empty dictionary for expired session data.
+
+  The format of the stored session data is unchanged.
+
 .. _deprecated-features-6.2:
 
 Features deprecated in 6.2
