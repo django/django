@@ -10,8 +10,9 @@ Detailed form API reference. For introductory material, see the
 
    api
    fields
-   models
+   format_guidelines
    formsets
+   models
    renderers
    widgets
    validation
