@@ -64,7 +64,7 @@ class GeneratedField(Field):
             getattr(self.expression, "conditional", False)
             and not connection.features.supports_boolean_expr_in_select_clause
         ):
-            sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
+            sql, params = connection.ops.conditional_expression_to_value(sql, params)
         return sql, params
 
     @cached_property

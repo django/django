@@ -1017,6 +1017,12 @@ class SchemaTests(TransactionTestCase):
                 output_field=BooleanField(),
                 db_persist=False,
             )
+            is_one = GeneratedField(
+                expression=Q(value=1),
+                output_field=BooleanField(),
+                db_persist=False,
+                null=True,
+            )
 
             class Meta:
                 app_label = "schema"
@@ -1025,8 +1031,10 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(GeneratedBooleanFieldModel)
         obj = GeneratedBooleanFieldModel.objects.create()
         self.assertIs(obj.has_value, False)
+        self.assertIsNone(obj.is_one)
         obj = GeneratedBooleanFieldModel.objects.create(value=1)
         self.assertIs(obj.has_value, True)
+        self.assertIs(obj.is_one, True)
 
     @isolate_apps("schema")
     @skipUnlessDBFeature("supports_stored_generated_columns")

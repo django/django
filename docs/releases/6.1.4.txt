@@ -44,3 +44,7 @@ Bugfixes
 * Fixed a regression in Django 6.1 where model formsets raised a
   :exc:`TypeError` for sliced querysets whose ordering could contain ties
   (:ticket:`37531`).
+
+* Fixed a regression in Django 6.1 where negating a nullable
+  :class:`~django.db.models.BooleanField` with ``~F()`` returned ``False``
+  instead of ``None`` for ``NULL`` values on SQLite (:ticket:`37520`).

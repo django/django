@@ -739,6 +739,23 @@ class BaseDatabaseOperations:
             return True
         return False
 
+    def conditional_expression_to_value(self, sql, params, nullable=True):
+        """
+        Convert a conditional expression to 1 or 0, preserving NULL when
+        nullable.
+
+        For nullable expressions, the condition appears twice in the SQL. If it
+        is non-deterministic, the evaluations may differ, causing the result to
+        be NULL.
+        """
+        if nullable:
+            sql = f"CASE WHEN {sql} THEN 1 WHEN NOT ({sql}) THEN 0 END"
+            # As SQL is evaluated twice above, parameters need to be repeated.
+            params = (*params, *params)
+        else:
+            sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
+        return sql, params
+
     def combine_expression(self, connector, sub_expressions):
         """
         Combine a list of subexpressions into a single expression, using
