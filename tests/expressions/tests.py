@@ -68,6 +68,7 @@ from django.db.models.functions import (
     TruncDate,
     Upper,
 )
+from django.db.models.lookups import Exact
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
@@ -3020,7 +3021,6 @@ class NegatedExpressionTests(TestCase):
             [("Example Inc.", False), ("Foobar Ltd.", True)],
         )
 
-    @skipUnlessDBFeature("supports_boolean_expr_in_select_clause")
     def test_values_null(self):
         eu = Case(When(based_in_eu=True, then=True), output_field=BooleanField())
         self.assertSequenceEqual(
@@ -3028,6 +3028,17 @@ class NegatedExpressionTests(TestCase):
             .values_list("name", "negated")
             .order_by("name"),
             [("Example Inc.", False), ("Foobar Ltd.", None)],
+        )
+
+    def test_values_condition_null(self):
+        eu = Case(When(based_in_eu=True, then=True), output_field=BooleanField())
+        lookup = Exact(eu, True)
+        self.assertSequenceEqual(
+            Company.objects.alias(eu=eu)
+            .annotate(lookup=lookup, negated_lookup=~lookup, q=Q(eu=True))
+            .values_list("name", "lookup", "negated_lookup", "q")
+            .order_by("name"),
+            [("Example Inc.", True, False, True), ("Foobar Ltd.", None, None, None)],
         )
 
 

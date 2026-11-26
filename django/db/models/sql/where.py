@@ -303,7 +303,9 @@ class WhereNode(tree.Node):
         # (e.g. Oracle) doesn't support boolean expression in SELECT or GROUP
         # BY list.
         if not compiler.connection.features.supports_boolean_expr_in_select_clause:
-            sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
+            sql, params = compiler.connection.ops.conditional_expression_to_value(
+                sql, params
+            )
         return sql, params
 
     def get_db_converters(self, connection):

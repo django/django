@@ -739,6 +739,21 @@ class BaseDatabaseOperations:
             return True
         return False
 
+    def conditional_expression_to_value(self, sql, params, nullable=True):
+        """
+        Turn a conditional expression into 1, 0, or NULL (when the condition is
+        unknown), for databases that can't use it as a value (e.g. Oracle < 23
+        in the SELECT or GROUP BY list). If nullable, the condition appears
+        twice, so its params are repeated, and a non-deterministic condition
+        may give NULL.
+        """
+        if nullable:
+            sql = f"CASE WHEN {sql} THEN 1 WHEN NOT ({sql}) THEN 0 END"
+            params = (*params, *params)
+        else:
+            sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
+        return sql, params
+
     def combine_expression(self, connector, sub_expressions):
         """
         Combine a list of subexpressions into a single expression, using
