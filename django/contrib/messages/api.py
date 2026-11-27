@@ -3,6 +3,7 @@ from django.contrib.messages.storage import default_storage
 
 __all__ = (
     "add_message",
+    "clear_messages",
     "get_messages",
     "get_level",
     "set_level",
@@ -38,6 +39,28 @@ def add_message(request, level, message, extra_tags="", fail_silently=False):
             )
     else:
         return messages.add(level, message, extra_tags)
+
+
+def clear_messages(request):
+    """
+    Remove all messages from the message storage on the request.
+
+    Return ``True`` if messages were cleared, or ``False`` if the messages
+    middleware isn't installed.
+    """
+    try:
+        messages = request._messages
+    except AttributeError:
+        if hasattr(request, "META"):
+            return False
+
+        raise TypeError(
+            "clear_messages() argument must be an HttpRequest object, not "
+            f"'{request.__class__.__name__}'."
+        )
+
+    messages.clear()
+    return True
 
 
 def get_messages(request):

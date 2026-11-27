@@ -10,5 +10,8 @@ class DummyStorage:
     def add(self, level, message, extra_tags=""):
         self.store.append(Message(level, message, extra_tags))
 
+    def clear(self):
+        self.store = []
+
     def __iter__(self):
         return iter(self.store)
