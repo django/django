@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Post, Tenant, User
+from .models import Post, Tenant, TimeStamped, User
 
 
 class CompositePKCreateTests(TestCase):
@@ -77,6 +77,17 @@ class CompositePKCreateTests(TestCase):
         self.assertEqual(obj_3.id, 8214)
         self.assertEqual(obj_3.pk, (obj_3.tenant_id, obj_3.id))
         self.assertEqual(obj_3.email, "user8214@example.com")
+
+    def test_bulk_create_pk_field_set_on_pre_save(self):
+        obj_1, obj_2 = TimeStamped.objects.bulk_create(
+            [TimeStamped(id=1), TimeStamped(id=2)]
+        )
+        self.assertIsNotNone(obj_1.created)
+        self.assertIsNotNone(obj_2.created)
+        self.assertIs(obj_1._state.adding, False)
+        self.assertIs(obj_2._state.adding, False)
+        self.assertEqual(TimeStamped.objects.get(pk=obj_1.pk), obj_1)
+        self.assertEqual(TimeStamped.objects.get(pk=obj_2.pk), obj_2)
 
     @skipUnlessDBFeature(
         "supports_update_conflicts",
