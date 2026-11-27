@@ -1,0 +1,163 @@
+=====================================================
+How to use the Django ORM outside of a Django project
+=====================================================
+
+You can use Django's ORM from a script or another Python project without
+creating a project with :cli:`startproject`. Install Django, configure the
+database and the app that holds your models, then initialize Django. There is
+no separate ORM package: the ``django`` package is enough.
+
+This guide uses a small ``books`` app and a SQLite file. The same settings
+work with Django's other database backends.
+
+.. code-block:: text
+
+    orm_config.py
+    manage.py
+    query.py
+    books/
+        __init__.py
+        models.py
+
+Define a model
+==============
+
+``books`` must be a Python package, so ``books/__init__.py`` can be empty.
+Put the model in ``books/models.py``::
+
+    from django.db import models
+
+
+    class Book(models.Model):
+        title = models.CharField(max_length=200, unique=True)
+
+Defining the class does not create a database table. That happens when you
+apply migrations, below.
+
+Configure settings
+==================
+
+A standalone program has no ``settings.py`` module and no
+:envvar:`DJANGO_SETTINGS_MODULE`. Call ``configure()`` instead, before using
+any setting. Put that call in one place so ``manage.py`` and your script share
+it. ``orm_config.py``::
+
+    from pathlib import Path
+
+    from django.conf import settings
+
+
+    def configure():
+        settings.configure(
+            INSTALLED_APPS=["books"],
+            DATABASES={
+                "default": {
+                    "ENGINE": "django.db.backends.sqlite3",
+                    "NAME": Path(__file__).resolve().parent / "books.sqlite3",
+                }
+            },
+            DEFAULT_AUTO_FIELD="django.db.models.BigAutoField",
+        )
+
+:setting:`INSTALLED_APPS` must include the package that defines the models.
+A model class created only in ``__main__`` is not registered. :setting:`NAME`
+is the SQLite file Django opens; the path above keeps ``books.sqlite3`` next
+to ``orm_config.py``. :setting:`DEFAULT_AUTO_FIELD` selects the primary key
+used when migrations create ``Book``. You do not need :setting:`SECRET_KEY`
+for this ORM-only setup.
+
+Use exactly one of ``configure()`` or :envvar:`DJANGO_SETTINGS_MODULE`.
+Calling ``configure()`` more than once, or calling it after a setting has
+already been read, raises ``RuntimeError``. See :doc:`/topics/settings` for
+the rules.
+
+Run management commands
+=======================
+
+``manage.py`` configures those settings and then hands the command line to
+Django::
+
+    from django.core.management import execute_from_command_line
+
+    from orm_config import configure
+
+    if __name__ == "__main__":
+        configure()
+        execute_from_command_line()
+
+``execute_from_command_line()`` reads ``sys.argv`` when you call it with no
+arguments. The management command calls :func:`django.setup` for you.
+
+An empty ``manage.py`` runs and exits without configuring Django or running a
+command, so ``python manage.py makemigrations`` prints nothing.
+
+``books`` does not have a ``migrations`` package yet, so Django treats it as
+an app that is not under migration control. ``makemigrations`` and
+``migrate`` with no app label skip that app and report that there is nothing
+to do. Name the app the first time:
+
+.. code-block:: shell
+
+    $ python manage.py makemigrations books
+    $ python manage.py migrate
+
+``makemigrations`` writes ``books/migrations/0001_initial.py``. ``migrate``
+creates the ``books_book`` table in ``books.sqlite3``. Later model changes
+can use ``python manage.py makemigrations`` without the app label, because
+the ``migrations`` package now exists.
+
+Query from a script
+===================
+
+A script that does not go through ``manage.py`` must call
+:func:`django.setup` itself, after ``configure()``. Import the model after
+that call. Importing it earlier raises
+:class:`~django.core.exceptions.AppRegistryNotReady`, because the app
+registry is not ready yet. ``query.py``::
+
+    import django
+
+    from orm_config import configure
+
+
+    def main():
+        configure()
+        django.setup()
+
+        from books.models import Book
+
+        Book.objects.get_or_create(title="The Great Gatsby")
+        for title in Book.objects.values_list("title", flat=True):
+            print(title)
+
+
+    if __name__ == "__main__":
+        main()
+
+Run it from the directory that contains ``books`` and ``orm_config.py``, so
+Python can import both:
+
+.. code-block:: shell
+
+    $ python query.py
+    The Great Gatsby
+
+``get_or_create()`` inserts a row when that title is not already stored, so
+you can run the script more than once. ``title`` is unique, so ``create()``
+raises :exc:`~django.db.IntegrityError` on a second run. ``values_list()``
+reads the title from the database. Printing ``title`` on the object returned
+by ``create()`` does not issue another query, because that object already
+holds the value that was just saved. If you run the script before
+``migrate``, SQLite has no ``books_book`` table and Django raises
+:exc:`~django.db.OperationalError`: ``no such table: books_book``.
+Opening the database is what creates the empty ``books.sqlite3`` file; it
+does not create your model tables.
+
+.. seealso::
+
+    :doc:`/topics/settings`
+        ``configure()``, :func:`django.setup`, and standalone Django usage.
+
+    :doc:`/howto/legacy-databases`
+        Point this configuration at a database Django did not create, and use
+        :cli:`inspectdb` to generate unmanaged models.
