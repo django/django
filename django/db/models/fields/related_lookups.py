@@ -150,4 +150,6 @@ class RelatedLessThanOrEqual(RelatedLookupMixin, LessThanOrEqual):
 
 
 class RelatedIsNull(RelatedLookupMixin, IsNull):
-    pass
+    @classmethod
+    def _is_builtin_isnull(cls):
+        return cls is RelatedIsNull

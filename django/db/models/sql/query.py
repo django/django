@@ -34,7 +34,7 @@ from django.db.models.expressions import (
     Value,
 )
 from django.db.models.fields import Field
-from django.db.models.lookups import Lookup
+from django.db.models.lookups import IsNull, Lookup
 from django.db.models.query_utils import (
     Q,
     check_rel_lookup_compatibility,
@@ -2151,6 +2151,10 @@ class Query(BaseExpression):
             filter_rhs = OuterRef(filter_rhs.name)
         query.add_filter(filter_lhs, filter_rhs)
         query.clear_ordering(force=True)
+        if check_existence := query._can_check_reverse_relation_existence():
+            related_alias = query.where.children[0].lhs.alias
+            query.clear_where()
+            query.demote_joins([related_alias])
         # Try to have as simple as possible subquery -> trim leading joins from
         # the subquery.
         trimmed_prefix, contains_louter = query.trim_start(names_with_path)
@@ -2158,7 +2162,7 @@ class Query(BaseExpression):
         col = query.select[0]
         select_field = col.target
         alias = col.alias
-        if alias in can_reuse:
+        if alias in can_reuse and not check_existence:
             pk = select_field.model._meta.pk
             # Need to add a restriction so that outer query's filters are in
             # effect for the subquery, too.
@@ -2174,7 +2178,10 @@ class Query(BaseExpression):
             lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
             query.where.add(lookup, AND)
 
-        condition, needed_inner = self.build_filter(Exists(query))
+        exists = Exists(query)
+        condition, needed_inner = self.build_filter(
+            ~exists if check_existence else exists
+        )
 
         if contains_louter:
             or_null_condition, _ = self.build_filter(
@@ -2190,6 +2197,49 @@ class Query(BaseExpression):
             # correct. If the IS NULL check is removed, then if outercol
             # IS NULL we will not match the row.
         return condition, needed_inner
+
+    def _can_check_reverse_relation_existence(self):
+        if len(self.where.children) != 1 or len(self._lookup_joins) != 2:
+            return False
+
+        lookup = self.where.children[0]
+        if (
+            not isinstance(lookup, IsNull)
+            or not isinstance(lookup.lhs, Col)
+            or lookup.lhs.alias != self._lookup_joins[1]
+        ):
+            return False
+
+        join = self.alias_map[lookup.lhs.alias]
+        if len(join.join_fields) != 1:
+            return False
+
+        related_field = lookup.lhs.target
+        parent_field, _ = join.join_fields[0]
+
+        is_builtin_absence = lookup._is_builtin_isnull() and lookup.rhs is True
+        is_nonnullable_pk = related_field.primary_key and not self.is_nullable(
+            related_field
+        )
+        is_plain_reverse_join = (
+            join.join_field.one_to_many
+            and not join.filtered_relation
+            and join.join_field.get_extra_restriction(
+                join.table_alias, join.parent_alias
+            )
+            is None
+        )
+        is_nonnullable_parent_key = not self.is_nullable(parent_field) and (
+            # Oracle allows NULL in non-PK text fields even with null=False.
+            parent_field.primary_key
+            or not parent_field.empty_strings_allowed
+        )
+        return (
+            is_builtin_absence
+            and is_nonnullable_pk
+            and is_plain_reverse_join
+            and is_nonnullable_parent_key
+        )
 
     def set_empty(self):
         self.where.add(NothingNode(), AND)
