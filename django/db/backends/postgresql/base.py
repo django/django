@@ -45,10 +45,10 @@ if (3,) <= psycopg_version() < (3, 1, 12):
     )
 
 
-from .psycopg_any import IsolationLevel, is_psycopg3  # NOQA isort:skip
+from .psycopg_any import IsolationLevel, is_psycopg3, sql  # NOQA isort:skip
 
 if is_psycopg3:
-    from psycopg import adapters, sql
+    from psycopg import adapters
     from psycopg.pq import Format
 
     from .psycopg_any import get_adapters_template, register_tzloader
@@ -372,8 +372,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def _configure_role(self, connection):
         if new_role := self.settings_dict["OPTIONS"].get("assume_role"):
             with connection.cursor() as cursor:
-                sql = self.ops.compose_sql("SET ROLE %s", [new_role])
-                cursor.execute(sql)
+                query = sql.SQL("SET ROLE {}").format(sql.Identifier(new_role))
+                cursor.execute(query)
             return True
         return False
 
