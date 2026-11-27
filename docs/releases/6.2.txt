@@ -124,7 +124,9 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Column headers for related fields in :attr:`.ModelAdmin.list_display`, such
+  as ``"city__name"``, now show each step of the relationship, using
+  ``verbose_name`` where set, e.g. "City > Name".
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

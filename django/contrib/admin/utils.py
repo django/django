@@ -27,6 +27,9 @@ QUOTE_MAP = {i: "_%02X" % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
 UNQUOTE_RE = _lazy_re_compile("_(?:%s)" % "|".join([x[1:] for x in UNQUOTE_MAP]))
 
+# Joins the labels of each field in a related lookup, e.g. "Parent > Name".
+RELATED_LABEL_SEPARATOR = " > "
+
 
 class FieldIsAForeignKeyColumnName(Exception):
     """A field is a foreign key attname, i.e. <FK>_id."""
@@ -352,6 +355,15 @@ def _get_non_gfk_field(opts, name):
     return field
 
 
+def _field_label(field):
+    """Return a label for one field in a related lookup path."""
+    try:
+        return field.verbose_name
+    except AttributeError:
+        # field is likely a ForeignObjectRel
+        return field.related_model._meta.verbose_name
+
+
 def label_for_field(name, model, model_admin=None, return_attr=False, form=None):
     """
     Return a sensible label for a field name. The name can be a callable,
@@ -374,6 +386,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
             label = str(model._meta.verbose_name)
             attr = model.__str__
         else:
+            path = None
             if callable(name):
                 attr = name
             elif hasattr(model_admin, name):
@@ -384,7 +397,8 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
                 attr = form.fields[name]
             else:
                 try:
-                    attr = get_fields_from_path(model, name)[-1]
+                    path = get_fields_from_path(model, name)
+                    attr = path[-1]
                 except (FieldDoesNotExist, NotRelationField):
                     message = f"Unable to lookup '{name}' on {model._meta.object_name}"
                     if model_admin:
@@ -393,7 +407,11 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
                         message += f" or {form.__class__.__name__}"
                     raise AttributeError(message)
 
-            if hasattr(attr, "short_description"):
+            if path and len(path) > 1:
+                label = RELATED_LABEL_SEPARATOR.join(
+                    capfirst(str(_field_label(field))) for field in path
+                )
+            elif hasattr(attr, "short_description"):
                 label = attr.short_description
             elif (
                 isinstance(attr, property)

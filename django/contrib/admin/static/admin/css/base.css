@@ -427,7 +427,7 @@ thead th.sorted .text {
     padding-right: 42px;
 }
 
-table thead th .text span {
+table thead th .text > span {
     padding: 8px 10px;
     display: block;
 }

@@ -6,7 +6,12 @@ from playwright_tests import AdminPlaywrightTestCase
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.templatetags.admin_list import pagination, result_headers
+from django.contrib.admin.templatetags.admin_list import (
+    _related_label_html,
+    pagination,
+    result_headers,
+)
+from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import (
     ALL_VAR,
     IS_FACETS_VAR,
@@ -18,14 +23,14 @@ from django.contrib.admin.views.main import (
 )
 from django.contrib.auth.models import User
 from django.contrib.messages.storage.cookie import CookieStorage
-from django.db import DatabaseError, connection
+from django.db import DatabaseError, connection, models
 from django.db.models import F, Field, IntegerField
 from django.db.models.functions import Upper
 from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.test.client import RequestFactory
-from django.test.utils import CaptureQueriesContext, register_lookup
+from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
 from django.urls import reverse
 from django.utils import formats
 
@@ -1896,6 +1901,51 @@ class ChangeListTests(TestCase):
         self.assertContains(
             response,
             '<th scope="col" class="sortable column-parent__parent__name">',
+        )
+        # Related fields show the lookup path, using verbose_name where set.
+        changelist = m.get_changelist_instance(request)
+        headers = [
+            header["text"]
+            for header in result_headers(changelist)
+            if "action-checkbox-column" not in header["class_attrib"]
+        ]
+        self.assertEqual(
+            headers, ["name", "Parent > Name", "Parent > Parent > Family name"]
+        )
+        # The separators are replaced for assistive technology.
+        separator = (
+            '<span aria-hidden="true"> &gt; </span>'
+            '<span class="visually-hidden">, </span>'
+        )
+        self.assertContains(response, f"Parent{separator}Name", html=True)
+        self.assertContains(
+            response, f"Parent{separator}Parent{separator}Family name", html=True
+        )
+
+    @isolate_apps("admin_changelist")
+    def test_list_display_related_field_label_escaped(self):
+        """
+        Special HTML characters in the verbose_name of each field in a related
+        lookup are escaped in the column header.
+        """
+
+        class Author(models.Model):
+            name = models.CharField(max_length=50, verbose_name="name <required>")
+
+        class Book(models.Model):
+            author = models.ForeignKey(
+                Author, models.CASCADE, verbose_name="author <required>"
+            )
+
+        html = _related_label_html(
+            label_for_field("author__name", Book),
+            "author__name",
+            Author._meta.get_field("name"),
+        )
+        self.assertEqual(
+            html,
+            'Author &lt;required&gt;<span aria-hidden="true"> &gt; </span>'
+            '<span class="visually-hidden">, </span>Name &lt;required&gt;',
         )
 
     def test_list_display_related_field_null(self):
