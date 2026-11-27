@@ -32,6 +32,7 @@ sys.path.insert(1, dirname(dirname(abspath(__file__))))
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(abspath(join(dirname(__file__), "_ext")))
+sys.path.append(abspath(join(dirname(__file__), "_theme")))
 
 # Use the module to GitHub url resolver, but import it after the _ext directory
 # it lives in has been added to sys.path.
@@ -45,7 +46,8 @@ needs_sphinx = "8.2.0"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
-    "djangodocs",
+    "djangodocs",  # Extension.
+    "djangodocs_html",  # Theme.
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosectionlabel",
@@ -208,7 +210,7 @@ suppress_warnings = ["app.add_directive", "epub.duplicated_toc_entry"]
 
 # The theme to use for HTML and HTML Help pages. See the documentation for
 # a list of builtin themes.
-html_theme = "djangodocs"
+html_theme = "djangodocs_html"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further. For a list of options available for each theme, see the

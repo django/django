@@ -27,11 +27,3 @@ html .console-block {
         }
     }
 }
-
-/* Keep Read the Docs' preview widgets from covering header and footer. */
-body:has(readthedocs-filetreediff:not([hidden])) .bd-header {
-    padding-block-start: 2rem;
-}
-body:has(readthedocs-flyout:not([hidden])) .bd-footer {
-    padding-block-end: 6rem;
-}
