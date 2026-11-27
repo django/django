@@ -203,9 +203,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def get_new_connection(self, conn_params):
-        if not self.is_in_memory_db():
+        database = conn_params["database"]
+        if not self.is_in_memory_db() and not (
+            isinstance(database, str) and database.startswith("file:")
+        ):
             try:
-                Path(conn_params["database"]).parent.mkdir(exist_ok=True, parents=True)
+                Path(database).parent.mkdir(exist_ok=True, parents=True)
             except OSError as e:
                 raise InterfaceError(f"Error creating path to SQLite database: {e}.")
         conn = Database.connect(**conn_params)
