@@ -200,6 +200,30 @@ class AcceptHeaderTests(TestCase):
             ["text/html"],
         )
 
+    def test_unparsable_media_ranges_ignored(self):
+        tests = [
+            # Unknown charset in an RFC 2231 extended parameter.
+            "text/plain; a*=x-no-such-charset''v",
+            # Charsets whose codecs reject the "replace" error handler.
+            "text/plain; a*=idna''v",
+            "text/plain; a*=undefined''v",
+            # RFC 2231 section number exceeding int() digit limits.
+            "text/plain; a*%s=v" % ("9" * 4301),
+        ]
+        for media_range in tests:
+            with self.subTest(media_range=media_range[:40]):
+                request = HttpRequest()
+                request.META["HTTP_ACCEPT"] = f"{media_range}, text/html;q=0.5"
+                self.assertEqual(
+                    [str(accepted_type) for accepted_type in request.accepted_types],
+                    ["text/html; q=0.5"],
+                )
+                self.assertIs(request.accepts("text/plain"), False)
+                self.assertEqual(
+                    request.get_preferred_type(["text/plain", "text/html"]),
+                    "text/html",
+                )
+
     def test_precedence(self):
         """
         Taken from https://datatracker.ietf.org/doc/html/rfc7231#section-5.3.2.

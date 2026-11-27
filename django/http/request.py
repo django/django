@@ -96,12 +96,16 @@ class HttpRequest:
         Return a list of MediaType instances, in order of preference (quality).
         """
         header_value = self.headers.get("Accept", "*/*")
+        media_types = []
+        for token in header_value.split(","):
+            token = token.strip()
+            try:
+                if token and (media_type := MediaType(token)).quality != 0:
+                    media_types.append(media_type)
+            except ValueError:
+                continue
         return sorted(
-            (
-                media_type
-                for token in header_value.split(",")
-                if token.strip() and (media_type := MediaType(token)).quality != 0
-            ),
+            media_types,
             key=operator.attrgetter("quality", "specificity"),
             reverse=True,
         )
