@@ -33,18 +33,35 @@ def file_move_safe(
     except OSError:
         pass
 
-    if not allow_overwrite and os.access(new_file_name, os.F_OK):
-        raise FileExistsError(
-            f"Destination file {new_file_name} exists and allow_overwrite is False."
-        )
-
-    try:
-        os.rename(old_file_name, new_file_name)
-        return
-    except OSError:
-        # OSError happens with os.rename() if moving to another filesystem or
-        # when moving opened files on certain operating systems.
-        pass
+    if allow_overwrite:
+        try:
+            os.rename(old_file_name, new_file_name)
+            return
+        except OSError:
+            # OSError happens with os.rename() if moving to another filesystem
+            # or when moving opened files on certain operating systems.
+            pass
+    else:
+        try:
+            os.link(old_file_name, new_file_name)
+        except FileExistsError as e:
+            raise FileExistsError(
+                f"Destination file {new_file_name} exists and allow_overwrite is False."
+            ) from e
+        except OSError:
+            # os.link() fails if moving to another filesystem or if the
+            # filesystem doesn't support hard links. Fall back to manual copy.
+            pass
+        else:
+            try:
+                os.unlink(old_file_name)
+            except PermissionError as e:
+                # Windows error 32 (ERROR_SHARING_VIOLATION) occurs when
+                # deleting an open file. Temporary files will be auto-deleted
+                # on close.
+                if getattr(e, "winerror", 0) != 32:
+                    raise
+            return
 
     # first open the old file, so that it won't go away
     with open(old_file_name, "rb") as old_file:
