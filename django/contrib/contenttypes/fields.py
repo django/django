@@ -289,7 +289,18 @@ class GenericForeignKeyDescriptor:
 
     def fetch_many(self, instances):
         is_cached = self.field.is_cached
-        missing_instances = [i for i in instances if not is_cached(i)]
+        ct_attname = self.field.model._meta.get_field(self.field.ct_field).attname
+        fk_attname = self.field.model._meta.get_field(self.field.fk_field).attname
+        missing_instances = []
+        for instance in instances:
+            if is_cached(instance):
+                continue
+            try:
+                getattr(instance, ct_attname)
+                getattr(instance, fk_attname)
+            except instance._meta.concrete_model.DoesNotExist:
+                continue
+            missing_instances.append(instance)
         return prefetch_related_objects(missing_instances, self.field.name)
 
     def __set__(self, instance, value):

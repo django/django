@@ -812,6 +812,33 @@ class GenericRelationsTests(TestCase):
             self.assertEqual(platypus_tag.content_object, self.platypus)
             self.assertEqual(quartz_tag.content_object, self.quartz)
 
+    def test_fetch_mode_fetch_peers_deleted_peer(self):
+        tag1, tag2 = (
+            TaggedItem.objects.fetch_mode(FETCH_PEERS)
+            .only("tag")
+            .filter(content_type=ContentType.objects.get_for_model(Animal))
+            .order_by("pk")
+        )
+        TaggedItem.objects.filter(pk=tag1.pk).delete()
+        # The deleted peer doesn't affect the other one.
+        # Reading the deferred values, checking the deleted peer, and fetching.
+        with self.assertNumQueries(4):
+            self.assertEqual(tag2.content_object, self.lion)
+        # The deleted peer behaves as it does with FETCH_ONE.
+        with self.assertRaises(TaggedItem.DoesNotExist):
+            tag1.content_object
+
+    def test_fetch_mode_fetch_peers_deleted_peer_deferred_object_id(self):
+        tag1, tag2 = (
+            TaggedItem.objects.fetch_mode(FETCH_PEERS)
+            .only("tag", "content_type")
+            .filter(content_type=ContentType.objects.get_for_model(Animal))
+            .order_by("pk")
+        )
+        TaggedItem.objects.filter(pk=tag1.pk).delete()
+        with self.assertNumQueries(3):
+            self.assertEqual(tag2.content_object, self.lion)
+
     def test_fetch_mode_raise(self):
         tag = TaggedItem.objects.fetch_mode(FETCH_RAISE).get(tag="yellow")
         msg = "Fetching of TaggedItem.content_object blocked."

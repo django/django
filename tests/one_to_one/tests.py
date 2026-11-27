@@ -642,6 +642,19 @@ class OneToOneTests(TestCase):
         with self.assertNumQueries(0):
             p2.restaurant
 
+    def test_fetch_mode_fetch_peers_reverse_deleted_peer_to_field(self):
+        Target.objects.create(name="target 1")
+        target2 = Target.objects.create(name="target 2")
+        pointer2 = ToFieldPointer.objects.create(target=target2)
+        targets = Target.objects.fetch_mode(FETCH_PEERS).only("id")
+        target1, target2 = targets.order_by("pk")
+
+        Target.objects.filter(pk=target1.pk).delete()
+        # The deleted peer doesn't prevent fetching the other one's relation.
+        self.assertEqual(target2.tofieldpointer, pointer2)
+        with self.assertRaises(Target.DoesNotExist):
+            target1.tofieldpointer
+
     def test_fetch_mode_raise_forward(self):
         r = Restaurant.objects.fetch_mode(FETCH_RAISE).get(pk=self.r1.pk)
         msg = "Fetching of Restaurant.place blocked."
