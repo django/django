@@ -161,7 +161,10 @@ class DayMixin:
 
         The interval is defined by start date <= item date < next start date.
         """
-        return date + datetime.timedelta(days=1)
+        try:
+            return date + datetime.timedelta(days=1)
+        except OverflowError:
+            raise Http404(_("Date out of range"))
 
     def _get_current_day(self, date):
         """Return the start date of the current interval."""
@@ -764,7 +767,10 @@ def _get_next_prev(generic_view, date, is_previous, period):
     # If allow_empty is True, the naive result will be valid
     if allow_empty:
         if is_previous:
-            result = get_current(start - datetime.timedelta(days=1))
+            try:
+                result = get_current(start - datetime.timedelta(days=1))
+            except OverflowError:
+                raise Http404(_("Date out of range"))
         else:
             result = end
 
