@@ -129,6 +129,24 @@ class CompositePKAggregateTests(TestCase):
         self.assertEqual(users.count(), 3)
         self.assertSequenceEqual(users, (self.user_3, self.user_3, self.user_3))
 
+    def test_users_annotated_with_comments_count_filtered_by_comments(self):
+        users = User.objects.annotate(comments_count=Count("comments")).filter(
+            comments__text__icontains="baz"
+        )
+        self.assertSequenceEqual(
+            users.values_list("pk", "comments_count"),
+            [(self.user_3.pk, 3)],
+        )
+
+    def test_users_annotated_with_comments_count_filtered_by_comments_as_subquery(self):
+        users = User.objects.annotate(comments_count=Count("comments")).filter(
+            comments__text__icontains="baz"
+        )
+        self.assertSequenceEqual(
+            User.objects.filter(pk__in=users.values("pk")), [self.user_3]
+        )
+        self.assertEqual(users.update(email="user0003@example.org"), 1)
+
     def test_order_by_comments_id_count(self):
         self.assertSequenceEqual(
             User.objects.annotate(comments_count=Count("comments__id")).order_by(
