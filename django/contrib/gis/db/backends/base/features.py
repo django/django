@@ -95,6 +95,33 @@ class BaseSpatialFeatures:
     def supports_union_aggr(self):
         return models.Union not in self.connection.ops.disallowed_aggregates
 
+    @property
+    def supports_collect_aggr_order_by(self):
+        disallowed = self.connection.ops.disallowed_aggregates_order_by
+        return (
+            self.supports_collect_aggr
+            and self.supports_aggregate_order_by_clause
+            and models.Collect not in disallowed
+        )
+
+    @property
+    def supports_make_line_aggr_order_by(self):
+        disallowed = self.connection.ops.disallowed_aggregates_order_by
+        return (
+            self.supports_make_line_aggr
+            and self.supports_aggregate_order_by_clause
+            and models.MakeLine not in disallowed
+        )
+
+    @property
+    def supports_union_aggr_order_by(self):
+        disallowed = self.connection.ops.disallowed_aggregates_order_by
+        return (
+            self.supports_union_aggr
+            and self.supports_aggregate_order_by_clause
+            and models.Union not in disallowed
+        )
+
     def __getattr__(self, name):
         m = re.match(r"has_(\w*)_function$", name)
         if m:

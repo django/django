@@ -907,6 +907,10 @@ use these aggregate functions, see :doc:`the topic guide on aggregation
 =====================  =====================================================
 Keyword Argument       Description
 =====================  =====================================================
+``order_by``           Supported by :class:`Collect`, :class:`MakeLine`, and
+                       :class:`Union` on PostGIS. It specifies the order in
+                       which the geometries are aggregated, as described in
+                       :class:`~django.db.models.Aggregate`.
 ``tolerance``          This keyword is for Oracle only. It is for the
                        tolerance value used by the ``SDOAGGRTYPE``
                        procedure; the  `Oracle documentation`__ has more
@@ -926,7 +930,7 @@ Example:
 ``Collect``
 ~~~~~~~~~~~
 
-.. class:: Collect(geo_field, filter=None)
+.. class:: Collect(geo_field, filter=None, order_by=None)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Collect.html>`__,
 MariaDB, MySQL, SpatiaLite
@@ -936,6 +940,10 @@ geometry column. This is analogous to a simplified version of the
 :class:`Union` aggregate, except it can be several orders of magnitude faster
 than performing a union because it rolls up geometries into a collection or
 multi object, not caring about dissolving boundaries.
+
+.. versionchanged:: 6.2
+
+    The ``order_by`` argument was added.
 
 ``Extent``
 ~~~~~~~~~~
@@ -978,13 +986,18 @@ Example:
 ``MakeLine``
 ~~~~~~~~~~~~
 
-.. class:: MakeLine(geo_field, filter=None)
+.. class:: MakeLine(geo_field, filter=None, order_by=None)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MakeLine.html>`__,
 SpatiaLite
 
 Returns a ``LineString`` constructed from the point field geometries in the
-``QuerySet``. Currently, ordering the queryset has no effect.
+``QuerySet``. Ordering the queryset has no effect on the order of the points;
+on PostGIS, use the ``order_by`` argument instead.
+
+.. versionchanged:: 6.2
+
+    The ``order_by`` argument was added.
 
 Example:
 
@@ -997,7 +1010,7 @@ Example:
 ``Union``
 ~~~~~~~~~
 
-.. class:: Union(geo_field, filter=None)
+.. class:: Union(geo_field, filter=None, order_by=None)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Union.html>`__,
 Oracle, SpatiaLite
@@ -1011,6 +1024,10 @@ large querysets.
 
     If the computation time for using this method is too expensive, consider
     using :class:`Collect` instead.
+
+.. versionchanged:: 6.2
+
+    The ``order_by`` argument was added.
 
 Example:
 
