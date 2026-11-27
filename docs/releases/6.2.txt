@@ -124,7 +124,9 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :attr:`.ModelAdmin.ordering` now accepts the name of a ``ModelAdmin`` or
+  model method that declares an ``admin_order_field``, matching the behavior
+  already supported in :attr:`.ModelAdmin.list_display`.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

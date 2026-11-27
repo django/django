@@ -1240,6 +1240,68 @@ class OrderingCheckTests(CheckTestCase):
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
+    def test_valid_admin_method_with_admin_order_field(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = ("sorted_name",)
+
+            @admin.display(ordering="name")
+            def sorted_name(self, obj):
+                return obj.name
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_valid_model_method_with_admin_order_field(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = ("name_order_field",)
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
+    def test_invalid_admin_method_without_admin_order_field(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = ("plain_method",)
+
+            def plain_method(self, obj):
+                return obj.name
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            "The value of 'ordering[0]' refers to 'plain_method', which is not "
+            "a field of 'modeladmin.ValidationTestModel'.",
+            "admin.E033",
+        )
+
+    def test_invalid_admin_method_with_missing_admin_order_field(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = ("sorted_name",)
+
+            @admin.display(ordering="nonexistent")
+            def sorted_name(self, obj):
+                return obj.name
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            ValidationTestModel,
+            "The value of 'ordering[0]' refers to 'nonexistent', which is not "
+            "a field of 'modeladmin.ValidationTestModel'.",
+            "admin.E033",
+        )
+
+    def test_valid_admin_method_with_annotation_admin_order_field(self):
+        class TestModelAdmin(ModelAdmin):
+            ordering = ("upper_name",)
+
+            def get_queryset(self, request):
+                return self.model._default_manager.get_queryset().annotate(
+                    upper_name_annotation=Upper("name")
+                )
+
+            @admin.display(ordering="upper_name_annotation")
+            def upper_name(self, obj):
+                return obj.upper_name_annotation
+
+        self.assertIsValid(TestModelAdmin, ValidationTestModel)
+
 
 class ListSelectRelatedCheckTests(CheckTestCase):
     def test_invalid_type(self):

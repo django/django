@@ -51,6 +51,11 @@ class ValidationTestModel(models.Model):
     def decade_published_in(self):
         return self.pub_date.strftime("%Y")[:3] + "0's"
 
+    def name_order_field(self):
+        return self.name
+
+    name_order_field.admin_order_field = "name"
+
 
 class ValidationTestInlineModel(models.Model):
     parent = models.ForeignKey(ValidationTestModel, models.CASCADE)
