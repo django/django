@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.admin.exceptions import NotRegistered
 from django.contrib.admin.utils import NotRelationField, flatten, get_fields_from_path
 from django.core import checks
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Combinable
@@ -772,6 +772,19 @@ class BaseModelAdminChecks:
             try:
                 obj.model._meta.get_field(field_name)
             except FieldDoesNotExist:
+                attr = getattr(obj, field_name, None)
+                if attr is None:
+                    attr = getattr(obj.model, field_name, None)
+                if isinstance(attr, property) and attr.fget is not None:
+                    attr = attr.fget
+                if callable(attr) and hasattr(attr, "admin_order_field"):
+                    return self._check_ordering_item(obj, attr.admin_order_field, label)
+                try:
+                    annotations = obj.get_queryset(None).query.annotations
+                except (AttributeError, FieldError, TypeError):
+                    annotations = {}
+                if field_name in annotations:
+                    return []
                 return refer_to_missing_field(
                     field=field_name, option=label, obj=obj, id="admin.E033"
                 )
