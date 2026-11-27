@@ -306,6 +306,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Special-case implicit M2M tables.
         if field.many_to_many and field.remote_field.through._meta.auto_created:
             self.create_model(field.remote_field.through)
+        # It might not actually have a column behind it.
+        elif field.db_parameters(connection=self.connection)["type"] is None:
+            return
         elif isinstance(field, CompositePrimaryKey):
             # If a CompositePrimaryKey field was added, the existing primary
             # key field had to be altered too, resulting in an AddField,
@@ -341,20 +344,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if field.remote_field.through._meta.auto_created:
                 self.delete_model(field.remote_field.through)
             # For explicit "through" M2M fields, do nothing
+        # It might not actually have a column behind it
+        elif field.db_parameters(connection=self.connection)["type"] is None:
+            return
         elif (
             # Primary keys, unique fields, indexed fields, and foreign keys are
             # not supported in ALTER TABLE DROP COLUMN.
             not field.primary_key
             and not field.unique
             and not field.db_index
-            and not (field.remote_field and field.db_constraint)
+            and not (field.remote_field and getattr(field, "db_constraint", False))
         ):
             super().remove_field(model, field)
         # For everything else, remake.
         else:
-            # It might not actually have a column behind it
-            if field.db_parameters(connection=self.connection)["type"] is None:
-                return
             self._remake_table(model, delete_field=field)
 
     def _alter_field(

@@ -4773,6 +4773,7 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name("author")
         with connection.schema_editor() as editor:
             editor.add_field(BookForeignObj, new_field)
+            editor.remove_field(BookForeignObj, new_field)
 
     def test_creation_deletion_reserved_names(self):
         """
