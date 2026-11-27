@@ -408,7 +408,10 @@ Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromWKB.html>`__, SpatiaLite
 
 Creates geometry from `Well-known binary (WKB)`_ representation. The optional
 ``srid`` argument allows to specify the SRID of the resulting geometry.
-``srid`` is ignored on Oracle.
+
+.. versionchanged:: 6.2
+
+    Support for the ``srid`` parameter was added on Oracle.
 
 ``FromWKT``
 -----------
@@ -421,7 +424,10 @@ Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromText.html>`__, SpatiaLite
 
 Creates geometry from `Well-known text (WKT)`_ representation. The optional
 ``srid`` argument allows to specify the SRID of the resulting geometry.
-``srid`` is ignored on Oracle.
+
+.. versionchanged:: 6.2
+
+    Support for the ``srid`` parameter was added on Oracle.
 
 Output format
 =============

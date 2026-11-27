@@ -38,4 +38,19 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
                 },
             }
         )
+        if self.connection.oracle_version < (19, 25):
+            skips.update(
+                {
+                    "Raises ORA-06553 on Oracle < 19.25": {
+                        "gis_tests.geoapp.test_functions.GISFunctionsTests."
+                        "test_fromwkb",
+                        "gis_tests.geoapp.test_functions.GISFunctionsTests."
+                        "test_fromwkt",
+                        "gis_tests.geoapp.test_functions.GISFunctionsTests."
+                        "test_transform_fromwkb",
+                        "gis_tests.geoapp.test_functions.GISFunctionsTests."
+                        "test_transform_fromwkt",
+                    },
+                }
+            )
         return skips
