@@ -145,7 +145,7 @@ class BaseSpatialOperations:
             sql = f"{transform_func}({self.from_text}(%s, %s), %s)"
             params = (value, value.srid, f.srid)
             return sql, params
-        elif self.connection.features.has_spatialrefsys_table:
+        elif self.connection.features.supports_srid_in_geometry_literals:
             return f"{self.from_text}(%s, %s)", (value, f.srid)
         else:
             # For backwards compatibility on MySQL (#27464).

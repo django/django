@@ -151,5 +151,19 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
         return converter
 
+    def geometry_columns(self):
+        if self.mariadb:
+            return super().geometry_columns()
+        from .models import MySQLGeometryColumns
+
+        return MySQLGeometryColumns
+
+    def spatial_ref_sys(self):
+        if self.mariadb:
+            return super().spatial_ref_sys()
+        from .models import MySQLSpatialRefSys
+
+        return MySQLSpatialRefSys
+
     def spatial_aggregate_name(self, agg_name):
         return getattr(self, agg_name.lower())

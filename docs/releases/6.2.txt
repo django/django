@@ -148,6 +148,10 @@ Minor features
 * :class:`~django.contrib.gis.gdal.DataSource` now preserves millisecond
   precision when reading time and datetime fields.
 
+* On MySQL, GeoDjango now supports querying geometry column and spatial
+  reference system metadata and registering custom spatial reference systems
+  with ``django.contrib.gis.utils.add_srs_entry()``.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

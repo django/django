@@ -26,6 +26,14 @@ Django supports spatial functions operating on real geometries available in
 modern MySQL versions. However, the spatial functions are not as rich as other
 backends like PostGIS.
 
+.. versionadded:: 6.2
+
+    On MySQL, ``django.contrib.gis.utils.add_srs_entry()`` registers a spatial
+    reference system if its SRID is missing from the server catalog. Creating
+    an entry requires autocommit and permission to create spatial reference
+    systems. Spatial reference systems are shared by all databases on the
+    server.
+
 Raster Support
 --------------
 
