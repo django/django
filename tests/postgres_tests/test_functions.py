@@ -1,8 +1,11 @@
 import uuid
 from datetime import datetime
+from datetime import timezone as datetime_timezone
 from time import sleep
 
 from django.contrib.postgres.functions import RandomUUID, TransactionNow
+from django.db.models import DateTimeField, Func, Value
+from django.test import override_settings
 
 from . import PostgreSQLTestCase
 from .models import NowTestModel, UUIDTestModel
@@ -37,3 +40,30 @@ class TestRandomUUID(PostgreSQLTestCase):
         m2.refresh_from_db()
         self.assertIsInstance(m1.uuid, uuid.UUID)
         self.assertNotEqual(m1.uuid, m2.uuid)
+
+
+@override_settings(USE_TZ=True, TIME_ZONE="America/New_York")
+class TestTimeZoneFunction(PostgreSQLTestCase):
+    def test_timezone_function_returns_naive_datetime(self):
+        original = datetime(2026, 6, 15, 12, tzinfo=datetime_timezone.utc)
+        obj = NowTestModel.objects.create(when=original)
+        obj = NowTestModel.objects.annotate(
+            local_when=Func(
+                Value("Europe/Paris"),
+                "when",
+                function="timezone",
+                output_field=DateTimeField(),
+            )
+        ).get(pk=obj.pk)
+
+        self.assertEqual(obj.local_when, datetime(2026, 6, 15, 14))
+        self.assertIsNone(obj.local_when.tzinfo)
+
+        obj.when = obj.local_when
+        with self.assertWarns(RuntimeWarning):
+            obj.save()
+        obj.refresh_from_db()
+        self.assertEqual(
+            obj.when,
+            datetime(2026, 6, 15, 18, tzinfo=datetime_timezone.utc),
+        )
