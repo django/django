@@ -6,6 +6,7 @@ from django.db import IntegrityError, connection, models
 from django.db.models import Case, F, When
 from django.db.models.constraints import BaseConstraint, UniqueConstraint
 from django.db.models.functions import Abs, Lower, Sqrt, Upper
+from django.db.models.lookups import IsNull
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 
@@ -298,6 +299,16 @@ class CheckConstraintTests(TestCase):
             constraint.validate(Product, Product(price=500, discounted_price=5))
         constraint.validate(Product, Product(price=501, discounted_price=5))
         constraint.validate(Product, Product(price=499, discounted_price=5))
+
+    def test_validate_negated_isnull_lookup(self):
+        constraint = models.CheckConstraint(
+            condition=~IsNull(F("price"), True),
+            name="price_not_null",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(Product, Product(price=None))
+        constraint.validate(Product, Product(price=1))
 
     def test_validate_rawsql_expressions_noop(self):
         constraint = models.CheckConstraint(
