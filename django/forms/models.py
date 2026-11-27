@@ -1592,6 +1592,10 @@ class ModelChoiceField(ChoiceField):
         if value in self.empty_values:
             return None
         self.validate_no_null_characters(value)
+        if self.queryset.query.is_sliced:
+            raise TypeError(
+                "%s does not support sliced querysets." % self.__class__.__name__
+            )
         try:
             key = self.to_field_name or "pk"
             if isinstance(value, self.queryset.model):
@@ -1665,6 +1669,10 @@ class ModelMultipleChoiceField(ModelChoiceField):
         corresponding objects. Raise a ValidationError if a given value is
         invalid (not a valid PK, not in the queryset, etc.)
         """
+        if self.queryset.query.is_sliced:
+            raise TypeError(
+                "%s does not support sliced querysets." % self.__class__.__name__
+            )
         key = self.to_field_name or "pk"
         # deduplicate given values to avoid creating many querysets or
         # requiring the database backend deduplicate efficiently.
