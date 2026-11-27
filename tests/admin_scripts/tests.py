@@ -139,6 +139,7 @@ class AdminScriptTestCase(SimpleTestCase):
         test_environ["PYTHONPATH"] = os.pathsep.join(python_path)
         test_environ["PYTHONWARNINGS"] = ""
         test_environ["PYTHON_COLORS"] = "0"
+        test_environ["PYTHONIOENCODING"] = "utf-8"
 
         p = subprocess.run(
             [sys.executable, *args],
@@ -146,6 +147,7 @@ class AdminScriptTestCase(SimpleTestCase):
             cwd=self.test_dir,
             env=test_environ,
             text=True,
+            encoding="utf-8",
             umask=umask,
         )
         return p.stdout, p.stderr
@@ -763,6 +765,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         args = ["startapp", "settings_test"]
         app_path = os.path.join(self.test_dir, "settings_test")
         out, err = self.run_django_admin(args, "test_project.settings")
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         with open(os.path.join(app_path, "apps.py")) as f:
@@ -779,6 +782,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         args = ["startapp", "--template", template_path, "custom_settings_test"]
         app_path = os.path.join(self.test_dir, "custom_settings_test")
         out, err = self.run_django_admin(args, "test_project.settings")
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         self.assertTrue(os.path.exists(os.path.join(app_path, "api.py")))
@@ -788,6 +792,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         args = ["startapp", "こんにちは"]
         app_path = os.path.join(self.test_dir, "こんにちは")
         out, err = self.run_django_admin(args, "test_project.settings")
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
@@ -909,8 +914,15 @@ class ManageNoSettings(AdminScriptTestCase):
     def test_startapp_with_bad_settings(self):
         args = ["startapp", "--settings=bad_settings", "app1"]
         out, err = self.run_manage(args)
+        self.assertOutput(out, 'Success! Created app "app1"')
+        self.assertNoOutput(err)
+
+    def test_startapp_with_verbosity_zero(self):
+        args = ["startapp", "--verbosity=0", "app1"]
+        out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertNoOutput(err)
+        self.assertTrue(os.path.isdir(os.path.join(self.test_dir, "app1")))
 
     def test_builtin_with_bad_environment(self):
         """
@@ -2621,6 +2633,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
+        self.assertIn("Success! Created project", out)
         self.assertTrue(os.path.isdir(testproject_dir))
 
         # running again..
@@ -2632,6 +2645,13 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             "existing Python module and cannot be used as a project name. "
             "Please try another name.",
         )
+
+    def test_verbosity_zero(self):
+        args = ["startproject", "--verbosity=0", "testproject"]
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(out)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.isdir(os.path.join(self.test_dir, "testproject")))
 
     def test_invalid_project_name(self):
         """
@@ -2700,6 +2720,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         os.mkdir(testproject_dir)
 
         out, err = self.run_django_admin(args)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "manage.py")))
 
@@ -2722,6 +2743,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "customtestproject")
 
         out, err = self.run_django_admin(args)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "additional_dir")))
@@ -2750,6 +2772,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "customtestproject")
 
         out, err = self.run_django_admin(args)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "additional_dir")))
@@ -2764,6 +2787,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "tarballtestproject")
 
         out, err = self.run_django_admin(args)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "run.py")))
@@ -2785,6 +2809,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         os.mkdir(testproject_dir)
 
         out, err = self.run_django_admin(args)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "run.py")))
@@ -2800,6 +2825,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "urltestproject")
 
         out, err = self.run_django_admin(args)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "run.py")))
@@ -2861,6 +2887,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "urltestproject")
 
         out, err = self.run_django_admin(args)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "run.py")))
@@ -2884,6 +2911,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "customtestproject")
 
         out, err = self.run_django_admin(args)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "additional_dir")))
@@ -2908,6 +2936,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, "project_dir")
         os.mkdir(testproject_dir)
         out, err = self.run_django_admin(args)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, "manage.py")
         with open(test_manage_py) as fp:
@@ -2956,7 +2985,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         ]
         testproject_dir = os.path.join(self.test_dir, "project_dir2")
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
+        self.assertIn("Success! Created project", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(testproject_dir))
 
@@ -3160,9 +3189,10 @@ class StartApp(AdminScriptTestCase):
     def test_trailing_slash_in_target_app_directory_name(self):
         app_dir = os.path.join(self.test_dir, "apps", "app1")
         os.makedirs(app_dir)
-        _, err = self.run_django_admin(
+        out, err = self.run_django_admin(
             ["startapp", "app", os.path.join("apps", "app1", "")]
         )
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertIs(os.path.exists(os.path.join(app_dir, "apps.py")), True)
 
@@ -3179,6 +3209,7 @@ class StartApp(AdminScriptTestCase):
 
     def test_template(self):
         out, err = self.run_django_admin(["startapp", "new_app"])
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         app_path = os.path.join(self.test_dir, "new_app")
         self.assertIs(os.path.exists(app_path), True)
@@ -3195,7 +3226,7 @@ class StartApp(AdminScriptTestCase):
         ]
         testapp_dir = os.path.join(self.test_dir, "my_app")
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(testapp_dir))
 
@@ -3207,7 +3238,7 @@ class StartApp(AdminScriptTestCase):
         ]
         testapp_dir = os.path.join(self.test_dir, "apps", "my_app")
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(out)
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(testapp_dir))
 
@@ -3219,7 +3250,7 @@ class StartApp(AdminScriptTestCase):
         nested_args = ["startapp", "child", "parent/child"]
         child_app_dir = os.path.join(self.test_dir, "parent", "child")
         out, err = self.run_django_admin(nested_args)
-        self.assertNoOutput(out)
+        self.assertIn("Success! Created app", out)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(child_app_dir))
 

@@ -269,6 +269,9 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
+* The :cli:`startproject` and :cli:`startapp` commands now display a
+  success message after creating a project or app.
+
 * The new :cli:`listurls` command lists the URLs from the project's root
   URLconf, including the view class or function (and name, if present).
 
