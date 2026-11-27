@@ -78,7 +78,7 @@ class Command(BaseCommand):
             return
         connection = connections[database]
 
-        if tablename in connection.introspection.table_names():
+        if tablename in connection.introspection.table_names(only_tables=[tablename]):
             if self.verbosity > 0:
                 self.stdout.write("Cache table '%s' already exists." % tablename)
             return

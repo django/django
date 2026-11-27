@@ -1,4 +1,5 @@
 from django.db import DatabaseError, connection
+from django.db.backends.base.introspection import TableInfo
 from django.db.models import DB_CASCADE, DB_SET_DEFAULT, DB_SET_NULL, DO_NOTHING, Index
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
@@ -34,6 +35,67 @@ class IntrospectionTests(TransactionTestCase):
             Article._meta.db_table,
             tl,
             "'%s' isn't in table_list()." % Article._meta.db_table,
+        )
+
+    def test_table_names_only_tables(self):
+        tables = connection.introspection.table_names(
+            only_tables=[
+                Reporter._meta.db_table,
+                Article._meta.db_table,
+                "introspection_nonexistent",
+            ]
+        )
+        self.assertEqual(tables, [Article._meta.db_table, Reporter._meta.db_table])
+
+    def test_table_names_only_tables_subset(self):
+        tables = connection.introspection.table_names()[::2]
+        self.assertEqual(
+            connection.introspection.table_names(only_tables=iter(tables)), tables
+        )
+
+    def test_table_names_only_tables_empty(self):
+        with self.assertNumQueries(0):
+            self.assertEqual(connection.introspection.table_names(only_tables=[]), [])
+
+    def test_get_table_list_only_tables_empty(self):
+        with connection.cursor() as cursor:
+            table_list = connection.introspection.get_table_list(
+                cursor, only_tables=set()
+            )
+        self.assertIsInstance(table_list, list)
+
+    def test_table_names_only_tables_identifier_converter(self):
+        """
+        Names in only_tables are compared after applying
+        identifier_converter().
+        """
+        converter = connection.introspection.identifier_converter
+        table = Reporter._meta.db_table
+        expected = [table] if converter(table.upper()) == converter(table) else []
+        self.assertEqual(
+            connection.introspection.table_names(only_tables=[table.upper()]),
+            expected,
+        )
+
+    def test_table_names_only_tables_unfiltered_get_table_list(self):
+        """
+        table_names() filters the tables if get_table_list() ignores
+        only_tables.
+        """
+
+        class CustomIntrospection(type(connection.introspection)):
+            def get_table_list(self, cursor, only_tables=None):
+                return [
+                    TableInfo("introspection_custom", "t"),
+                    TableInfo("introspection_other", "t"),
+                ]
+
+        introspection = CustomIntrospection(connection)
+        self.assertEqual(
+            introspection.table_names(
+                only_tables=["introspection_custom", Reporter._meta.db_table]
+            ),
+            ["introspection_custom"],
         )
 
     def test_django_table_names(self):
@@ -73,6 +135,17 @@ class IntrospectionTests(TransactionTestCase):
             )
             self.assertNotIn(
                 "introspection_article_view", connection.introspection.table_names()
+            )
+            only_tables = ["introspection_article_view", Article._meta.db_table]
+            self.assertEqual(
+                connection.introspection.table_names(
+                    include_views=True, only_tables=only_tables
+                ),
+                [Article._meta.db_table, "introspection_article_view"],
+            )
+            self.assertEqual(
+                connection.introspection.table_names(only_tables=only_tables),
+                [Article._meta.db_table],
             )
         finally:
             with connection.cursor() as cursor:

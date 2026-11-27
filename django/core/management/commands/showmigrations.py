@@ -4,7 +4,6 @@ from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.loader import MigrationLoader
-from django.db.migrations.recorder import MigrationRecorder
 
 
 class Command(BaseCommand):
@@ -84,8 +83,7 @@ class Command(BaseCommand):
         """
         # Load migrations from disk/DB
         loader = MigrationLoader(connection, ignore_no_migrations=True)
-        recorder = MigrationRecorder(connection)
-        recorded_migrations = recorder.applied_migrations()
+        recorded_migrations = loader.recorder.applied_migrations()
         graph = loader.graph
         # If we were passed a list of apps, validate it
         if app_names:
