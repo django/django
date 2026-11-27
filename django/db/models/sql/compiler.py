@@ -429,13 +429,10 @@ class SQLCompiler:
                 )
                 continue
 
-            if expr := self.query.annotations.get(col):
-                ref = col
-                transforms = []
-            else:
-                ref, *transforms = col.split(LOOKUP_SEP)
-                expr = self.query.annotations.get(ref)
-            if expr:
+            alias, transforms = self.query.get_alias_and_lookup_parts(col)
+            expr = self.query.annotations.get(alias) if alias is not None else None
+            if expr is not None:
+                ref = alias
                 if self.query.combinator and self.select:
                     if transforms:
                         raise NotImplementedError(

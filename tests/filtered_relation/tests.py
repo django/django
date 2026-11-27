@@ -381,6 +381,71 @@ class FilteredRelationTests(TestCase):
         ).filter(title__contains="outer space")
         self.assertSequenceEqual(queryset.order_by(alias), [book5, book6])
 
+    def test_lookup_sep_in_alias_lookup_values(self):
+        for alias in ["filtered__editor", "author__favorite_books"]:
+            with self.subTest(alias=alias):
+                queryset = Book.objects.annotate(
+                    **{
+                        alias: FilteredRelation(
+                            "editor", condition=Q(editor__isnull=False)
+                        )
+                    }
+                ).filter(title="The book by Alice")
+                self.assertSequenceEqual(
+                    queryset.values(alias + "__pk"),
+                    [{alias + "__pk": self.editor_a.pk}],
+                )
+                self.assertSequenceEqual(
+                    queryset.values_list(alias + "__pk"), [(self.editor_a.pk,)]
+                )
+                self.assertSequenceEqual(
+                    queryset.annotate(other=Value(1)).values(alias + "__pk"),
+                    [{alias + "__pk": self.editor_a.pk}],
+                )
+
+    def test_lookup_sep_in_alias_lookup_order_by(self):
+        editor_d = Editor.objects.create(name="d")
+        editor_c = Editor.objects.create(name="c")
+        book5 = Book.objects.create(
+            title="Poems from outer space", editor=editor_d, author=self.author1
+        )
+        book6 = Book.objects.create(
+            title="Stories from outer space", editor=editor_c, author=self.author1
+        )
+        for alias in ["filtered__editor", "author__favorite_books"]:
+            with self.subTest(alias=alias):
+                queryset = Book.objects.annotate(
+                    **{
+                        alias: FilteredRelation(
+                            "editor", condition=Q(editor__isnull=False)
+                        )
+                    }
+                ).filter(title__contains="outer space")
+                self.assertSequenceEqual(
+                    queryset.order_by(alias + "__name"), [book6, book5]
+                )
+                self.assertSequenceEqual(
+                    queryset.order_by("-" + alias + "__name"), [book5, book6]
+                )
+                self.assertSequenceEqual(
+                    queryset.order_by(alias + "__pk"), [book5, book6]
+                )
+
+    def test_lookup_sep_in_alias_lookup_filter(self):
+        for alias in ["filtered__editor", "author__favorite_books", "pub__editor"]:
+            with self.subTest(alias=alias):
+                queryset = Book.objects.annotate(
+                    pub=Value(1),
+                    **{
+                        alias: FilteredRelation(
+                            "editor", condition=Q(editor__isnull=False)
+                        )
+                    },
+                ).filter(**{f"{alias}__name": "a"})
+                self.assertSequenceEqual(
+                    queryset.order_by("pk"), [self.book1, self.book4]
+                )
+
     def test_extra(self):
         self.assertSequenceEqual(
             Author.objects.annotate(

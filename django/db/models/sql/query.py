@@ -38,7 +38,6 @@ from django.db.models.lookups import Lookup
 from django.db.models.query_utils import (
     Q,
     check_rel_lookup_compatibility,
-    refs_expression,
 )
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import BaseTable, Empty, Join, MultiJoin
@@ -1346,18 +1345,17 @@ class Query(BaseExpression):
         """
         Solve the lookup type from the lookup (e.g.: 'foobar__id__icontains').
         """
-        lookup_splitted = lookup.split(LOOKUP_SEP)
-        if self.annotations:
-            annotation, expression_lookups = refs_expression(
-                lookup_splitted, self.annotations
-            )
-            if annotation:
-                expression = self.annotations[annotation]
-                if summarize:
-                    expression = Ref(annotation, expression)
-                return expression_lookups, (), expression
-        _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
-        field_parts = lookup_splitted[0 : len(lookup_splitted) - len(lookup_parts)]
+        alias, lookup_parts = self.get_alias_and_lookup_parts(lookup)
+        if (
+            alias is not None
+            and (expression := self.annotations.get(alias)) is not None
+        ):
+            if summarize:
+                expression = Ref(alias, expression)
+            return lookup_parts, (), expression
+        names_to_join = [alias, *lookup_parts] if alias is not None else lookup_parts
+        _, field, _, lookup_parts = self.names_to_path(names_to_join, self.get_meta())
+        field_parts = names_to_join[0 : len(names_to_join) - len(lookup_parts)]
         if len(lookup_parts) > 1 and not field_parts:
             raise FieldError(
                 'Invalid lookup "%s" for model %s".'
@@ -1486,16 +1484,31 @@ class Query(BaseExpression):
                 "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
+    def get_alias_and_lookup_parts(self, expr):
+        """
+        Return the longest annotation or FilteredRelation alias prefix of
+        expr, together with the remaining lookup parts.
+        """
+        if expr in self.annotations or expr in self._filtered_relations:
+            return expr, []
+        names = expr.split(LOOKUP_SEP)
+        if not self.annotations and not self._filtered_relations:
+            return None, names
+        for pos in range(len(names) - 1, 0, -1):
+            alias = LOOKUP_SEP.join(names[:pos])
+            if alias in self.annotations or alias in self._filtered_relations:
+                return alias, names[pos:]
+        return None, names
+
     def get_names_to_join(self, expr):
         """
         Helper method for the resolution of expressions that could either be an
         annotation alias (including FilteredRelation) or a field lookup.
         """
-        return (
-            [expr]
-            if (expr in self._filtered_relations or expr in self.annotations)
-            else expr.split(LOOKUP_SEP)
-        )
+        alias, lookup_parts = self.get_alias_and_lookup_parts(expr)
+        if alias is not None:
+            return [alias, *lookup_parts]
+        return lookup_parts
 
     def build_filter(
         self,
@@ -2072,11 +2085,12 @@ class Query(BaseExpression):
         yield from (expr.alias for expr in cls._gen_cols(exprs))
 
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
-        annotation = self.annotations.get(name)
+        alias, transforms = self.get_alias_and_lookup_parts(name)
+        annotation = self.annotations.get(alias) if alias is not None else None
         if annotation is not None:
             if not allow_joins:
-                for alias in self._gen_col_aliases([annotation]):
-                    if isinstance(self.alias_map[alias], Join):
+                for col_alias in self._gen_col_aliases([annotation]):
+                    if isinstance(self.alias_map[col_alias], Join):
                         raise FieldError(
                             "Joined field references are not permitted in this query"
                         )
@@ -2086,21 +2100,17 @@ class Query(BaseExpression):
                 # aggregate() elements reference an existing annotation. In
                 # that case we need to return a Ref to the subquery's
                 # annotation.
-                if name not in self.annotation_select:
+                if alias not in self.annotation_select:
                     raise FieldError(
                         "Cannot aggregate over the '%s' alias. Use annotate() "
-                        "to promote it." % name
+                        "to promote it." % alias
                     )
-                return Ref(name, self.annotation_select[name])
-            else:
-                return annotation
+                annotation = Ref(alias, self.annotation_select[alias])
+            for transform in transforms:
+                annotation = self.try_transform(annotation, transform)
+            return annotation
         else:
-            field_list = name.split(LOOKUP_SEP)
-            annotation = self.annotations.get(field_list[0])
-            if annotation is not None:
-                for transform in field_list[1:]:
-                    annotation = self.try_transform(annotation, transform)
-                return annotation
+            field_list = [alias, *transforms] if alias is not None else transforms
             join_info = self.setup_joins(
                 field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse
             )
@@ -2622,11 +2632,12 @@ class Query(BaseExpression):
                     if extra := self.extra_select.get(f):
                         extra_names.append(f)
                         selected[f] = RawSQL(*extra)
-                    # Check exact aliases before considering transforms like
-                    # "published__year", since an alias can contain LOOKUP_SEP.
-                    elif (alias := f) in self.annotations or (
-                        (alias := f.split(LOOKUP_SEP, 1)[0]) in self.annotations
-                    ):
+                    # Check the longest matching alias before considering
+                    # transforms like "published__year", since an alias can
+                    # contain LOOKUP_SEP.
+                    elif (
+                        alias := self.get_alias_and_lookup_parts(f)[0]
+                    ) in self.annotations:
                         if alias not in self.annotation_select:
                             if self.annotation_select:
                                 raise FieldError(
@@ -2650,7 +2661,9 @@ class Query(BaseExpression):
                         # annotations about to be masked as valid choices if
                         # `f` is not resolvable.
                         if self.annotation_select:
-                            self.names_to_path(f.split(LOOKUP_SEP), self.model._meta)
+                            self.names_to_path(
+                                self.get_names_to_join(f), self.model._meta
+                            )
                         selected[f] = len(field_names)
                         field_names.append(f)
             self.set_extra_mask(extra_names)

@@ -640,6 +640,78 @@ class NonAggregateAnnotationTestCase(TestCase):
                 "published__not_a_transform"
             )
 
+    def test_values_transform_on_annotation_containing_lookup_separator(self):
+        for alias in ["pub__date", "publisher__name"]:
+            with self.subTest(alias=alias):
+                qs = Book.objects.annotate(
+                    pub=Value(1),
+                    **{alias: TruncMonth("pubdate")},
+                ).filter(**{f"{alias}__year": self.b1.pubdate.year})
+                self.assertSequenceEqual(
+                    qs.values(f"{alias}__year"),
+                    [{f"{alias}__year": self.b1.pubdate.year}],
+                )
+                self.assertSequenceEqual(
+                    qs.values_list(f"{alias}__year", flat=True),
+                    [self.b1.pubdate.year],
+                )
+
+    def test_aggregate_transform_on_annotation(self):
+        self.assertEqual(
+            Book.objects.annotate(pub__date=TruncMonth("pubdate")).aggregate(
+                max_year=Max("pub__date__year")
+            ),
+            {"max_year": 2008},
+        )
+        self.assertEqual(
+            Book.objects.annotate(
+                author_count=Count("authors"),
+                pub__date=TruncMonth("pubdate"),
+            ).aggregate(max_year=Max("pub__date__year")),
+            {"max_year": 2008},
+        )
+
+    def test_update_transform_on_joined_annotation_disallowed(self):
+        msg = "Joined field references are not permitted in this query"
+        with self.assertRaisesMessage(FieldError, msg):
+            Book.objects.annotate(pub__name=F("publisher__name")).update(
+                name=F("pub__name__lower")
+            )
+
+    def test_order_by_transform_on_annotation_containing_lookup_separator(self):
+        for alias in ["pub__date", "publisher__name"]:
+            with self.subTest(alias=alias):
+                qs = Book.objects.annotate(
+                    pub=Value(1),
+                    **{alias: TruncMonth("pubdate")},
+                )
+                self.assertSequenceEqual(
+                    qs.order_by(f"{alias}__year", "pk"),
+                    [self.b6, self.b5, self.b1, self.b2, self.b3, self.b4],
+                )
+                self.assertSequenceEqual(
+                    qs.order_by(f"-{alias}__year", "pk"),
+                    [self.b2, self.b3, self.b4, self.b1, self.b5, self.b6],
+                )
+
+    def test_lookup_on_fk_annotation(self):
+        pk_field_name = Publisher._meta.pk.__class__.__name__
+        msg = (
+            f"Unsupported lookup 'pk' for {pk_field_name} or join on the field "
+            "not permitted."
+        )
+        for alias in ["pub_alias", "pub__alias"]:
+            qs = Book.objects.annotate(**{alias: F("publisher")})
+            with self.subTest(alias=alias, method="values"):
+                with self.assertRaisesMessage(FieldError, msg):
+                    qs.values(f"{alias}__pk")
+            with self.subTest(alias=alias, method="values_list"):
+                with self.assertRaisesMessage(FieldError, msg):
+                    qs.values_list(f"{alias}__pk")
+            with self.subTest(alias=alias, method="order_by"):
+                with self.assertRaisesMessage(FieldError, msg):
+                    list(qs.order_by(f"{alias}__pk"))
+
     def test_values_fields_annotations_order(self):
         qs = Book.objects.annotate(other_rating=F("rating") - 1).values(
             "other_rating", "rating"
@@ -1640,6 +1712,36 @@ class AliasTests(TestCase):
             qs.values("pub__date").get(pk=self.b1.pk)["pub__date"],
             self.b1.pubdate.replace(day=1),
         )
+
+    def test_values_transform_on_alias_containing_lookup_separator(self):
+        qs = Book.objects.alias(pub__date=TruncMonth("pubdate"))
+        msg = "Cannot select the 'pub__date' alias. Use annotate() to promote it."
+        for operation in ["values", "values_list"]:
+            with self.subTest(operation=operation):
+                with self.assertRaisesMessage(FieldError, msg):
+                    getattr(qs, operation)("pub__date__year")
+        aggregate_msg = (
+            "Cannot aggregate over the 'pub__date' alias. Use annotate() to promote it."
+        )
+        with self.assertRaisesMessage(FieldError, aggregate_msg):
+            qs.aggregate(max_year=Max("pub__date__year"))
+        self.assertSequenceEqual(
+            qs.order_by("pub__date__year", "pk"),
+            [self.b4, self.b3, self.b1, self.b2],
+        )
+
+        annotated = Book.objects.annotate(pub__date=TruncMonth("pubdate"))
+        with self.assertRaisesMessage(FieldError, msg):
+            annotated.values("pk").values("pub__date__year")
+        excluded_msg = (
+            "Cannot select the 'pub__date' alias. It was excluded by a previous "
+            "values() or values_list() call. Include 'pub__date' in that call "
+            "to select it."
+        )
+        with self.assertRaisesMessage(FieldError, excluded_msg):
+            annotated.annotate(other=F("rating")).values("other").values(
+                "pub__date__year"
+            )
 
     def test_alias_after_values(self):
         qs = Book.objects.values_list("pk").alias(other_pk=F("pk"))
