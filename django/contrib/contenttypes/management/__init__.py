@@ -5,14 +5,15 @@ from django.db import DEFAULT_DB_ALIAS, IntegrityError, migrations, router, tran
 
 
 class RenameContentType(migrations.RunPython):
-    def __init__(self, app_label, old_model, new_model):
+    def __init__(self, app_label, old_model, new_model, apps=None):
         self.app_label = app_label
         self.old_model = old_model
         self.new_model = new_model
+        self.apps = apps
         super().__init__(self.rename_forward, self.rename_backward)
 
     def _rename(self, apps, schema_editor, old_model, new_model):
-        ContentType = apps.get_model("contenttypes", "ContentType")
+        ContentType = (self.apps or apps).get_model("contenttypes", "ContentType")
         db = schema_editor.connection.alias
         if not router.allow_migrate_model(db, ContentType):
             return
@@ -91,6 +92,9 @@ def inject_rename_contenttypes_operations(
                     migration.app_label,
                     operation.old_name_lower,
                     operation.new_name_lower,
+                    # The state used to unapply a migration may not include
+                    # all applied contenttypes migrations.
+                    apps=apps if backward else None,
                 )
                 inserts.append((index + 1, operation))
         for inserted, (index, operation) in enumerate(inserts):
