@@ -2848,7 +2848,7 @@ class UUIDField(Field):
             input_form = "int" if isinstance(value, int) else "hex"
             try:
                 return uuid.UUID(**{input_form: value})
-            except (AttributeError, ValueError):
+            except (AttributeError, TypeError, ValueError):
                 raise exceptions.ValidationError(
                     self.error_messages["invalid"],
                     code="invalid",
