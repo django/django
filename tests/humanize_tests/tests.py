@@ -570,6 +570,63 @@ class HumanizeTests(SimpleTestCase):
         finally:
             humanize.datetime = orig_humanize_datetime
 
+    def test_naturaltime_depth(self):
+        test_list = [
+            now,
+            now - datetime.timedelta(hours=1, minutes=30, seconds=30),
+            now - datetime.timedelta(hours=23, minutes=50, seconds=50),
+            now - datetime.timedelta(days=1),
+            now - datetime.timedelta(days=500),
+            now + datetime.timedelta(days=2, hours=6, minutes=30),
+            now + datetime.timedelta(days=500),
+        ]
+        results = {
+            1: [
+                "now",
+                "an hour ago",
+                "23\xa0hours ago",
+                "1\xa0day ago",
+                "1\xa0year ago",
+                "2\xa0days from now",
+                "1\xa0year from now",
+            ],
+            2: [
+                "now",
+                "an hour ago",
+                "23\xa0hours ago",
+                "1\xa0day ago",
+                "1\xa0year, 4\xa0months ago",
+                "2\xa0days, 6\xa0hours from now",
+                "1\xa0year, 4\xa0months from now",
+            ],
+            3: [
+                "now",
+                "an hour ago",
+                "23\xa0hours ago",
+                "1\xa0day ago",
+                "1\xa0year, 4\xa0months, 1\xa0week ago",
+                "2\xa0days, 6\xa0hours, 30\xa0minutes from now",
+                "1\xa0year, 4\xa0months, 1\xa0week from now",
+            ],
+            4: [
+                "now",
+                "an hour ago",
+                "23\xa0hours ago",
+                "1\xa0day ago",
+                "1\xa0year, 4\xa0months, 1\xa0week, 5\xa0days ago",
+                "2\xa0days, 6\xa0hours, 30\xa0minutes from now",
+                "1\xa0year, 4\xa0months, 1\xa0week, 6\xa0days from now",
+            ],
+        }
+
+        orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
+        try:
+            with translation.override("en"):
+                for depth, result_list in results.items():
+                    self.humanize_tester(test_list, result_list, f"naturaltime:{depth}")
+        finally:
+            humanize.datetime = orig_humanize_datetime
+
     def test_naturaltime_as_documented(self):
         """
         #23340 -- Verify the documented behavior of humanize.naturaltime.
