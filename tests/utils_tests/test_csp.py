@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 from django.test import SimpleTestCase
 from django.utils.csp import CSP, LazyNonce, build_policy, generate_nonce
-from django.utils.functional import empty
+from django.utils.functional import empty, lazy
 
 basic_config = {
     "default-src": [CSP.SELF],
@@ -55,6 +55,18 @@ class CSPBuildPolicyTest(SimpleTestCase):
         """
         policy = {"default-src": CSP.SELF}
         self.assertPolicyEqual(build_policy(policy), "default-src 'self'")
+
+    def test_config_lazy_values(self):
+        """Lazy values (e.g. reverse_lazy()) are resolved to strings."""
+        policy = {
+            "default-src": [CSP.SELF],
+            "report-uri": lazy(lambda: "/csp-report/", str)(),
+            "script-src": [lazy(lambda: "example.com", str)()],
+        }
+        self.assertPolicyEqual(
+            build_policy(policy),
+            "default-src 'self'; report-uri /csp-report/; " "script-src example.com",
+        )
 
     def test_config_value_as_tuple(self):
         """

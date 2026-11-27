@@ -125,7 +125,7 @@ def build_policy(config, nonce=None):
             if not values:
                 continue
 
-            rendered_value = " ".join(values)
+            rendered_value = " ".join(map(str, values))
 
         policy.append(f"{directive} {rendered_value}".rstrip())
 
