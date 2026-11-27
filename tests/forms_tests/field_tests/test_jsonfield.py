@@ -1,6 +1,7 @@
 import json
+import sys
 import uuid
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import (
@@ -37,6 +38,50 @@ class JSONFieldTest(SimpleTestCase):
         with mock.patch.object(json, "loads", side_effect=RecursionError):
             with self.assertRaisesMessage(ValidationError, "Enter a valid JSON."):
                 field.clean("[[[]]]")
+
+    @skipIf(
+        sys.get_int_max_str_digits() == 0,
+        "requires an active integer string conversion limit",
+    )
+    def test_integer_exceeding_digit_limit(self):
+        class JSONForm(Form):
+            json_field = JSONField()
+
+        class CustomDecoder(json.JSONDecoder):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, parse_int=str, **kwargs)
+
+        value = "9" * (sys.get_int_max_str_digits() + 1)
+        field = JSONField()
+        tests = [
+            value,
+            f"-{value}",
+            f"[{value}]",
+            f'{{"value": {value}}}',
+        ]
+        for json_value in tests:
+            with self.subTest(json_value=json_value):
+                with self.assertRaisesMessage(ValidationError, "Enter a valid JSON."):
+                    field.clean(json_value)
+                self.assertIs(field.has_changed(None, json_value), True)
+        self.assertEqual(JSONField(decoder=CustomDecoder).clean(value), value)
+
+        form = JSONForm({"json_field": value})
+        self.assertIs(form.is_valid(), False)
+        self.assertEqual(form.errors["json_field"], ["Enter a valid JSON."])
+        self.assertIn(f"{value}</textarea>", form.as_p())
+
+    def test_custom_decoder_value_error(self):
+        class CustomDecoder(json.JSONDecoder):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, object_hook=self.object_hook, **kwargs)
+
+            def object_hook(self, obj):
+                raise ValueError("Custom decoder rejected this value.")
+
+        field = JSONField(decoder=CustomDecoder)
+        with self.assertRaisesMessage(ValidationError, "Enter a valid JSON."):
+            field.clean('{"value": 1}')
 
     def test_prepare_value(self):
         field = JSONField()
