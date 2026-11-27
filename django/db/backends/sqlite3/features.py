@@ -29,6 +29,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_case_insensitive_like = True
     supports_parentheses_in_compound = False
     can_defer_constraint_checks = True
+    supports_same_table_select_as_update = True
     supports_over_clause = True
     supports_frame_range_fixed_distance = True
     supports_frame_exclusion = True
