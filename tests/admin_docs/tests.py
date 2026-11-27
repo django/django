@@ -32,6 +32,7 @@ class AdminDocsPlaywrightTestCase(AdminPlaywrightTestCase):
     )
 
     def setUp(self):
+        super().setUp()
         User.objects.create_superuser(
             username="super", password="secret", email="super@example.com"
         )

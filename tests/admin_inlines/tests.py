@@ -2103,6 +2103,7 @@ class PlaywrightTests(AdminPlaywrightTestCase):
     available_apps = ["admin_inlines"] + AdminPlaywrightTestCase.available_apps
 
     def setUp(self):
+        super().setUp()
         User.objects.create_superuser(
             username="super", password="secret", email="super@example.com"
         )
