@@ -804,6 +804,39 @@ class LogFormattersTests(SimpleTestCase):
                 logger_output.getvalue(), r"^\[[/:,\w\s\d]+\] %s\n" % log_msg
             )
 
+    def test_server_formatter_server_time_all_styles(self):
+        tests = [
+            ("%", "[%(server_time)s] %(message)s"),
+            ("{", "[{server_time}] {message}"),
+            ("{", "[{server_time:10}] {message}"),
+            ("$", "[$server_time] $message"),
+            ("$", "[${server_time}] $message"),
+        ]
+        for style, fmt in tests:
+            with self.subTest(style=style, fmt=fmt):
+                formatter = ServerFormatter(fmt=fmt, style=style)
+                formatter.formatTime = (
+                    lambda record, datefmt=None: "27/Nov/2026 10:20:30"
+                )
+                record = logging.makeLogRecord({"msg": "log message"})
+                self.assertEqual(
+                    formatter.format(record),
+                    "[27/Nov/2026 10:20:30] log message",
+                )
+
+    def test_server_formatter_no_server_time_in_format(self):
+        formatter = ServerFormatter(fmt="%(message)s", style="%")
+        record = logging.makeLogRecord({"msg": "log message"})
+        self.assertEqual(formatter.format(record), "log message")
+        self.assertIs(hasattr(record, "server_time"), False)
+
+    def test_server_formatter_keeps_existing_server_time(self):
+        formatter = ServerFormatter(fmt="[%(server_time)s] %(message)s", style="%")
+        record = logging.makeLogRecord(
+            {"msg": "log message", "server_time": "2026-11-27 10:20:30"}
+        )
+        self.assertEqual(formatter.format(record), "[2026-11-27 10:20:30] log message")
+
 
 class LogResponseRealLoggerTests(LoggingAssertionMixin, TestCase):
 
