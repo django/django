@@ -407,3 +407,50 @@ class AcceptHeaderTests(TestCase):
         self.assertEqual(
             request.get_preferred_type(["text/plain", "image/jpeg"]), "image/jpeg"
         )
+
+    def test_malformed_tokens_ignored(self):
+        """
+        Malformed tokens that raise ValueError during parameter parsing
+        (e.g. oversized tokens or invalid RFC 2231 encodings) are ignored
+        without raising an unhandled exception.
+        """
+        request = HttpRequest()
+        oversized_token = "text/plain;" + "a" * 10005
+        rfc2231_invalid = "text/xml; foo*=unknown-charset''bar"
+        request.META["HTTP_ACCEPT"] = (
+            f"text/html, {oversized_token}, "
+            f"application/json;q=0.9, {rfc2231_invalid}"
+        )
+        self.assertEqual(
+            [str(accepted_type) for accepted_type in request.accepted_types],
+            ["text/html", "application/json; q=0.9"],
+        )
+
+    def test_entirely_malformed_accept_header(self):
+        """
+        An Accept header containing only malformed tokens returns an empty
+        list.
+        """
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = "text/plain;" + "a" * 10005
+        self.assertEqual(request.accepted_types, [])
+        self.assertIs(request.accepts("text/plain"), False)
+
+    def test_accepted_type_malformed_input(self):
+        """
+        Passing malformed media types to accepted_type or accepts returns
+        None / False instead of raising ValueError.
+        """
+        request = HttpRequest()
+        request.META["HTTP_ACCEPT"] = "text/html"
+        oversized = "text/plain;" + "a" * 10005
+        self.assertIsNone(request.accepted_type(oversized))
+        self.assertIs(request.accepts(oversized), False)
+
+    def test_media_type_match_malformed_input(self):
+        """
+        Matching a MediaType against a malformed string returns False.
+        """
+        media_type = MediaType("text/html")
+        oversized = "text/html;" + "a" * 10005
+        self.assertIs(media_type.match(oversized), False)

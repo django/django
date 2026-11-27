@@ -96,12 +96,19 @@ class HttpRequest:
         Return a list of MediaType instances, in order of preference (quality).
         """
         header_value = self.headers.get("Accept", "*/*")
+        media_types = []
+        for token in header_value.split(","):
+            token = token.strip()
+            if not token:
+                continue
+            try:
+                media_type = MediaType(token)
+            except ValueError:
+                continue
+            if media_type.quality != 0:
+                media_types.append(media_type)
         return sorted(
-            (
-                media_type
-                for token in header_value.split(",")
-                if token.strip() and (media_type := MediaType(token)).quality != 0
-            ),
+            media_types,
             key=operator.attrgetter("quality", "specificity"),
             reverse=True,
         )
@@ -122,7 +129,10 @@ class HttpRequest:
         """
         Return the MediaType instance which best matches the given media type.
         """
-        media_type = MediaType(media_type)
+        try:
+            media_type = MediaType(media_type)
+        except ValueError:
+            return None
         return next(
             (
                 accepted_type
@@ -777,7 +787,10 @@ class MediaType:
             return False
 
         if not isinstance(other, MediaType):
-            other = MediaType(other)
+            try:
+                other = MediaType(other)
+            except ValueError:
+                return False
 
         main_types = [self.main_type, other.main_type]
         sub_types = [self.sub_type, other.sub_type]
