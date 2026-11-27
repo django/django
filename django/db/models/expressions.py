@@ -1603,7 +1603,7 @@ class NegatedExpression(ExpressionWrapper):
         # to be compared to another expression unless they're wrapped in a CASE
         # WHEN.
         if not ops.conditional_expression_supported_in_where_clause(self.expression):
-            return f"CASE WHEN {sql} = 0 THEN 1 ELSE 0 END", params
+            return ops.conditional_expression_to_value(f"{sql} = 0", params)
         return f"NOT {sql}", params
 
     def resolve_expression(
@@ -1628,7 +1628,12 @@ class NegatedExpression(ExpressionWrapper):
             # Avoid double wrapping.
             and expression_supported_in_where_clause(self.expression)
         ):
-            sql = "CASE WHEN {} THEN 1 ELSE 0 END".format(sql)
+            sql, params = compiler.connection.ops.conditional_expression_to_value(
+                sql,
+                params,
+                # NOT EXISTS() is never NULL.
+                nullable=not isinstance(self.expression, Exists),
+            )
         return sql, params
 
 
@@ -1898,7 +1903,9 @@ class Exists(Subquery):
         # (e.g. Oracle) doesn't support boolean expression in SELECT or GROUP
         # BY list.
         if not compiler.connection.features.supports_boolean_expr_in_select_clause:
-            sql = "CASE WHEN {} THEN 1 ELSE 0 END".format(sql)
+            sql, params = compiler.connection.ops.conditional_expression_to_value(
+                sql, params, nullable=False
+            )
         return sql, params
 
     def as_sql(self, compiler, *args, **kwargs):
