@@ -23,7 +23,6 @@ from django.core.exceptions import (
 from django.db import (
     DJANGO_VERSION_PICKLE_KEY,
     DatabaseError,
-    connection,
     connections,
     router,
     transaction,
@@ -1556,16 +1555,18 @@ class Model(AltersData, metaclass=ModelBase):
             # Try to look up an existing object with the same values as this
             # object's values for all the unique field.
 
+            # Use the connection the uniqueness query will be routed to, as
+            # backends may differ in how they treat empty strings.
+            features = connections[model_class._default_manager.db].features
             lookup_kwargs = {}
             for field_name in unique_check:
                 f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
-                # TODO: Handle multiple backends with different feature flags.
                 if (
                     lookup_value is None
                     or (
                         lookup_value == ""
-                        and connection.features.interprets_empty_strings_as_nulls
+                        and features.interprets_empty_strings_as_nulls
                     )
                     or (
                         isinstance(lookup_value, DatabaseDefault)

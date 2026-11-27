@@ -1,10 +1,12 @@
 import datetime
 import unittest
+from unittest import mock
 
 from django.apps.registry import Apps
 from django.core.exceptions import ValidationError
-from django.db import models
-from django.test import TestCase, skipUnlessDBFeature
+from django.db import connections, models
+from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
 from .models import (
     CustomPKModel,
@@ -19,6 +21,11 @@ from .models import (
     UniqueTogetherDbDefaultExpressionModel,
     UniqueTogetherModel,
 )
+
+
+class ReadFromOtherRouter:
+    def db_for_read(self, model, **hints):
+        return "other"
 
 
 class GetUniqueCheckTests(unittest.TestCase):
@@ -267,3 +274,37 @@ class PerformUniqueChecksTest(TestCase):
         self.assertEqual(
             cm.exception.message_dict, {"no": ["Custom unique number message."]}
         )
+
+
+class UniqueChecksMultiDatabaseTests(TestCase):
+    databases = {"default", "other"}
+
+    def _validate_empty_name(self):
+        m = UniqueErrorsModel(name="", no=1)
+        with CaptureQueriesContext(connections["default"]) as default_queries:
+            with CaptureQueriesContext(connections["other"]) as other_queries:
+                m.validate_unique(exclude={"id", "no"})
+        return len(default_queries), len(other_queries)
+
+    @override_settings(DATABASE_ROUTERS=[ReadFromOtherRouter()])
+    def test_empty_string_uses_routed_database_features(self):
+        """
+        Whether an empty string is treated as NULL (and skipped) depends on the
+        database the uniqueness query is routed to, not the default database.
+        """
+        other = connections["other"]
+        default = connections["default"]
+        with mock.patch.object(
+            other.features, "interprets_empty_strings_as_nulls", True
+        ):
+            with mock.patch.object(
+                default.features, "interprets_empty_strings_as_nulls", False
+            ):
+                self.assertEqual(self._validate_empty_name(), (0, 0))
+        with mock.patch.object(
+            other.features, "interprets_empty_strings_as_nulls", False
+        ):
+            with mock.patch.object(
+                default.features, "interprets_empty_strings_as_nulls", True
+            ):
+                self.assertEqual(self._validate_empty_name(), (0, 1))
