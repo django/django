@@ -438,6 +438,12 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('msgctxt "Special blocktranslate context #4"', po_contents)
             self.assertMsgId("Translatable literal #8d %(a)s", po_contents)
 
+            # The force_escape option doesn't affect extraction.
+            self.assertIn('msgctxt "Special blocktranslate context #5"', po_contents)
+            self.assertMsgId("Translatable literal #8e", po_contents)
+            self.assertIn('msgctxt "context #7.2a"', po_contents)
+            self.assertMsgId("Translatable literal #7.2a", po_contents)
+
             # {% trans %} and {% blocktrans %}
             self.assertMsgId("trans text", po_contents)
             self.assertMsgId("blocktrans text", po_contents)

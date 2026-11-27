@@ -435,6 +435,95 @@ class I18nBlockTransTagTests(SimpleTestCase):
     @setup(
         {
             "template": (
+                '{% load i18n %}<a title="{% blocktranslate force_escape %}'
+                'Say "{{ greeting }}" & go{% endblocktranslate %}">'
+            )
+        }
+    )
+    def test_force_escape(self):
+        output = self.engine.render_to_string("template", {"greeting": "<hi>"})
+        self.assertEqual(output, '<a title="Say &quot;&lt;hi&gt;&quot; &amp; go">')
+
+    @setup(
+        {
+            "template": (
+                '{% load i18n %}{% blocktranslate %}Say "{{ greeting }}" & go'
+                "{% endblocktranslate %}"
+            )
+        }
+    )
+    def test_no_force_escape(self):
+        output = self.engine.render_to_string("template", {"greeting": "<hi>"})
+        self.assertEqual(output, 'Say "&lt;hi&gt;" & go')
+
+    @setup(
+        {
+            "template": (
+                "{% load i18n %}{% blocktranslate force_escape %}<{{ greeting }}>"
+                "{% endblocktranslate %}"
+            )
+        }
+    )
+    def test_force_escape_safe_variable(self):
+        output = self.engine.render_to_string(
+            "template", {"greeting": mark_safe("<b>hi</b>")}
+        )
+        self.assertEqual(output, "&lt;<b>hi</b>&gt;")
+
+    @setup(
+        {
+            "template": (
+                "{% load i18n %}{% blocktranslate count counter=num force_escape %}"
+                '{{ counter }} "item"{% plural %}{{ counter }} "items"'
+                "{% endblocktranslate %}"
+            )
+        }
+    )
+    def test_force_escape_plural(self):
+        output = self.engine.render_to_string("template", {"num": 2})
+        self.assertEqual(output, "2 &quot;items&quot;")
+
+    @setup(
+        {
+            "template": (
+                "{% load i18n %}"
+                "{% blocktranslate force_escape asvar title %}<{{ name }}>"
+                "{% endblocktranslate %}{{ title }}"
+            )
+        }
+    )
+    def test_force_escape_asvar(self):
+        output = self.engine.render_to_string("template", {"name": "<x>"})
+        self.assertEqual(output, "&lt;&lt;x&gt;&gt;")
+
+    @setup(
+        {
+            "template": (
+                '{% load i18n %}{% blocktranslate force_escape %}100% "sure"'
+                "{% endblocktranslate %}"
+            )
+        }
+    )
+    def test_force_escape_percent(self):
+        output = self.engine.render_to_string("template")
+        self.assertEqual(output, "100% &quot;sure&quot;")
+
+    @setup(
+        {
+            "template": (
+                "{% load i18n %}{% autoescape off %}"
+                '{% blocktranslate force_escape %}"{{ name }}"{% endblocktranslate %}'
+                "{% endautoescape %}"
+            )
+        }
+    )
+    def test_force_escape_autoescape_off(self):
+        output = self.engine.render_to_string("template", {"name": "<b>"})
+        self.assertEqual(output, "&quot;<b>&quot;")
+
+    @setup(
+        {
+            "template": (
                 "{% load i18n %}{% blocktranslate asvar %}Yes{% endblocktranslate %}"
             )
         }
