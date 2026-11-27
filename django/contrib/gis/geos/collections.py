@@ -92,9 +92,25 @@ class GeometryCollection(GEOSGeometry):
     @property
     def tuple(self):
         "Return a tuple of all the coordinates in this Geometry Collection"
-        return tuple(g.tuple for g in self)
+        return self._tuple_from_ptr(self.ptr)
 
     coords = tuple
+
+    @classmethod
+    def _tuple_from_ptr(cls, ptr):
+        """
+        Return a tuple version of the geometry directly from child geometry
+        pointers.
+        """
+        geometry_classes = cls._get_geos_classes()
+
+        def get_tuple(child):
+            child_class = geometry_classes[capi.geos_typeid(child)]
+            return child_class._tuple_from_ptr(child)
+
+        return tuple(
+            get_tuple(capi.get_geomn(ptr, i)) for i in range(capi.get_num_geoms(ptr))
+        )
 
 
 # MultiPoint, MultiLineString, and MultiPolygon class definitions.
@@ -102,15 +118,48 @@ class MultiPoint(GeometryCollection):
     _allowed = Point
     _typeid = 4
 
+    @staticmethod
+    def _tuple_from_ptr(ptr):
+        """
+        Return a tuple version of the geometry directly from child geometry
+        pointers.
+        """
+        return tuple(
+            Point._tuple_from_ptr(capi.get_geomn(ptr, i))
+            for i in range(capi.get_num_geoms(ptr))
+        )
+
 
 class MultiLineString(LinearGeometryMixin, GeometryCollection):
     _allowed = (LineString, LinearRing)
     _typeid = 5
 
+    @staticmethod
+    def _tuple_from_ptr(ptr):
+        """
+        Return a tuple version of the geometry directly from child geometry
+        pointers.
+        """
+        return tuple(
+            LineString._tuple_from_ptr(capi.get_geomn(ptr, i))
+            for i in range(capi.get_num_geoms(ptr))
+        )
+
 
 class MultiPolygon(GeometryCollection):
     _allowed = Polygon
     _typeid = 6
+
+    @staticmethod
+    def _tuple_from_ptr(ptr):
+        """
+        Return a tuple version of the geometry directly from child geometry
+        pointers.
+        """
+        return tuple(
+            Polygon._tuple_from_ptr(capi.get_geomn(ptr, i))
+            for i in range(capi.get_num_geoms(ptr))
+        )
 
 
 # Setting the allowed types here since GeometryCollection is defined before
