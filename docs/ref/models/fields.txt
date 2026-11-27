@@ -1084,6 +1084,13 @@ underlying :class:`~django.core.files.storage.Storage` class.
 
 .. _file-upload-security:
 
+.. warning::
+
+    Restricting access to a model instance does not restrict access to the
+    underlying file of a :class:`FileField`. Anyone who knows or guesses the
+    file's URL can retrieve it. Configure the storage backend or file-serving
+    layer to restrict access when required.
+
 Note that whenever you deal with uploaded files, you should pay close attention
 to where you're uploading them and what type of files they are, to avoid
 security holes. *Validate all uploaded files* so that you're sure the files are
