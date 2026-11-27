@@ -1,5 +1,6 @@
 from django.core.handlers.wsgi import WSGIHandler
-from django.test import SimpleTestCase, override_settings
+from django.core.signals import got_request_exception
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import (
     BOUNDARY,
     MULTIPART_CONTENT,
@@ -53,3 +54,41 @@ class ExceptionHandlerTests(SimpleTestCase):
 
         response = WSGIHandler()(environ, lambda *a, **k: None)
         self.assertEqual(response.status_code, 400)
+
+    @override_settings(ROOT_URLCONF="handlers.urls")
+    def test_uncaught_exception_survives_failing_signal_receiver(self):
+        """
+        response_for_exception() still produces a 500 response for the
+        original exception even if a got_request_exception receiver itself
+        raises (#21777).
+        """
+
+        def failing_receiver(sender, request, **kwargs):
+            raise RuntimeError("receiver boom")
+
+        got_request_exception.connect(failing_receiver)
+        self.addCleanup(got_request_exception.disconnect, failing_receiver)
+
+        environ = RequestFactory().get("/errored/").environ
+        with self.assertLogs("django.dispatch", "ERROR"):
+            response = WSGIHandler()(environ, lambda *a, **k: None)
+        self.assertEqual(response.status_code, 500)
+
+    @override_settings(ROOT_URLCONF="handlers.urls_error_handlers")
+    def test_get_exception_response_survives_failing_signal_receiver(self):
+        """
+        get_exception_response() still produces a 500 response when the
+        error-handler callback raises, even if a got_request_exception
+        receiver itself raises (#21777).
+        """
+
+        def failing_receiver(sender, request, **kwargs):
+            raise RuntimeError("receiver boom")
+
+        got_request_exception.connect(failing_receiver)
+        self.addCleanup(got_request_exception.disconnect, failing_receiver)
+
+        environ = RequestFactory().get("/does-not-exist/").environ
+        with self.assertLogs("django.dispatch", "ERROR"):
+            response = WSGIHandler()(environ, lambda *a, **k: None)
+        self.assertEqual(response.status_code, 500)
