@@ -578,25 +578,8 @@ information on contributing that you should probably take a look at:
 Finding your first real ticket
 ------------------------------
 
-Once you've looked through some of that information, you'll be ready to go out
-and find a ticket of your own to contribute to. Pay special attention to
-tickets with the "easy pickings" criterion. These tickets are often much
-simpler in nature and are great for first time contributors. Once you're
-familiar with contributing to Django, you can start working on more difficult
-and complicated tickets.
-
-If you just want to get started already (and nobody would blame you!), try
-taking a look at the list of `easy tickets without a branch`__ and the
-`easy tickets that have branches which need improvement`__. If you're familiar
-with writing tests, you can also look at the list of
-`easy tickets that need tests`__. Remember to follow the guidelines about
-claiming tickets that were mentioned in the link to Django's documentation on
-:doc:`claiming tickets and submitting branches
-</internals/contributing/writing-code/submitting-patches>`.
-
-__ https://code.djangoproject.com/query?status=new&status=reopened&has_patch=0&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
-__ https://code.djangoproject.com/query?status=new&status=reopened&needs_better_patch=1&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
-__ https://code.djangoproject.com/query?status=new&status=reopened&needs_tests=1&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
+Once you've looked through some of that information, see
+:ref:`finding-a-ticket` for guidance on finding a ticket to contribute to.
 
 What's next after creating a pull request?
 ------------------------------------------
