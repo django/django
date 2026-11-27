@@ -7,7 +7,7 @@ import os
 import socket
 import threading
 import unittest
-from http.client import HTTPConnection
+from http.client import HTTPConnection, IncompleteRead
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -189,6 +189,27 @@ class LiveServerViews(LiveServerBase):
         """Launched server serves with HTTP 1.1."""
         with self.urlopen("/example_view/") as f:
             self.assertEqual(f.version, 11)
+
+    def test_wrong_content_length(self):
+        conn = HTTPConnection(
+            LiveServerViews.server_thread.host,
+            LiveServerViews.server_thread.port,
+            timeout=2,
+        )
+        self.addCleanup(conn.close)
+
+        conn.request(
+            "GET",
+            "/wrong_length_view/",
+            headers={"Connection": "keep-alive"},
+        )
+        response = conn.getresponse()
+
+        self.assertEqual(response.status, 200)
+        self.assertEqual(response.getheader("Content-Length"), "42")
+
+        with self.assertRaises(IncompleteRead):
+            response.read()
 
     def test_closes_connection_without_content_length(self):
         """
