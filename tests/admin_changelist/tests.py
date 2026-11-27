@@ -210,6 +210,19 @@ class ChangeListTests(TestCase):
         cl = ia.get_changelist_instance(request)
         self.assertEqual(cl.queryset.query.select_related, {"player": {}, "band": {}})
 
+    def test_search_with_lone_quote(self):
+        quoted = Parent.objects.create(name='has"quote')
+        Parent.objects.create(name="plain")
+
+        m = admin.ModelAdmin(Parent, custom_site)
+        m.search_fields = ["name"]
+        for search_term, expected_result in [('"', [quoted]), ("'", [])]:
+            request = self.factory.get("/", data={SEARCH_VAR: search_term})
+            request.user = self.superuser
+            with self.subTest(search_term=search_term):
+                cl = m.get_changelist_instance(request)
+                self.assertCountEqual(cl.queryset, expected_result)
+
     def test_many_search_terms(self):
         parent = Parent.objects.create(name="Mary")
         Child.objects.create(parent=parent, name="Danielle")
