@@ -3,7 +3,6 @@ Tests for django test runner
 """
 
 import collections.abc
-import functools
 import multiprocessing
 import os
 import sys
@@ -705,9 +704,9 @@ class NoInitializeSuiteTestRunnerTests(SimpleTestCase):
 class TestRunnerInitializerTests(SimpleTestCase):
     # Raise an exception to don't actually run tests.
     @mock.patch.object(
-        multiprocessing, "Pool", side_effect=Exception("multiprocessing.Pool()")
+        multiprocessing, "Process", side_effect=Exception("multiprocessing.Process()")
     )
-    def test_no_initialize_suite_test_runner(self, mocked_pool):
+    def test_no_initialize_suite_test_runner(self, mocked_process):
         class StubTestRunner(DiscoverRunner):
             def setup_test_environment(self, **kwargs):
                 return
@@ -732,21 +731,18 @@ class TestRunnerInitializerTests(SimpleTestCase):
         runner = StubTestRunner(
             verbosity=0, interactive=False, parallel=2, debug_mode=True
         )
-        with self.assertRaisesMessage(Exception, "multiprocessing.Pool()"):
+        with self.assertRaisesMessage(Exception, "multiprocessing.Process()"):
             runner.run_tests(
                 [
                     "test_runner_apps.sample.tests_sample.TestDjangoTestCase",
                     "test_runner_apps.simple.tests",
                 ]
             )
-        # Initializer must be a partial function binding _init_worker.
-        initializer = mocked_pool.call_args.kwargs["initializer"]
-        self.assertIsInstance(initializer, functools.partial)
-        self.assertIs(initializer.args[0], _init_worker)
-        initargs = mocked_pool.call_args.kwargs["initargs"]
-        self.assertEqual(len(initargs), 8)
-        self.assertEqual(initargs[6], True)  # debug_mode
-        self.assertEqual(initargs[7], {db.DEFAULT_DB_ALIAS})  # Used database aliases.
+        _, _, initializer, initargs, _ = mocked_process.call_args.kwargs["args"]
+        self.assertIs(initializer, _init_worker)
+        self.assertEqual(len(initargs), 7)
+        self.assertEqual(initargs[5], True)  # debug_mode
+        self.assertEqual(initargs[6], {db.DEFAULT_DB_ALIAS})  # Used database aliases.
 
 
 class Ticket17477RegressionTests(AdminScriptTestCase):
