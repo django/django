@@ -1357,7 +1357,7 @@ class ModelAdmin(BaseModelAdmin):
 
             term_queries = []
             for bit in smart_split(search_term):
-                if bit.startswith(('"', "'")) and bit[0] == bit[-1]:
+                if len(bit) >= 2 and bit.startswith(('"', "'")) and bit[0] == bit[-1]:
                     bit = unescape_string_literal(bit)
                 # Build term lookups, skipping values that cannot be converted
                 # to the expected type.

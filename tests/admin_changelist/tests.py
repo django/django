@@ -818,6 +818,27 @@ class ChangeListTests(TestCase):
                 group_changelist = group_model_admin.get_changelist_instance(request)
                 self.assertEqual(group_changelist.queryset.count(), result_count)
 
+    def test_search_with_lone_quotes(self):
+        double_quote = Child.objects.create(name='has"quote')
+        single_quote = Child.objects.create(name="has'quote")
+        Child.objects.create(name="plain")
+        model_admin = ChildAdmin(Child, custom_site)
+        model_admin.search_fields = ["name"]
+
+        for search_term, expected in (
+            ('"', [double_quote]),
+            ("'", [single_quote]),
+        ):
+            with self.subTest(search_term=search_term):
+                request = self.factory.get("/child/", data={SEARCH_VAR: search_term})
+                request.user = self.superuser
+                changelist = model_admin.get_changelist_instance(request)
+                self.assertCountEqual(changelist.queryset, expected)
+
+        request = self.factory.get("/child/", data={SEARCH_VAR: 'Foo "Bar "Baz"'})
+        request.user = self.superuser
+        model_admin.get_changelist_instance(request)
+
     def test_pk_in_search_fields(self):
         band = Group.objects.create(name="The Hype")
         Concert.objects.create(name="Woodstock", group=band)
