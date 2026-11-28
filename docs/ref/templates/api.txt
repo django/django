@@ -406,6 +406,12 @@ template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
 
+If a lookup raises an exception with ``silent_variable_failure = True``, the
+engine uses ``string_if_invalid`` as the resolved value. For example, when a
+template checks a reverse :class:`~django.db.models.OneToOneField` relationship
+with an ``if`` tag, a nonempty ``string_if_invalid`` makes the condition true
+when the related object is missing.
+
 If ``string_if_invalid`` contains a ``'%s'``, the format marker will be
 replaced with the name of the invalid variable.
 
