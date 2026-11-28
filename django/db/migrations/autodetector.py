@@ -1371,6 +1371,22 @@ class MigrationAutodetector:
     def create_altered_indexes(self):
         option_name = operations.AddIndex.option_name
         self.renamed_index_together_values = defaultdict(list)
+        # Changes to index_together, per model. Computed once: computing them
+        # inside the loop below, for every model, is quadratic in the number
+        # of models.
+        altered_index_together = defaultdict(list)
+        for (
+            old_value,
+            new_value,
+            index_together_app_label,
+            index_together_model_name,
+            dependencies,
+        ) in self._get_altered_foo_together_operations(
+            operations.AlterIndexTogether.option_name
+        ):
+            altered_index_together[
+                index_together_app_label, index_together_model_name
+            ].append((old_value, new_value))
 
         for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get(
@@ -1402,20 +1418,7 @@ class MigrationAutodetector:
                         remove_from_added.append(new_index)
                         remove_from_removed.append(old_index)
             # Find index_together changed to indexes.
-            for (
-                old_value,
-                new_value,
-                index_together_app_label,
-                index_together_model_name,
-                dependencies,
-            ) in self._get_altered_foo_together_operations(
-                operations.AlterIndexTogether.option_name
-            ):
-                if (
-                    app_label != index_together_app_label
-                    or model_name != index_together_model_name
-                ):
-                    continue
+            for old_value, new_value in altered_index_together[app_label, model_name]:
                 removed_values = old_value.difference(new_value)
                 for removed_index_together in removed_values:
                     renamed_index_together_indexes = []
@@ -1436,7 +1439,7 @@ class MigrationAutodetector:
                             (None, renamed_index.name, removed_index_together)
                         )
                         self.renamed_index_together_values[
-                            index_together_app_label, index_together_model_name
+                            app_label, model_name
                         ].append(removed_index_together)
             # Remove renamed indexes from the lists of added and removed
             # indexes.

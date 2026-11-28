@@ -3320,6 +3320,59 @@ class AutodetectorTests(BaseAutodetectorTests):
             old_name="book_title_author_idx",
         )
 
+    def test_create_altered_indexes_index_together_computed_once(self):
+        book_index_together = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+                ("title", models.CharField(max_length=200)),
+            ],
+            {"index_together": {("author", "title")}},
+        )
+        book_indexes = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+                ("title", models.CharField(max_length=200)),
+            ],
+            {
+                "indexes": [
+                    models.Index(
+                        fields=["author", "title"], name="book_author_title_idx"
+                    )
+                ],
+            },
+        )
+        with mock.patch.object(
+            MigrationAutodetector,
+            "_get_altered_foo_together_operations",
+            autospec=True,
+            wraps=MigrationAutodetector._get_altered_foo_together_operations,
+        ) as mocked:
+            changes = self.get_changes(
+                [self.author_empty, self.publisher, book_index_together],
+                [self.author_empty, self.publisher, book_indexes],
+            )
+        index_together_calls = [
+            call for call in mocked.call_args_list if call.args[1] == "index_together"
+        ]
+        self.assertEqual(len(index_together_calls), 1)
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(changes, "otherapp", 0, ["RenameIndex"])
+        self.assertOperationAttributes(
+            changes,
+            "otherapp",
+            0,
+            0,
+            model_name="book",
+            new_name="book_author_title_idx",
+            old_fields=("author", "title"),
+        )
+
     def test_order_fields_indexes(self):
         """Test change detection of reordering of fields in indexes."""
         changes = self.get_changes(
