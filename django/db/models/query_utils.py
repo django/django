@@ -207,7 +207,23 @@ class Q(tree.Node):
                 error,
                 level="warning",
             )
-            return True
+            # Be lenient only when RawSQL is involved, since RawSQL
+            # expressions cannot have their column references replaced
+            # by annotation values in Query(None). For all other
+            # expressions the DatabaseError indicates a real data
+            # problem (e.g. invalid cast) and should fail validation.
+            from django.db.models.expressions import RawSQL
+            from django.db.models.sql.where import WhereNode
+
+            def contains_raw_sql(where):
+                return any(
+                    isinstance(ref, RawSQL)
+                    or (isinstance(ref, WhereNode) and contains_raw_sql(ref))
+                    for leaf in where.leaves()
+                    for ref in (leaf.flatten() if hasattr(leaf, "flatten") else [leaf])
+                )
+
+            return contains_raw_sql(query.where)
 
     def deconstruct(self):
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
