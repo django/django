@@ -296,12 +296,16 @@ class ProjectState:
             fields[name] = field
         # TODO: investigate if old relational fields must be reloaded or if
         # it's sufficient if the new field is (#27737).
-        # Delay rendering of relationships if it's not a relational field and
-        # not referenced by a foreign key.
-        delay = not field.is_relation and not field_is_referenced(
-            self, model_key, (name, field)
-        )
-        self.reload_model(*model_key, delay=delay)
+        # reload_model() does nothing unless the models are rendered, and
+        # field_is_referenced() scans every field of every model, so only
+        # compute `delay` when it's used.
+        if "apps" in self.__dict__:  # hasattr would cache the property
+            # Delay rendering of relationships if it's not a relational field
+            # and not referenced by a foreign key.
+            delay = not field.is_relation and not field_is_referenced(
+                self, model_key, (name, field)
+            )
+            self.reload_model(*model_key, delay=delay)
 
     def rename_field(self, app_label, model_name, old_name, new_name):
         model_key = app_label, model_name

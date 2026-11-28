@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.apps.registry import Apps
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
@@ -682,6 +684,84 @@ class StateTests(SimpleTestCase):
         self.assertEqual([r.related_model for r in A._meta.related_objects], [B])
         self.assertEqual([r.related_model for r in B._meta.related_objects], [C])
         self.assertEqual([r.related_model for r in C._meta.related_objects], [])
+
+    def test_alter_field_unrendered_skips_reference_check(self):
+        project_state = ProjectState()
+        project_state.add_model(
+            ModelState(
+                "migrations",
+                "A",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("name", models.CharField(max_length=10)),
+                ],
+            )
+        )
+        new_field = models.CharField(max_length=20)
+        with mock.patch("django.db.migrations.state.field_is_referenced") as mocked:
+            project_state.alter_field(
+                "migrations", "a", "name", new_field, preserve_default=True
+            )
+        mocked.assert_not_called()
+        self.assertNotIn("apps", project_state.__dict__)
+        self.assertIs(project_state.models["migrations", "a"].fields["name"], new_field)
+
+    def test_alter_field_rendered_reloads_referenced_field(self):
+        project_state = ProjectState()
+        project_state.add_model(
+            ModelState(
+                "migrations",
+                "A",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("code", models.CharField(max_length=10, unique=True)),
+                    ("name", models.CharField(max_length=10)),
+                ],
+            )
+        )
+        project_state.add_model(
+            ModelState(
+                "migrations",
+                "B",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("a", models.ForeignKey("A", models.CASCADE, to_field="code")),
+                ],
+            )
+        )
+        project_state.add_model(
+            ModelState(
+                "migrations",
+                "C",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                    ("b", models.ForeignKey("B", models.CASCADE)),
+                ],
+            )
+        )
+        old_c = project_state.apps.get_model("migrations", "C")
+        # Altering a referenced non-relation field reloads related models
+        # recursively (delay=False).
+        project_state.alter_field(
+            "migrations",
+            "a",
+            "code",
+            models.CharField(max_length=20, unique=True),
+            preserve_default=True,
+        )
+        self.assertIs(project_state.is_delayed, False)
+        self.assertIsNot(project_state.apps.get_model("migrations", "C"), old_c)
+
+        # Altering an unreferenced non-relation field delays reloading
+        # (delay=True).
+        project_state.alter_field(
+            "migrations",
+            "a",
+            "name",
+            models.CharField(max_length=20),
+            preserve_default=True,
+        )
+        self.assertIs(project_state.is_delayed, True)
 
     def test_add_relations(self):
         """
