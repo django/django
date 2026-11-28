@@ -36,7 +36,13 @@ Python and Django
 
 Because GeoDjango is included with Django, please refer to Django's
 :ref:`installation instructions <installing-official-release>` for details on
-how to install.
+how to install. The :optional-dependency:`gis` extra installs the optional
+Python packages that GeoDjango uses, and the extra for your database (for
+example :optional-dependency:`postgresql`) installs its driver:
+
+.. console::
+
+    $ python -m pip install "django[gis,postgresql]"
 
 .. _spatial_database:
 
@@ -445,12 +451,12 @@ psycopg
 ~~~~~~~
 
 The ``psycopg`` Python module provides the interface between Python and the
-PostgreSQL database. ``psycopg`` can be installed via pip within your Python
-virtual environment:
+PostgreSQL database. Install it with the :optional-dependency:`postgresql`
+extra within your Python virtual environment:
 
 .. code-block:: doscon
 
-    ...\> py -m pip install psycopg
+    ...\> py -m pip install "django[postgresql]"
 
 .. rubric:: Footnotes
 .. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from
