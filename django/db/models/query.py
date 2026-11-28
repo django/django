@@ -2428,10 +2428,21 @@ class QuerySet(AltersData):
             )
 
     def _clear_ordering_in_combined_queries(self, cloned_query, other_qs):
-        combined_queries = [self.query]
-        for qs in other_qs:
+        combined_queries = []
+        for qs in (self, *other_qs):
             query = qs.query.clone()
-            query.clear_ordering(force=False, clear_default=False)
+            if qs is self:
+                # Explicit ordering of the first query is preserved so that the
+                # compiler can reject it on backends that don't support it.
+                if not (
+                    query.is_sliced or query.distinct_fields or query.select_for_update
+                ):
+                    # The default ordering is discarded in favor of the outer
+                    # query's ordering. Keeping it would also produce invalid
+                    # SQL on Oracle.
+                    query.default_ordering = False
+            else:
+                query.clear_ordering(force=False, clear_default=True)
             combined_queries.append(query)
         cloned_query.combined_queries = tuple(combined_queries)
 
