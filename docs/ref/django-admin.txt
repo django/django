@@ -956,7 +956,8 @@ If you're using Linux or MacOS and install both :pypi:`pywatchman` and the
 (rather than polling file modification timestamps each second). This offers
 better performance on large projects, reduced response time after code changes,
 more robust change detection, and a reduction in power usage. Django supports
-``pywatchman`` 1.2.0 and higher.
+``pywatchman`` 1.2.0 and higher. The :optional-dependency:`pywatchman` extra
+installs it.
 
 .. admonition:: Large directories with many files may cause performance issues
 
@@ -1612,11 +1613,11 @@ touch the filesystem should create a temporary directory for their own use.
     classes sequentially <topics-testing-enforce-run-sequentially>`.
 
 This option requires the third-party ``tblib`` package to display tracebacks
-correctly:
+correctly. The :optional-dependency:`test-parallel` extra installs it:
 
 .. code-block:: console
 
-    $ python -m pip install tblib
+    $ python -m pip install "django[test-parallel]"
 
 This feature isn't available on Windows. It doesn't work with the Oracle
 database backend either.
@@ -2033,11 +2034,11 @@ two third-party libraries are needed:
 * Install :pypi:`colorama`, a Python package that translates ANSI color codes
   into Windows API calls. Django commands will detect its presence and will
   make use of its services to color output just like on Unix-based platforms.
-  ``colorama`` can be installed via pip:
+  The :optional-dependency:`colorama` extra installs it:
 
   .. code-block:: doscon
 
-    ...\> py -m pip install "colorama >= 0.4.6"
+    ...\> py -m pip install "django[colorama]"
 
 * Install `ANSICON`_, a third-party tool that allows ``cmd.exe`` to process
   ANSI color codes. Django commands will detect its presence and will make use
