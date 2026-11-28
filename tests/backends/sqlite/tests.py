@@ -173,6 +173,35 @@ class Tests(TestCase):
             connections["default"].close()
             self.assertTrue(os.path.isfile(os.path.join(tmp, "subdir", "test.db")))
 
+    def test_database_name_uri_does_not_create_directory(self):
+        tests = (
+            ("absolute_uri", lambda db_path: Path(db_path).as_uri() + "?mode=ro"),
+            ("relative_uri", lambda db_path: "file:test.db?mode=ro"),
+        )
+        for name, get_uri in tests:
+            with self.subTest(name):
+                with tempfile.TemporaryDirectory() as tmp:
+                    db_path = os.path.join(tmp, "test.db")
+                    conn = sqlite3.connect(db_path)
+                    conn.close()
+
+                    uri_name = get_uri(db_path)
+                    settings_dict = {
+                        "default": {
+                            "ENGINE": "django.db.backends.sqlite3",
+                            "NAME": uri_name,
+                        },
+                    }
+                    cwd = os.getcwd()
+                    try:
+                        os.chdir(tmp)
+                        connections = ConnectionHandler(settings_dict)
+                        connections["default"].ensure_connection()
+                        connections["default"].close()
+                        self.assertFalse(os.path.exists(os.path.join(tmp, "file:")))
+                    finally:
+                        os.chdir(cwd)
+
     def test_database_name_with_file_in_path_not_allowed(self):
         tests = ("subdir/test.db", "subdir/subsubdir/test.db")
         for db_path in tests:
