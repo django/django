@@ -1175,6 +1175,66 @@ class DateTimePickerPlaywrightTests(AdminWidgetPlaywrightTestCase):
         icon.press("Enter")
         self.expect(expected_focus).to_be_focused()
 
+    def test_calendar_and_time_picker_hover_and_focus_contrast(self):
+        """
+        Hovered or focused time picker options and calendar days have enough
+        contrast between text and background (WCAG AA, at least 4.5:1).
+        https://www.w3.org/TR/WCAG22/#contrast-minimum
+        """
+
+        def luminance(css_color):
+            values = [float(v) for v in re.findall(r"[\d.]+", css_color)]
+            # Only opaque colors can be compared without compositing.
+            self.assertIn(values[3:], ([], [1.0]), f"{css_color} is not opaque.")
+
+            def channel(value):
+                value /= 255
+                if value <= 0.03928:
+                    return value / 12.92
+                return ((value + 0.055) / 1.055) ** 2.4
+
+            r, g, b = (channel(value) for value in values[:3])
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+        self.page.emulate_media(color_scheme="light")
+        self.addCleanup(self.page.emulate_media, color_scheme="null")
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.page.goto(self.live_server_url + reverse("admin:admin_widgets_member_add"))
+        cases = [
+            ("#clocklink0", "#clockbox0 .timelist a"),
+            # Skip today and the selected day, which are styled differently.
+            ("#calendarlink0", "#calendarin0 td:not(.today):not(.selected) a"),
+        ]
+        for icon, links in cases:
+            for state in ("hover", "focus"):
+                with self.subTest(icon=icon, state=state):
+                    self.page.locator(icon).click()
+                    try:
+                        link = self.page.locator(links).nth(2)
+                        if state == "hover":
+                            link.hover()
+                        else:
+                            # Focus in code, not by keyboard. Move the mouse
+                            # away so only :focus applies.
+                            self.page.mouse.move(0, 0)
+                            link.focus()
+                        # Wait for the color transition to end before reading.
+                        text, background = link.evaluate("""async (el) => {
+                                await Promise.all(
+                                    el.getAnimations().map((a) => a.finished)
+                                );
+                                const style = getComputedStyle(el);
+                                return [style.color, style.backgroundColor];
+                            }""")
+                        lighter, darker = sorted(
+                            [luminance(text), luminance(background)], reverse=True
+                        )
+                        ratio = (lighter + 0.05) / (darker + 0.05)
+                        self.assertGreaterEqual(ratio, 4.5)
+                    finally:
+                        # Close the popup so the next case can open its own.
+                        self.page.keyboard.press("Escape")
+
     def assertImmediatelyPrecedes(self, first, second):
         self.assertTrue(
             first.evaluate(
