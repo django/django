@@ -1,4 +1,6 @@
+import gc
 import os
+import weakref
 from functools import cached_property
 from unittest.mock import patch
 
@@ -215,6 +217,46 @@ class AppsTests(SimpleTestCase):
 
         self.assertEqual(apps.get_swappable_settings_name.cache_info().currsize, 0)
         self.assertEqual(apps.get_models.cache_info().currsize, 0)
+
+    @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
+    def test_clear_cache_isolated_between_registries(self):
+        # Populate the global registry's caches.
+        self.assertIsNone(apps.get_swappable_settings_name("admin.LogEntry"))
+        apps.get_models()
+        swappable_currsize = apps.get_swappable_settings_name.cache_info().currsize
+        models_currsize = apps.get_models.cache_info().currsize
+        self.assertGreater(swappable_currsize, 0)
+        self.assertGreater(models_currsize, 0)
+
+        # Clearing a separate registry must not clear the global registry's
+        # caches, and must still clear its own.
+        other_apps = Apps(["apps"])
+        self.assertIsNone(other_apps.get_swappable_settings_name("apps.TotallyNormal"))
+        other_apps.get_models()
+        self.assertGreater(
+            other_apps.get_swappable_settings_name.cache_info().currsize, 0
+        )
+        self.assertGreater(other_apps.get_models.cache_info().currsize, 0)
+
+        other_apps.clear_cache()
+
+        self.assertEqual(
+            other_apps.get_swappable_settings_name.cache_info().currsize, 0
+        )
+        self.assertEqual(other_apps.get_models.cache_info().currsize, 0)
+        self.assertEqual(
+            apps.get_swappable_settings_name.cache_info().currsize, swappable_currsize
+        )
+        self.assertEqual(apps.get_models.cache_info().currsize, models_currsize)
+
+    def test_cache_does_not_retain_registry(self):
+        other_apps = Apps(["apps"])
+        other_apps.get_models()
+        other_apps.get_swappable_settings_name("apps.TotallyNormal")
+        ref = weakref.ref(other_apps)
+        del other_apps
+        gc.collect()
+        self.assertIsNone(ref())
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_cached_properties_cleared_after_cache_clear(self):

@@ -33,6 +33,16 @@ class Apps:
         # all_models is never overridden or reset.
         self.all_models = defaultdict(dict)
 
+        # get_models() and get_swappable_settings_name() are cached per
+        # registry. With the cache on the method itself (@functools.cache),
+        # every registry shares it, so one registry's clear_cache() empties
+        # every registry's entries, including the global one's. Migrations
+        # create many registries and clear them constantly.
+        self.get_models = functools.cache(self.get_models)
+        self.get_swappable_settings_name = functools.cache(
+            self.get_swappable_settings_name
+        )
+
         # Mapping of labels to AppConfig instances for installed apps.
         self.app_configs = {}
 
@@ -165,7 +175,7 @@ class Apps:
             raise LookupError(message)
 
     # This method is performance-critical at least for Django's test suite.
-    @functools.cache
+    # Cached per registry, see __init__().
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
         Return a list of all installed models.
@@ -280,17 +290,17 @@ class Apps:
             raise LookupError("Model '%s.%s' not registered." % (app_label, model_name))
         return model
 
-    @functools.cache
     def get_swappable_settings_name(self, to_string):
         """
         For a given model string (e.g. "auth.User"), return the name of the
         corresponding settings name if it refers to a swappable model. If the
         referred model is not swappable, return None.
 
-        This method is decorated with @functools.cache because it's performance
-        critical when it comes to migrations. Since the swappable settings
-        don't change after Django has loaded the settings, there is no reason
-        to get the respective settings attribute over and over again.
+        This method is cached (per registry, see __init__()) because it's
+        performance critical when it comes to migrations. Since the swappable
+        settings don't change after Django has loaded the settings, there is
+        no reason to get the respective settings attribute over and over
+        again.
         """
         to_string = to_string.lower()
         for model in self.get_models(include_swapped=True):
