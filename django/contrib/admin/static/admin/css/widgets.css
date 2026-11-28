@@ -516,7 +516,7 @@ span.clearable-file-input label {
 .calendar td a:hover,
 .timelist a:hover {
     background: var(--primary);
-    color: white;
+    color: var(--body-fg);
 }
 
 .calendar td a:active,
