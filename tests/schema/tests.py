@@ -1311,6 +1311,41 @@ class SchemaTests(TransactionTestCase):
         self.assertLessEqual(count["uniques"], 1)
 
     @isolate_apps("schema")
+    def test_add_primary_key_field_remakes_related_tables(self):
+        class A(Model):
+            name = CharField(max_length=10)
+
+            class Meta:
+                app_label = "schema"
+
+        class B(Model):
+            a = ForeignKey(A, CASCADE)
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(A)
+            editor.create_model(B)
+        self.isolated_local_models = [A, B]
+        old_pk = A._meta.get_field("id")
+        new_pk = UUIDField(primary_key=True)
+        new_pk.set_attributes_from_name("uuid")
+        new_pk.model = A
+        with connection.schema_editor() as editor:
+            editor.remove_field(A, old_pk)
+            A._meta.local_fields.remove(old_pk)
+            A._meta.local_fields.append(new_pk)
+            A._meta._expire_cache()
+            editor.add_field(A, new_pk)
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(
+                cursor, B._meta.db_table
+            )
+        fk_constraints = [c for c in constraints.values() if c["foreign_key"]]
+        self.assertEqual(len(fk_constraints), 1)
+
+    @isolate_apps("schema")
     def test_alter_primary_key_quoted_db_table(self):
         class Foo(Model):
             class Meta:

@@ -327,6 +327,21 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             or (field.has_db_default() and not isinstance(field.db_default, Value))
         ):
             self._remake_table(model, create_field=field)
+            # Rebuild tables with FKs pointing to this field if it's a PK.
+            if field.primary_key:
+                related_models = {
+                    rel.related_model
+                    for _, rel in _related_non_m2m_objects(field, field)
+                    if rel.related_model != model
+                }
+                opts = field.model._meta
+                for many_to_many in opts.many_to_many:
+                    if many_to_many.related_model == model:
+                        continue
+                    if many_to_many.remote_field.through._meta.auto_created:
+                        related_models.add(many_to_many.remote_field.through)
+                for related_model in related_models:
+                    self._remake_table(related_model)
         else:
             super().add_field(model, field)
 
